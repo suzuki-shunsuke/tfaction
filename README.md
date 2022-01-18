@@ -19,7 +19,7 @@ Build good Terraform Workflow easily with GitHub Actions.
   * There are multiple Terraform Working Directory in a repository
 * GitHub Actions
 * Store terraform plan files and tfmigrate history files at AWS S3
-* Manage dependencies with aqua
+* Manage dependencies with [aqua](https://aquaproj.github.io/)
 
 ## Feature
 
