@@ -28,7 +28,7 @@ runs:
             -m "scaffold a working directory (${{inputs.target}})"
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ github.event.outputs.token }}
+        GITHUB_TOKEN: ${{ inputs.github_app_token }}
     - run: |
         ghcp pull-request -r "$GITHUB_REPOSITORY" \
           -b "${{steps.branch.outputs.branch}}" \
