@@ -33,7 +33,7 @@ Build good Terraform Workflow easily with GitHub Actions.
   * terraform validate
   * [tflint](https://github.com/terraform-linters/tflint)
   * [tfsec](https://github.com/aquasecurity/tfsec)
-  * [conftest](https://www.conftest.dev/)
+  * [conftest](https://www.conftest.dev/) [Run conftest against Terraform Plan File](https://www.openpolicyagent.org/docs/latest/terraform/)
 * [Update related pull requests automatically when the base branch is updated](docs/auto-update-related-prs.md)
 * [Update Terraform Providers and Terraform with Renovate safely](docs/renovate.md)
 * [Auto create and update Terraform lock file](https://github.com/suzuki-shunsuke/github-action-terraform-init)
