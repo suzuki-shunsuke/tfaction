@@ -14,16 +14,19 @@ runs:
   using: composite
   steps:
     - run: git add .
+      shell: bash
       working-directory: ${{inputs.working_directory}}
     - run: |
         echo "::set-output name=branch::scaffold-working-diretory/${{inputs.target}}/$(date +%Y%m%dT%H%M%S)"
       id: branch
+      shell: bash
 
     - run: |
         git diff --cached --name-only "${{inputs.working_directory}}" |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "${{steps.branch.outputs.branch}}" \
             -m "scaffold a working directory (${{inputs.target}})"
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ github.event.outputs.token }}
     - run: |
@@ -31,5 +34,6 @@ runs:
           -b "${{steps.branch.outputs.branch}}" \
           --title "Scaffold a working directory (${{inputs.target}})" \
           --body "This pull request was created by GitHub Actions workflow_dispatch event https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}

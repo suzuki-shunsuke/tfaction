@@ -21,6 +21,8 @@ outputs:
     description: S3 Buckte name for plan files
   s3_bucket_name_tfmigrate_history:
     description: S3 Buckte name for tfmigrate history files
+  template_dir:
+    description: Template Directory path for scaffolding a working directory
 runs:
   using: 'node16'
   main: 'dist/index.js'

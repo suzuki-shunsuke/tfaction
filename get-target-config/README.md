@@ -31,5 +31,8 @@ Nothing.
 
 name | type | description
 --- | --- | ---
-tfmigrate_targets | []object | List of tfmigrate targets
-terraform_targets | []object | List of terraform targets
+working_directory | string (file path) | Working Directory
+assume_role_arn | string | AWS Assume Role ARN
+aws_region | string | AWS Region
+s3_bucket_name_plan_file | string (S3 Bucket Name) | S3 Bucket Name for Terraform Plan files
+s3_bucket_name_tfmigrate_history | string (S3 Bucket Name) | S3 Bucket Name for tfmigrate History files

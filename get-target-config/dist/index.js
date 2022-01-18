@@ -5705,6 +5705,7 @@ try {
         core.setOutput('aws_region', targetConfig.aws_region);
         core.setOutput('s3_bucket_name_plan_file', targetConfig.s3_bucket_name_plan_file);
         core.setOutput('s3_bucket_name_tfmigrate_history', targetConfig.s3_bucket_name_tfmigrate_history);
+        core.setOutput('template_dir', targetConfig.template_dir);
         break;
     }
 }
