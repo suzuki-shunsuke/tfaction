@@ -1,0 +1,26 @@
+name: Get target configuration
+description: Get target configuration
+inputs:
+  target:
+    description: 'target'
+    required: true
+  config:
+    description: 'config file path'
+    required: true
+  is_apply:
+    description: 'whether apply is run'
+    required: true
+outputs:
+  working_directory:
+    description: working directory
+  assume_role_arn:
+    description: AWS Assume Role ARN
+  aws_region:
+    description: AWS Region
+  s3_bucket_name_plan_file:
+    description: S3 Buckte name for plan files
+  s3_bucket_name_tfmigrate_history:
+    description: S3 Buckte name for tfmigrate history files
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

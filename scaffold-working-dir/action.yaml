@@ -1,0 +1,51 @@
+name: Scaffold a working directory
+description: Scaffold a working directory
+inputs:
+  target:
+    description: Target
+    required: true
+  config:
+    description: configuration file path
+    required: false
+    default: tfaction.yaml
+outputs:
+  working_direcotry:
+    description: Working Directory
+    value: ${{ steps.target-config.outputs.working_directory }}
+
+runs:
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+      id: target-config
+      with:
+        target: ${{ inputs.target }}
+        config: ${{ inputs.config }}
+        is_apply: "false"
+
+    - run: mkdir -p "$(dirname "${{steps.target-config.outputs.working_directory}}")"
+
+    - run: cp -R "$template" "${{steps.target-config.outputs.template_dir}}"
+
+    - run: git add .
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+
+    - run: echo '{}' > ci.yaml
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+    - run: git ls-files | xargs -n 1 sed -i 's|%%TARGET%%|${{inputs.target}}|g'
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+
+    # - run: tfenv list-remote | head -n 1 > .terraform-version
+    #   working-directory: ${{steps.target-config.outputs.working_directory}}
+
+    - run: aqua init
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+    - run: |
+        echo '- import: aqua/*.yaml' >> aqua.yaml
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+    - run: aqua g open-policy-agent/conftest >> aqua/conftest.yaml
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+    - run: aqua g terraform-linters/tflint >> aqua/tflint.yaml
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+    - run: aqua g aquasecurity/tfsec >> aqua/tfsec.yaml
+      working-directory: ${{steps.target-config.outputs.working_directory}}

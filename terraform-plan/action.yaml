@@ -1,0 +1,34 @@
+name: terraform plan
+description: terraform plan
+inputs:
+  target:
+    description: 'Target'
+    required: true
+  github_app_token:
+    description: 'GitHub Access Token'
+    required: true
+  s3_bucket_name_plan_file:
+    description: 'S3 Bucket Name for Terraform Plan files'
+    required: true
+
+  working_directory:
+    description: 'Working Directory'
+    required: false
+    default: ''
+  github_token:
+    description: 'GitHub Access Token'
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - run: bash ${{ github.action_path }}/main.sh
+      working-directory: ${{ inputs.working_directory }}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        TF_VAR_github_token: ${{ inputs.github_app_token }}
+        ROOT_DIR: ${{ github.workspace }}
+        TARGET: ${{ inputs.target }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        S3_BUCKET_NAME_PLAN_FILE: ${{ inputs.s3_bucket_name_plan_file }}

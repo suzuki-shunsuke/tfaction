@@ -1,0 +1,25 @@
+name: List targets with changed files
+description: List targets with changed files
+inputs:
+  changed_files:
+    description: 'Changed Files'
+    required: true
+  labels:
+    description: 'Labels File'
+    required: true
+  config_files:
+    description: 'config file paths'
+    required: true
+
+  config:
+    description: 'config file path'
+    required: false
+    default: tfaction.yaml
+outputs:
+  tfmigrate_targets:
+    description: list of tfmigrate targets
+  terraform_targets:
+    description: list of terraform targets
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
