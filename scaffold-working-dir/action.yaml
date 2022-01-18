@@ -26,7 +26,7 @@ runs:
     - run: mkdir -p "$(dirname "${{steps.target-config.outputs.working_directory}}")"
       shell: bash
 
-    - run: cp -R "$template" "${{steps.target-config.outputs.template_dir}}"
+    - run: cp -R "${{steps.target-config.outputs.template_dir}}" "${{steps.target-config.outputs.working_directory}}"
       shell: bash
 
     - run: echo '{}' > ci.yaml
