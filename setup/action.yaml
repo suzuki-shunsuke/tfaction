@@ -50,7 +50,7 @@ runs:
     - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
 
-    - uses: aws-actions/configure-aws-credentials@v1.6.0
+    - uses: aws-actions/configure-aws-credentials@v1.6.1
       with:
         role-to-assume: ${{ steps.target-config.outputs.assume_role_arn }}
         role-session-name: samplerolesession
