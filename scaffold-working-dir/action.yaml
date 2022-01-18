@@ -51,28 +51,28 @@ runs:
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
-    - run: cat "packages:" > aqua/conftest.yaml
+    - run: echo "packages:" > aqua/conftest.yaml
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: aqua g open-policy-agent/conftest >> aqua/conftest.yaml
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
-    - run: cat "packages:" > aqua/tflint.yaml
+    - run: echo "packages:" > aqua/tflint.yaml
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: aqua g terraform-linters/tflint >> aqua/tflint.yaml
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
-    - run: cat "packages:" > aqua/tfsec.yaml
+    - run: echo "packages:" > aqua/tfsec.yaml
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: aqua g aquasecurity/tfsec >> aqua/tfsec.yaml
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
-    - run: cat "packages:" > aqua/terraform.yaml
+    - run: echo "packages:" > aqua/terraform.yaml
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: aqua g hashicorp/terraform >> aqua/terraform.yaml
