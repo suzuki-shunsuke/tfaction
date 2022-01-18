@@ -9,7 +9,7 @@ inputs:
     required: false
     default: tfaction.yaml
 outputs:
-  working_direcotry:
+  working_directory:
     description: Working Directory
     value: ${{ steps.target-config.outputs.working_directory }}
 
