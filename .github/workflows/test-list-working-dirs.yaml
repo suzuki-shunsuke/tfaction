@@ -1,0 +1,24 @@
+name: test-list-working-dirs
+
+on:
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: aquaproj/aqua-installer@v0.6.0
+      with:
+        aqua_version: v0.10.0
+    - uses: ./list-working-dirs
+      id: working_dirs
+      with:
+        file: ci.yaml
+        base_directory: list-working-dirs/tests
+    - run: cat "${{ steps.working_dirs.outputs.file }}"

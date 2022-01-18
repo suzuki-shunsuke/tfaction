@@ -1,0 +1,10 @@
+---
+# aqua - Declarative CLI Version Manager
+# https://aquaproj.github.io/
+registries:
+- type: standard
+  ref: v0.14.0 # renovate: depName=aquaproj/aqua-registry
+
+packages:
+- import: aqua/*.yaml
+- name: reviewdog/reviewdog@v0.13.1
