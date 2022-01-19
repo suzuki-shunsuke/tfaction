@@ -5,11 +5,42 @@ import * as path from 'path';
 
 const yaml = require('js-yaml');
 
-try {
-  const config = yaml.load(fs.readFileSync(core.getInput('config'), 'utf8'));
+function getInput(name: string, envName: string): string {
+  const value = core.getInput(name);
+  if (value != '') {
+    return value;
+  }
+  const valueEnv = process.env[envName];
+  if (valueEnv === undefined || valueEnv == '') {
+    return '';
+  }
+  return valueEnv;
+}
 
-  const target = core.getInput('target');
-  const isApply = core.getBooleanInput('is_apply', { required: true });
+function getBooleanInput(name: string, envName: string): boolean {
+  const val = getInput(name, envName);
+  if (['true', 'True', 'TRUE'].includes(val)) {
+    return true;
+  }
+  if (['false', 'False', 'FALSE'].includes(val)) {
+    return false;
+  }
+  throw 'boolean must be one of true, True, TRUE, false, False, and FALSE';
+}
+
+try {
+  const configFilePath = getInput('config', 'TFACTION_CONFIG');
+  if (configFilePath == '') {
+    throw 'the input "config" or environment variable TFACTION_CONFIG is required';
+  }
+  const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+
+  const target = getInput('target', 'TFACTION_TARGET');
+  if (target == '') {
+    throw 'the input target or environment variable TFACTION_TARGET is required';
+  }
+
+  const isApply = getBooleanInput('is_apply', 'TFACTION_IS_APPLY');
 
   for (let i = 0; i < config.targets.length; i++) {
     const targetConfig = config.targets[i];

@@ -3,13 +3,13 @@ description: Get target configuration
 inputs:
   target:
     description: 'target'
-    required: true
+    required: false
   config:
     description: 'config file path'
-    required: true
+    required: false
   is_apply:
     description: 'whether apply is run'
-    required: true
+    required: false
 outputs:
   working_directory:
     description: working directory
