@@ -24,17 +24,17 @@ GitHub Actions to run tfmigrate apply
 
 ### Required Inputs
 
-name | type | description
---- | --- | ---
-github_app_token | string | GitHub Access Token. `github.token` can't be used because it can't invoke GitHub Actions Workflow
+name | description
+--- | ---
+github_app_token | GitHub Access Token. `github.token` can't be used because it can't invoke GitHub Actions Workflow
 
 ### Optional Inputs
 
-name | type | default | description
+name | environment variable | default | description
 --- | --- | --- | ---
-target | string | '' | target
-github_token | string | `github.token` | GitHub Access Token
-working_directory | string (file path) | '' (current directory) | Working Directory
+target | TFACTION_TARGET | '' | target
+github_token | | `github.token` | GitHub Access Token
+working_directory | | '' (current directory) | Working Directory
 
 ## Outputs
 

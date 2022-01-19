@@ -3,6 +3,8 @@
 set -eu
 set -o pipefail
 
+TARGET=${TARGET:-${TFACTION_TARGET:-}}
+
 curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${PR_NUMBER}/labels" \
 	-H "Authorization: token ${GITHUB_TOKEN}" \
 	-H "Accept: application/json" \

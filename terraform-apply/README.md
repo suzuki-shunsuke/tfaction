@@ -24,18 +24,18 @@ GitHub Actions to run terraform apply
 
 ### Required Inputs
 
-name | type | description
---- | --- | ---
-github_app_token | string | GitHub Access Token. `github.token` can't be used because it can't invoke GitHub Actions Workflow
-target | string | target
-s3_bucket_name_plan_file | string | AWS S3 Bucket Name for Terraform Plan files
+name | description
+--- | ---
+github_app_token | GitHub Access Token. `github.token` can't be used because it can't invoke GitHub Actions Workflow
+s3_bucket_name_plan_file | AWS S3 Bucket Name for Terraform Plan files
 
 ### Optional Inputs
 
-name | type | default | description
+name | environment variable | default | description
 --- | --- | --- | ---
-github_token | string | `github.token` | GitHub Access Token
-working_directory | string (file path) | '' (current directory) | Working Directory
+github_token | | `github.token` | GitHub Access Token
+target | TFACTION_TARGET | '' | target
+working_directory | | '' (current directory) | Working Directory
 
 ## Outputs
 
