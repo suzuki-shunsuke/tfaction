@@ -22,14 +22,14 @@
 
 ### Required Inputs
 
-name | type | description
---- | --- | ---
-github_app_token | string | GitHub Access Token. `github.token` can't be used because it can't invoke GitHub Actions Workflow
+name | description
+--- | ---
+github_app_token | GitHub Access Token. `github.token` can't be used because it can't invoke GitHub Actions Workflow
 
 ### Optional Inputs
 
-name | type | default | description
+name | environment variable | default | description
 --- | --- | --- | ---
-target | string | '' | target
-working_directory | string | '' | working directory
-github_token | string | `github.token` | GitHub Access Token
+target | TFACTION_TARGET | '' | target
+config | TFACTION_CONFIG | tfaction.yaml | configuration file path
+github_token | | `github.token` | GitHub Access Token

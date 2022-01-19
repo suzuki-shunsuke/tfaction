@@ -33,8 +33,8 @@ github_app_token | GitHub Access Token. `github.token` can't be used because it 
 name | environment variable | default | description
 --- | --- | --- | ---
 target | TFACTION_TARGET | '' | target
+config | TFACTION_CONFIG | tfaction.yaml | configuration file path
 github_token | | `github.token` | GitHub Access Token
-working_directory | | '' (current directory) | Working Directory
 
 ## Outputs
 
