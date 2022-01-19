@@ -1,0 +1,44 @@
+name: test-get-target-config
+
+on:
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: aquaproj/aqua-installer@v0.6.0
+      with:
+        aqua_version: v0.10.1
+    - uses: ./get-target-config
+      id: target-config
+      with:
+        config: get-target-config/tests/config-1.yaml
+        target: aws/foo
+        is_apply: 'false'
+    - run: echo "${{ steps.target-config.outputs.working_directory }}"
+    - run: echo "${{ steps.target-config.outputs.assume_role_arn }}"
+    - run: echo "${{ steps.target-config.outputs.aws_region }}"
+    - run: echo "${{ steps.target-config.outputs.s3_bucket_name_plan_file }}"
+    - run: echo "${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}"
+    - run: echo "${{ steps.target-config.outputs.template_dir }}"
+
+    - uses: ./get-target-config
+      id: target-config-from-env
+      env:
+        TFACTION_CONFIG: get-target-config/tests/config-1.yaml
+        TFACTION_TARGET: aws/foo
+        TFACTION_IS_APPLY: 'false'
+
+    - run: echo "${{ steps.target-config-from-env.outputs.working_directory }}"
+    - run: echo "${{ steps.target-config-from-env.outputs.assume_role_arn }}"
+    - run: echo "${{ steps.target-config-from-env.outputs.aws_region }}"
+    - run: echo "${{ steps.target-config-from-env.outputs.s3_bucket_name_plan_file }}"
+    - run: echo "${{ steps.target-config-from-env.outputs.s3_bucket_name_tfmigrate_history }}"
+    - run: echo "${{ steps.target-config-from-env.outputs.template_dir }}"

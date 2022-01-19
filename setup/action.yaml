@@ -4,10 +4,10 @@ inputs:
   github_app_token:
     description: 'GitHub Access Token'
     required: true
+
   target:
     description: 'target'
-    required: true
-
+    required: false
   github_token:
     description: 'GitHub Access Token'
     required: false
@@ -18,7 +18,6 @@ inputs:
   is_apply:
     description:
     required: false
-    default: 'false'
   config:
     description: Configuration file path
     required: false
@@ -55,14 +54,6 @@ runs:
         role-to-assume: ${{ steps.target-config.outputs.assume_role_arn }}
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
-
-    - name: Run tfenv install if .terraform-version exists
-      run: |
-        [ ! -f .terraform-version ] || github-comment exec -- tfenv install
-      shell: bash
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
       if: inputs.ssh_key != ''

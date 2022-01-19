@@ -18,12 +18,17 @@
 
 ## Inputs
 
+name | environment variable | default | description
+--- | --- | --- | ---
+target | TFACTION_TARGET | | target
+is_apply | TFACTION_IS_APPLY | | `true` or `false`. Whether the apply is run
+config | TFACTION_CONFIG | `tfaction.yaml` | configuration file path
+
 ### Required Inputs
 
 name | type | description
 --- | --- | ---
 github_app_token | string | GitHub Access Token. `github.token` can't be used because it can't invoke GitHub Actions Workflow
-target | string | target
 
 ### Optional Inputs
 
@@ -31,8 +36,6 @@ name | type | default | description
 --- | --- | --- | ---
 github_token | string | `github.token` | GitHub Access Token
 ssh_key | string | '' | SSH Private Key
-is_apply | `true` or `false` | `false` | Whether apply is run
-config | string (file path) | tfaction.yaml | Configuration file path
 
 ## Outputs
 
