@@ -3,30 +3,29 @@ description: tfmigrate plan
 inputs:
   target:
     description: 'Target'
-    required: true
+    required: false
   github_app_token:
     description: 'GitHub Access Token'
     required: true
-  s3_bucket_name_tfmigrate_history:
-    description: 'S3 Bucket Name for tfmigrate history files'
-    required: true
-  s3_bucket_name_plan_file:
-    description: 'S3 Bucket Name for Terraform Plan files'
-    required: true
 
-  working_directory:
-    description: 'Working Directory'
-    required: false
-    default: ''
   github_token:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
+  config:
+    description: Configuration file path
+    required: false
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+      id: target-config
+      with:
+        target: ${{ inputs.target }}
+        config: ${{ inputs.config }}
+        is_apply: 'false'
     - run: bash ${{ github.action_path }}/main.sh
-      working-directory: ${{ inputs.working_directory }}
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -36,5 +35,5 @@ runs:
         ROOT_DIR: ${{ github.workspace }}
         TARGET: ${{ inputs.target }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
-        S3_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ inputs.s3_bucket_name_tfmigrate_history }}
-        S3_BUCKET_NAME_PLAN_FILE: ${{ inputs.s3_bucket_name_plan_file }}
+        S3_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}
+        S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
