@@ -28,9 +28,9 @@ config_files | string (file path) | a file path where the list of configuration 
 
 ### Optional Inputs
 
-name | type | default | description
---- | --- | --- | ---
-config | string (file path) | tfaction.yaml | configuration file path
+name | environment variable | type | default | description
+--- | --- | --- | --- | ---
+config | TFACTION_CONFIG | string (file path) | tfaction.yaml | configuration file path
 
 ## Outputs
 

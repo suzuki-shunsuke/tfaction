@@ -4,8 +4,25 @@ import * as path from 'path';
 
 const yaml = require('js-yaml');
 
+function getInput(name: string, envName: string): string {
+  const value = core.getInput(name);
+  if (value != '') {
+    return value;
+  }
+  const valueEnv = process.env[envName];
+  if (valueEnv === undefined || valueEnv == '') {
+    return '';
+  }
+  return valueEnv;
+}
+
 try {
-  const config = yaml.load(fs.readFileSync(core.getInput('config'), 'utf8'));
+  const configFilePath = getInput('config', 'TFACTION_CONFIG');
+  if (configFilePath == '') {
+    throw 'the input "config" or environment variable TFACTION_CONFIG is required';
+  }
+  const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+
   const configWorkingDirMap = new Map();
   const configTargetMap = new Map();
   for (let i = 0; i < config.targets.length; i++) {
