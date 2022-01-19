@@ -45,19 +45,20 @@ Build good Terraform Workflow easily with GitHub Actions.
 ## Links
 
 * Actions
-  * [deploy-ssh-key](deploy-ssh-key)
+  * [list-targets](list-targets)
   * [setup](setup)
   * [test](test)
   * [tfmigrate-plan](tfmigrate-plan)
   * [tfmigrate-apply](tfmigrate-apply)
   * [terraform-plan](terraform-plan)
   * [terraform-apply](terraform-apply)
-  * [get-target-config](get-target-config)
-  * [list-targets](list-targets)
-  * [list-targets-with-changed-files](list-targets-with-changed-files)
-  * [list-working-dirs](list-working-dirs)
   * [create-scaffold-pr](create-scaffold-pr)
   * [scaffold-working-dir](scaffold-working-dir)
+  * Low Level Actions. These Actions are used internally
+    * [get-target-config](get-target-config)
+    * [list-targets-with-changed-files](list-targets-with-changed-files)
+    * [list-working-dirs](list-working-dirs)
+    * [deploy-ssh-key](deploy-ssh-key)
 * Actions outside of this repository
   * [suzuki-shunsuke/github-action-tflint](https://github.com/suzuki-shunsuke/github-action-tflint)
   * [suzuki-shunsuke/github-action-tfsec](https://github.com/suzuki-shunsuke/github-action-tfsec)
