@@ -1,0 +1,18 @@
+name: Get global configuration
+description: Get global configuration
+inputs:
+  config:
+    description: 'config file path'
+    required: false
+outputs:
+  renovate_login:
+    description: Renovate login
+  label_prefix_target:
+    description: label prefix for target
+  label_prefix_tfmigrate:
+    description: label prefix for tfmigrate
+  label_prefix_ignore:
+    description: label prefix for ignore
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

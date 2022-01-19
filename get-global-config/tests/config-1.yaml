@@ -1,8 +1,3 @@
-# Configuration
-
-tfaction.yaml
-
-```yaml
 ---
 targets:
 - working_directory: aws/
@@ -29,9 +24,7 @@ targets:
     tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
     terraform_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
 
-renovate_login: 'renovate[bot]'
 label_prefixes:
   target: "target:"
   tfmigrate: "migrate:"
   ignore: "ignore:"
-```
