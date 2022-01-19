@@ -12,7 +12,6 @@ inputs:
   config:
     description: 'config file path'
     required: false
-    default: tfaction.yaml
 outputs:
   tfmigrate_targets:
     description: list of tfmigrate targets
