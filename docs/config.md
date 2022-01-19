@@ -35,3 +35,11 @@ label_prefixes:
   tfmigrate: "migrate:"
   ignore: "ignore:"
 ```
+
+## Environment Variables
+
+name | default | description
+--- | --- | ---
+TFACTION_CONFIG | tfaction.yaml | configuration file path
+TFACTION_TARGET | | target
+TFACTION_IS_APPLY | | `true` or `false`. Whether `terraform apply` or `tfmigrate apply` are run
