@@ -13,15 +13,20 @@ inputs:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
-  working_directory:
-    description: 'Working Directory'
+  config:
+    description: Configuration file path
     required: false
-    default: ''
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+      id: target-config
+      with:
+        target: ${{ inputs.target }}
+        config: ${{ inputs.config }}
+        is_apply: 'true'
     - run: bash ${{ github.action_path }}/main.sh
-      working-directory: ${{ inputs.working_directory }}
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
