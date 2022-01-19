@@ -69,7 +69,7 @@ Build good Terraform Workflow easily with GitHub Actions.
 
 ## Example
 
-Coming soon.
+https://github.com/suzuki-shunsuke/tfaction-example
 
 ## LICENSE
 
