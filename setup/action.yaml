@@ -21,7 +21,6 @@ inputs:
   config:
     description: Configuration file path
     required: false
-    default: 'tfaction.yaml'
 outputs:
   working_directory:
     description: working directory

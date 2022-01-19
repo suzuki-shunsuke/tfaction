@@ -7,7 +7,6 @@ inputs:
   config:
     description: configuration file path
     required: false
-    default: tfaction.yaml
 outputs:
   working_directory:
     description: Working Directory
