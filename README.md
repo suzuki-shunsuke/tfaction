@@ -56,6 +56,7 @@ Build good Terraform Workflow easily with GitHub Actions.
   * [scaffold-working-dir](scaffold-working-dir)
   * Low Level Actions. These Actions are used internally
     * [get-target-config](get-target-config)
+    * [get-global-config](get-global-config)
     * [list-targets-with-changed-files](list-targets-with-changed-files)
     * [list-working-dirs](list-working-dirs)
     * [deploy-ssh-key](deploy-ssh-key)
