@@ -29,9 +29,9 @@ function getBooleanInput(name: string, envName: string): boolean {
 }
 
 try {
-  const configFilePath = getInput('config', 'TFACTION_CONFIG');
+  let configFilePath = getInput('config', 'TFACTION_CONFIG');
   if (configFilePath == '') {
-    throw 'the input "config" or environment variable TFACTION_CONFIG is required';
+    configFilePath = 'tfaction.yaml';
   }
   const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
 
