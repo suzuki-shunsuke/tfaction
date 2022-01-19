@@ -5713,9 +5713,9 @@ function getBooleanInput(name, envName) {
     throw 'boolean must be one of true, True, TRUE, false, False, and FALSE';
 }
 try {
-    const configFilePath = getInput('config', 'TFACTION_CONFIG');
+    let configFilePath = getInput('config', 'TFACTION_CONFIG');
     if (configFilePath == '') {
-        throw 'the input "config" or environment variable TFACTION_CONFIG is required';
+        configFilePath = 'tfaction.yaml';
     }
     const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
     const target = getInput('target', 'TFACTION_TARGET');
