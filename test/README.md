@@ -7,7 +7,6 @@
 * [ghcp](https://github.com/int128/ghcp)
 * [github-comment](https://github.com/suzuki-shunsuke/github-comment)
 * [ci-info](https://github.com/suzuki-shunsuke/ci-info)
-* [tfenv](https://github.com/tfutils/tfenv)
 * [tflint](https://github.com/aquasecurity/tfsec)
 
 ## Example

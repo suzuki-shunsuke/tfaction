@@ -55,14 +55,6 @@ runs:
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - name: Run tfenv install if .terraform-version exists
-      run: |
-        [ ! -f .terraform-version ] || github-comment exec -- tfenv install
-      shell: bash
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-
     - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
       if: inputs.ssh_key != ''
       with:
