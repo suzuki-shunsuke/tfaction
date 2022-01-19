@@ -3,7 +3,7 @@ description: terraform plan
 inputs:
   target:
     description: 'Target'
-    required: true
+    required: false
   github_app_token:
     description: 'GitHub Access Token'
     required: true

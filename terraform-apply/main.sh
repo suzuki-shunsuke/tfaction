@@ -3,6 +3,8 @@
 set -eu
 set -o pipefail
 
+TARGET=${TARGET:-${TFACTION_TARGET:-}}
+
 github-comment exec -- aws s3 cp "s3://$S3_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TARGET/tfplan.binary" tfplan.binary
 
 author=$CI_INFO_PR_AUTHOR

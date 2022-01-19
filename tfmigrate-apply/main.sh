@@ -3,6 +3,8 @@
 set -eu
 set -o pipefail
 
+TARGET=${TARGET:-${TFACTION_TARGET:-}}
+
 set +e
 github-comment exec -k tfmigrate-apply -- tfmigrate apply
 code=$?
