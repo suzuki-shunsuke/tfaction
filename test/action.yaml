@@ -20,7 +20,7 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_app_token }}
 
-    - run: github-comment exec -var "target:${{ inputs.target }}" -- terraform validate
+    - run: github-comment exec -var "target:${TFACTION_TARGET}" -- terraform validate
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:

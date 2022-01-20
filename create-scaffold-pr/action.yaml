@@ -7,9 +7,6 @@ inputs:
   github_app_token:
     description: 'GitHub Access Token'
     required: true
-  config:
-    description: configuration file path
-    required: false
 runs:
   using: composite
   steps:
@@ -17,7 +14,6 @@ runs:
       id: target-config
       with:
         target: ${{ inputs.target }}
-        config: ${{ inputs.config }}
         is_apply: "false"
 
     - run: git add .
