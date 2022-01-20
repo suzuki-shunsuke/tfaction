@@ -1,14 +1,5 @@
 name: List Working Directories
 description: List Working Directories
-inputs:
-  file:
-    description: 'file name'
-    required: false
-    default: ci.yaml
-  base_directory:
-    description: 'base directory'
-    required: false
-    default: '.'
 outputs:
   file:
     description: Output file path
@@ -16,9 +7,11 @@ outputs:
 runs:
   using: composite
   steps:
-  - run: |
-      tempfile=$(mktemp)
-      git ls-files "${{ inputs.base_directory }}" | grep -E "/${{ inputs.file }}$" > "$tempfile"
-      echo "::set-output name=file::$tempfile"
-    shell: bash
-    id: main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
+    - run: |
+        tempfile=$(mktemp)
+        git ls-files "${{ steps.global-config.outputs.base_working_directory }}" | grep -E "/${{ steps.global-config.outputs.working_directory_file }}$" > "$tempfile"
+        echo "::set-output name=file::$tempfile"
+      shell: bash
+      id: main

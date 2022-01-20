@@ -5,21 +5,12 @@ inputs:
     description: 'GitHub Access Token'
     required: true
 
-  target:
-    description: 'target'
-    required: false
   github_token:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
   ssh_key:
     description: 'SSH Key for Terraform Private Module'
-    required: false
-  is_apply:
-    description:
-    required: false
-  config:
-    description: Configuration file path
     required: false
 outputs:
   working_directory:
@@ -36,10 +27,6 @@ runs:
   steps:
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
-      with:
-        target: ${{ inputs.target }}
-        config: ${{ inputs.config }}
-        is_apply: ${{ inputs.is_apply }}
 
     - run: aqua i -l -a
       shell: bash

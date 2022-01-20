@@ -11,17 +11,7 @@ GitHub Actions to list targets
 
 ## Inputs
 
-### Required Inputs
-
 Nothing.
-
-### Optional Inputs
-
-name | type | default | description
---- | --- | --- | ---
-working_dir_file | string (file name) | ci.yaml | working directory file name
-base_directory | string (file path) | '.' (current directory) | base directory
-config | string (file path) | tfaction.yaml | configuration file path
 
 ## Outputs
 

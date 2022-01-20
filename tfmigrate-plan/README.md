@@ -14,7 +14,6 @@ GitHub Actions to run tfmigrate plan
 ```yaml
 - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@main
   with:
-    target: github/foo
     github_app_token: ${{ secrets.GITHUB_APP_TOKEN }}
 ```
 
@@ -31,8 +30,6 @@ github_app_token | GitHub Access Token. `github.token` can't be used because it 
 name | environment variable | default | description
 --- | --- | ---
 github_token | | `github.token` | GitHub Access Token
-target | TFACTION_TARGET | '' | target
-config | TFACTION_CONFIG | tfaction.yaml | configuration file path
 
 ## Outputs
 

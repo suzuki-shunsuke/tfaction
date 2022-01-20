@@ -15,9 +15,7 @@ GitHub Actions to run terraform plan
 ```yaml
 - uses: suzuki-shunsuke/tfaction/terraform-plan@main
   with:
-    target: github/foo
     github_app_token: ${{ secrets.GITHUB_APP_TOKEN }}
-    s3_bucket_name_plan_file: '<AWS S3 Bucket Name for Terraform Plan files>'
 ```
 
 ## Inputs
@@ -33,8 +31,6 @@ github_app_token | | GitHub Access Token. `github.token` can't be used because i
 name | environment variable | default | description
 --- | --- | --- | ---
 github_token | | `github.token` | GitHub Access Token
-target | TFACTION_TARGET | '' | target
-config | TFACTION_CONFIG | tfaction.yaml | configuration file path
 
 ## Outputs
 

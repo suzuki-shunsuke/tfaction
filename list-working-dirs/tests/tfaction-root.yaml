@@ -1,0 +1,2 @@
+base_working_directory: list-working-dirs/tests
+working_directory_file: ci.yaml

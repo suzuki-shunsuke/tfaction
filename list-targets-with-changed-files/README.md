@@ -26,12 +26,6 @@ changed_files | string (file path) | a file path where the list of changed file 
 labels | string (file path) | a file path where the list of pull request labels are written
 config_files | string (file path) | a file path where the list of configuration file paths are written
 
-### Optional Inputs
-
-name | environment variable | type | default | description
---- | --- | --- | --- | ---
-config | TFACTION_CONFIG | string (file path) | tfaction.yaml | configuration file path
-
 ## Outputs
 
 name | type | description

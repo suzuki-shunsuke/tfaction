@@ -14,17 +14,7 @@
 
 ## Inputs
 
-### Required Inputs
-
-name | type | description
---- | --- | ---
-target | string | target
-
-### Optional Inputs
-
-name | type | default | description
---- | --- | --- | ---
-config | string (file path) | tfaction.yaml | Configuration file path
+Nothing.
 
 ## Outputs
 

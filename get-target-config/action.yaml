@@ -1,15 +1,5 @@
 name: Get target configuration
 description: Get target configuration
-inputs:
-  target:
-    description: 'target'
-    required: false
-  config:
-    description: 'config file path'
-    required: false
-  is_apply:
-    description: 'whether apply is run'
-    required: false
 outputs:
   working_directory:
     description: working directory

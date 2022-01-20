@@ -18,12 +18,6 @@
 
 ## Inputs
 
-name | environment variable | default | description
---- | --- | --- | ---
-target | TFACTION_TARGET | | target
-is_apply | TFACTION_IS_APPLY | | `true` or `false`. Whether the apply is run
-config | TFACTION_CONFIG | `tfaction.yaml` | configuration file path
-
 ### Required Inputs
 
 name | type | description

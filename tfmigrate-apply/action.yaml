@@ -5,30 +5,18 @@ inputs:
     description: 'GitHub Access Token'
     required: true
 
-  target:
-    description: 'target'
-    required: false
-    default: ''
   github_token:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
-  config:
-    description: Configuration file path
-    required: false
 runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
-      with:
-        target: ${{ inputs.target }}
-        config: ${{ inputs.config }}
-        is_apply: 'true'
     - run: bash ${{ github.action_path }}/main.sh
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
-        TARGET: ${{ inputs.target }}

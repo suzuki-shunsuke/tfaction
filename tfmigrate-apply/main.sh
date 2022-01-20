@@ -3,8 +3,6 @@
 set -eu
 set -o pipefail
 
-TARGET=${TARGET:-${TFACTION_TARGET:-}}
-
 set +e
 github-comment exec -k tfmigrate-apply -- tfmigrate apply
 code=$?
@@ -17,6 +15,6 @@ while read -r pr_number; do
 	fi
 	echo "===> Update PR $pr_number" >&2
 	env GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh api -X PUT "repos/{owner}/{repo}/pulls/${pr_number}/update-branch" || :
-done < <(github-comment exec -- gh pr list --json number -L 100 -l "$TARGET" -q ".[].number")
+done < <(github-comment exec -- gh pr list --json number -L 100 -l "$TFACTION_TARGET" -q ".[].number")
 
 exit "$code"
