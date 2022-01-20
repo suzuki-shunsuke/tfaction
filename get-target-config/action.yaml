@@ -3,10 +3,17 @@ description: Get target configuration
 outputs:
   working_directory:
     description: working directory
+
   assume_role_arn:
     description: AWS Assume Role ARN
   aws_region:
     description: AWS Region
+
+  gcp_service_account:
+    description: Google Cloud Platform Service Account for GCP Workload Identity Federation
+  gcp_workload_identity_provider:
+    description: Google Cloud Platform Identity Provider for GCP Workload Identity Federation
+
   s3_bucket_name_plan_file:
     description: S3 Buckte name for plan files
   s3_bucket_name_tfmigrate_history:

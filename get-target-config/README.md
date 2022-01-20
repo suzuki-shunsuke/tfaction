@@ -19,11 +19,13 @@ Nothing.
 
 ## Outputs
 
-name | type | description
---- | --- | ---
-working_directory | string (file path) | Working Directory
-assume_role_arn | string | AWS Assume Role ARN
-aws_region | string | AWS Region
-s3_bucket_name_plan_file | string (S3 Bucket Name) | S3 Bucket Name for Terraform Plan files
-s3_bucket_name_tfmigrate_history | string (S3 Bucket Name) | S3 Bucket Name for tfmigrate History files
-template_dir | string (file path) | working directory template directory path
+name | description
+--- | ---
+working_directory | Working Directory
+assume_role_arn | AWS Assume Role ARN
+aws_region | AWS Region
+gcp_service_account | Google Cloud Platform Service Account for [GCP Workload Identity Federation](https://github.com/google-github-actions/auth)
+gcp_workload_identity_provider | Google Cloud Platform Identity Provider for [GCP Workload Identity Federation](https://github.com/google-github-actions/auth)
+s3_bucket_name_plan_file | S3 Bucket Name for Terraform Plan files
+s3_bucket_name_tfmigrate_history | S3 Bucket Name for tfmigrate History files
+template_dir | working directory template directory path

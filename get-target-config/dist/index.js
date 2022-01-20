@@ -5705,6 +5705,8 @@ try {
         core.setOutput('s3_bucket_name_plan_file', targetConfig.s3_bucket_name_plan_file);
         core.setOutput('s3_bucket_name_tfmigrate_history', targetConfig.s3_bucket_name_tfmigrate_history);
         core.setOutput('template_dir', targetConfig.template_dir);
+        core.setOutput('gcp_service_account', targetConfig.gcp_service_account);
+        core.setOutput('gcp_workload_identity_provider', targetConfig.gcp_workload_identity_provider);
         break;
     }
 }
