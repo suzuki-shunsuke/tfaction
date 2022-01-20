@@ -8,8 +8,8 @@ GitHub Actions to list working directories
 - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
   id: working_dirs
 - run: cat "${{ steps.working_dirs.outputs.file }}"
-# tests/foo/ci.yaml
-# tests/bar/ci.yaml
+# tests/foo/tfaction.yaml
+# tests/bar/tfaction.yaml
 # ...
 ```
 

@@ -5691,27 +5691,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(11));
 const fs = __importStar(__nccwpck_require__(147));
 const path = __importStar(__nccwpck_require__(17));
-const yaml = __nccwpck_require__(716);
-function getInput(name, envName) {
-    const value = core.getInput(name);
-    if (value != '') {
-        return value;
-    }
-    const valueEnv = process.env[envName];
-    if (valueEnv === undefined || valueEnv == '') {
-        return '';
-    }
-    return valueEnv;
-}
-function getConfig() {
-    let configFilePath = process.env.TFACTION_CONFIG;
-    if (configFilePath == '' || configFilePath == undefined) {
-        configFilePath = 'tfaction.yaml';
-    }
-    return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
-}
+const lib = __importStar(__nccwpck_require__(181));
 try {
-    const config = getConfig();
+    const config = lib.getConfig();
     const configWorkingDirMap = new Map();
     const configTargetMap = new Map();
     for (let i = 0; i < config.targets.length; i++) {
@@ -5733,18 +5715,12 @@ try {
     const terraformTargets = new Set();
     const tfmigrates = new Set();
     const ignores = new Set();
-    let targetPrefix = config.label_prefixes.target;
-    if (targetPrefix == undefined || targetPrefix == '') {
-        targetPrefix = 'target:';
-    }
-    let ignorePrefix = config.label_prefixes.ignore;
-    if (ignorePrefix == undefined || ignorePrefix == '') {
-        ignorePrefix = 'ignore:';
-    }
-    let tfmigratePrefix = config.label_prefixes.tfmigrate;
-    if (tfmigratePrefix == undefined || tfmigratePrefix == '') {
-        tfmigratePrefix = 'tfmigrate:';
-    }
+    const targetPrefix = (config.label_prefixes != undefined && config.label_prefixes.target != undefined && config.label_prefixes.target != '') ?
+        config.label_prefixes.target : 'target:';
+    const ignorePrefix = (config.label_prefixes != undefined && config.label_prefixes.ignore != undefined && config.label_prefixes.ignore != '') ?
+        config.label_prefixes.ignore : 'ignore:';
+    const tfmigratePrefix = (config.label_prefixes != undefined && config.label_prefixes.tfmigrate != undefined && config.label_prefixes.tfmigrate != '') ?
+        config.label_prefixes.tfmigrate : 'tfmigrate:';
     for (let i = 0; i < labels.length; i++) {
         const label = labels[i];
         if (label == '') {
@@ -5795,6 +5771,63 @@ try {
 catch (error) {
     core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
 }
+
+
+/***/ }),
+
+/***/ 181:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.setValue = exports.getIsApply = exports.getTarget = exports.getConfig = void 0;
+const fs = __importStar(__nccwpck_require__(147));
+const core = __importStar(__nccwpck_require__(11));
+const yaml = __nccwpck_require__(716);
+function getConfig() {
+    let configFilePath = process.env.TFACTION_CONFIG;
+    if (configFilePath == '' || configFilePath == undefined) {
+        configFilePath = 'tfaction-root.yaml';
+    }
+    return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+}
+exports.getConfig = getConfig;
+function getTarget() {
+    const target = process.env.TFACTION_TARGET;
+    if (target == '' || target == undefined) {
+        throw 'the environment variable TFACTION_TARGET is required';
+    }
+    return target;
+}
+exports.getTarget = getTarget;
+function getIsApply() {
+    return process.env.TFACTION_IS_APPLY == 'true';
+}
+exports.getIsApply = getIsApply;
+function setValue(name, value, defaultValue) {
+    core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
+}
+exports.setValue = setValue;
 
 
 /***/ }),

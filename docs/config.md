@@ -1,6 +1,6 @@
 # Configuration
 
-tfaction.yaml
+`tfaction-root.yaml`
 
 ```yaml
 ---
@@ -30,7 +30,7 @@ targets:
     terraform_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
 
 base_working_directory: ""
-working_directory_file: ci.yaml
+working_directory_file: tfaction.yaml # default is "tfaction.yaml"
 renovate_login: 'renovate[bot]'
 label_prefixes:
   target: "target:" # default is "target:"
@@ -42,6 +42,14 @@ label_prefixes:
 
 name | default | description
 --- | --- | ---
-TFACTION_CONFIG | tfaction.yaml | configuration file path
+TFACTION_CONFIG | `tfaction-root.yaml` | configuration file path
 TFACTION_TARGET | | target
 TFACTION_IS_APPLY | | `true` or `false`. Whether `terraform apply` or `tfmigrate apply` are run
+
+## `tfaction.yaml`
+
+Please add `tfaction.yaml` in each working directory for tfaction to detect working directories.
+Currently, these files are used only for the detection of working directories,
+so it has no problem even if the content is empty.
+
+You can change the file name by the configuration `working_directory_file`.

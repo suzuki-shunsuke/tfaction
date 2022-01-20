@@ -1,31 +1,11 @@
 import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as lib from './lib';
 
-const yaml = require('js-yaml');
-
-function getInput(name: string, envName: string): string {
-  const value = core.getInput(name);
-  if (value != '') {
-    return value;
-  }
-  const valueEnv = process.env[envName];
-  if (valueEnv === undefined || valueEnv == '') {
-    return '';
-  }
-  return valueEnv;
-}
-
-function getConfig() {
-  let configFilePath = process.env.TFACTION_CONFIG;
-  if (configFilePath == '' || configFilePath == undefined) {
-    configFilePath = 'tfaction.yaml';
-  }
-  return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
-}
 
 try {
-  const config = getConfig();
+  const config = lib.getConfig();
 
   const configWorkingDirMap = new Map();
   const configTargetMap = new Map();
@@ -51,20 +31,12 @@ try {
   const tfmigrates = new Set<string>();
   const ignores = new Set<string>();
 
-  let targetPrefix = config.label_prefixes.target;
-  if (targetPrefix == undefined || targetPrefix == '') {
-    targetPrefix = 'target:';
-  }
-
-  let ignorePrefix = config.label_prefixes.ignore;
-  if (ignorePrefix == undefined || ignorePrefix == '') {
-    ignorePrefix = 'ignore:';
-  }
-
-  let tfmigratePrefix = config.label_prefixes.tfmigrate;
-  if (tfmigratePrefix == undefined || tfmigratePrefix == '') {
-    tfmigratePrefix = 'tfmigrate:';
-  }
+  const targetPrefix = (config.label_prefixes != undefined && config.label_prefixes.target != undefined && config.label_prefixes.target != '') ?
+    config.label_prefixes.target : 'target:';
+  const ignorePrefix = (config.label_prefixes != undefined && config.label_prefixes.ignore != undefined && config.label_prefixes.ignore != '') ?
+    config.label_prefixes.ignore : 'ignore:';
+  const tfmigratePrefix = (config.label_prefixes != undefined && config.label_prefixes.tfmigrate != undefined && config.label_prefixes.tfmigrate != '') ?
+    config.label_prefixes.tfmigrate : 'tfmigrate:';
 
   for (let i = 0; i < labels.length; i++) {
     const label = labels[i];

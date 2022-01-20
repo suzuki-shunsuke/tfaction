@@ -2,33 +2,12 @@ import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as readline from 'readline';
 import * as path from 'path';
-
-const yaml = require('js-yaml');
-
-function getConfig() {
-  let configFilePath = process.env.TFACTION_CONFIG;
-  if (configFilePath == '' || configFilePath == undefined) {
-    configFilePath = 'tfaction.yaml';
-  }
-  return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
-}
-
-function getTarget(): string {
-  const target = process.env.TFACTION_TARGET;
-  if (target == '' || target == undefined) {
-    throw 'the environment variable TFACTION_TARGET is required';
-  }
-  return target;
-}
-
-function getIsApply(): boolean {
-  return process.env.TFACTION_IS_APPLY == 'true'
-}
+import * as lib from './lib';
 
 try {
-  const config = getConfig();
-  const target = getTarget();
-  const isApply = getIsApply();
+  const config = lib.getConfig();
+  const target = lib.getTarget();
+  const isApply = lib.getIsApply();
 
   for (let i = 0; i < config.targets.length; i++) {
     const targetConfig = config.targets[i];
