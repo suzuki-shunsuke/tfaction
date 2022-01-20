@@ -4,11 +4,11 @@ AWS Account is required.
 
 Prepare following files.
 
+* tfaction-root.yaml
 * tfaction.yaml
-* ci.yaml
 * aqua.yaml
 * templates of working directories
-* renovate configuration
+* Renovate configuration
 * github-comment.yaml
 
 Configure GitHub Actions Workflow using tfaction.

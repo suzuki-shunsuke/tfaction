@@ -12,14 +12,14 @@ steps:
 
 ## Inputs
 
-name | environment variable | default | description
---- | --- | --- | ---
-config | TFACTION_CONFIG | `tfaction.yaml` | configuration file path
+Nothing.
 
 ## Outputs
 
 name | description
 --- | ---
+base_working_directory | base directory of working directories
+working_directory_file | file name which locates on working directories
 renovate_login | Renovate login
 label_prefix_target | label prefix for target
 label_prefix_tfmigrate | label prefix for tfmigrate

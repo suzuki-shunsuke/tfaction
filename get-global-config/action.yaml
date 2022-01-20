@@ -4,7 +4,7 @@ outputs:
   base_working_directory:
     description: base directory of working directories
   working_directory_file:
-    description: file which locates on working directories
+    description: file name which locates on working directories
   renovate_login:
     description: Renovate login
   label_prefix_target:
