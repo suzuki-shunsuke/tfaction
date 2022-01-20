@@ -31,9 +31,9 @@ targets:
 
 renovate_login: 'renovate[bot]'
 label_prefixes:
-  target: "target:"
-  tfmigrate: "migrate:"
-  ignore: "ignore:"
+  target: "target:" # default is "target:"
+  tfmigrate: "tfmigrate:" # default is "tfmigrate:"
+  ignore: "ignore:" # default is "ignore:"
 ```
 
 ## Environment Variables

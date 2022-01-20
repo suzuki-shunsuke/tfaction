@@ -5730,23 +5730,35 @@ try {
     const terraformTargets = new Set();
     const tfmigrates = new Set();
     const ignores = new Set();
+    let targetPrefix = config.label_prefixes.target;
+    if (targetPrefix == undefined || targetPrefix == '') {
+        targetPrefix = 'target:';
+    }
+    let ignorePrefix = config.label_prefixes.ignore;
+    if (ignorePrefix == undefined || ignorePrefix == '') {
+        ignorePrefix = 'ignore:';
+    }
+    let tfmigratePrefix = config.label_prefixes.tfmigrate;
+    if (tfmigratePrefix == undefined || tfmigratePrefix == '') {
+        tfmigratePrefix = 'tfmigrate:';
+    }
     for (let i = 0; i < labels.length; i++) {
         const label = labels[i];
         if (label == '') {
             continue;
         }
-        if (label.startsWith(config.label_prefixes.target)) {
-            const target = label.slice(config.label_prefixes.target.length);
+        if (label.startsWith(targetPrefix)) {
+            const target = label.slice(targetPrefix.length);
             terraformTargets.add(target);
             continue;
         }
-        if (label.startsWith(config.label_prefixes.tfmigrate)) {
-            const target = label.slice(config.label_prefixes.tfmigrate.length);
+        if (label.startsWith(tfmigratePrefix)) {
+            const target = label.slice(tfmigratePrefix.length);
             tfmigrates.add(target);
             continue;
         }
-        if (label.startsWith(config.label_prefixes.ignore)) {
-            ignores.add(label.slice(config.label_prefixes.ignore.length));
+        if (label.startsWith(ignorePrefix)) {
+            ignores.add(label.slice(ignorePrefix.length));
             continue;
         }
     }
