@@ -29,6 +29,8 @@ targets:
     tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
     terraform_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
 
+base_working_directory: ""
+working_directory_file: ci.yaml
 renovate_login: 'renovate[bot]'
 label_prefixes:
   target: "target:" # default is "target:"

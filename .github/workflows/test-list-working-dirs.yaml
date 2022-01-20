@@ -18,7 +18,6 @@ jobs:
         aqua_version: v0.10.1
     - uses: ./list-working-dirs
       id: working_dirs
-      with:
-        file: ci.yaml
-        base_directory: list-working-dirs/tests
+      env:
+        TFACTION_CONFIG: list-working-dirs/tests/tfaction-root.yaml
     - run: cat "${{ steps.working_dirs.outputs.file }}"

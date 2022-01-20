@@ -5691,38 +5691,27 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(11));
 const fs = __importStar(__nccwpck_require__(147));
 const yaml = __nccwpck_require__(716);
-function getInput(name, envName) {
-    const value = core.getInput(name);
-    if (value != '') {
-        return value;
-    }
-    const valueEnv = process.env[envName];
-    if (valueEnv === undefined || valueEnv == '') {
-        return '';
-    }
-    return valueEnv;
-}
-function getBooleanInput(name, envName) {
-    const val = getInput(name, envName);
-    if (['true', 'True', 'TRUE'].includes(val)) {
-        return true;
-    }
-    if (['false', 'False', 'FALSE'].includes(val)) {
-        return false;
-    }
-    throw 'boolean must be one of true, True, TRUE, false, False, and FALSE';
-}
-try {
-    let configFilePath = getInput('config', 'TFACTION_CONFIG');
-    if (configFilePath == '') {
+function getConfig() {
+    let configFilePath = process.env.TFACTION_CONFIG;
+    if (configFilePath == '' || configFilePath == undefined) {
         configFilePath = 'tfaction.yaml';
     }
-    const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
-    const target = getInput('target', 'TFACTION_TARGET');
-    if (target == '') {
-        throw 'the input target or environment variable TFACTION_TARGET is required';
+    return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+}
+function getTarget() {
+    const target = process.env.TFACTION_TARGET;
+    if (target == '' || target == undefined) {
+        throw 'the environment variable TFACTION_TARGET is required';
     }
-    const isApply = getBooleanInput('is_apply', 'TFACTION_IS_APPLY');
+    return target;
+}
+function getIsApply() {
+    return process.env.TFACTION_IS_APPLY == 'true';
+}
+try {
+    const config = getConfig();
+    const target = getTarget();
+    const isApply = getIsApply();
     for (let i = 0; i < config.targets.length; i++) {
         const targetConfig = config.targets[i];
         if (!target.startsWith(targetConfig.target)) {

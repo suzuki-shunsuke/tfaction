@@ -5,42 +5,30 @@ import * as path from 'path';
 
 const yaml = require('js-yaml');
 
-function getInput(name: string, envName: string): string {
-  const value = core.getInput(name);
-  if (value != '') {
-    return value;
+function getConfig() {
+  let configFilePath = process.env.TFACTION_CONFIG;
+  if (configFilePath == '' || configFilePath == undefined) {
+    configFilePath = 'tfaction.yaml';
   }
-  const valueEnv = process.env[envName];
-  if (valueEnv === undefined || valueEnv == '') {
-    return '';
-  }
-  return valueEnv;
+  return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
 }
 
-function getBooleanInput(name: string, envName: string): boolean {
-  const val = getInput(name, envName);
-  if (['true', 'True', 'TRUE'].includes(val)) {
-    return true;
+function getTarget(): string {
+  const target = process.env.TFACTION_TARGET;
+  if (target == '' || target == undefined) {
+    throw 'the environment variable TFACTION_TARGET is required';
   }
-  if (['false', 'False', 'FALSE'].includes(val)) {
-    return false;
-  }
-  throw 'boolean must be one of true, True, TRUE, false, False, and FALSE';
+  return target;
+}
+
+function getIsApply(): boolean {
+  return process.env.TFACTION_IS_APPLY == 'true'
 }
 
 try {
-  let configFilePath = getInput('config', 'TFACTION_CONFIG');
-  if (configFilePath == '') {
-    configFilePath = 'tfaction.yaml';
-  }
-  const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
-
-  const target = getInput('target', 'TFACTION_TARGET');
-  if (target == '') {
-    throw 'the input target or environment variable TFACTION_TARGET is required';
-  }
-
-  const isApply = getBooleanInput('is_apply', 'TFACTION_IS_APPLY');
+  const config = getConfig();
+  const target = getTarget();
+  const isApply = getIsApply();
 
   for (let i = 0; i < config.targets.length; i++) {
     const targetConfig = config.targets[i];

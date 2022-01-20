@@ -15,9 +15,7 @@ GitHub Actions to run tfmigrate apply
 ```yaml
 - uses: suzuki-shunsuke/tfaction/tfmigrate-apply@main
   with:
-    target: github/foo
     github_app_token: ${{ secrets.GITHUB_APP_TOKEN }}
-    s3_bucket_name_plan_file: '<AWS S3 Bucket Name for Terraform Plan files>'
 ```
 
 ## Inputs
@@ -32,8 +30,6 @@ github_app_token | GitHub Access Token. `github.token` can't be used because it 
 
 name | environment variable | default | description
 --- | --- | --- | ---
-target | TFACTION_TARGET | '' | target
-config | TFACTION_CONFIG | tfaction.yaml | configuration file path
 github_token | | `github.token` | GitHub Access Token
 
 ## Outputs

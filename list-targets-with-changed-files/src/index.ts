@@ -16,12 +16,16 @@ function getInput(name: string, envName: string): string {
   return valueEnv;
 }
 
-try {
-  let configFilePath = getInput('config', 'TFACTION_CONFIG');
-  if (configFilePath == '') {
+function getConfig() {
+  let configFilePath = process.env.TFACTION_CONFIG;
+  if (configFilePath == '' || configFilePath == undefined) {
     configFilePath = 'tfaction.yaml';
   }
-  const config = yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+  return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+}
+
+try {
+  const config = getConfig();
 
   const configWorkingDirMap = new Map();
   const configTargetMap = new Map();

@@ -1,17 +1,5 @@
 name: List targets
 description: List targets
-inputs:
-  working_dir_file:
-    description: 'working directory file name'
-    required: false
-    default: ci.yaml
-  base_directory:
-    description: 'base directory'
-    required: false
-    default: '.'
-  config:
-    description: 'config file path'
-    required: false
 outputs:
   tfmigrate_targets:
     description: list of tfmigrate targets
@@ -26,13 +14,9 @@ runs:
       shell: bash
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
-      with:
-        file: ${{ inputs.working_dir_file }}
-        base_directory: ${{ inputs.base_directory }}
     - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
       id: list-targets
       with:
         changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
-        config: ${{ inputs.config }}
