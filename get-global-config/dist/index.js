@@ -5692,7 +5692,7 @@ const core = __importStar(__nccwpck_require__(11));
 const lib = __importStar(__nccwpck_require__(181));
 try {
     const config = lib.getConfig();
-    core.setOutput('base_working_directory', config.base_working_directory);
+    lib.setValue('base_working_directory', config.base_working_directory, '.');
     lib.setValue('working_directory_file', config.working_directory_file, 'tfaction.yaml');
     lib.setValue('renovate_login', config.renovate_login, 'renovate[bot]');
     if (config.label_prefixes != undefined) {
