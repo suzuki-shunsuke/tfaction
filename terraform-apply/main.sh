@@ -29,7 +29,9 @@ fi
 # 3. open pull request
 
 follow_up_branch="follow-up/$CI_INFO_PR_NUMBER/$TFACTION_TARGET"
-ghcp empty-commit -r "$GITHUB_REPOSITORY" -b "$follow_up_branch" -m "chore: empty commit to open follow up pull request
+GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
+	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
+	-m "chore: empty commit to open follow up pull request
 
 Follow up #$CI_INFO_PR_NUMBER
 https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
@@ -49,13 +51,13 @@ Please add commits to fix the problem if needed."
 label=${TFACTION_TARGET_LABEL_PREFIX}${TFACTION_TARGET}
 
 curl \
-  -X POST \
-  -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Accept: application/vnd.github.v3+json" \
-  "https://api.github.com/repos/$GITHUB_REPOSITORY/labels" \
-  -d "{\"name\":\"$label\"}"
+	-X POST \
+	-H "Authorization: token $GITHUB_TOKEN" \
+	-H "Accept: application/vnd.github.v3+json" \
+	"https://api.github.com/repos/$GITHUB_REPOSITORY/labels" \
+	-d "{\"name\":\"$label\"}"
 
-follow_up_pr_url=$(gh pr create -H "$follow_up_branch" -a "$GITHUB_ACTOR" -t "$pr_title" -b "$pr_body" -l "$label")
+follow_up_pr_url=$(GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh pr create -H "$follow_up_branch" -a "$GITHUB_ACTOR" -t "$pr_title" -b "$pr_body" -l "$label")
 
 github-comment post -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "follow_up_pr_url:$follow_up_pr_url" -k create-follow-up-pr
 
