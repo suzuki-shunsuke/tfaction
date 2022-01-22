@@ -9,6 +9,5 @@ Prepare following files.
 * aqua.yaml
 * templates of working directories
 * Renovate configuration
-* github-comment.yaml
 
 Configure GitHub Actions Workflow using tfaction.

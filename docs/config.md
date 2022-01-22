@@ -54,18 +54,6 @@ so it has no problem even if the content is empty.
 
 You can change the file name by the configuration `working_directory_file`.
 
-## github-comment.yaml
-
-tfaction uses [github-comment](https://github.com/suzuki-shunsuke/github-comment), which is a CLI tool to post and hide comments of GitHub Commits, Issues, and Pull Requests.
-You have to configure some comment templates.
-
-* exec
-  * tfmigrate-plan
-  * tfmigrate-apply
-  * conftest
-
-e.g. https://github.com/suzuki-shunsuke/tfaction-example/blob/main/github-comment.yaml
-
 ## aqua.yaml
 
 tfaction uses [aqua](https://aquaproj.github.io/), which is a Declarative CLI Version Manager written in Go.
