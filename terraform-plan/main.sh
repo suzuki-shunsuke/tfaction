@@ -33,7 +33,7 @@ fi
 # If you allow changes, please set the pull request label `renovate-change`.
 if [ "$CI_INFO_PR_AUTHOR" = "$RENOVATE_LOGIN" ]; then
 	if ! grep -x renovate-change "$CI_INFO_TEMP_DIR/labels.txt" >/dev/null 2>&1; then
-		github-comment post -k renovate-plan-change
+		github-comment post --config "${GITHUB_ACTION_PATH}/github-comment.yaml" -k renovate-plan-change
 		return 1
 	fi
 fi

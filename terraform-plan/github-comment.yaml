@@ -1,0 +1,10 @@
+# https://github.com/suzuki-shunsuke/github-comment
+post:
+  renovate-plan-change:
+    template: |
+      ## :x: {{if (env "TFACTION_TARGET")}}{{env "TFACTION_TARGET"}}: {{end}}Renovate's PR must be `No change`
+
+      {{template "link" .}}
+
+      In the pull request created by Renovate, the result of `terraform plan` must be `No change` to enable automerge safely.
+      If you allow changes, please set the pull request label `renovate-change` and rerun CI.
