@@ -9,8 +9,8 @@ runs:
   steps:
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
-      with:
-        is_apply: "false"
+      env:
+        TFACTION_IS_APPLY: "false"
 
     - run: git add .
       shell: bash
