@@ -12,10 +12,10 @@ targets:
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/aws
   aws_assume_role_arns:
-    tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPR
-    terraform_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPR
-    tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMain
-    terraform_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMain
+    tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_plan
+    terraform_plan: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan
+    tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_apply
+    terraform_apply: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_apply
 
 - working_directory: github/services/
   target: github/
@@ -24,10 +24,24 @@ targets:
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/github
   aws_assume_role_arns:
-    tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPRGitHub
-    terraform_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPRGitHub
-    tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
-    terraform_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
+    tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_plan
+    terraform_plan: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_plan
+    tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_apply
+    terraform_apply: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_apply
+
+- working_directory: gcp/
+  target: gcp/
+  aws_region: ap-northeast-1
+  s3_bucket_name_plan_file: '<S3 Bucket Name for Terraform Plan File>'
+  s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
+  template_dir: templates/github
+  gcp_service_account: terraform@my-project.iam.gserviceaccount.com
+  gcp_workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+  aws_assume_role_arns:
+    tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_plan
+    terraform_plan: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_plan
+    tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_apply
+    terraform_apply: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_apply
 
 base_working_directory: ""
 working_directory_file: tfaction.yaml # default is "tfaction.yaml"
