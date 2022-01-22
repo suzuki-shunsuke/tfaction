@@ -43,8 +43,7 @@ git branch "$follow_up_branch" "origin/$follow_up_branch"
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 pr_body="This pull request was created automatically to follow up the failure of apply.
 
-Follow up #$CI_INFO_PR_NUMBER
-https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+Follow up #$CI_INFO_PR_NUMBER ([failed workflow](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))
 
 Please add commits to fix the problem if needed."
 

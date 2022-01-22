@@ -9,4 +9,9 @@ post:
 
       {{template "header" .}}
 
-      Please check {{.Vars.follow_up_pr_url}}
+      Apply failed. Please handle the problem.
+
+      1. Check the error message
+      1. Check {{.Vars.follow_up_pr_url}}
+      1. Add commits to {{.Vars.follow_up_pr_url}} to fix the problem if needed
+      1. Review and merge {{.Vars.follow_up_pr_url}}
