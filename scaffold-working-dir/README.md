@@ -8,9 +8,12 @@
 
 ```yaml
 - uses: suzuki-shunsuke/tfaction/scaffold-working-dir@main
-  with:
-    target: github/foo
 ```
+
+## Environment variables
+
+* TFACTION_TARGET (required)
+* TFACTION_CONFIG (optional)
 
 ## Inputs
 

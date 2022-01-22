@@ -1,9 +1,6 @@
 name: Create a pull request to scaffold a working directory
 description: Create a pull request to scaffold a working directory
 inputs:
-  target:
-    description: 'Target'
-    required: true
   github_app_token:
     description: 'GitHub Access Token'
     required: true
@@ -13,14 +10,13 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
       with:
-        target: ${{ inputs.target }}
         is_apply: "false"
 
     - run: git add .
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: |
-        echo "::set-output name=branch::scaffold-working-diretory/${{inputs.target}}/$(date +%Y%m%dT%H%M%S)"
+        echo "::set-output name=branch::scaffold-working-diretory/${TFACTION_TARGET}/$(date +%Y%m%dT%H%M%S)"
       id: branch
       shell: bash
 
@@ -28,14 +24,14 @@ runs:
         git diff --cached --name-only "${{steps.target-config.outputs.working_directory}}" |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "${{steps.branch.outputs.branch}}" \
-            -m "scaffold a working directory (${{inputs.target}})"
+            -m "scaffold a working directory (${TFACTION_TARGET})"
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
     - run: |
         ghcp pull-request -r "$GITHUB_REPOSITORY" \
           -b "${{steps.branch.outputs.branch}}" \
-          --title "Scaffold a working directory (${{inputs.target}})" \
+          --title "Scaffold a working directory (${TFACTION_TARGET})" \
           --body "This pull request was created by GitHub Actions workflow_dispatch event https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
       shell: bash
       env:
