@@ -28,7 +28,7 @@ fi
 # 2. create a label
 # 3. open pull request
 
-follow_up_branch="follow-up/$CI_INFO_PR_NUMBER/$TFACTION_TARGET"
+follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
 GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
 	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
 	-m "chore: empty commit to open follow up pull request
@@ -45,7 +45,10 @@ pr_body="This pull request was created automatically to follow up the failure of
 
 Follow up #$CI_INFO_PR_NUMBER ([failed workflow](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))
 
-Please add commits to fix the problem if needed."
+1. Check the error message #$CI_INFO_PR_NUMBER
+1. Check the result of \`terraform plan\`
+1. Add commits to this pull request and fix the problem if needed
+1. Review and merge this pull request"
 
 label=${TFACTION_TARGET_LABEL_PREFIX}${TFACTION_TARGET}
 
