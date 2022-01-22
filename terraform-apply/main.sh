@@ -57,6 +57,6 @@ curl \
 
 follow_up_pr_url=$(gh pr create -H "$follow_up_branch" -a "$GITHUB_ACTOR" -t "$pr_title" -b "$pr_body" -l "$label")
 
-github-comment post -var "follow_up_pr_url:$follow_up_pr_url" -k create-follow-up-pr
+github-comment post -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "follow_up_pr_url:$follow_up_pr_url" -k create-follow-up-pr
 
 exit "$code"

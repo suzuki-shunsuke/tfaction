@@ -1,0 +1,12 @@
+---
+# https://github.com/suzuki-shunsuke/github-comment
+templates:
+  header: '{{env "TFACTION_TARGET"}} {{template "link" .}}'
+post:
+  create-follow-up-pr:
+    template: |
+      ## Follow up PR was created
+
+      {{template "header" .}}
+
+      Please check {{.Vars.follow_up_pr_url}}
