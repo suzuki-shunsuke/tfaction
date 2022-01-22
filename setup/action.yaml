@@ -36,10 +36,17 @@ runs:
       shell: bash
 
     - uses: aws-actions/configure-aws-credentials@v1.6.1
+      if: steps.target-config.outputs.assume_role_arn != ''
       with:
         role-to-assume: ${{ steps.target-config.outputs.assume_role_arn }}
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
+
+    - uses: google-github-actions/auth@v0
+      if: steps.target-config.outputs.gcp_service_account != ''
+      with:
+        workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
+        service_account: ${{ steps.target-config.outputs.gcp_service_account }}
 
     - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
       if: inputs.ssh_key != ''
