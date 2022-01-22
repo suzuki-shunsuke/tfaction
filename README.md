@@ -2,10 +2,6 @@
 
 GitHub Actions collection for Opinionated Terraform Workflow
 
-## Status
-
-Stil in alpha. Don't use this action yet.
-
 ## Goal
 
 Build good Terraform Workflow easily with GitHub Actions.
@@ -71,6 +67,10 @@ Build good Terraform Workflow easily with GitHub Actions.
 ## Example
 
 https://github.com/suzuki-shunsuke/tfaction-example
+
+## Versioning Policy
+
+[suzuki-shunsuke/versioning-policy v0.1.0](https://github.com/suzuki-shunsuke/versioning-policy/blob/v0.1.0/POLICY.md), which is compatible with [Semantic Versioning 2.0.0](https://semver.org/).
 
 ## LICENSE
 
