@@ -59,8 +59,6 @@ You can change the file name by the configuration `working_directory_file`.
 tfaction uses [github-comment](https://github.com/suzuki-shunsuke/github-comment), which is a CLI tool to post and hide comments of GitHub Commits, Issues, and Pull Requests.
 You have to configure some comment templates.
 
-* post
-  * renovate-plan-change
 * exec
   * tfmigrate-plan
   * tfmigrate-apply
