@@ -1,0 +1,17 @@
+---
+# https://github.com/suzuki-shunsuke/github-comment
+templates:
+  header: '{{env "TFACTION_TARGET"}} {{template "link" .}}'
+post:
+  create-follow-up-pr:
+    template: |
+      ## {{env "TFACTION_TARGET"}} Follow up PR was created
+
+      {{template "link" .}}
+
+      Apply failed. Please handle the problem.
+
+      1. Check the error message
+      1. Check {{.Vars.follow_up_pr_url}}
+      1. Add commits to {{.Vars.follow_up_pr_url}} to fix the problem if needed
+      1. Review and merge {{.Vars.follow_up_pr_url}}

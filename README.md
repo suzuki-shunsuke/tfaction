@@ -34,6 +34,7 @@ Build good Terraform Workflow easily with GitHub Actions.
 * [Update Terraform Providers and Terraform with Renovate safely](docs/renovate.md)
 * [Auto create and update Terraform lock file](https://github.com/suzuki-shunsuke/github-action-terraform-init)
 * [Auto format by `terraform fmt`](https://github.com/suzuki-shunsuke/github-action-terraform-fmt)
+* [Create a pull request automatically to handle the problem when apply failed](docs/follow-up-pr.md)
 * Support AWS OIDC
   * Support changing configuration such as Assume Role ARN per working directory
 * [Scaffold working directory by GitHub Actions `workflow_dispatch` event](docs/scaffold-working-dir.md)
