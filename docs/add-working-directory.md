@@ -18,7 +18,7 @@ e.g.
 ```yaml
 - working_directory: github/services/
   # ...
-  assume_role_arns:
+  aws_assume_role_arns:
     tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPRGitHub
     terraform_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPRGitHub
     tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub

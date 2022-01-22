@@ -4,7 +4,7 @@ outputs:
   working_directory:
     description: working directory
 
-  assume_role_arn:
+  aws_assume_role_arn:
     description: AWS Assume Role ARN
   aws_region:
     description: AWS Region

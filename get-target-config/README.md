@@ -22,7 +22,7 @@ Nothing.
 name | description
 --- | ---
 working_directory | Working Directory
-assume_role_arn | AWS Assume Role ARN
+aws_assume_role_arn | AWS Assume Role ARN
 aws_region | AWS Region
 gcp_service_account | Google Cloud Platform Service Account for [GCP Workload Identity Federation](https://github.com/google-github-actions/auth)
 gcp_workload_identity_provider | Google Cloud Platform Identity Provider for [GCP Workload Identity Federation](https://github.com/google-github-actions/auth)
