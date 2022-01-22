@@ -1,0 +1,13 @@
+---
+# https://github.com/suzuki-shunsuke/github-comment
+exec:
+  tfmigrate-apply:
+  - when: true
+    template: |
+      ## {{template "status" .}} {{if (env "TFACTION_TARGET")}}{{env "TFACTION_TARGET"}}: {{end}} tfmigrate apply
+
+      {{template "link" .}}
+
+      {{template "join_command" .}}
+
+      {{template "hidden_combined_output" .}}

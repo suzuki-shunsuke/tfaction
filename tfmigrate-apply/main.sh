@@ -4,7 +4,10 @@ set -eu
 set -o pipefail
 
 set +e
-github-comment exec -k tfmigrate-apply -- tfmigrate apply
+github-comment exec \
+	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+	-k tfmigrate-apply -- \
+		tfmigrate apply
 code=$?
 set -e
 
