@@ -5,13 +5,8 @@ set -o pipefail
 
 github-comment exec -- aws s3 cp "s3://$S3_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TFACTION_TARGET/tfplan.binary" tfplan.binary
 
-author=$CI_INFO_PR_AUTHOR
-if [[ $author =~ \[bot\]$ ]]; then
-	author=suzuki-shunsuke
-fi
-
 set +e
-tfcmt -var "target:$TFACTION_TARGET" -var "author:$author" apply -- terraform apply -auto-approve -input=false tfplan.binary
+tfcmt -var "target:$TFACTION_TARGET" apply -- terraform apply -auto-approve -input=false tfplan.binary
 code=$?
 set -e
 
