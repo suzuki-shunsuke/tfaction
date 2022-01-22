@@ -2,10 +2,6 @@
 
 GitHub Actions collection for Opinionated Terraform Workflow
 
-## Status
-
-Stil in alpha. Don't use this action yet.
-
 ## Goal
 
 Build good Terraform Workflow easily with GitHub Actions.
