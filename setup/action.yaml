@@ -36,9 +36,9 @@ runs:
       shell: bash
 
     - uses: aws-actions/configure-aws-credentials@v1.6.1
-      if: steps.target-config.outputs.assume_role_arn != ''
+      if: steps.target-config.outputs.aws_assume_role_arn != ''
       with:
-        role-to-assume: ${{ steps.target-config.outputs.assume_role_arn }}
+        role-to-assume: ${{ steps.target-config.outputs.aws_assume_role_arn }}
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 

@@ -6,7 +6,7 @@ targets:
   s3_bucket_name_plan_file: '<S3 Bucket Name for Terraform Plan File>'
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/aws
-  assume_role_arns:
+  aws_assume_role_arns:
     tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPR
     terraform_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPR
     tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMain
@@ -18,7 +18,7 @@ targets:
   s3_bucket_name_plan_file: '<S3 Bucket Name for Terraform Plan File>'
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/github
-  assume_role_arns:
+  aws_assume_role_arns:
     tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPRGitHub
     terraform_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPRGitHub
     tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
