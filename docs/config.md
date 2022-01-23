@@ -32,9 +32,9 @@ targets:
 - working_directory: gcp/
   target: gcp/
   aws_region: ap-northeast-1
-  s3_bucket_name_plan_file: '<S3 Bucket Name for Terraform Plan File>'
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/github
+  gcs_bucket_name_plan_file: '<Google Cloud Storage Bucket Name for Terraform Plan File>'
   gcp_service_account: terraform@my-project.iam.gserviceaccount.com
   gcp_workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
   aws_assume_role_arns:
