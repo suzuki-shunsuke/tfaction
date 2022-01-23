@@ -3,7 +3,11 @@
 set -eu
 set -o pipefail
 
-github-comment exec -- aws s3 cp "s3://$S3_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TFACTION_TARGET/tfplan.binary" tfplan.binary
+if [ -n "${S3_BUCKET_NAME_PLAN_FILE:-}" ]; then
+	github-comment exec -- aws s3 cp "s3://$S3_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TFACTION_TARGET/tfplan.binary" tfplan.binary
+elif [ -n "${GCS_BUCKET_NAME_PLAN_FILE:-}" ]; then
+	github-comment exec -- gsutil cp "gs://$GCS_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TFACTION_TARGET/tfplan.binary" tfplan.binary
+fi
 
 set +e
 tfcmt -var "target:$TFACTION_TARGET" apply -- terraform apply -auto-approve -input=false tfplan.binary

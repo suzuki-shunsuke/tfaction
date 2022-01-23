@@ -11,4 +11,4 @@ tfaction's Workflow
 In this case, it is important to apply the same result as the result of `terraform plan` of the pull request CI.
 Otherwise, unexpected changes may be applied.
 
-tfaction stores the latest Terraform Plan files to the S3 bucket per pull request and working directory, and downloading them when `terraform apply` is run.
+tfaction stores the latest Terraform Plan files to the AWS S3 or Google Cloud Storage bucket per pull request and working directory, and downloading them when `terraform apply` is run.

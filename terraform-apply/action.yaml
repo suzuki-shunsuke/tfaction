@@ -24,4 +24,5 @@ runs:
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
         TF_VAR_github_token: ${{ inputs.github_app_token }}
         S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
+        GCS_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}
         TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
