@@ -15,15 +15,19 @@ tfcmt -var "target:$TFACTION_TARGET" plan -- \
 code=$?
 set -e
 
+if [ "$code" = "1" ]; then
+	echo "===> Delete old plan file to prevent the accident" >&2
+	if aws s3api head-object --bucket "$S3_BUCKET_NAME_PLAN_FILE" --key "$PR_NUMBER/$TFACTION_TARGET/tfplan.binary"; then
+		github-comment exec -- aws s3 delete "s3://$S3_BUCKET_NAME_PLAN_FILE/$PR_NUMBER/$TFACTION_TARGET/tfplan.binary"
+	fi
+	exit 1
+fi
+
 if [ -n "${S3_BUCKET_NAME_PLAN_FILE:-}" ]; then
 	github-comment exec -- aws s3 cp tfplan.binary "s3://$S3_BUCKET_NAME_PLAN_FILE/$PR_NUMBER/$TFACTION_TARGET/tfplan.binary"
 fi
 if [ -n "${GCS_BUCKET_NAME_PLAN_FILE:-}" ]; then
 	github-comment exec -- gsutil cp tfplan.binary "gs://$GCS_BUCKET_NAME_PLAN_FILE/$PR_NUMBER/$TFACTION_TARGET/tfplan.binary"
-fi
-
-if [ "$code" = "1" ]; then
-	exit 1
 fi
 
 github-comment exec -- terraform show -json tfplan.binary >tfplan.json

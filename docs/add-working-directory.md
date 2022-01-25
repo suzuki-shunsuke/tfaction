@@ -44,7 +44,8 @@ https://github.com/suzuki-shunsuke/terraform-aws-tfaction
         {
             "Effect": "Allow",
             "Action": [
-                "s3:PutObject"
+                "s3:PutObject",
+                "s3:DeleteObject"
             ],
             "Resource": "arn:aws:s3:::<S3 Bucket for Plan File>/*"
         }
