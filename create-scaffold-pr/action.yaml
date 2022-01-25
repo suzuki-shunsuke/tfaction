@@ -28,11 +28,13 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
+
     - run: |
-        ghcp pull-request -r "$GITHUB_REPOSITORY" \
-          -b "${{steps.branch.outputs.branch}}" \
-          --title "Scaffold a working directory (${TFACTION_TARGET})" \
-          --body "This pull request was created by GitHub Actions workflow_dispatch event https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        gh pr create \
+          -H "${{steps.branch.outputs.branch}}" \
+          -a "$GITHUB_ACTOR" \
+          -t "Scaffold a working directory (${TFACTION_TARGET})" \
+          -b "This pull request was created by GitHub Actions workflow_dispatch event https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
