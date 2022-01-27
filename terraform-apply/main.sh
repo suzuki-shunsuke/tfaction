@@ -63,7 +63,7 @@ curl \
 	"https://api.github.com/repos/$GITHUB_REPOSITORY/labels" \
 	-d "{\"name\":\"$label\"}"
 
-follow_up_pr_url=$(GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh pr create -H "$follow_up_branch" -a "$GITHUB_ACTOR" -t "$pr_title" -b "$pr_body" -l "$label")
+follow_up_pr_url=$(GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh pr create -d -H "$follow_up_branch" -a "$GITHUB_ACTOR" -t "$pr_title" -b "$pr_body" -l "$label")
 
 github-comment post -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "follow_up_pr_url:$follow_up_pr_url" -k create-follow-up-pr
 
