@@ -35,7 +35,7 @@ conftest -v # Install conftest in advance to exclude aqua lazy install log from 
 github-comment exec \
 	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-k conftest -- \
-		conftest test --no-color -p "$ROOT_DIR/policy/terraform" tfplan.json
+		conftest test --no-color -p "$ROOT_DIR/policy" tfplan.json
 
 if [ "$code" = "0" ]; then
 	exit 0
