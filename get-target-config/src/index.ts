@@ -25,6 +25,7 @@ try {
     core.setOutput('gcp_service_account', targetConfig.gcp_service_account);
     core.setOutput('gcp_workload_identity_provider', targetConfig.gcp_workload_identity_provider);
     core.setOutput('gcs_bucket_name_plan_file', targetConfig.gcs_bucket_name_plan_file);
+    core.setOutput('runs_on', targetConfig.runs_on ? targetConfig.runs_on : 'ubuntu-latest');
     break;
   }
 } catch (error) {

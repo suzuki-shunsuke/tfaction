@@ -29,3 +29,4 @@ gcp_workload_identity_provider | Google Cloud Platform Identity Provider for [GC
 s3_bucket_name_plan_file | S3 Bucket Name for Terraform Plan files
 s3_bucket_name_tfmigrate_history | S3 Bucket Name for tfmigrate History files
 template_dir | working directory template directory path
+runs_on | GitHub Actions job's `runs-on`
