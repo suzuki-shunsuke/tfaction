@@ -1,7 +1,4 @@
 import * as core from '@actions/core';
-import * as fs from 'fs';
-import * as readline from 'readline';
-import * as path from 'path';
 import * as lib from './lib';
 
 try {
