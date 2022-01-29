@@ -5699,6 +5699,7 @@ function getTargetConfigByTarget(targets, target) {
             return {
                 target: target,
                 runs_on: t.runs_on ? t.runs_on : 'ubuntu-latest',
+                environment: t.environment ? t.environment : null,
             };
         }
     }
