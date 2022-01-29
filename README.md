@@ -53,6 +53,7 @@ Build good Terraform Workflow easily with GitHub Actions.
   * [create-follow-up-pr](create-follow-up-pr)
   * [create-scaffold-pr](create-scaffold-pr)
   * [scaffold-working-dir](scaffold-working-dir)
+  * [export-secrets](export-secrets)
   * Low Level Actions. These Actions are used internally
     * [get-target-config](get-target-config)
     * [get-global-config](get-global-config)
