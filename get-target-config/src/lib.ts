@@ -65,6 +65,33 @@ export function getJobType(): string {
   return process.env.TFACTION_JOB_TYPE;
 }
 
-export function setValue(name: string, value: string, defaultValue: string) {
-  core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
+export function getJobConfig(config: TargetConfig, isApply: boolean, jobType: string): JobConfig | undefined {
+  if (isApply) {
+    switch (jobType) {
+      case 'terraform':
+        return config.terraform_apply_config;
+      case 'tfmigrate':
+        return config.tfmigrate_apply_config;
+      default:
+        throw `unknown type: ${jobType}`;
+    }
+  }
+  switch (jobType) {
+    case 'terraform':
+      return config.terraform_plan_config;
+    case 'tfmigrate':
+      return config.tfmigrate_plan_config;
+    default:
+      throw `unknown type: ${jobType}`;
+  }
+}
+
+export function setValue(name: string, values: Array<any>) {
+  for (let i = 0; i < values.length; i++) {
+    const value = values[i];
+    if (value != undefined) {
+      core.setOutput(name, value);
+      return;
+    }
+  }
 }

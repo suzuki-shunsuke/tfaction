@@ -5690,35 +5690,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(11));
 const lib = __importStar(__nccwpck_require__(181));
-function getJobConfig(config, isApply, jobType) {
-    if (isApply) {
-        switch (jobType) {
-            case 'terraform':
-                return config.terraform_apply_config;
-            case 'tfmigrate':
-                return config.tfmigrate_apply_config;
-            default:
-                throw `unknown type: ${jobType}`;
-        }
-    }
-    switch (jobType) {
-        case 'terraform':
-            return config.terraform_plan_config;
-        case 'tfmigrate':
-            return config.tfmigrate_plan_config;
-        default:
-            throw `unknown type: ${jobType}`;
-    }
-}
-function setValue(name, values) {
-    for (let i = 0; i < values.length; i++) {
-        const value = values[i];
-        if (value != undefined) {
-            core.setOutput(name, value);
-            return;
-        }
-    }
-}
 try {
     const config = lib.getConfig();
     const target = lib.getTarget();
@@ -5735,22 +5706,17 @@ try {
         core.setOutput('s3_bucket_name_tfmigrate_history', targetConfig.s3_bucket_name_tfmigrate_history);
         core.setOutput('template_dir', targetConfig.template_dir);
         core.setOutput('gcs_bucket_name_plan_file', targetConfig.gcs_bucket_name_plan_file);
-        const jobConfig = getJobConfig(targetConfig, isApply, jobType);
+        const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
         if (jobConfig == undefined) {
-            setValue('aws_assume_role_arn', [targetConfig.aws_assume_role_arn]);
-            setValue('gcp_service_account', [targetConfig.gcp_service_account]);
-            setValue('gcp_workload_identity_provider', [targetConfig.gcp_workload_identity_provider]);
-            setValue('secrets', [targetConfig.secrets]);
-            setValue('environment', [targetConfig.environment]);
-            setValue('runs_on', [targetConfig.runs_on]);
+            lib.setValue('aws_assume_role_arn', [targetConfig.aws_assume_role_arn]);
+            lib.setValue('gcp_service_account', [targetConfig.gcp_service_account]);
+            lib.setValue('gcp_workload_identity_provider', [targetConfig.gcp_workload_identity_provider]);
+            lib.setValue('secrets', [targetConfig.secrets]);
             break;
         }
-        setValue('aws_assume_role_arn', [jobConfig.aws_assume_role_arn, targetConfig.aws_assume_role_arn]);
-        setValue('gcp_service_account', [jobConfig.gcp_service_account, targetConfig.gcp_service_account]);
-        setValue('gcp_workload_identity_provider', [jobConfig.gcp_workload_identity_provider, targetConfig.gcp_workload_identity_provider]);
-        setValue('secrets', [jobConfig.secrets, targetConfig.secrets]);
-        setValue('environment', [jobConfig.environment, targetConfig.environment]);
-        setValue('runs_on', [jobConfig.runs_on, targetConfig.runs_on]);
+        lib.setValue('aws_assume_role_arn', [jobConfig.aws_assume_role_arn, targetConfig.aws_assume_role_arn]);
+        lib.setValue('gcp_service_account', [jobConfig.gcp_service_account, targetConfig.gcp_service_account]);
+        lib.setValue('gcp_workload_identity_provider', [jobConfig.gcp_workload_identity_provider, targetConfig.gcp_workload_identity_provider]);
         break;
     }
 }
@@ -5786,7 +5752,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setValue = exports.getJobType = exports.getIsApply = exports.getTarget = exports.getConfig = void 0;
+exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.getTarget = exports.getConfig = void 0;
 const fs = __importStar(__nccwpck_require__(147));
 const core = __importStar(__nccwpck_require__(11));
 const yaml = __nccwpck_require__(716);
@@ -5817,8 +5783,35 @@ function getJobType() {
     return process.env.TFACTION_JOB_TYPE;
 }
 exports.getJobType = getJobType;
-function setValue(name, value, defaultValue) {
-    core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
+function getJobConfig(config, isApply, jobType) {
+    if (isApply) {
+        switch (jobType) {
+            case 'terraform':
+                return config.terraform_apply_config;
+            case 'tfmigrate':
+                return config.tfmigrate_apply_config;
+            default:
+                throw `unknown type: ${jobType}`;
+        }
+    }
+    switch (jobType) {
+        case 'terraform':
+            return config.terraform_plan_config;
+        case 'tfmigrate':
+            return config.tfmigrate_plan_config;
+        default:
+            throw `unknown type: ${jobType}`;
+    }
+}
+exports.getJobConfig = getJobConfig;
+function setValue(name, values) {
+    for (let i = 0; i < values.length; i++) {
+        const value = values[i];
+        if (value != undefined) {
+            core.setOutput(name, value);
+            return;
+        }
+    }
 }
 exports.setValue = setValue;
 

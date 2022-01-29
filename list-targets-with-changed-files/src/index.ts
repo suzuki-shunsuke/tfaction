@@ -7,24 +7,38 @@ interface TargetConfig {
   target: string
   runs_on: string
   environment: string | object | null
+  secrets: object | undefined
 }
 
-function getTargetConfigByTarget(targets: Array<TargetConfig>, target: string): TargetConfig {
+function getTargetConfigByTarget(targets: Array<lib.TargetConfig>, target: string, isApply: boolean, jobType: string): TargetConfig {
   for (let i = 0; i < targets.length; i++) {
     const t = targets[i];
-    if (target.startsWith(t.target)) {
+    if (!target.startsWith(t.target)) {
+      continue;
+    }
+    const jobConfig = lib.getJobConfig(t, isApply, jobType);
+    if (jobConfig == undefined) {
       return {
         target: target,
         runs_on: t.runs_on ? t.runs_on : 'ubuntu-latest',
         environment: t.environment ? t.environment : null,
+        secrets: t.secrets,
       };
     }
+    return {
+      target: target,
+      runs_on: jobConfig.runs_on ? jobConfig.runs_on : (t.runs_on ? t.runs_on : 'ubuntu-latest'),
+      environment: jobConfig.environment ? jobConfig.environment : (t.environment ? t.environment : null),
+      secrets: jobConfig.secrets ? jobConfig.secrets : t.secrets,
+    };
   }
   throw 'target is invalid';
 }
 
 try {
   const config = lib.getConfig();
+
+  const isApply = lib.getIsApply();
 
   const configWorkingDirMap = new Map();
   const configTargetMap = new Map();
@@ -68,7 +82,7 @@ try {
       const target = label.slice(targetPrefix.length);
       if (!terraformTargets.has(target)) {
         terraformTargets.add(target);
-        terraformTargetObjs.push(getTargetConfigByTarget(config.targets, target));
+        terraformTargetObjs.push(getTargetConfigByTarget(config.targets, target, isApply, 'terraform'));
       }
       continue;
     }
@@ -76,7 +90,7 @@ try {
       const target = label.slice(tfmigratePrefix.length);
       if (!tfmigrates.has(target)) {
         tfmigrates.add(target);
-        tfmigrateObjs.push(getTargetConfigByTarget(config.targets, target));
+        tfmigrateObjs.push(getTargetConfigByTarget(config.targets, target, isApply, 'tfmigrate'));
       }
       continue;
     }
@@ -106,7 +120,7 @@ try {
         const changedTarget = changedWorkingDir.replace(target.working_directory, target.target);
         if (!terraformTargets.has(changedTarget) && !ignores.has(changedTarget) && !tfmigrates.has(changedTarget)) {
           terraformTargets.add(changedTarget);
-          terraformTargetObjs.push(getTargetConfigByTarget(config.targets, changedTarget));
+          terraformTargetObjs.push(getTargetConfigByTarget(config.targets, changedTarget, isApply, 'terraform'));
         }
         break;
       }
