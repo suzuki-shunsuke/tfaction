@@ -39,15 +39,19 @@ curl \
 	"https://api.github.com/repos/$GITHUB_REPOSITORY/labels" \
 	-d "{\"name\":\"$label\"}"
 
-assignees=""
-if [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
-	assignees="-a $CI_INFO_PR_AUTHOR"
+create_opts=-H "$follow_up_branch" -t "$pr_title" -b "$pr_body" -l "$label"
+
+if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
+	create_opts="$create_opts -a $CI_INFO_PR_AUTHOR"
 fi
-if [[ "$GITHUB_ACTOR" =~ \[bot\] ]]; then
-	assignees="$assignees -a $GITHUB_ACTOR"
+if ! [[ "$GITHUB_ACTOR" =~ \[bot\] ]]; then
+	create_opts="$create_opts -a $GITHUB_ACTOR"
+fi
+if [ "$TFACTION_DRAFT_PR" = "true" ]; then
+	create_opts="$create_opts -d"
 fi
 
 # shellcheck disable=SC2086
-follow_up_pr_url=$(GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh pr create -d -H "$follow_up_branch" $assignees -t "$pr_title" -b "$pr_body" -l "$label")
+follow_up_pr_url=$(GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh pr create $create_opts)
 
 github-comment post -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "follow_up_pr_url:$follow_up_pr_url" -k create-follow-up-pr
