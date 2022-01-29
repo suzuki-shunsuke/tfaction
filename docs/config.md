@@ -34,6 +34,7 @@ targets:
   aws_region: ap-northeast-1
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/github
+  runs_on: ubuntu-latest # default is "ubuntu-latest". This is useful to use GitHub Actions Self Hosted Runner for the specific provider
   gcs_bucket_name_plan_file: '<Google Cloud Storage Bucket Name for Terraform Plan File>'
   gcp_service_account: terraform@my-project.iam.gserviceaccount.com
   gcp_workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
