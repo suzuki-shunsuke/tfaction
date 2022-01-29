@@ -2,17 +2,20 @@ import * as core from '@actions/core';
 import * as lib from './lib';
 
 interface TargetConfig {
-  target: string
   secrets: Map<string, string>
 }
 
-function getTargetConfigByTarget(targets: Array<TargetConfig>, target: string): TargetConfig {
+interface Target {
+  target: string
+  secrets: object
+}
+
+function getTargetConfigByTarget(targets: Array<Target>, target: string): TargetConfig {
   for (let i = 0; i < targets.length; i++) {
     const t = targets[i];
     if (target.startsWith(t.target)) {
       return {
-        target: target,
-        secrets: t.secrets,
+        secrets: new Map<string, string>(Object.entries(t.secrets)),
       };
     }
   }
@@ -21,7 +24,7 @@ function getTargetConfigByTarget(targets: Array<TargetConfig>, target: string): 
 
 try {
   const config = lib.getConfig();
-  const secrets = JSON.parse(core.getInput('secrets')) as Map<string, string>;
+  const secrets = new Map<string, string>(Object.entries(JSON.parse(core.getInput('secrets'))));
   if (process.env.TFACTION_TARGET == undefined) {
     throw 'environment variable TFACTION_TARGET is required';
   }

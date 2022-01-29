@@ -5695,8 +5695,7 @@ function getTargetConfigByTarget(targets, target) {
         const t = targets[i];
         if (target.startsWith(t.target)) {
             return {
-                target: target,
-                secrets: t.secrets,
+                secrets: new Map(Object.entries(t.secrets)),
             };
         }
     }
@@ -5704,7 +5703,7 @@ function getTargetConfigByTarget(targets, target) {
 }
 try {
     const config = lib.getConfig();
-    const secrets = JSON.parse(core.getInput('secrets'));
+    const secrets = new Map(Object.entries(JSON.parse(core.getInput('secrets'))));
     if (process.env.TFACTION_TARGET == undefined) {
         throw 'environment variable TFACTION_TARGET is required';
     }
