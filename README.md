@@ -49,6 +49,7 @@ Build good Terraform Workflow easily with GitHub Actions.
   * [tfmigrate-apply](tfmigrate-apply)
   * [terraform-plan](terraform-plan)
   * [terraform-apply](terraform-apply)
+  * [create-follow-up-pr](create-follow-up-pr)
   * [create-scaffold-pr](create-scaffold-pr)
   * [scaffold-working-dir](scaffold-working-dir)
   * Low Level Actions. These Actions are used internally
