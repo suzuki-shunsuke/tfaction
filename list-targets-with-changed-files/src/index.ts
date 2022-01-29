@@ -6,6 +6,7 @@ import * as lib from './lib';
 interface TargetConfig {
   target: string
   runs_on: string
+  environment: string | object | null
 }
 
 function getTargetConfigByTarget(targets: Array<TargetConfig>, target: string): TargetConfig {
@@ -15,6 +16,7 @@ function getTargetConfigByTarget(targets: Array<TargetConfig>, target: string): 
       return {
         target: target,
         runs_on: t.runs_on ? t.runs_on : 'ubuntu-latest',
+        environment: t.environment ? t.environment : null,
       };
     }
   }
