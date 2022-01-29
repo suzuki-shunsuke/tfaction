@@ -3,6 +3,23 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as lib from './lib';
 
+interface TargetConfig {
+  target: string
+  runs_on: string
+}
+
+function getTargetConfigByTarget(targets: Array<TargetConfig>, target: string): TargetConfig {
+  for (let i = 0; i < targets.length; i++) {
+    const t = targets[i];
+    if (target.startsWith(t.target)) {
+      return {
+        target: target,
+        runs_on: t.runs_on ? t.runs_on : 'ubuntu-latest',
+      };
+    }
+  }
+  throw 'target is invalid';
+}
 
 try {
   const config = lib.getConfig();
@@ -30,6 +47,8 @@ try {
   const terraformTargets = new Set<string>();
   const tfmigrates = new Set<string>();
   const ignores = new Set<string>();
+  const terraformTargetObjs = new Array<TargetConfig>();
+  const tfmigrateObjs = new Array<TargetConfig>();
 
   const targetPrefix = (config.label_prefixes != undefined && config.label_prefixes.target != undefined && config.label_prefixes.target != '') ?
     config.label_prefixes.target : 'target:';
@@ -45,12 +64,18 @@ try {
     }
     if (label.startsWith(targetPrefix)) {
       const target = label.slice(targetPrefix.length);
-      terraformTargets.add(target);
+      if (!terraformTargets.has(target)) {
+        terraformTargets.add(target);
+        terraformTargetObjs.push(getTargetConfigByTarget(config.targets, target));
+      }
       continue;
     }
     if (label.startsWith(tfmigratePrefix)) {
       const target = label.slice(tfmigratePrefix.length);
-      tfmigrates.add(target);
+      if (!tfmigrates.has(target)) {
+        tfmigrates.add(target);
+        tfmigrateObjs.push(getTargetConfigByTarget(config.targets, target));
+      }
       continue;
     }
     if (label.startsWith(ignorePrefix)) {
@@ -79,13 +104,14 @@ try {
         const changedTarget = changedWorkingDir.replace(target.working_directory, target.target);
         if (!terraformTargets.has(changedTarget) && !ignores.has(changedTarget) && !tfmigrates.has(changedTarget)) {
           terraformTargets.add(changedTarget);
+          terraformTargetObjs.push(getTargetConfigByTarget(config.targets, changedTarget));
         }
         break;
       }
     }
   }
-  core.setOutput('tfmigrate_targets', Array.from(tfmigrates));
-  core.setOutput('terraform_targets', Array.from(terraformTargets));
+  core.setOutput('tfmigrate_targets', tfmigrateObjs);
+  core.setOutput('terraform_targets', terraformTargetObjs);
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
 }
