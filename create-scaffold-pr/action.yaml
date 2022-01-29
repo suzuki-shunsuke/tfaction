@@ -7,6 +7,8 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
       env:
@@ -30,12 +32,11 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
 
     - run: |
-        gh pr create \
-          -d \
-          -H "${{steps.branch.outputs.branch}}" \
-          -a "$GITHUB_ACTOR" \
-          -t "Scaffold a working directory (${TFACTION_TARGET})" \
-          -b "This pull request was created by GitHub Actions workflow_dispatch event https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a working directory (${TFACTION_TARGET})" -b "This pull request was created by GitHub Actions workflow_dispatch event https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
+        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+          opts+=( -d )
+        fi
+        gh pr create "${opts[@]}"
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
