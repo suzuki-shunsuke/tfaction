@@ -6,11 +6,14 @@ targets:
   s3_bucket_name_plan_file: '<S3 Bucket Name for Terraform Plan File>'
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/aws
-  aws_assume_role_arns:
-    tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPR
-    terraform_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPR
-    tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMain
-    terraform_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMain
+  terraform_plan_config:
+    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan
+  tfmigrate_plan_config:
+    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_plan
+  terraform_apply_config:
+    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_apply
+  tfmigrate_apply_config:
+    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_apply
 
 - working_directory: github/services/
   target: github/
@@ -18,11 +21,14 @@ targets:
   s3_bucket_name_plan_file: '<S3 Bucket Name for Terraform Plan File>'
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/github
-  aws_assume_role_arns:
-    tfmigrate_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPRGitHub
-    terraform_plan: arn:aws:iam::000000000000:role/GitHubActionsTerraformPRGitHub
-    tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
-    terraform_apply: arn:aws:iam::000000000000:role/GitHubActionsTerraformMainGitHub
+  terraform_plan_config:
+    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_plan
+  tfmigrate_plan_config:
+    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_plan
+  terraform_apply_config:
+    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_apply
+  tfmigrate_apply_config:
+    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_apply
 
 label_prefixes:
   target: "target:"
