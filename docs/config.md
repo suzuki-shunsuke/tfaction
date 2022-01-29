@@ -43,6 +43,7 @@ targets:
     tfmigrate_apply: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_apply
     terraform_apply: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_apply
 
+draft_pr: true # default is false
 base_working_directory: ""
 working_directory_file: tfaction.yaml # default is "tfaction.yaml"
 renovate_login: 'renovate[bot]'

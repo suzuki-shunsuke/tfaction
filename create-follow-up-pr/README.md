@@ -1,19 +1,16 @@
-# terraform-apply
+# create-follow-up-pr
 
-GitHub Actions to run terraform apply
+GitHub Actions to create a follow up pull request
 
 ## Requirements
 
-* Terraform
-* AWS CLI
 * [GitHub CLI](https://github.com/cli/cli)
-* [tfcmt](https://github.com/suzuki-shunsuke/tfcmt)
 * [github-comment](https://github.com/suzuki-shunsuke/github-comment)
 
 ## Example
 
 ```yaml
-- uses: suzuki-shunsuke/tfaction/terraform-apply@main
+- uses: suzuki-shunsuke/tfaction/create-follow-up-pr@main
   with:
     github_app_token: ${{ secrets.GITHUB_APP_TOKEN }}
 ```

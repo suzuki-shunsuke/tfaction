@@ -1,5 +1,5 @@
-name: terraform apply
-description: terraform apply
+name: create follow up pull request
+description: create follow up pull request
 inputs:
   github_app_token:
     description: 'GitHub Access Token'
@@ -12,13 +12,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
-      id: target-config
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
     - run: bash ${{ github.action_path }}/main.sh
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
-        S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
-        GCS_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}
+        TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
+        TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
