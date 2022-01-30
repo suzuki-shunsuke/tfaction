@@ -3,9 +3,9 @@
 Sometimes `terraform apply` fails even if `terraform plan` passed.
 In that case, tfaction automatically creates a pull request with an empty commit to fix the failure.
 
-![image](https://user-images.githubusercontent.com/13323303/150639029-340a397d-375e-4053-b8fa-138d19e6b468.png)
+![image](https://user-images.githubusercontent.com/13323303/151699230-1c109a57-47d1-4c3b-9c3a-4dfec786a043.png)
 
-![image](https://user-images.githubusercontent.com/13323303/150639055-273935fe-dd2a-4e18-9dac-3d18633a35de.png)
+![image](https://user-images.githubusercontent.com/13323303/151699142-6d19cd51-eac5-4f69-bfe5-7920df69edc6.png)
 
 If the problem would be solved by running `terraform apply` again,
 please merge the created pull request.
