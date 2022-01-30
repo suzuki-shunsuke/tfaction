@@ -42,8 +42,8 @@ try {
 
   const configWorkingDirMap = new Map();
   const configTargetMap = new Map();
-  for (let i = 0; i < config.targets.length; i++) {
-    const target = config.targets[i];
+  for (let i = 0; i < config.target_groups.length; i++) {
+    const target = config.target_groups[i];
     configWorkingDirMap.set(target.working_directory, target);
     configTargetMap.set(target.target, target);
   }
@@ -82,7 +82,7 @@ try {
       const target = label.slice(targetPrefix.length);
       if (!terraformTargets.has(target)) {
         terraformTargets.add(target);
-        terraformTargetObjs.push(getTargetConfigByTarget(config.targets, target, isApply, 'terraform'));
+        terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, target, isApply, 'terraform'));
       }
       continue;
     }
@@ -90,7 +90,7 @@ try {
       const target = label.slice(tfmigratePrefix.length);
       if (!tfmigrates.has(target)) {
         tfmigrates.add(target);
-        tfmigrateObjs.push(getTargetConfigByTarget(config.targets, target, isApply, 'tfmigrate'));
+        tfmigrateObjs.push(getTargetConfigByTarget(config.target_groups, target, isApply, 'tfmigrate'));
       }
       continue;
     }
@@ -114,13 +114,13 @@ try {
   }
 
   for (let changedWorkingDir of changedWorkingDirs) {
-    for (let i = 0; i < config.targets.length; i++) {
-      const target = config.targets[i];
+    for (let i = 0; i < config.target_groups.length; i++) {
+      const target = config.target_groups[i];
       if (changedWorkingDir.startsWith(target.working_directory)) {
         const changedTarget = changedWorkingDir.replace(target.working_directory, target.target);
         if (!terraformTargets.has(changedTarget) && !ignores.has(changedTarget) && !tfmigrates.has(changedTarget)) {
           terraformTargets.add(changedTarget);
-          terraformTargetObjs.push(getTargetConfigByTarget(config.targets, changedTarget, isApply, 'terraform'));
+          terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedTarget, isApply, 'terraform'));
         }
         break;
       }
