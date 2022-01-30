@@ -7,7 +7,7 @@ GitHub Actions to export secrets as environment variables
 ```yaml
 - uses: suzuki-shunsuke/tfaction/export-secrets@main
   with:
-    secrets: ${{ secrets }}
+    secrets: ${{ toJSON(secrets) }}
 ```
 
 ## Environment variables
