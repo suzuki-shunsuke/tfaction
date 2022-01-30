@@ -1,35 +1,15 @@
 import * as core from '@actions/core';
 import * as lib from './lib';
 
-interface TargetConfig {
-  secrets: Map<string, string>
-}
-
-interface Target {
-  target: string
-  secrets: object
-}
-
-function getTargetConfigByTarget(targets: Array<Target>, target: string): TargetConfig {
-  for (let i = 0; i < targets.length; i++) {
-    const t = targets[i];
-    if (target.startsWith(t.target)) {
-      return {
-        secrets: new Map<string, string>(Object.entries(t.secrets)),
-      };
-    }
-  }
-  throw 'target is invalid';
-}
-
 try {
   const config = lib.getConfig();
   const secrets = new Map<string, string>(Object.entries(JSON.parse(core.getInput('secrets'))));
-  if (process.env.TFACTION_TARGET == undefined) {
-    throw 'environment variable TFACTION_TARGET is required';
-  }
-  const target = getTargetConfigByTarget(config.targets, process.env.TFACTION_TARGET);
-  for (let [envName, secretName] of target.secrets) {
+  const targetS = lib.getTarget();
+  const jobType = lib.getJobType();
+  const isApply = lib.getIsApply();
+  const targetConfig = lib.getTargetConfig(config.targets, targetS);
+  const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
+  for (let [envName, secretName] of lib.getSecrets(targetConfig, jobConfig)) {
     if (!secrets.has(secretName)) {
       throw `secret is not found: ${secretName}`;
     }
