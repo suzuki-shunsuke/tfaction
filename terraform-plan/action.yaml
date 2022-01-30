@@ -21,7 +21,6 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        TF_VAR_github_token: ${{ inputs.github_app_token }}
         ROOT_DIR: ${{ github.workspace }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
