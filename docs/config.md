@@ -4,7 +4,7 @@
 
 ```yaml
 ---
-targets:
+target_groups:
 - working_directory: aws/
   target: aws/
   aws_region: ap-northeast-1

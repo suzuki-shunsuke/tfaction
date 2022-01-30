@@ -5696,7 +5696,7 @@ try {
     const targetS = lib.getTarget();
     const jobType = lib.getJobType();
     const isApply = lib.getIsApply();
-    const targetConfig = lib.getTargetConfig(config.targets, targetS);
+    const targetConfig = lib.getTargetConfig(config.target_groups, targetS);
     const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
     for (let [envName, secretName] of lib.getSecrets(targetConfig, jobConfig)) {
         if (!secrets.has(secretName)) {

@@ -4,7 +4,7 @@ import * as core from '@actions/core';
 const yaml = require('js-yaml');
 
 interface Config {
-  targets: Array<TargetConfig>
+  target_groups: Array<TargetConfig>
   label_prefixes: LabelPrefixes | undefined
 }
 

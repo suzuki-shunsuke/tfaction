@@ -7,8 +7,8 @@ try {
   const isApply = lib.getIsApply();
   const jobType = lib.getJobType();
 
-  for (let i = 0; i < config.targets.length; i++) {
-    const targetConfig = config.targets[i];
+  for (let i = 0; i < config.target_groups.length; i++) {
+    const targetConfig = config.target_groups[i];
     if (!target.startsWith(targetConfig.target)) {
       continue;
     }
