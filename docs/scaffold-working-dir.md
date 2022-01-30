@@ -6,7 +6,7 @@ Execute GitHub Actions Workflow manually.
 
 Then a pull request would be created.
 
-![image](https://user-images.githubusercontent.com/13323303/149978172-96e9b96f-0660-46bd-b737-9015131f63b8.png)
+![image](https://user-images.githubusercontent.com/13323303/151699745-b8743536-7e54-41e1-8f8e-73fdf296fef4.png)
 
 Compared with executing commands at the localhost, GitHub Actions has the following merits.
 
