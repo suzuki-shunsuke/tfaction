@@ -38,7 +38,8 @@ Build good Terraform Workflow easily with GitHub Actions.
 * Support AWS OIDC
   * Support changing configuration such as Assume Role ARN per working directory
 * [Scaffold working directory by GitHub Actions `workflow_dispatch` event](docs/scaffold-working-dir.md)
-* Support configuring GitHub Actions job's `runs-on`
+* Support configuring GitHub Actions per working directory and job
+  * AWS Assume Role ARN, GCP Service Account, GitHub Actions's `runs-on`, `environment`, Secrets, and so on
 
 ## Links
 
