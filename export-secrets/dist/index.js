@@ -5690,25 +5690,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(11));
 const lib = __importStar(__nccwpck_require__(181));
-function getTargetConfigByTarget(targets, target) {
-    for (let i = 0; i < targets.length; i++) {
-        const t = targets[i];
-        if (target.startsWith(t.target)) {
-            return {
-                secrets: new Map(Object.entries(t.secrets)),
-            };
-        }
-    }
-    throw 'target is invalid';
-}
 try {
     const config = lib.getConfig();
     const secrets = new Map(Object.entries(JSON.parse(core.getInput('secrets'))));
-    if (process.env.TFACTION_TARGET == undefined) {
-        throw 'environment variable TFACTION_TARGET is required';
-    }
-    const target = getTargetConfigByTarget(config.targets, process.env.TFACTION_TARGET);
-    for (let [envName, secretName] of target.secrets) {
+    const targetS = lib.getTarget();
+    const jobType = lib.getJobType();
+    const isApply = lib.getIsApply();
+    const targetConfig = lib.getTargetConfig(config.targets, targetS);
+    const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
+    for (let [envName, secretName] of lib.getSecrets(targetConfig, jobConfig)) {
         if (!secrets.has(secretName)) {
             throw `secret is not found: ${secretName}`;
         }
@@ -5748,7 +5738,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setValue = exports.getIsApply = exports.getTarget = exports.getConfig = void 0;
+exports.getSecrets = exports.getTargetConfig = exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.getTarget = exports.getConfig = void 0;
 const fs = __importStar(__nccwpck_require__(147));
 const core = __importStar(__nccwpck_require__(11));
 const yaml = __nccwpck_require__(716);
@@ -5772,10 +5762,70 @@ function getIsApply() {
     return process.env.TFACTION_IS_APPLY == 'true';
 }
 exports.getIsApply = getIsApply;
-function setValue(name, value, defaultValue) {
-    core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
+function getJobType() {
+    if (process.env.TFACTION_JOB_TYPE == undefined) {
+        throw 'environment variable TFACTION_JOB_TYPE is required';
+    }
+    return process.env.TFACTION_JOB_TYPE;
+}
+exports.getJobType = getJobType;
+function getJobConfig(config, isApply, jobType) {
+    if (isApply) {
+        switch (jobType) {
+            case 'terraform':
+                return config.terraform_apply_config;
+            case 'tfmigrate':
+                return config.tfmigrate_apply_config;
+            default:
+                throw `unknown type: ${jobType}`;
+        }
+    }
+    switch (jobType) {
+        case 'terraform':
+            return config.terraform_plan_config;
+        case 'tfmigrate':
+            return config.tfmigrate_plan_config;
+        default:
+            throw `unknown type: ${jobType}`;
+    }
+}
+exports.getJobConfig = getJobConfig;
+function setValue(name, values) {
+    for (let i = 0; i < values.length; i++) {
+        const value = values[i];
+        if (value != undefined) {
+            core.setOutput(name, value);
+            return;
+        }
+    }
 }
 exports.setValue = setValue;
+function getTargetConfig(targets, target) {
+    for (let i = 0; i < targets.length; i++) {
+        const t = targets[i];
+        if (target.startsWith(t.target)) {
+            return t;
+        }
+    }
+    throw 'target is invalid';
+}
+exports.getTargetConfig = getTargetConfig;
+function getSecrets(targetConfig, jobConfig) {
+    const targetSecrets = targetConfig.secrets;
+    const secrets = new Map();
+    if (targetSecrets != undefined) {
+        for (let [k, v] of Object.entries(targetSecrets)) {
+            secrets.set(k, v);
+        }
+    }
+    if (jobConfig != undefined && jobConfig.secrets != undefined) {
+        for (let [k, v] of Object.entries(jobConfig.secrets)) {
+            secrets.set(k, v);
+        }
+    }
+    return secrets;
+}
+exports.getSecrets = getSecrets;
 
 
 /***/ }),
