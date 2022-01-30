@@ -14,6 +14,7 @@ try {
       throw `secret is not found: ${secretName}`;
     }
     const secretValue = secrets.get(secretName);
+    core.info(`export the secret ${secretName} as the environment variable ${envName}`);
     core.exportVariable(envName, secretValue);
   }
 } catch (error) {
