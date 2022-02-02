@@ -5811,18 +5811,35 @@ function getTargetConfig(targets, target) {
     throw 'target is invalid';
 }
 exports.getTargetConfig = getTargetConfig;
+function setSecretToMap(secrets, m) {
+    for (let i = 0; i < secrets.length; i++) {
+        const secret = secrets[i];
+        if (secret.env_name) {
+            if (secret.secret_name) {
+                m.set(secret.env_name, secret.secret_name);
+            }
+            else {
+                m.set(secret.env_name, secret.env_name);
+            }
+        }
+        else {
+            if (secret.secret_name) {
+                m.set(secret.secret_name, secret.secret_name);
+            }
+            else {
+                throw 'either secret_name or env_name is required';
+            }
+        }
+    }
+}
 function getSecrets(targetConfig, jobConfig) {
     const targetSecrets = targetConfig.secrets;
     const secrets = new Map();
     if (targetSecrets != undefined) {
-        for (let [k, v] of Object.entries(targetSecrets)) {
-            secrets.set(k, v);
-        }
+        setSecretToMap(targetSecrets, secrets);
     }
     if (jobConfig != undefined && jobConfig.secrets != undefined) {
-        for (let [k, v] of Object.entries(jobConfig.secrets)) {
-            secrets.set(k, v);
-        }
+        setSecretToMap(jobConfig.secrets, secrets);
     }
     return secrets;
 }
