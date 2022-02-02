@@ -2,6 +2,16 @@ import * as core from '@actions/core';
 import * as lib from './lib';
 import { SecretsManagerClient, GetSecretValueCommand, GetSecretValueCommandInput } from '@aws-sdk/client-secrets-manager';
 
+function exportSecret(envName: string, secretID: string, secretValue: string, secretKey: string) {
+  if (secretKey) {
+    core.info(`export the secret as the environment variable: secret_id=${secretID} env_name=${envName} secret_key=${secretKey}`);
+  } else {
+    core.info(`export the secret as the environment variable: secret_id=${secretID} env_name=${envName}`);
+  }
+  core.setSecret(secretValue);
+  core.exportVariable(envName, secretValue);
+}
+
 async function exportSecrets(client: SecretsManagerClient, secrets: Array<lib.AWSSecretsManagerSecret>) {
   for (let i = 0; i < secrets.length; i++) {
     const secret = secrets[i];
@@ -22,8 +32,7 @@ async function exportSecrets(client: SecretsManagerClient, secrets: Array<lib.AW
         throw `env_name is required: secret_id=${secret.secret_id}`;
       }
       if (!e.secret_key) {
-        core.info(`export the secret ${secret.secret_id} as the environment variable ${e.env_name}`);
-        core.exportVariable(e.env_name, response.SecretString);
+        exportSecret(e.env_name, secret.secret_id, response.SecretString, '');
         continue;
       }
       if (!secretJSON) {
@@ -32,8 +41,7 @@ async function exportSecrets(client: SecretsManagerClient, secrets: Array<lib.AW
       if (!secretJSON[e.secret_key]) {
         throw `secret key isn't found: secret_key=${e.secret_key} secret_id=${secret.secret_id}`;
       }
-      core.info(`export the secret ${e.secret_key} as the environment variable ${e.env_name}`);
-      core.exportVariable(e.env_name, secretJSON[e.secret_key]);
+      exportSecret(e.env_name, secret.secret_id, secretJSON[e.secret_key], e.secret_key);
     }
   }
 }
