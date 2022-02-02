@@ -27,7 +27,7 @@ export interface TargetConfig {
   gcp_service_account: string | undefined
   gcp_workload_identity_provider: string | undefined
   environment: object | string | undefined
-  secrets: object | undefined
+  secrets: Array<Secret> | undefined
   runs_on: string | undefined
 
   terraform_plan_config: JobConfig | undefined
@@ -36,12 +36,17 @@ export interface TargetConfig {
   tfmigrate_apply_config: JobConfig | undefined
 }
 
+export interface Secret {
+  env_name: string | undefined
+  secret_name: string | undefined
+}
+
 export interface JobConfig {
   aws_assume_role_arn: string | undefined
   gcp_service_account: string | undefined
   gcp_workload_identity_provider: string | undefined
   environment: object | string | undefined
-  secrets: object | undefined
+  secrets: Array<Secret> | undefined
   runs_on: string | undefined
 }
 
@@ -117,19 +122,34 @@ export function getTargetConfig(targets: Array<TargetConfig>, target: string): T
   throw 'target is invalid';
 }
 
+function setSecretToMap(secrets: Array<Secret>, m: Map<string, string>) {
+  for (let i = 0; i < secrets.length; i++) {
+    const secret = secrets[i];
+    if (secret.env_name) {
+      if (secret.secret_name) {
+        m.set(secret.env_name, secret.secret_name);
+      } else {
+        m.set(secret.env_name, secret.env_name);
+      }
+    } else {
+      if (secret.secret_name) {
+        m.set(secret.secret_name, secret.secret_name);
+      } else {
+        throw 'either secret_name or env_name is required';
+      }
+    }
+  }
+}
+
 export function getSecrets(targetConfig: TargetConfig, jobConfig: JobConfig | undefined): Map<string, string> {
   const targetSecrets = targetConfig.secrets;
   const secrets = new Map<string, string>();
   if (targetSecrets != undefined) {
-    for (let [k, v] of Object.entries(targetSecrets)) {
-      secrets.set(k, v);
-    }
+    setSecretToMap(targetSecrets, secrets);
   }
   
   if (jobConfig != undefined && jobConfig.secrets != undefined) {
-    for (let [k, v] of Object.entries(jobConfig.secrets)) {
-      secrets.set(k, v);
-    }
+    setSecretToMap(jobConfig.secrets, secrets);
   }
   return secrets;
 }

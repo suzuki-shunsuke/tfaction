@@ -58,9 +58,9 @@ target_groups:
     # https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment
     name: production
     url: https://github.com
-  secrets:
-    # enviornment variable name: secret name
-    FOO: FOO_STAGING
+  secrets: # GitHub Secrets
+  - env_name: FOO # Environment variable name
+    secret_name: FOO_STAGING # Secret name
 
   gcs_bucket_name_plan_file: '<Google Cloud Storage Bucket Name for Terraform Plan File>'
   terraform_plan_config:
@@ -201,8 +201,9 @@ target_groups:
 - working_directory: atlas/staging/
   # ...
   secrets:
-    # <environment variable name>: <GitHub Secrets Name>
-    ATLAS_API_KEY: ATLAS_API_KEY_STAGING # export the secret `ATLAS_API_KEY_STAGING` as the environment variable `ATLAS_API_KEY`
+  # export the secret `ATLAS_API_KEY_STAGING` as the environment variable `ATLAS_API_KEY`
+  - env_name: ATLAS_API_KEY
+    secret_name: ATLAS_API_KEY_STAGING
 ```
 
 Job Configuration
@@ -216,8 +217,8 @@ target_groups:
   terraform_plan_config:
     # ...
     secrets:
-      # <environment variable name>: <GitHub Secrets Name>
-      ATLAS_API_KEY: ATLAS_API_KEY_STAGING_READ_ONLY
+    - env_name: ATLAS_API_KEY
+      secret_name: ATLAS_API_KEY_STAGING_READ_ONLY
 ```
 
 ### AWS Secrets Manager
