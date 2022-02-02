@@ -61,6 +61,7 @@ Build good Terraform Workflow easily with GitHub Actions.
     * [list-targets-with-changed-files](list-targets-with-changed-files)
     * [list-working-dirs](list-working-dirs)
     * [deploy-ssh-key](deploy-ssh-key)
+    * [export-aws-secrets-manager](export-aws-secrets-manager)
 * Actions outside of this repository
   * [suzuki-shunsuke/github-action-tflint](https://github.com/suzuki-shunsuke/github-action-tflint)
   * [suzuki-shunsuke/github-action-tfsec](https://github.com/suzuki-shunsuke/github-action-tfsec)

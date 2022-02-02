@@ -26,12 +26,25 @@ target_groups:
   s3_bucket_name_plan_file: '<S3 Bucket Name for Terraform Plan File>'
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
   template_dir: templates/github
+  aws_secrets_manager:
+  # export AWS Secrets Manager's secret as environment variable
+  - secret_id: bar
+    envs:
+    - env_name: BAR
   terraform_plan_config:
     aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_plan
   tfmigrate_plan_config:
     aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_plan
   terraform_apply_config:
     aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_terraform_apply
+    aws_secrets_manager:
+    # export AWS Secrets Manager's secret as environment variable
+    - secret_id: atlas_api_key
+      envs:
+      - env_name: ATLAS_API_PUBLIC_KEY
+        secret_key: public_key
+      - env_name: ATLAS_API_PRIVATE_KEY
+        secret_key: private_key
   tfmigrate_apply_config:
     aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_github_tfmigrate_apply
 
@@ -48,6 +61,7 @@ target_groups:
   secrets:
     # enviornment variable name: secret name
     FOO: FOO_STAGING
+
   gcs_bucket_name_plan_file: '<Google Cloud Storage Bucket Name for Terraform Plan File>'
   terraform_plan_config:
     aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_gcp_terraform_plan
@@ -158,3 +172,101 @@ gsutil doesn't support Workload Identity Federation yet, so you have to use trad
 * https://github.com/google-github-actions/auth#authenticating-via-workload-identity-federation
 
 > The bq and gsutil tools do no currently support Workload Identity Federation! You will need to use traditional service account key authentication for now.
+
+## Secrets Management
+
+tfaction supports two types of secrets management.
+
+1. [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+1. [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
+
+We recommend using AWS Secrets Manager to restrict the access to secrets.
+
+### GitHub Secrets
+
+You can export GitHub Secrets as environment variables with [export-secrets](export-secrets) Action.
+
+```yaml
+- uses: suzuki-shunsuke/tfaction/export-secrets@main
+  with:
+    secrets: ${{ toJSON(secrets) }}
+```
+
+Target Group Configuration
+
+e.g.
+
+```yaml
+target_groups:
+- working_directory: atlas/staging/
+  # ...
+  secrets:
+    # <environment variable name>: <GitHub Secrets Name>
+    ATLAS_API_KEY: ATLAS_API_KEY_STAGING # export the secret `ATLAS_API_KEY_STAGING` as the environment variable `ATLAS_API_KEY`
+```
+
+Job Configuration
+
+e.g.
+
+```yaml
+target_groups:
+- working_directory: atlas/staging/
+  # ...
+  terraform_plan_config:
+    # ...
+    secrets:
+      # <environment variable name>: <GitHub Secrets Name>
+      ATLAS_API_KEY: ATLAS_API_KEY_STAGING_READ_ONLY
+```
+
+### AWS Secrets Manager
+
+You can export AWS Secrets Manager's Secrets as environment variables with [export-aws-secrets-manager](export-aws-secrets-manager) Action.
+This action is used in [setup](setup) Action, so you don't have to use this Action explicitly.
+
+Target Group Configuration
+
+e.g.
+
+```yaml
+target_groups:
+- working_directory: foo/
+  # ...
+  aws_secrets_manager:
+  - secret_id: foo
+    envs:
+    - env_name: FOO_API_KEY
+    # if `secret_key` isn't specified, the whole secret value is exported
+```
+
+```yaml
+target_groups:
+- working_directory: atlas/
+  # ...
+  aws_secrets_manager:
+  - secret_id: atlas
+    envs:
+    - env_name: ATLAS_API_PUBLIC_KEY
+      secret_key: public_key
+    - env_name: ATLAS_API_PRIVATE_KEY
+      secret_key: private_key
+      # if `secret_key` is specified, the secret value is treated as JSON and the specified key is exported
+```
+
+Job Configuration
+
+```yaml
+target_groups:
+- working_directory: atlas/
+  # ...
+  terraform_plan_config:
+    # ...
+    aws_secrets_manager:
+    - secret_id: atlas
+      envs:
+      - env_name: ATLAS_API_PUBLIC_KEY
+        secret_key: public_key
+      - env_name: ATLAS_API_PRIVATE_KEY
+        secret_key: private_key
+```
