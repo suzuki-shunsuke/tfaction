@@ -22887,6 +22887,16 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(5324));
 const lib = __importStar(__nccwpck_require__(463));
 const client_secrets_manager_1 = __nccwpck_require__(1876);
+function exportSecret(envName, secretID, secretValue, secretKey) {
+    if (secretKey) {
+        core.info(`export the secret as the environment variable: secret_id=${secretID} env_name=${envName} secret_key=${secretKey}`);
+    }
+    else {
+        core.info(`export the secret as the environment variable: secret_id=${secretID} env_name=${envName}`);
+    }
+    core.setSecret(secretValue);
+    core.exportVariable(envName, secretValue);
+}
 function exportSecrets(client, secrets) {
     return __awaiter(this, void 0, void 0, function* () {
         for (let i = 0; i < secrets.length; i++) {
@@ -22908,8 +22918,7 @@ function exportSecrets(client, secrets) {
                     throw `env_name is required: secret_id=${secret.secret_id}`;
                 }
                 if (!e.secret_key) {
-                    core.info(`export the secret ${secret.secret_id} as the environment variable ${e.env_name}`);
-                    core.exportVariable(e.env_name, response.SecretString);
+                    exportSecret(e.env_name, secret.secret_id, response.SecretString, '');
                     continue;
                 }
                 if (!secretJSON) {
@@ -22918,8 +22927,7 @@ function exportSecrets(client, secrets) {
                 if (!secretJSON[e.secret_key]) {
                     throw `secret key isn't found: secret_key=${e.secret_key} secret_id=${secret.secret_id}`;
                 }
-                core.info(`export the secret ${e.secret_key} as the environment variable ${e.env_name}`);
-                core.exportVariable(e.env_name, secretJSON[e.secret_key]);
+                exportSecret(e.env_name, secret.secret_id, secretJSON[e.secret_key], e.secret_key);
             }
         }
     });
