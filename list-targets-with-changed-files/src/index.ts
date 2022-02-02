@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import * as github from '@actions/github';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as lib from './lib';
@@ -58,6 +59,14 @@ try {
       continue;
     }
     workingDirs.add(path.dirname(configFile));
+  }
+
+  // <!-- tfaction follow up pr target=foo -->
+  let followupTarget = '';
+  const followupPRBodyPrefix='<!-- tfaction follow up pr target=';
+  const prBody = (github.context.payload.pull_request && github.context.payload.pull_request.body) ? github.context.payload.pull_request.body : '';
+  if (prBody.startsWith(followupPRBodyPrefix)) {
+    followupTarget = prBody.split('\n')[0].slice(followupPRBodyPrefix.length, - ' -->'.length);
   }
 
   const terraformTargets = new Set<string>();
@@ -126,6 +135,12 @@ try {
       }
     }
   }
+
+  if (followupTarget && !tfmigrates.has(followupTarget) && !terraformTargets.has(followupTarget)) {
+    terraformTargets.add(followupTarget);
+    terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, followupTarget, isApply, 'terraform'));
+  }
+
   core.setOutput('tfmigrate_targets', tfmigrateObjs);
   core.setOutput('terraform_targets', terraformTargetObjs);
 } catch (error) {

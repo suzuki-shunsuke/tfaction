@@ -5,8 +5,7 @@ set -o pipefail
 
 # create a pull request with empty commit
 # 1. create a remote branch
-# 2. create a label
-# 3. open pull request
+# 2. open pull request
 
 follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
 GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
@@ -21,7 +20,8 @@ git fetch origin "$follow_up_branch"
 git branch "$follow_up_branch" "origin/$follow_up_branch"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
-pr_body="This pull request was created automatically to follow up the failure of apply.
+pr_body="<!-- tfaction follow up pr target=$TFACTION_TARGET -->
+This pull request was created automatically to follow up the failure of apply.
 
 Follow up #$CI_INFO_PR_NUMBER ([failed workflow](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))
 
@@ -30,16 +30,7 @@ Follow up #$CI_INFO_PR_NUMBER ([failed workflow](https://github.com/$GITHUB_REPO
 1. Add commits to this pull request and fix the problem if needed
 1. Review and merge this pull request"
 
-label=${TFACTION_TARGET_LABEL_PREFIX}${TFACTION_TARGET}
-
-curl \
-	-X POST \
-	-H "Authorization: token $GITHUB_TOKEN" \
-	-H "Accept: application/vnd.github.v3+json" \
-	"https://api.github.com/repos/$GITHUB_REPOSITORY/labels" \
-	-d "{\"name\":\"$label\"}"
-
-create_opts=(-H "$follow_up_branch" -t "$pr_title" -b "$pr_body" -l "$label")
+create_opts=(-H "$follow_up_branch" -t "$pr_title" -b "$pr_body")
 if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
 	create_opts+=( -a "$CI_INFO_PR_AUTHOR" )
 fi
