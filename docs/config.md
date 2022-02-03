@@ -180,8 +180,6 @@ tfaction supports two types of secrets management.
 1. [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
 1. [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
 
-We recommend using AWS Secrets Manager to restrict the access to secrets.
-
 ### GitHub Secrets
 
 You can export GitHub Secrets as environment variables with [export-secrets](export-secrets) Action.
