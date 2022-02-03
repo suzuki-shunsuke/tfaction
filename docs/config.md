@@ -4,13 +4,22 @@
 
 ```yaml
 ---
+draft_pr: true # default is false. If `draft_pr` is true, tfaction creates pull requests as draft
+base_working_directory: "" # default is empty, which means the current directory
+working_directory_file: tfaction.yaml # default is "tfaction.yaml"
+renovate_login: 'renovate[bot]' # default is "renovate[bot]"
+label_prefixes:
+  target: "target:" # default is "target:"
+  tfmigrate: "tfmigrate:" # default is "tfmigrate:"
+  ignore: "ignore:" # default is "ignore:"
+
 target_groups:
 - working_directory: aws/
   target: aws/
   aws_region: ap-northeast-1
   s3_bucket_name_plan_file: '<S3 Bucket Name for Terraform Plan File>'
   s3_bucket_name_tfmigrate_history: '<S3 Bucket Name for tfmigrate history files>'
-  template_dir: templates/aws
+  template_dir: templates/aws # This is used by `scaffold-working-dir` action
   terraform_plan_config:
     aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan
   tfmigrate_plan_config:
@@ -79,15 +88,6 @@ target_groups:
     aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_gcp_tfmigrate_apply
     gcp_service_account: terraform@my-project.iam.gserviceaccount.com
     gcp_workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
-
-draft_pr: true # default is false
-base_working_directory: ""
-working_directory_file: tfaction.yaml # default is "tfaction.yaml"
-renovate_login: 'renovate[bot]'
-label_prefixes:
-  target: "target:" # default is "target:"
-  tfmigrate: "tfmigrate:" # default is "tfmigrate:"
-  ignore: "ignore:" # default is "ignore:"
 ```
 
 ## Environment Variables
@@ -97,6 +97,7 @@ name | default | description
 TFACTION_CONFIG | `tfaction-root.yaml` | configuration file path
 TFACTION_TARGET | | target
 TFACTION_IS_APPLY | | `true` or `false`. Whether `terraform apply` or `tfmigrate apply` are run
+TFACTION_JOB_TYPE | | `terraform` or `tfmigrate`
 
 ## `tfaction.yaml`
 
