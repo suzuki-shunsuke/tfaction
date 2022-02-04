@@ -14,7 +14,7 @@ aws s3 rm "s3://$S3_BUCKET_NAME_PLAN_FILE/$PR_NUMBER/$TFACTION_TARGET/tfplan.bin
 
 if [ ! -f .tfmigrate.hcl ]; then
 	sed "s|%%TARGET%%|$TFACTION_TARGET|g" \
-		"$ROOT_DIR/.github/actions/tfmigrate-plan/tfmigrate.hcl" |
+		"$GITHUB_ACTION_PATH/tfmigrate.hcl" |
 		sed "s|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|$S3_BUCKET_NAME_TFMIGRATE_HISTORY|g" >.tfmigrate.hcl
 	github-comment exec -- \
 		ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
