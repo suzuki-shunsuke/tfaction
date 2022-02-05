@@ -1,0 +1,159 @@
+{
+  "$id": "https://github.com/suzuki-shunsuke/tfaction/blob/main/schema/tfaction.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "tfaction.yaml",
+  "type": "object",
+  "description": "tfaction.yaml",
+  "required": [],
+  "properties": {
+    "aws_region": {
+      "$ref": "#/$defs/AWSRegion"
+    },
+    "template_dir": {
+      "$ref": "#/$defs/TemplateDir"
+    },
+    "gcs_bucket_name_plan_file": {
+      "$ref": "#/$defs/GCSBucketNamePlanFile"
+    },
+    "s3_bucket_name_plan_file": {
+      "$ref": "#/$defs/S3BucketNamePlanFile"
+    },
+    "s3_bucket_name_tfmigrate_history": {
+      "$ref": "#/$defs/S3BucketNameTfmigrateHistory"
+    },
+    "terraform_plan_config": {
+      "$ref": "#/$defs/JobConfig",
+      "description": "configuration which is used in the job for 'terraform plan'"
+    },
+    "terraform_apply_config": {
+      "$ref": "#/$defs/JobConfig",
+      "description": "configuration which is used in the job for 'terraform apply'"
+    },
+    "tfmigrate_plan_config": {
+      "$ref": "#/$defs/JobConfig",
+      "description": "configuration which is used in the job for 'tfmigrate plan'"
+    },
+    "tfmigrate_apply_config": {
+      "$ref": "#/$defs/JobConfig",
+      "description": "configuration which is used in the job for 'tfmigrate apply'"
+    }
+  },
+  "$defs": {
+    "AWSRegion": {
+      "type": "string",
+      "description": "AWS Region. This is used for AWS OIDC Authentication, Getting Secrets from AWS Secrets Manager, and so on"
+    },
+    "AWSAssumeRoleARN": {
+      "type": "string",
+      "description": "AWS Assume Role ARN"
+    },
+    "GCPServiceAccount": {
+      "type": "string",
+      "description": "GCP Service Account"
+    },
+    "GCPWorkloadIdentityProvider": {
+      "type": "string",
+      "description": "GCP Workload Identity Provider"
+    },
+    "GCSBucketNamePlanFile": {
+      "type": "string",
+      "description": "GCS Bucket Name to store Terraform Plan files"
+    },
+    "TemplateDir": {
+      "type": "string",
+      "description": "the template directory path to scaffold a working directory"
+    },
+    "S3BucketNamePlanFile": {
+      "type": "string",
+      "description": "S3 Bucket name to store Terraform Plan files"
+    },
+    "S3BucketNameTfmigrateHistory": {
+      "type": "string",
+      "description": "S3 Bucket name to store tfmigrate History files"
+    },
+    "Secrets": {
+      "type": "array",
+      "description": "list of exported GitHub Secrets",
+      "items": {
+        "type": "object",
+        "description": "exported GitHub Secret",
+        "properties": {
+          "env_name": {
+            "type": "string",
+            "description": "exported environment variable",
+            "default": "the value of 'secret_name'"
+          },
+          "secret_name": {
+            "type": "string",
+            "description": "exported GitHub Secret name",
+            "default": "the value of 'env_name'"
+          }
+        }
+      }
+    },
+    "AWSSecretsManager": {
+      "type": "array",
+      "description": "list of AWS Secrets Manager's secret and exported environment variables",
+      "items": {
+        "type": "object",
+        "description": "target group configuration",
+        "required": [
+          "secret_id",
+          "envs"
+        ],
+        "properties": {
+          "secret_id": {
+            "type": "string",
+            "description": "AWS Secrets Manager's secret id"
+          },
+          "envs": {
+            "type": "array",
+            "description": "exported environment variables",
+            "items": {
+              "type": "object",
+              "description": "exported environment variable",
+              "required": [
+                "env_name"
+              ],
+              "properties": {
+                "env_name": {
+                  "type": "string",
+                  "description": "exported environment variable"
+                },
+                "secret_key": {
+                  "type": "string",
+                  "description": "AWS Secrets Manager's secret key"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "JobConfig": {
+      "type": "object",
+      "description": "job configuration",
+      "required": [],
+      "properties": {
+        "aws_region": {
+          "$ref": "#/$defs/AWSRegion"
+        },
+        "aws_assume_role_arn": {
+          "$ref": "#/$defs/AWSAssumeRoleARN"
+        },
+        "gcp_service_account": {
+          "$ref": "#/$defs/GCPServiceAccount"
+        },
+        "gcp_workload_identity_provider": {
+          "$ref": "#/$defs/GCPWorkloadIdentityProvider"
+        },
+        "secrets": {
+          "$ref": "#/$defs/Secrets"
+        },
+        "aws_secrets_manager": {
+          "$ref": "#/$defs/AWSSecretsManager"
+        }
+      }
+    }
+  }
+}
