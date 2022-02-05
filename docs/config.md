@@ -1,5 +1,17 @@
 # Configuration
 
+## JSON Schema
+
+* [tfaction-root.yaml](../schema/tfaction-root.json)
+* [tfaction.yaml](../schema/tfaction.json)
+
+## Generated document from JSON Schema
+
+* [tfaction-root.yaml](https://suzuki-shunsuke.github.io/tfaction/config/tfaction-root.yaml.html)
+* [tfaction.yaml](https://suzuki-shunsuke.github.io/tfaction/config/tfaction.yaml.html)
+
+---
+
 `tfaction-root.yaml`
 
 ```yaml
