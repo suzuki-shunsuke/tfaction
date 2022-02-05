@@ -5690,33 +5690,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(324));
 const lib = __importStar(__nccwpck_require__(463));
+const path = __importStar(__nccwpck_require__(17));
 try {
     const config = lib.getConfig();
     const target = lib.getTarget();
     const isApply = lib.getIsApply();
     const jobType = lib.getJobType();
+    const workingDirectoryFile = config.working_directory_file ? config.working_directory_file : 'tfaction.yaml';
     for (let i = 0; i < config.target_groups.length; i++) {
         const targetConfig = config.target_groups[i];
         if (!target.startsWith(targetConfig.target)) {
             continue;
         }
-        core.setOutput('working_directory', target.replace(targetConfig.target, targetConfig.working_directory));
-        core.setOutput('aws_region', targetConfig.aws_region);
-        core.setOutput('s3_bucket_name_plan_file', targetConfig.s3_bucket_name_plan_file);
-        core.setOutput('s3_bucket_name_tfmigrate_history', targetConfig.s3_bucket_name_tfmigrate_history);
-        core.setOutput('template_dir', targetConfig.template_dir);
-        core.setOutput('gcs_bucket_name_plan_file', targetConfig.gcs_bucket_name_plan_file);
-        const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
-        if (jobConfig == undefined) {
-            lib.setValue('aws_assume_role_arn', [targetConfig.aws_assume_role_arn]);
-            lib.setValue('gcp_service_account', [targetConfig.gcp_service_account]);
-            lib.setValue('gcp_workload_identity_provider', [targetConfig.gcp_workload_identity_provider]);
-            lib.setValue('secrets', [targetConfig.secrets]);
-            break;
-        }
-        lib.setValue('aws_assume_role_arn', [jobConfig.aws_assume_role_arn, targetConfig.aws_assume_role_arn]);
-        lib.setValue('gcp_service_account', [jobConfig.gcp_service_account, targetConfig.gcp_service_account]);
-        lib.setValue('gcp_workload_identity_provider', [jobConfig.gcp_workload_identity_provider, targetConfig.gcp_workload_identity_provider]);
+        const rootJobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
+        const workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
+        core.setOutput('working_directory', workingDir);
+        const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
+        const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
+        lib.setOutputs([
+            'aws_region',
+            's3_bucket_name_plan_file',
+            's3_bucket_name_tfmigrate_history',
+            'template_dir',
+            'gcs_bucket_name_plan_file',
+            'aws_assume_role_arn',
+            'gcp_service_account',
+            'gcp_workload_identity_provider',
+            'secrets',
+        ], [jobConfig, wdConfig, rootJobConfig, targetConfig]);
         break;
     }
 }
@@ -5752,18 +5753,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.getTarget = exports.getConfig = void 0;
+exports.setOutputs = exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.getTarget = exports.readTargetConfig = exports.getConfig = void 0;
 const fs = __importStar(__nccwpck_require__(147));
 const core = __importStar(__nccwpck_require__(324));
 const yaml = __nccwpck_require__(502);
 function getConfig() {
-    let configFilePath = process.env.TFACTION_CONFIG;
-    if (configFilePath == '' || configFilePath == undefined) {
-        configFilePath = 'tfaction-root.yaml';
-    }
+    const configFilePath = process.env.TFACTION_CONFIG ? process.env.TFACTION_CONFIG : 'tfaction-root.yaml';
     return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
 }
 exports.getConfig = getConfig;
+function readTargetConfig(p) {
+    return yaml.load(fs.readFileSync(p, 'utf8'));
+}
+exports.readTargetConfig = readTargetConfig;
 function getTarget() {
     const target = process.env.TFACTION_TARGET;
     if (target == '' || target == undefined) {
@@ -5814,6 +5816,19 @@ function setValue(name, values) {
     }
 }
 exports.setValue = setValue;
+function setOutputs(keys, objs) {
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        for (let j = 0; j < objs.length; j++) {
+            const obj = objs[j];
+            if (obj != undefined && obj != null && obj[key] != undefined) {
+                core.setOutput(key, obj[key]);
+                break;
+            }
+        }
+    }
+}
+exports.setOutputs = setOutputs;
 
 
 /***/ }),
