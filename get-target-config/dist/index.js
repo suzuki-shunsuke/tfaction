@@ -5708,15 +5708,16 @@ try {
         const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
         const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
         lib.setOutputs([
-            'aws_region',
             's3_bucket_name_plan_file',
             's3_bucket_name_tfmigrate_history',
             'template_dir',
             'gcs_bucket_name_plan_file',
+        ], [wdConfig, targetConfig]);
+        lib.setOutputs([
+            'aws_region',
             'aws_assume_role_arn',
             'gcp_service_account',
             'gcp_workload_identity_provider',
-            'secrets',
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig]);
         break;
     }
