@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as lib from './lib';
+import * as path from 'path';
 
 try {
   const config = lib.getConfig();
@@ -7,31 +8,32 @@ try {
   const isApply = lib.getIsApply();
   const jobType = lib.getJobType();
 
+  const workingDirectoryFile = config.working_directory_file ? config.working_directory_file : 'tfaction.yaml';
+
   for (let i = 0; i < config.target_groups.length; i++) {
     const targetConfig = config.target_groups[i];
     if (!target.startsWith(targetConfig.target)) {
       continue;
     }
+    const rootJobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
 
-    core.setOutput('working_directory', target.replace(targetConfig.target, targetConfig.working_directory));
-    core.setOutput('aws_region', targetConfig.aws_region);
-    core.setOutput('s3_bucket_name_plan_file', targetConfig.s3_bucket_name_plan_file);
-    core.setOutput('s3_bucket_name_tfmigrate_history', targetConfig.s3_bucket_name_tfmigrate_history);
-    core.setOutput('template_dir', targetConfig.template_dir);
-    core.setOutput('gcs_bucket_name_plan_file', targetConfig.gcs_bucket_name_plan_file);
+    const workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
 
-    const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
+    core.setOutput('working_directory', workingDir);
 
-    if (jobConfig == undefined) {
-      lib.setValue('aws_assume_role_arn', [targetConfig.aws_assume_role_arn]);
-      lib.setValue('gcp_service_account', [targetConfig.gcp_service_account]);
-      lib.setValue('gcp_workload_identity_provider', [targetConfig.gcp_workload_identity_provider]);
-      lib.setValue('secrets', [targetConfig.secrets]);
-      break;
-    }
-    lib.setValue('aws_assume_role_arn', [jobConfig.aws_assume_role_arn, targetConfig.aws_assume_role_arn]);
-    lib.setValue('gcp_service_account', [jobConfig.gcp_service_account, targetConfig.gcp_service_account]);
-    lib.setValue('gcp_workload_identity_provider', [jobConfig.gcp_workload_identity_provider, targetConfig.gcp_workload_identity_provider]);
+    const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
+    const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
+    lib.setOutputs([
+      'aws_region',
+      's3_bucket_name_plan_file',
+      's3_bucket_name_tfmigrate_history',
+      'template_dir',
+      'gcs_bucket_name_plan_file',
+      'aws_assume_role_arn',
+      'gcp_service_account',
+      'gcp_workload_identity_provider',
+      'secrets',
+    ], [jobConfig, wdConfig, rootJobConfig, targetConfig]);
     break;
   }
 } catch (error) {

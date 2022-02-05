@@ -4,6 +4,7 @@ import * as core from '@actions/core';
 const yaml = require('js-yaml');
 
 interface Config {
+  working_directory_file: string | undefined
   target_groups: Array<TargetConfig>
 }
 
@@ -39,11 +40,12 @@ export interface JobConfig {
 }
 
 export function getConfig(): Config {
-  let configFilePath = process.env.TFACTION_CONFIG;
-  if (configFilePath == '' || configFilePath == undefined) {
-    configFilePath = 'tfaction-root.yaml';
-  }
+  const configFilePath = process.env.TFACTION_CONFIG ? process.env.TFACTION_CONFIG : 'tfaction-root.yaml';
   return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+}
+
+export function readTargetConfig(p: string): TargetConfig {
+  return yaml.load(fs.readFileSync(p, 'utf8'));
 }
 
 export function getTarget(): string {
@@ -92,6 +94,19 @@ export function setValue(name: string, values: Array<any>) {
     if (value != undefined) {
       core.setOutput(name, value);
       return;
+    }
+  }
+}
+
+export function setOutputs(keys: Array<string>, objs: Array<any>) {
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    for (let j = 0; j < objs.length; j++) {
+      const obj = objs[j];
+      if (obj != undefined && obj != null && obj[key] != undefined) {
+        core.setOutput(key, obj[key]);
+        break;
+      }
     }
   }
 }
