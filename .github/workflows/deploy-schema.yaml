@@ -1,4 +1,4 @@
-name: Genrate document from JSON Schema and deploy
+name: Generate document from JSON Schema and deploy
 on:
   push:
     branches:
