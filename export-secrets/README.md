@@ -16,7 +16,11 @@ GitHub Actions to export secrets as environment variables
 
 ## Inputs
 
-Nothing.
+### Required Inputs
+
+name | type | description
+--- |------| ---
+secrets | json | secrets of GitHub repository
 
 ## Outputs
 
