@@ -28,12 +28,14 @@ if [ -n "${GCS_BUCKET_NAME_PLAN_FILE:-}" ]; then
 	github-comment exec -- gsutil cp tfplan.binary "gs://$GCS_BUCKET_NAME_PLAN_FILE/$PR_NUMBER/$TFACTION_TARGET/tfplan.binary"
 fi
 
-github-comment exec -- terraform show -json tfplan.binary >tfplan.json
-conftest -v # Install conftest in advance to exclude aqua lazy install log from github-comment's comment
-github-comment exec \
-	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-	-k conftest -- \
-		conftest test --no-color -p "$ROOT_DIR/policy" tfplan.json
+if [ -d "$ROOT_DIR/policy" ]; then
+	github-comment exec -- terraform show -json tfplan.binary >tfplan.json
+	conftest -v # Install conftest in advance to exclude aqua lazy install log from github-comment's comment
+	github-comment exec \
+		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+		-k conftest -- \
+			conftest test --no-color -p "$ROOT_DIR/policy" tfplan.json
+fi
 
 if [ "$code" = "0" ]; then
 	exit 0
