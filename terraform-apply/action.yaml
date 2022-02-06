@@ -18,7 +18,6 @@ runs:
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
-        AWS_DEFAULT_REGION: ${{ steps.target-config.outputs.aws_region }}
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
         S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}

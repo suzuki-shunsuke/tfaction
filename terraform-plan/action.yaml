@@ -20,7 +20,6 @@ runs:
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
-        AWS_DEFAULT_REGION: ${{ steps.target-config.outputs.aws_region }}
         GITHUB_TOKEN: ${{ inputs.github_token }}
         ROOT_DIR: ${{ github.workspace }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
