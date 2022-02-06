@@ -6,21 +6,41 @@
   "description": "tfaction.yaml",
   "required": [],
   "properties": {
+    "template_dir": {
+      "$ref": "#/$defs/TemplateDir"
+    },
+
     "aws_region": {
       "$ref": "#/$defs/AWSRegion"
     },
-    "template_dir": {
-      "$ref": "#/$defs/TemplateDir"
+    "aws_assume_role_arn": {
+      "$ref": "#/$defs/AWSAssumeRoleARN"
+    },
+
+    "gcs_bucket_name_plan_file": {
+      "$ref": "#/$defs/GCSBucketNamePlanFile"
+    },
+    "gcp_workload_identity_provider": {
+      "$ref": "#/$defs/GCPWorkloadIdentityProvider"
     },
     "gcs_bucket_name_plan_file": {
       "$ref": "#/$defs/GCSBucketNamePlanFile"
     },
+
     "s3_bucket_name_plan_file": {
       "$ref": "#/$defs/S3BucketNamePlanFile"
     },
     "s3_bucket_name_tfmigrate_history": {
       "$ref": "#/$defs/S3BucketNameTfmigrateHistory"
     },
+
+    "secrets": {
+      "$ref": "#/$defs/Secrets"
+    },
+    "aws_secrets_manager": {
+      "$ref": "#/$defs/AWSSecretsManager"
+    },
+
     "terraform_plan_config": {
       "$ref": "#/$defs/JobConfig",
       "description": "configuration which is used in the job for 'terraform plan'"
