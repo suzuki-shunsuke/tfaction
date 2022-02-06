@@ -67,7 +67,10 @@ export function getJobType(): string {
   return process.env.TFACTION_JOB_TYPE;
 }
 
-export function getJobConfig(config: TargetConfig, isApply: boolean, jobType: string): JobConfig | undefined {
+export function getJobConfig(config: TargetConfig | undefined, isApply: boolean, jobType: string): JobConfig | undefined {
+  if (config == undefined) {
+    return undefined;
+  }
   if (isApply) {
     switch (jobType) {
       case 'terraform':
