@@ -1,0 +1,29 @@
+name: Genrate document from JSON Schema and deploy
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - .github/workflows/deploy-schema.yaml
+    - schema/**
+  pull_request:
+    branches:
+    - main
+    paths:
+    - .github/workflows/deploy-schema.yaml
+    - schema/**
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: pip install json-schema-for-humans
+    - run: mkdir build
+    - run: generate-schema-doc --expand-buttons --link-to-reused-ref schema build
+
+    - uses: peaceiris/actions-gh-pages@v3
+      if: github.event_name != 'pull_request'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
+        destination_dir: ./config
