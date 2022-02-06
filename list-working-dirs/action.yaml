@@ -11,7 +11,7 @@ runs:
       id: global-config
     - run: |
         tempfile=$(mktemp)
-        git ls-files "${{ steps.global-config.outputs.base_working_directory }}" | grep -E "/${{ steps.global-config.outputs.working_directory_file }}$" > "$tempfile"
+        git ls-files "${{ steps.global-config.outputs.base_working_directory }}" | grep -E "/${{ steps.global-config.outputs.working_directory_file }}$" > "$tempfile" || :
         echo "::set-output name=file::$tempfile"
       shell: bash
       id: main
