@@ -15,11 +15,10 @@ try {
     if (!target.startsWith(targetConfig.target)) {
       continue;
     }
-    const rootJobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
 
     const workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
-
     core.setOutput('working_directory', workingDir);
+
     if (jobType == 'scaffold_working_dir') {
       lib.setOutputs([
         's3_bucket_name_plan_file',
@@ -32,9 +31,11 @@ try {
         'aws_assume_role_arn',
         'gcp_service_account',
         'gcp_workload_identity_provider',
-      ], [rootJobConfig, targetConfig]);
+      ], [targetConfig]);
       break;
     }
+
+    const rootJobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
 
     const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
     const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
