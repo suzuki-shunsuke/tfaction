@@ -21,7 +21,11 @@ try {
 
     core.setOutput('working_directory', workingDir);
 
-    const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
+    let wdConfig = undefined;
+    if (jobType == 'scaffold_working_dir') {
+      wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
+    }
+
     const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
     lib.setOutputs([
       's3_bucket_name_plan_file',
