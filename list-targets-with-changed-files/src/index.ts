@@ -36,6 +36,21 @@ function getTargetConfigByTarget(targets: Array<lib.TargetConfig>, target: strin
   throw 'target is invalid';
 }
 
+function getPRBody(): string {
+  if (github.context.payload.pull_request) {
+    return github.context.payload.pull_request.body ? github.context.payload.pull_request.body : '';
+  }
+  const prPath = core.getInput('pull_request');
+  if (!prPath) {
+    return '';
+  }
+  const pr = JSON.parse(fs.readFileSync(prPath, 'utf8'));
+  if (!pr || !pr.body) {
+    return '';
+  }
+  return pr.body;
+}
+
 try {
   const config = lib.getConfig();
 
@@ -64,7 +79,7 @@ try {
   // <!-- tfaction follow up pr target=foo -->
   let followupTarget = '';
   const followupPRBodyPrefix='<!-- tfaction follow up pr target=';
-  const prBody = (github.context.payload.pull_request && github.context.payload.pull_request.body) ? github.context.payload.pull_request.body : '';
+  const prBody = getPRBody();
   if (prBody.startsWith(followupPRBodyPrefix)) {
     followupTarget = prBody.split('\n')[0].slice(followupPRBodyPrefix.length, - ' -->'.length);
   }

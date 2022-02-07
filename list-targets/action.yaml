@@ -19,4 +19,5 @@ runs:
       with:
         changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
+        pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
