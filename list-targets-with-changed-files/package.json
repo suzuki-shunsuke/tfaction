@@ -9,6 +9,7 @@
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
+    "@vercel/ncc": "^0.33.1",
     "typescript": "4.5.5"
   }
 }
