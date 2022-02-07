@@ -25,7 +25,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/get-target-config@v0.4.8
       id: target-config
 
     - run: aqua i -l -a
@@ -42,7 +42,7 @@ runs:
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
+    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@v0.4.8
 
     - uses: google-github-actions/auth@v0
       if: steps.target-config.outputs.gcp_service_account != ''
@@ -50,7 +50,7 @@ runs:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
         service_account: ${{ steps.target-config.outputs.gcp_service_account }}
 
-    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
+    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@v0.4.8
       if: inputs.ssh_key != ''
       with:
        ssh_key: ${{ inputs.ssh_key }}
