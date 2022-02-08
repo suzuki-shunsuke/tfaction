@@ -1,0 +1,15 @@
+name: List targets with changed files
+description: List targets with changed files
+inputs:
+  labels:
+    description: 'Labels File'
+    required: true
+  pr_author:
+    description: 'Pull Request Author'
+    required: true
+outputs:
+  skip_terraform:
+    description: whether terraform is skipped
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
