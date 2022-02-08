@@ -12,9 +12,9 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/get-target-config@v0.4.9-0
       id: target-config
-    - uses: suzuki-shunsuke/tfaction/check-terraform-skip@main
+    - uses: suzuki-shunsuke/tfaction/check-terraform-skip@v0.4.9-0
       id: check-terraform-skip
       with:
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
