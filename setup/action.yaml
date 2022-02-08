@@ -26,7 +26,7 @@ runs:
   using: composite
   steps:
     - run: |
-        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/{{ github.event.pull_request.number }}/labels" \
+        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ github.event.pull_request.number }}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Accept: application/json" \
           -H "Content-type: application/json" \
