@@ -1,5 +1,5 @@
-name: List targets with changed files
-description: List targets with changed files
+name: Check if terraform plan and apply are skipped
+description: Check if terraform plan and apply are skipped
 inputs:
   labels:
     description: 'Labels File'
