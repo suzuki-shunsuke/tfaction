@@ -8,7 +8,9 @@ function getSkipTerraform(): boolean {
   if (renovateLogin != core.getInput('pr_author')) {
     return false;
   }
-  if (config.skip_terraform_by_renovate == false) {
+  // TODO change the default behavior
+  // if (config.skip_terraform_by_renovate == false) {
+  if (!config.skip_terraform_by_renovate) {
     return false;
   }
   const labels = fs.readFileSync(core.getInput('labels'), 'utf8').split('\n');
