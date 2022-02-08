@@ -25,6 +25,17 @@ outputs:
 runs:
   using: composite
   steps:
+    - run: |
+        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/{{ github.event.pull_request.number }}/labels" \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H "Accept: application/json" \
+          -H "Content-type: application/json" \
+          -d "[{\"name\":\"${TFACTION_TARGET}\"}]"
+      shell: bash
+      if: github.event_name == 'pull_request'
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
 
