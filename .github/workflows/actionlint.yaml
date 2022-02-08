@@ -4,15 +4,9 @@ on:
   pull_request:
     branches:
     - main
-    paths:
-    - .github/**
-    - aqua/actionlint.yaml
   push:
     branches:
     - main
-    paths:
-    - .github/**
-    - aqua/actionlint.yaml
 
 jobs:
   test:
