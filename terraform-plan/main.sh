@@ -3,12 +3,6 @@
 set -eu
 set -o pipefail
 
-curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${PR_NUMBER}/labels" \
-	-H "Authorization: token ${GITHUB_TOKEN}" \
-	-H "Accept: application/json" \
-	-H "Content-type: application/json" \
-	-d "[{\"name\":\"${TFACTION_TARGET}\"}]"
-
 set +e
 tfcmt -var "target:$TFACTION_TARGET" plan -- \
 	terraform plan -detailed-exitcode -out tfplan.binary -input=false
