@@ -34,6 +34,8 @@ runs:
 
     - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - uses: aws-actions/configure-aws-credentials@v1.6.1
       if: steps.target-config.outputs.aws_assume_role_arn != ''
