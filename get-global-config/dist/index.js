@@ -5696,8 +5696,6 @@ try {
     lib.setValue('working_directory_file', config.working_directory_file, 'tfaction.yaml');
     lib.setValue('renovate_login', config.renovate_login, 'renovate[bot]');
     core.setOutput('draft_pr', config.draft_pr ? true : false);
-    core.setOutput('skip_terraform_by_renovate', config.skip_terraform_by_renovate != false);
-    core.setOutput('renovate_terraform_labels', config.renovate_terraform_labels);
     if (config.label_prefixes != undefined) {
         lib.setValue('label_prefix_target', config.label_prefixes.target, 'target:');
         lib.setValue('label_prefix_tfmigrate', config.label_prefixes.tfmigrate, 'tfmigrate:');
