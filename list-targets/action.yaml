@@ -1,5 +1,10 @@
 name: List targets
 description: List targets
+inputs:
+  github_token:
+    description: 'GitHub Access Token'
+    required: false
+    default: ${{ github.token }}
 outputs:
   tfmigrate_targets:
     description: list of tfmigrate targets
@@ -12,6 +17,8 @@ runs:
   steps:
     - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
     - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
