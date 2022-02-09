@@ -11,7 +11,15 @@ GitHub Actions to list targets
 
 ## Inputs
 
+### Required Inputs
+
 Nothing.
+
+### Optional Inputs
+
+name | default | description
+--- | --- | ---
+github_token | `secrets.GITHUB_TOKEN` | GitHub Access Token
 
 ## Outputs
 
