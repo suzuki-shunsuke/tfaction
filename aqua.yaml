@@ -7,5 +7,5 @@ registries:
 
 packages:
 - import: aqua/*.yaml
-- name: reviewdog/reviewdog@v0.13.1
+- name: reviewdog/reviewdog@v0.14.0
 - name: suzuki-shunsuke/cmdx@v1.6.1
