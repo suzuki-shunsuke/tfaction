@@ -13,6 +13,21 @@
       "description": "If this is true, tfaction creates pull requests as draft",
       "default": false
     },
+
+    "skip_terraform_by_renovate": {
+      "type": "boolean",
+      "description": "If this is true, `terraform plan` and `terraform apply` are skipped in case of pull request by Renovate. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr)",
+      "default": false
+    },
+    "renovate_terraform_labels": {
+      "type": "array",
+      "description": "This attribute is ignored if `skip_terraform_by_renovate` is false. If any one of labels in `renovate_terraform_labels` is set to the pull request, tfaction would run `terraform plan` and `terraform apply`. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr)",
+      "items": {
+        "type": "string",
+        "description": "Pull Request label name"
+      }
+    },
+
     "base_working_directory": {
       "type": "string",
       "description": "tfaction searches working directories in this directory",
