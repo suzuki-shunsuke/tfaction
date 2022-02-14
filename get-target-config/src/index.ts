@@ -18,15 +18,13 @@ try {
 
     const workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
     core.setOutput('working_directory', workingDir);
+    lib.setOutputs(['template_dir'], [targetConfig]);
 
     if (jobType == 'scaffold_working_dir') {
       lib.setOutputs([
         's3_bucket_name_plan_file',
         's3_bucket_name_tfmigrate_history',
-        'template_dir',
         'gcs_bucket_name_plan_file',
-      ], [targetConfig]);
-      lib.setOutputs([
         'aws_region',
         'aws_assume_role_arn',
         'gcp_service_account',
@@ -42,7 +40,6 @@ try {
     lib.setOutputs([
       's3_bucket_name_plan_file',
       's3_bucket_name_tfmigrate_history',
-      'template_dir',
       'gcs_bucket_name_plan_file',
     ], [wdConfig, targetConfig]);
     lib.setOutputs([
