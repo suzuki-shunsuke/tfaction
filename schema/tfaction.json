@@ -6,10 +6,6 @@
   "description": "tfaction.yaml",
   "required": [],
   "properties": {
-    "template_dir": {
-      "$ref": "#/$defs/TemplateDir"
-    },
-
     "aws_region": {
       "$ref": "#/$defs/AWSRegion"
     },
