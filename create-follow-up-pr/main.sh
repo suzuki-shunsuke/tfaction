@@ -27,7 +27,7 @@ if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
 	create_opts+=( -a "$CI_INFO_PR_AUTHOR" )
 	mention="@$CI_INFO_PR_AUTHOR"
 fi
-if ! [[ "$GITHUB_ACTOR" =~ \[bot\] ]]; then
+if ! [[ "$GITHUB_ACTOR" =~ \[bot\] ]] && [ "$CI_INFO_PR_AUTHOR" != "$GITHUB_ACTOR" ]; then
 	create_opts+=( -a "$GITHUB_ACTOR" )
 	mention="@$GITHUB_ACTOR $mention"
 fi
