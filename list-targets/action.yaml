@@ -19,9 +19,9 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-    - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
+    - uses: suzuki-shunsuke/tfaction/list-working-dirs@v0.4.10
       id: list-working-directory-configs
-    - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
+    - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@v0.4.10
       id: list-targets
       with:
         changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
