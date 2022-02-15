@@ -20,7 +20,24 @@ git fetch origin "$follow_up_branch"
 git branch "$follow_up_branch" "origin/$follow_up_branch"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
+
+create_opts=( -H "$follow_up_branch" -t "$pr_title" )
+mention=""
+if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
+	create_opts+=( -a "$CI_INFO_PR_AUTHOR" )
+	mention="@$CI_INFO_PR_AUTHOR"
+fi
+if ! [[ "$GITHUB_ACTOR" =~ \[bot\] ]]; then
+	create_opts+=( -a "$GITHUB_ACTOR" )
+	mention="@$GITHUB_ACTOR $mention"
+fi
+if [ "$TFACTION_DRAFT_PR" = "true" ]; then
+	create_opts+=( -d )
+fi
+
 pr_body="<!-- tfaction follow up pr target=$TFACTION_TARGET -->
+$mention
+
 This pull request was created automatically to follow up the failure of apply.
 
 Follow up #$CI_INFO_PR_NUMBER ([failed workflow](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))
@@ -30,16 +47,7 @@ Follow up #$CI_INFO_PR_NUMBER ([failed workflow](https://github.com/$GITHUB_REPO
 1. Add commits to this pull request and fix the problem if needed
 1. Review and merge this pull request"
 
-create_opts=(-H "$follow_up_branch" -t "$pr_title" -b "$pr_body")
-if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
-	create_opts+=( -a "$CI_INFO_PR_AUTHOR" )
-fi
-if ! [[ "$GITHUB_ACTOR" =~ \[bot\] ]]; then
-	create_opts+=( -a "$GITHUB_ACTOR" )
-fi
-if [ "$TFACTION_DRAFT_PR" = "true" ]; then
-	create_opts+=( -d )
-fi
+create_opts+=( -b "$pr_body" )
 
 follow_up_pr_url=$(env GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh pr create "${create_opts[@]}")
 
