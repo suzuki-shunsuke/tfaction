@@ -68,8 +68,9 @@ runs:
       with:
        ssh_key: ${{ inputs.ssh_key }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@v0.1.3
+    - uses: suzuki-shunsuke/github-action-terraform-init@v0.1.4-0
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
         github_app_token: ${{ inputs.github_app_token }}
+        providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
