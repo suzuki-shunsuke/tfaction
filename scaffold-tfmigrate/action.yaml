@@ -17,9 +17,9 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v0.4.12-0
       id: global-config
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/get-target-config@v0.4.12-0
       id: target-config
       env:
         TFACTION_JOB_TYPE: scaffold_working_dir
