@@ -22,6 +22,9 @@ outputs:
     description: Google Cloud Storage Buckte name for plan files
   template_dir:
     description: Template Directory path for scaffolding a working directory
+
+  providers_lock_opts:
+    description: terraform providers lock options
 runs:
   using: 'node16'
   main: 'dist/index.js'

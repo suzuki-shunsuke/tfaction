@@ -18,6 +18,7 @@ try {
 
     const workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
     core.setOutput('working_directory', workingDir);
+    core.setOutput('providers_lock_opts', '-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64');
     lib.setOutputs(['template_dir'], [targetConfig]);
 
     if (jobType == 'scaffold_working_dir') {
@@ -41,13 +42,14 @@ try {
       's3_bucket_name_plan_file',
       's3_bucket_name_tfmigrate_history',
       'gcs_bucket_name_plan_file',
-    ], [wdConfig, targetConfig]);
+      'providers_lock_opts',
+    ], [wdConfig, targetConfig, config]);
     lib.setOutputs([
       'aws_region',
       'aws_assume_role_arn',
       'gcp_service_account',
       'gcp_workload_identity_provider',
-    ], [jobConfig, wdConfig, rootJobConfig, targetConfig]);
+    ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
     break;
   }
 } catch (error) {
