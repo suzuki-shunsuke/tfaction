@@ -1,0 +1,88 @@
+name: Scaffold tfmigrate migration pull request
+description: Scaffold tfmigrate migration pull request
+inputs:
+  github_app_token:
+    description: 'GitHub Access Token'
+    required: true
+
+  migration_name:
+    description: 'Migration name'
+    required: false
+    default: main
+outputs:
+  working_directory:
+    description: Working Directory
+    value: ${{ steps.target-config.outputs.working_directory }}
+
+runs:
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
+    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+      id: target-config
+      env:
+        TFACTION_JOB_TYPE: scaffold_working_dir
+
+    - run: mkdir -p "$(dirname "${{steps.target-config.outputs.working_directory}}")"
+      shell: bash
+
+    - run: |
+        if [ -f ".tfmigrate.hcl" ]; then
+          sed "s|%%TARGET%%|${TFACTION_TARGET}|g" ${{ github.action_path }}/tfmigrate.hcl |
+          sed 's|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}|g' > .tfmigrate.hcl
+        fi
+      shell: bash
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+    - run: mkdir -p tfmigrate
+      shell: bash
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+    # create tfmigrate/*.hcl
+    - run: sed "s|%%MIGRATION_NAME%%|${{inputs.migration_name}}|g"  ${{ github.action_path }}/migration.hcl > "tfmigrate/$(date +%Y%m%d%H%M%S)_${{inputs.migration_name}}.hcl"
+      shell: bash
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+
+    - run: git add .tfmigrate.hcl tfmigrate
+      shell: bash
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+
+    - run: |
+        echo "::set-output name=branch::scaffold-tfmigrate-${TFACTION_TARGET}-$(date +%Y%m%dT%H%M%S)"
+      id: branch
+      shell: bash
+
+    - run: |
+        git diff --cached --name-only |
+          xargs ghcp commit -r "$GITHUB_REPOSITORY" \
+            -b "${{steps.branch.outputs.branch}}" \
+            -m "chore: scaffold a tfmigrate migration (${TFACTION_TARGET})"
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+
+    - run: |
+        opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
+        About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
+        [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
+        Please fix the generated migration file." )
+        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+          opts+=( -d )
+        fi
+        tempfile=$(mktemp)
+        gh pr create "${opts[@]}" | tee "$tempfile"
+        echo "::set-output name=pr_number::$(cat "$tempfile" | xargs basename)"
+        rm "$tempfile"
+      shell: bash
+      id: create_pr
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+
+    - run: |
+        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ steps.create_pr.outputs.pr_number }}/labels" \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H "Accept: application/json" \
+          -H "Content-type: application/json" \
+          -d "[{\"name\":\"${{steps.global-config.outputs.label_prefix_tfmigrate}}${TFACTION_TARGET}\"}]"
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_app_token }}
