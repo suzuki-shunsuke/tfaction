@@ -15,5 +15,5 @@ jobs:
     - uses: actions/checkout@v2
     - uses: aquaproj/aqua-installer@v0.7.0
       with:
-        aqua_version: v0.10.2
+        aqua_version: v1.0.0
     - uses: suzuki-shunsuke/github-action-actionlint@v0.1.2

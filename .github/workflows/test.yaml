@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: aquaproj/aqua-installer@v0.7.0
         with:
-          aqua_version: v0.10.2
+          aqua_version: v1.0.0
       - uses: ./list-targets
         id: list-targets
 
@@ -48,7 +48,7 @@ jobs:
 
       - uses: aquaproj/aqua-installer@v0.7.0
         with:
-          aqua_version: v0.10.2
+          aqua_version: v1.0.0
 
       - uses: ./export-secrets
         with:
@@ -92,7 +92,7 @@ jobs:
 
       - uses: aquaproj/aqua-installer@v0.7.0
         with:
-          aqua_version: v0.10.2
+          aqua_version: v1.0.0
 
       - uses: ./export-secrets
         with:
