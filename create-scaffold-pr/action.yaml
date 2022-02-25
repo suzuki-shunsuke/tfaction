@@ -19,7 +19,7 @@ runs:
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: |
-        echo "::set-output name=branch::scaffold-working-diretory-${TFACTION_TARGET}-$(date +%Y%m%dT%H%M%S)"
+        echo "::set-output name=branch::scaffold-working-directory-${TFACTION_TARGET}-$(date +%Y%m%dT%H%M%S)"
       id: branch
       shell: bash
 
