@@ -21,6 +21,7 @@ runs:
       with:
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
+        skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_ignore }}
     - run: bash ${{ github.action_path }}/main.sh
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash

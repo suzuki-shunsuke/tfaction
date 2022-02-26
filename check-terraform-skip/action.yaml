@@ -4,6 +4,9 @@ inputs:
   labels:
     description: 'Labels File'
     required: true
+  skip_label_prefix:
+    description: 'Skip Label Prefix'
+    required: true
   pr_author:
     description: 'Pull Request Author'
     required: true

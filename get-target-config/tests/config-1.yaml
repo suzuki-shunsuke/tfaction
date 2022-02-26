@@ -33,4 +33,4 @@ target_groups:
 label_prefixes:
   target: "target:"
   tfmigrate: "migrate:"
-  ignore: "ignore:"
+  skip: "skip:"
