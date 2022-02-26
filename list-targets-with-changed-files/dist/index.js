@@ -12505,13 +12505,13 @@ try {
     }
     const terraformTargets = new Set();
     const tfmigrates = new Set();
-    const ignores = new Set();
+    const skips = new Set();
     const terraformTargetObjs = new Array();
     const tfmigrateObjs = new Array();
     const targetPrefix = (config.label_prefixes != undefined && config.label_prefixes.target != undefined && config.label_prefixes.target != '') ?
         config.label_prefixes.target : 'target:';
-    const ignorePrefix = (config.label_prefixes != undefined && config.label_prefixes.ignore != undefined && config.label_prefixes.ignore != '') ?
-        config.label_prefixes.ignore : 'ignore:';
+    const skipPrefix = (config.label_prefixes != undefined && config.label_prefixes.skip != undefined && config.label_prefixes.skip != '') ?
+        config.label_prefixes.skip : 'skip:';
     const tfmigratePrefix = (config.label_prefixes != undefined && config.label_prefixes.tfmigrate != undefined && config.label_prefixes.tfmigrate != '') ?
         config.label_prefixes.tfmigrate : 'tfmigrate:';
     for (let i = 0; i < labels.length; i++) {
@@ -12535,8 +12535,8 @@ try {
             }
             continue;
         }
-        if (label.startsWith(ignorePrefix)) {
-            ignores.add(label.slice(ignorePrefix.length));
+        if (label.startsWith(skipPrefix)) {
+            skips.add(label.slice(skipPrefix.length));
             continue;
         }
     }

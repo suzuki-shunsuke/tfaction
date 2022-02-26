@@ -11,11 +11,11 @@ try {
   if (config.label_prefixes != undefined) {
     lib.setValue('label_prefix_target', config.label_prefixes.target, 'target:');
     lib.setValue('label_prefix_tfmigrate', config.label_prefixes.tfmigrate, 'tfmigrate:');
-    lib.setValue('label_prefix_ignore', config.label_prefixes.ignore, 'ignore:');
+    lib.setValue('label_prefix_skip', config.label_prefixes.skip, 'skip:');
   } else {
     core.setOutput('label_prefix_target', 'target:');
     core.setOutput('label_prefix_tfmigrate', 'tfmigrate:');
-    core.setOutput('label_prefix_ignore', 'ignore:');
+    core.setOutput('label_prefix_skip', 'skip:');
   }
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));

@@ -11,8 +11,8 @@ outputs:
     description: label prefix for target
   label_prefix_tfmigrate:
     description: label prefix for tfmigrate
-  label_prefix_ignore:
-    description: label prefix for ignore
+  label_prefix_skip:
+    description: label prefix to skip terraform plan and apply
 runs:
   using: 'node16'
   main: 'dist/index.js'

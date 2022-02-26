@@ -10,7 +10,7 @@ interface Config {
 
 interface LabelPrefixes {
   target: string | undefined
-  ignore: string | undefined
+  skip: string | undefined
   tfmigrate: string | undefined
 }
 
