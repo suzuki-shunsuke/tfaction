@@ -12,3 +12,13 @@ tasks:
     required: true
     validate:
     - regexp: "^v\\d+\\.\\d+.\\d+(-\\d+)?$"
+- name: schema
+  description: build JSON Schema
+  usage: build JSON Schema
+  require:
+    exec:
+    - generate-schema-doc
+  script: |
+    mkdir -p build
+    generate-schema-doc --expand-buttons --link-to-reused-ref schema build
+
