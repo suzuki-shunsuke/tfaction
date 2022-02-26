@@ -12557,7 +12557,7 @@ try {
             const target = config.target_groups[i];
             if (changedWorkingDir.startsWith(target.working_directory)) {
                 const changedTarget = changedWorkingDir.replace(target.working_directory, target.target);
-                if (!terraformTargets.has(changedTarget) && !ignores.has(changedTarget) && !tfmigrates.has(changedTarget)) {
+                if (!terraformTargets.has(changedTarget) && !tfmigrates.has(changedTarget)) {
                     terraformTargets.add(changedTarget);
                     terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedTarget, isApply, 'terraform'));
                 }
