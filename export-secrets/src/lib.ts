@@ -5,13 +5,6 @@ const yaml = require('js-yaml');
 
 interface Config {
   target_groups: Array<TargetConfig>
-  label_prefixes: LabelPrefixes | undefined
-}
-
-interface LabelPrefixes {
-  target: string | undefined
-  ignore: string | undefined
-  tfmigrate: string | undefined
 }
 
 export interface TargetConfig {
