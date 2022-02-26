@@ -28,6 +28,9 @@
       }
     },
 
+    "providers_lock_opts": {
+      "$ref": "#/$defs/TerraformProvidersLockOptions"
+    },
     "base_working_directory": {
       "type": "string",
       "description": "tfaction searches working directories in this directory",
@@ -89,6 +92,10 @@
             "$ref": "#/$defs/TemplateDir"
           },
 
+          "providers_lock_opts": {
+            "$ref": "#/$defs/TerraformProvidersLockOptions"
+          },
+
           "aws_region": {
             "$ref": "#/$defs/AWSRegion"
           },
@@ -144,6 +151,11 @@
     "AWSRegion": {
       "type": "string",
       "description": "AWS Region. This is used for AWS OIDC Authentication, Getting Secrets from AWS Secrets Manager, and so on"
+    },
+    "TerraformProvidersLockOptions": {
+      "type": "string",
+      "description": "terraform providers lock command's option",
+      "default": "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64"
     },
     "AWSAssumeRoleARN": {
       "type": "string",
