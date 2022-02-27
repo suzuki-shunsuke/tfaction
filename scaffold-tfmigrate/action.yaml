@@ -61,6 +61,18 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
 
     - run: |
+        opts=(-H "${{steps.branch.outputs.branch}}" -t "Scaffold tfmigrate migration (${TFACTION_TARGET})" -b "This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
+        About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
+        [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)")
+        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+          opts+=( -d )
+        fi
+        echo '::notice::Create a pull request and fix the generated migration file.'
+        echo "::notice::$ gh pr create ${opts[@]}"
+      if: steps.global-config.outputs.skip_create_pr
+      shell: bash
+
+    - run: |
         opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
         About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
         [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
@@ -73,6 +85,7 @@ runs:
         echo "::set-output name=pr_number::$(cat "$tempfile" | xargs basename)"
         rm "$tempfile"
       shell: bash
+      if: '! steps.global-config.outputs.skip_create_pr'
       id: create_pr
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
@@ -84,5 +97,6 @@ runs:
           -H "Content-type: application/json" \
           -d "[{\"name\":\"${{steps.global-config.outputs.label_prefix_tfmigrate}}${TFACTION_TARGET}\"}]"
       shell: bash
+      if: '! steps.global-config.outputs.skip_create_pr'
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}

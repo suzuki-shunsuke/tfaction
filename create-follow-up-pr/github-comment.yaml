@@ -13,3 +13,22 @@ post:
       1. Check {{.Vars.follow_up_pr_url}}
       1. Add commits to {{.Vars.follow_up_pr_url}} to fix the problem if needed
       1. Review and merge {{.Vars.follow_up_pr_url}}
+
+  skip-create-follow-up-pr:
+    template: |
+      ## {{if (env "TFACTION_TARGET")}}{{env "TFACTION_TARGET"}}: {{end}}Please create a follow up pull request
+
+      {{template "link" .}}
+      
+      {{.Vars.mentions}}
+
+      Apply failed. Please handle the problem.
+
+      1. Check the error message
+      1. Create a follow up pull request
+      1. Add commits to the follow up pull request to fix the problem if needed
+      1. Review and merge {{.Vars.follow_up_pr_url}}
+
+      ```console
+      $ gh pr create {{.Vars.opts}}
+      ```
