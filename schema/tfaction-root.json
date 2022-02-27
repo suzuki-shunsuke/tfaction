@@ -13,6 +13,11 @@
       "description": "If this is true, tfaction creates pull requests as draft",
       "default": false
     },
+    "skip_create_pr": {
+      "type": "boolean",
+      "description": "If this is true, tfaction skips creating pull requests. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)",
+      "default": false
+    },
 
     "skip_terraform_by_renovate": {
       "type": "boolean",
