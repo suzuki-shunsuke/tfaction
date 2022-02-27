@@ -21,7 +21,7 @@ runs:
         cat "$tempfile" >> "$GITHUB_ENV"
         echo "::set-output name=path::$tempfile"
       shell: bash
-      id: tfaction-ci-info
+      id: ci-info
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
     - uses: actions/upload-artifact@v2
