@@ -29,9 +29,6 @@ runs:
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
-    # - run: tfenv list-remote | head -n 1 > .terraform-version
-    #   working-directory: ${{steps.target-config.outputs.working_directory}}
-
     - run: aqua init
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
