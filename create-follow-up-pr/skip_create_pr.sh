@@ -16,7 +16,7 @@ https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
-create_opts=( -H "$follow_up_branch" -t "$pr_title" )
+create_opts=( -R "$GITHUB_REPOSITORY" -H "$follow_up_branch" -t "\"$pr_title\"" )
 mention=""
 if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
 	mention="@$CI_INFO_PR_AUTHOR"

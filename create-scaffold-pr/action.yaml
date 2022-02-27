@@ -33,7 +33,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
 
     - run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -t "\"Scaffold a working directory (${TFACTION_TARGET})\"" -b "\"This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)\"")
+        opts=(-R "$GITHUB_REPOSITORY" -H "${{steps.branch.outputs.branch}}" -t "\"Scaffold a working directory (${TFACTION_TARGET})\"" -b "\"This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)\"")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
