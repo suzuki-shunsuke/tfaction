@@ -33,12 +33,11 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
 
     - run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -t "Scaffold a working directory (${TFACTION_TARGET})" -b "This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
+        opts=(-H "${{steps.branch.outputs.branch}}" -t "\"Scaffold a working directory (${TFACTION_TARGET})\"" -b "\"This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)\"")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
-        echo '::notice::Create a scaffold pull request.'
-        echo "::notice::$ gh pr create ${opts[@]}"
+        echo "::notice title=Create a scaffold pull request::$ gh pr create ${opts[@]}"
       if: steps.global-config.outputs.skip_create_pr
       shell: bash
 
