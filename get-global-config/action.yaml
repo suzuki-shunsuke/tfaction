@@ -13,6 +13,8 @@ outputs:
     description: label prefix for tfmigrate
   label_prefix_skip:
     description: label prefix to skip terraform plan and apply
+  skip_create_pr:
+    description: Whether skip creating pull requests
 runs:
   using: 'node16'
   main: 'dist/index.js'
