@@ -61,14 +61,12 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
 
     - run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -t "Scaffold tfmigrate migration (${TFACTION_TARGET})" -b "This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
-        About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
-        [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)")
+        opts=(-H "${{steps.branch.outputs.branch}}" -t "\"Scaffold tfmigrate migration (${TFACTION_TARGET})\"" -b "\"This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)\"")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
-        echo '::notice::Create a pull request and fix the generated migration file.'
-        echo "::notice::$ gh pr create ${opts[@]}"
+        echo "::notice title=Create a pull request and fix the generated migration file::$ gh pr create ${opts[@]}"
+        echo "::notice title=Create a pull request and fix the generated migration file::https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate"
       if: steps.global-config.outputs.skip_create_pr
       shell: bash
 
