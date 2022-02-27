@@ -55,9 +55,7 @@ runs:
         name: tfaction-ci-info
         path: ${{steps.ci-info.outputs.path}}
 
-    - run: |
-        ls "${{steps.ci-info.outputs.path}}"
-        cat "${{steps.ci-info.outputs.path}}" >> "$GITHUB_ENV"
+    - run: cat "${{steps.ci-info.outputs.path}}/env" >> "$GITHUB_ENV"
       shell: bash
 
     - uses: aws-actions/configure-aws-credentials@v1.6.1
