@@ -7,7 +7,7 @@ post:
 
       {{template "link" .}}
 
-      Apply failed. Please handle the problem.
+      Apply failed. Please handle the problem. **:warning: Don't rerun GitHub Actions Workflow**
 
       1. Check the error message
       1. Check {{.Vars.follow_up_pr_url}}
@@ -22,13 +22,16 @@ post:
       
       {{.Vars.mentions}}
 
-      Apply failed. Please handle the problem.
+      Apply failed. Please handle the problem. **:warning: Don't rerun GitHub Actions Workflow**
 
       1. Check the error message
       1. Create a follow up pull request
-      1. Add commits to the follow up pull request to fix the problem if needed
-      1. Review and merge {{.Vars.follow_up_pr_url}}
 
       ```console
       $ gh pr create {{.Vars.opts | AvoidHTMLEscape}}
       ```
+
+      ref. [gh pr create](https://cli.github.com/manual/gh_pr_create)
+
+      3. Add commits to the follow up pull request to fix the problem if needed
+      4. Review and merge {{.Vars.follow_up_pr_url}}
