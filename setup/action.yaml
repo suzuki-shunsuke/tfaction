@@ -43,7 +43,10 @@ runs:
       shell: bash
       working-directory: ${{ steps.target-config.outputs.working_directory }}
 
-    - run: echo "::set-output name=path::$(mktemp)"
+    - run: |
+        tempfile=$(mktemp)
+        rm "$tempfile"
+        echo "::set-output name=path::${tempfile}"
       shell: bash
       id: ci-info
 
@@ -52,7 +55,9 @@ runs:
         name: tfaction-ci-info
         path: ${{steps.ci-info.outputs.path}}
 
-    - run: cat ${{steps.ci-info.outputs.path}} >> "$GITHUB_ENV"
+    - run: |
+        ls "${{steps.ci-info.outputs.path}}"
+        cat "${{steps.ci-info.outputs.path}}" >> "$GITHUB_ENV"
       shell: bash
 
     - uses: aws-actions/configure-aws-credentials@v1.6.1
