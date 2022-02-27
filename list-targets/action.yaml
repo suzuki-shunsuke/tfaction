@@ -19,6 +19,7 @@ runs:
         tempfile="$(mktemp)"
         github-comment exec -- ci-info run | sed "s/^export //" > "${tempfile}"
         cat "$tempfile" >> "$GITHUB_ENV"
+        . "$tempfile"
         cp "$tempfile" "${CI_INFO_TEMP_DIR}/env"
       shell: bash
       env:
