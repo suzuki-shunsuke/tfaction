@@ -30,5 +30,5 @@ post:
       1. Review and merge {{.Vars.follow_up_pr_url}}
 
       ```console
-      $ gh pr create {{.Vars.opts}}
+      $ gh pr create {{.Vars.opts | AvoidHTMLEscape}}
       ```
