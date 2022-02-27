@@ -30,5 +30,4 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
-        TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
         TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}

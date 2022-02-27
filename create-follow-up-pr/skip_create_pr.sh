@@ -6,6 +6,15 @@ set -o pipefail
 # create a branch with empty commit
 # 1. create a remote branch
 
+target_label=${TFACTION_TARGET_LABEL_PREFIX}${TFACTION_TARGET}
+curl \
+	-X POST \
+	-H "Accept: application/vnd.github.v3+json" \
+	-H "Authorization: token ${GITHUB_TOKEN}" \
+	-H "Content-type: application/json" \
+	"https://api.github.com/repos/$GITHUB_REPOSITORY/issues" \
+	-d "{\"title\":\"${target_label}\"}"
+
 follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
 GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
 	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
@@ -16,7 +25,7 @@ https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
-create_opts=( -R "$GITHUB_REPOSITORY" -H "$follow_up_branch" -t "\"$pr_title\"" )
+create_opts=( -l "\"$target_label\"" -R "$GITHUB_REPOSITORY" -H "$follow_up_branch" -t "\"$pr_title\"" -b "\"Follow up #$CI_INFO_PR_NUMBER\"" )
 mention=""
 if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
 	mention="@$CI_INFO_PR_AUTHOR"

@@ -61,7 +61,16 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
 
     - run: |
-        opts=(-R "$GITHUB_REPOSITORY" -H "${{steps.branch.outputs.branch}}" -t "\"Scaffold tfmigrate migration (${TFACTION_TARGET})\"" -b "\"This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)\"")
+        label=${{steps.global-config.outputs.label_prefix_tfmigrate}}$TFACTION_TARGET
+        curl \
+          -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H "Content-type: application/json" \
+          "https://api.github.com/repos/$GITHUB_REPOSITORY/issues" \
+          -d "{\"title\":\"${label}\"}"
+
+        opts=(-l "\"$label\"" -R "$GITHUB_REPOSITORY" -H "${{steps.branch.outputs.branch}}" -t "\"Scaffold tfmigrate migration (${TFACTION_TARGET})\"" -b "\"This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)\"")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
