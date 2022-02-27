@@ -16,8 +16,8 @@ runs:
   using: composite
   steps:
     - run: |
-        tempfile=$(mktemp)
-        github-comment exec -- ci-info run | sed "s/^export //" > "$tempfile"
+        tempfile="$(mktemp -d)/env"
+        github-comment exec -- ci-info run | sed "s/^export //" > "${tempfile}"
         cat "$tempfile" >> "$GITHUB_ENV"
         echo "::set-output name=path::$tempfile"
       shell: bash
