@@ -53,7 +53,7 @@ runs:
       with:
         name: tfaction-ci-info
         path: ${{steps.ci-info.outputs.path}}
-    - run: cat "${{steps.ci-info.outputs.path}}/env" | sed -E "s/^CI_INFO_TEMP_DIR=.*$/CI_INFO_TEMP_DIR=${{steps.ci-info.outputs.path}}/" >> "$GITHUB_ENV"
+    - run: cat "${{steps.ci-info.outputs.path}}/env" | sed 's|^CI_INFO_TEMP_DIR=.*$|CI_INFO_TEMP_DIR=${{steps.ci-info.outputs.path}}|' >> "$GITHUB_ENV"
       shell: bash
 
     - uses: aws-actions/configure-aws-credentials@v1.6.1
