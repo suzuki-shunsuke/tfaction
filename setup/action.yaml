@@ -43,10 +43,17 @@ runs:
       shell: bash
       working-directory: ${{ steps.target-config.outputs.working_directory }}
 
-    - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
+    - run: echo "::set-output name=path::$(mktemp)"
       shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+      id: ci-info
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: tfaction-ci-info
+        path: ${{steps.ci-info.outputs.path}}
+
+    - run: cat ${{steps.ci-info.outputs.path}} >> "$GITHUB_ENV"
+      shell: bash
 
     - uses: aws-actions/configure-aws-credentials@v1.6.1
       if: steps.target-config.outputs.aws_assume_role_arn != ''

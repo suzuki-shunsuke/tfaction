@@ -15,10 +15,20 @@ outputs:
 runs:
   using: composite
   steps:
-    - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
+    - run: |
+        tempfile=$(mktemp)
+        github-comment exec -- ci-info run | sed "s/^export //" > "$tempfile"
+        cat "$tempfile" >> "$GITHUB_ENV"
+        echo "::set-output name=path::$tempfile"
       shell: bash
+      id: tfaction-ci-info
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+    - uses: actions/upload-artifact@v2
+      with:
+        name: tfaction-ci-info
+        path: ${{steps.ci-info.outputs.path}}
+
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
     - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
