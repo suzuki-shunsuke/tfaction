@@ -46,6 +46,9 @@ runs:
       env:
         MODULE_PATH: ${{inputs.module_path}}
 
+    - run: aqua init
+      shell: bash
+      working-directory: ${{inputs.module_path}}
     - run: aqua g -i aquasecurity/tfsec terraform-linters/tflint hashicorp/terraform
       shell: bash
       working-directory: ${{inputs.module_path}}
