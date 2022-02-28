@@ -5,6 +5,10 @@ try {
   const config = lib.getConfig();
   lib.setValue('base_working_directory', config.base_working_directory, '.');
   lib.setValue('working_directory_file', config.working_directory_file, 'tfaction.yaml');
+
+  lib.setValue('module_base_directory', config.module_base_directory, '.');
+  lib.setValue('module_file', config.module_file, 'tfaction_module.yaml');
+
   lib.setValue('renovate_login', config.renovate_login, 'renovate[bot]');
   core.setOutput('draft_pr', config.draft_pr ? true : false);
   core.setOutput('skip_create_pr', config.skip_create_pr ? true : false);

@@ -1,0 +1,31 @@
+name: Release Terraform Module
+description: Release Terraform Module
+inputs:
+  module_path:
+    description: 'Module path'
+    required: true
+  version:
+    description: 'module version'
+    required: true
+  github_token:
+    description: 'GitHub Access Token'
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    # create a tag
+    - run: |
+        module_name=${MODULE_PATH/\//_}
+        echo "::set-output name=tag::module_${module_name}_${{inputs.version}}"
+      id: get-tag
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+    - run: gh api "repos/{owner}/{repo}/git/refs" -f "sha=${GITHUB_SHA}" -f "ref=refs/tags/${{steps.get-tag.outputs.tag}}"
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+
+    # create a release
+    - run: gh release create "${{steps.get-tag.outputs.tag}}" --title "${{steps.get-tag.outputs.tag}}"
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}

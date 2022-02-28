@@ -3,8 +3,12 @@ description: Get global configuration
 outputs:
   base_working_directory:
     description: base directory of working directories
+  module_base_directory:
+    description: base directory of Modules
   working_directory_file:
     description: file name which locates on working directories
+  module_file:
+    description: file name which locates on Modules
   renovate_login:
     description: Renovate login
   label_prefix_target:
