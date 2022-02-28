@@ -4,6 +4,9 @@ outputs:
   file:
     description: Output file path
     value: ${{ steps.main.outputs.file }}
+  module_file:
+    description: Module file path
+    value: ${{ steps.module.outputs.module_file }}
 runs:
   using: composite
   steps:
@@ -15,3 +18,9 @@ runs:
         echo "::set-output name=file::$tempfile"
       shell: bash
       id: main
+    - run: |
+        tempfile=$(mktemp)
+        git ls-files "${{ steps.global-config.outputs.module_base_directory }}" | grep -E "/${{ steps.global-config.outputs.module_file }}$" > "$tempfile" || :
+        echo "::set-output name=module_file::$tempfile"
+      shell: bash
+      id: module
