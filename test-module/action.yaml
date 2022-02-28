@@ -18,6 +18,13 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
+    - uses: suzuki-shunsuke/github-action-format@v0.1.2
+      with:
+        working_directory: ${{ env.TFACTION_TARGET }}
+        github_token: ${{ inputs.github_app_token }}
+        command: terraform-docs . > README.md
+        commit_message: 'docs(${{ env.TFACTION_TARGET }}): generate Terraform Module document by terraform-docs'
+
     - uses: suzuki-shunsuke/github-action-terraform-fmt@v0.1.1
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
