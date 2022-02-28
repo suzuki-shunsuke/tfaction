@@ -14,6 +14,25 @@ inputs:
 runs:
   using: composite
   steps:
+    - run: |
+        echo "::error ::module_path is required"
+        exit 1
+      shell: bash
+      if: inputs.module_path == ''
+    - run: |
+        echo "::error ::version is required"
+        exit 1
+      shell: bash
+      if: inputs.version == ''
+    - run: |
+        if ! [ -d "$MODULE_PATH" ]; then
+          echo "::error ::module_path is invalid. $MODULE_PATH isn't found"
+          exit 1
+        fi
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
     # create a tag
     - run: |
         module_name=${MODULE_PATH/\//_}
