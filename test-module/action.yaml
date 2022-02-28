@@ -16,7 +16,7 @@ runs:
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
-        GITHUB_TOKEN: ${{ input.github_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - uses: suzuki-shunsuke/github-action-terraform-fmt@v0.1.1
       with:
