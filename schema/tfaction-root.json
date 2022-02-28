@@ -65,10 +65,10 @@
           "description": "Pull Request label prefix to specify the tfmigrate target",
           "default": "tfmigrate:"
         },
-        "ignore": {
+        "skip": {
           "type": "string",
-          "description": "Pull Request label prefix to ignore the target. This is used to migrate states across states with tfmigrate",
-          "default": "ignore:"
+          "description": "Pull Request label prefix to skip terraform plan and apply. This is used to migrate states across states with tfmigrate",
+          "default": "skip:"
         }
       }
     },
