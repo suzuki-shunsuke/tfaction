@@ -18,7 +18,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/github-action-format@v0.1.2
+    - uses: suzuki-shunsuke/github-action-format@v0.1.1
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_token: ${{ inputs.github_app_token }}
