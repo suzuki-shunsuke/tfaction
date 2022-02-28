@@ -29,6 +29,10 @@ runs:
         fi
         github-comment exec -- terraform-docs . > README.md
         if [ "$created" = "true" ] || ! git diff --quiet README.md; then
+          if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
+            echo "::error ::Please generate Module's README.md with terraform-docs."
+            exit 1
+          fi
           ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
             -m "docs($TFACTION_TARGET): generate Terraform Module document by terraform-docs" \
             -C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md" \
