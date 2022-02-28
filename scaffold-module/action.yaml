@@ -1,0 +1,96 @@
+name: Scaffold Terraform Module
+description: Scaffold Terraform Module
+inputs:
+  github_token:
+    description: 'GitHub Access Token'
+    required: true
+
+  module_path:
+    description: 'Module path'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - run: |
+        echo "::error ::github_token is required"
+        exit 1
+      shell: bash
+      if: inputs.github_token == ''
+    - run: |
+        echo "::error ::module_path is required"
+        exit 1
+      shell: bash
+      if: inputs.module_path == ''
+
+    - run: |
+        if [ -e "${MODULE_PATH}" ]; then
+          echo "::error ::file exists"
+          exit 1
+        fi
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
+
+    - run: |
+        mkdir -p "$(dirname "$MODULE_PATH")"
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: cp -R "${GITHUB_ACTION_PATH}/template" "$MODULE_PATH"
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: aqua g -i aquasecurity/tfsec terraform-linters/tflint hashicorp/terraform
+      shell: bash
+      working-directory: ${{inputs.module_path}}
+
+    - run: |
+        echo "::set-output name=branch::scaffold-module-${MODULE_PATH/\//_}"
+      id: branch
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: git add "$MODULE_PATH"
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: |
+        git diff --cached --name-only |
+          xargs ghcp commit -r "$GITHUB_REPOSITORY" \
+            -b "${{steps.branch.outputs.branch}}" \
+            -m "chore($MODULE_PATH): scaffold a Terraform Module"
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: |
+        opts=(-R "$GITHUB_REPOSITORY" -H "${{steps.branch.outputs.branch}}" -t "\"Scaffold a Terraform Module (${MODULE_PATH})\"" -b "\"This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)\"")
+        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+          opts+=( -d )
+        fi
+        echo "::notice title=Create a scaffold pull request::$ gh pr create ${opts[@]}"
+      if: steps.global-config.outputs.skip_create_pr
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: |
+        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by GitHub Actions workflow_dispatch event https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
+        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+          opts+=( -d )
+        fi
+        gh pr create "${opts[@]}"
+      shell: bash
+      if: '! steps.global-config.outputs.skip_create_pr'
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        MODULE_PATH: ${{inputs.module_path}}
