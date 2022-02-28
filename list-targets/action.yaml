@@ -12,6 +12,9 @@ outputs:
   terraform_targets:
     description: list of terraform targets
     value: ${{ steps.list-targets.outputs.terraform_targets }}
+  modules:
+    description: list of changed modules
+    value: ${{ steps.list-modules.outputs.modules }}
 runs:
   using: composite
   steps:
@@ -38,3 +41,8 @@ runs:
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
+    - uses: suzuki-shunsuke/tfaction/list-changed-modules@main
+      id: list-modules
+      with:
+        changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
+        config_files: ${{ steps.list-modules.outputs.modules }}
