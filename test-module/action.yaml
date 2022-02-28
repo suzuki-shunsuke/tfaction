@@ -18,12 +18,23 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/github-action-format@v0.1.1
-      with:
-        working_directory: ${{ env.TFACTION_TARGET }}
-        github_token: ${{ inputs.github_app_token }}
-        command: terraform-docs . > README.md
-        commit_message: 'docs(${{ env.TFACTION_TARGET }}): generate Terraform Module document by terraform-docs'
+    - shell: bash
+      working-directory: ${{ env.TFACTION_TARGET }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+      run: |
+        created=false
+        if ! [ -f README.md ]; then
+          created=true
+        fi
+        github-comment exec -- terraform-docs . > README.md
+        if [ "$created" = "true" ] || ! git diff --quiet README.md; then
+          ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
+            -m "docs($TFACTION_TARGET): generate Terraform Module document by terraform-docs" \
+            -C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md" \
+            --token "$GITHUB_APP_TOKEN"
+          exit 1
+        fi
 
     - uses: suzuki-shunsuke/github-action-terraform-fmt@v0.1.1
       with:
