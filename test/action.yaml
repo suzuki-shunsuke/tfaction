@@ -15,11 +15,6 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@v0.1.1
-      with:
-        working_directory: ${{ steps.target-config.outputs.working_directory }}
-        github_token: ${{ inputs.github_app_token }}
-
     - run: github-comment exec -var "target:${TFACTION_TARGET}" -- terraform validate
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
@@ -38,3 +33,8 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: 'true'
+
+    - uses: suzuki-shunsuke/github-action-terraform-fmt@v0.1.1
+      with:
+        working_directory: ${{ steps.target-config.outputs.working_directory }}
+        github_token: ${{ inputs.github_app_token }}
