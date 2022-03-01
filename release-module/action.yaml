@@ -33,18 +33,18 @@ runs:
       env:
         MODULE_PATH: ${{inputs.module_path}}
 
-    # create a tag
     - run: |
         module_name=${MODULE_PATH/\//_}
         echo "::set-output name=tag::module_${module_name}_${{inputs.version}}"
       id: get-tag
+      shell: bash
       env:
         MODULE_PATH: ${{inputs.module_path}}
     - run: gh api "repos/{owner}/{repo}/git/refs" -f "sha=${GITHUB_SHA}" -f "ref=refs/tags/${{steps.get-tag.outputs.tag}}"
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
 
-    # create a release
     - run: gh release create "${{steps.get-tag.outputs.tag}}" --title "${{steps.get-tag.outputs.tag}}"
+      shell: bash
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
