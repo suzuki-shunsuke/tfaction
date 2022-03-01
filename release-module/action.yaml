@@ -41,6 +41,7 @@ runs:
       env:
         MODULE_PATH: ${{inputs.module_path}}
     - run: gh api "repos/{owner}/{repo}/git/refs" -f "sha=${GITHUB_SHA}" -f "ref=refs/tags/${{steps.get-tag.outputs.tag}}"
+      shell: bash
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
 
