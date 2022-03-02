@@ -12,7 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: github-comment exec -- terraform init
+    - run: github-comment exec -- terraform init -input=false
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
@@ -35,6 +35,11 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: 'true'
+
+    # Remove .terraform.lock.hcl created by `terraform init` before running terraform-docs
+    - run: '! test -f .terraform.lock.hcl || rm .terraform.lock.hcl'
+      shell: bash
+      working-directory: ${{ env.TFACTION_TARGET }}
 
     - shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
