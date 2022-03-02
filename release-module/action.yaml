@@ -45,7 +45,14 @@ runs:
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
 
-    - run: gh release create "${{steps.get-tag.outputs.tag}}" --title "${{steps.get-tag.outputs.tag}}"
+    - run: |
+        note="module: $MODULE_PATH
+        version: $MODULE_VERSION
+
+        [Source code](https://github.com/$GITHUB_REPOSITORY/tree/${{steps.get-tag.outputs.tag}}/$MODULE_PATH)"
+        gh release create "${{steps.get-tag.outputs.tag}}" --title "${{steps.get-tag.outputs.tag}}" -n "${note}"
       shell: bash
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
+        MODULE_PATH: ${{inputs.module_path}}
+        MODULE_VERSION: ${{inputs.version}}
