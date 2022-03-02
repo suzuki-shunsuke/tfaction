@@ -7,13 +7,7 @@ set -o pipefail
 # 1. create a remote branch
 
 target_label=${TFACTION_TARGET_LABEL_PREFIX}${TFACTION_TARGET}
-curl \
-	-X POST \
-	-H "Accept: application/vnd.github.v3+json" \
-	-H "Authorization: token ${GITHUB_TOKEN}" \
-	-H "Content-type: application/json" \
-	"https://api.github.com/repos/$GITHUB_REPOSITORY/issues" \
-	-d "{\"title\":\"${target_label}\"}"
+gh api "repos/{owner}/{repo}/labels" -f name="${target_label}" || :
 
 follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
 GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
