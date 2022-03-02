@@ -12,7 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: github-comment exec -- terraform init
+    - run: github-comment exec -- terraform init -input=false
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
