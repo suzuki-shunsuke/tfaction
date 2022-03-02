@@ -12,7 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/get-target-config@v0.5.0-5
       id: target-config
 
     - run: github-comment exec -var "target:${TFACTION_TARGET}" -- terraform validate
