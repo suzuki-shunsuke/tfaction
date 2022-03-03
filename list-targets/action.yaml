@@ -27,7 +27,7 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: tfaction-ci-info
         path: ${{env.CI_INFO_TEMP_DIR}}
