@@ -68,8 +68,8 @@ runs:
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
-        echo "::notice title=Create a pull request and fix the generated migration file::$ gh pr create ${opts[@]}"
-        echo "::notice title=Create a pull request and fix the generated migration file::https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate"
+        echo "\n::notice title=Create a pull request and fix the generated migration file::$ gh pr create ${opts[@]}"
+        echo "\n::notice title=Create a pull request and fix the generated migration file::https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate"
       if: steps.global-config.outputs.skip_create_pr
       shell: bash
 
