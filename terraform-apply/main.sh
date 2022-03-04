@@ -10,7 +10,7 @@ elif [ -n "${GCS_BUCKET_NAME_PLAN_FILE:-}" ]; then
 fi
 
 set +e
-tfcmt -var "target:$TFACTION_TARGET" apply -- terraform apply -auto-approve -input=false tfplan.binary
+tfcmt -var "target:$TFACTION_TARGET" apply -- terraform apply -auto-approve -no-color -input=false tfplan.binary
 code=$?
 set -e
 

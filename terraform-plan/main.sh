@@ -5,7 +5,7 @@ set -o pipefail
 
 set +e
 tfcmt -var "target:$TFACTION_TARGET" plan -- \
-	terraform plan -detailed-exitcode -out tfplan.binary -input=false
+	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false
 code=$?
 set -e
 
