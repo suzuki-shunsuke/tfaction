@@ -18,10 +18,8 @@ inputs:
     description: 'config file path'
     required: false
 outputs:
-  tfmigrate_targets:
-    description: list of tfmigrate targets
-  terraform_targets:
-    description: list of terraform targets
+  targets:
+    description: list of targets
 runs:
   using: 'node16'
   main: 'dist/index.js'
