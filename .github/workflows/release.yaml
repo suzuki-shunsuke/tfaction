@@ -23,7 +23,7 @@ jobs:
 
       - run: |
           git ls-files | grep -E "/action\.yaml$" |
-            xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@$version|"
+            xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@${{github.event.inputs.tag}}|"
       - run: git checkout -b "release/${{github.event.inputs.tag}}"
       - run: |
           git ls-files | grep -E "/action\.yaml$" | xargs git add
