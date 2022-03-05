@@ -6,7 +6,7 @@ tasks:
   short: r
   description: release the new version
   usage: release the new version
-  script: bash scripts/release.sh "{{.version}}"
+  script: gh workflow run release.yaml -f tag={{.version}}
   args:
   - name: version
     required: true
