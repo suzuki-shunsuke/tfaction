@@ -1,0 +1,40 @@
+---
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tag'
+        required: true
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: gh auth setup-git
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      # https://github.community/t/github-actions-bot-email-address/17204/5
+      - run: git config user.name "github-actions[bot]"
+      - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - run: |
+          git ls-files | grep -E "/action\.yaml$" |
+            xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@$version|"
+      - run: git checkout -b "release/${{github.event.inputs.tag}}"
+      - run: |
+          git ls-files | grep -E "/action\.yaml$" | xargs git add
+      - run: |
+          git commit -m "chore: release ${{github.event.inputs.tag}}
+          base revision: $GITHUB_SHA"
+      - run: git tag "${{github.event.inputs.tag}}"
+      - run: git push origin "${{github.event.inputs.tag}}"
+      - run: git checkout main
+      - run: |
+          note_template='[Issues](https://github.com/suzuki-shunsuke/tfaction/issues?q=is%3Aissue+is%3Aclosed+milestone%3A${{github.event.inputs.tag}}) | [Pull Requests](https://github.com/suzuki-shunsuke/tfaction/pulls?q=is%3Apr+is%3Aclosed+milestone%3A${{github.event.inputs.tag}}) | https://github.com/suzuki-shunsuke/tfaction/compare/${{github.event.inputs.tag}}...${{github.event.inputs.tag}} | [Base revision](https://github.com/suzuki-shunsuke/tfaction/tree/BASE_REVISION)'
+          gh release create "${{github.event.inputs.tag}}" -p --title "${{github.event.inputs.tag}}" -n "${note_template//BASE_REVISION/$GITHUB_SHA}"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
