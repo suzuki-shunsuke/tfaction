@@ -71,7 +71,7 @@ runs:
         echo ""
         echo "::notice title=Create a pull request and fix the generated migration file::$ gh pr create ${opts[@]}"
         echo "::notice title=Create a pull request and fix the generated migration file::https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate"
-      if: steps.global-config.outputs.skip_create_pr == 'true'
+      if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
       shell: bash
 
     - run: |
@@ -87,7 +87,7 @@ runs:
         echo "::set-output name=pr_number::$(cat "$tempfile" | xargs basename)"
         rm "$tempfile"
       shell: bash
-      if: steps.global-config.outputs.skip_create_pr != 'true'
+      if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
       id: create_pr
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
@@ -99,6 +99,6 @@ runs:
           -H "Content-type: application/json" \
           -d "[{\"name\":\"${{steps.global-config.outputs.label_prefix_tfmigrate}}${TFACTION_TARGET}\"}]"
       shell: bash
-      if: '! steps.global-config.outputs.skip_create_pr'
+      if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
