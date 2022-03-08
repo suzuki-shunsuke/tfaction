@@ -81,7 +81,7 @@ runs:
           opts+=( -d )
         fi
         echo "::notice title=Create a scaffold pull request::$ gh pr create ${opts[@]}"
-      if: steps.global-config.outputs.skip_create_pr
+      if: steps.global-config.outputs.skip_create_pr == 'true'
       shell: bash
       env:
         MODULE_PATH: ${{inputs.module_path}}
@@ -93,7 +93,7 @@ runs:
         fi
         gh pr create "${opts[@]}"
       shell: bash
-      if: '! steps.global-config.outputs.skip_create_pr'
+      if: steps.global-config.outputs.skip_create_pr != 'true'
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         MODULE_PATH: ${{inputs.module_path}}
