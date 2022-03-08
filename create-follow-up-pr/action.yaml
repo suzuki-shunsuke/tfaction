@@ -17,7 +17,7 @@ runs:
 
     - run: bash ${{ github.action_path }}/skip_create_pr.sh
       shell: bash
-      if: steps.global-config.outputs.skip_create_pr == 'true'
+      if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
@@ -26,7 +26,7 @@ runs:
 
     - run: bash ${{ github.action_path }}/main.sh
       shell: bash
-      if: steps.global-config.outputs.skip_create_pr != 'true'
+      if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
