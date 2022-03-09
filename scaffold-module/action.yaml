@@ -77,6 +77,14 @@ runs:
       shell: bash
       working-directory: ${{inputs.module_path}}
 
+    - run: aqua i -l -a
+      shell: bash
+      working-directory: ${{inputs.module_path}}
+
+    - run: terraform-docs . > README.md
+      shell: bash
+      working-directory: ${{inputs.module_path}}
+
     - run: |
         echo "::set-output name=branch::scaffold-module-${MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)"
       id: branch
