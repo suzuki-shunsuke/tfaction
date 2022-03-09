@@ -12,7 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/get-target-config@v0.5.6
       id: target-config
     - run: bash ${{ github.action_path }}/main.sh
       working-directory: ${{ steps.target-config.outputs.working_directory }}
