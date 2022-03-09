@@ -46,6 +46,24 @@ runs:
       env:
         MODULE_PATH: ${{inputs.module_path}}
 
+    - run: |
+        sed -i "s|%%MODULE_PATH%%|$(basename "$MODULE_PATH")|g" "${MODULE_PATH}/docs/header.md"
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: |
+        sed -i "s|%%GITHUB_REPOSITORY%%|$GITHUB_REPOSITORY|g" "${MODULE_PATH}/docs/header.md"
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: |
+        sed -i "s|%%REF%%|module_${MODULE_PATH/\//_}|g" "${MODULE_PATH}/docs/header.md"
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
     - run: aqua init
       shell: bash
       working-directory: ${{inputs.module_path}}
