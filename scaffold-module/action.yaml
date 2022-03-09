@@ -47,7 +47,13 @@ runs:
         MODULE_PATH: ${{inputs.module_path}}
 
     - run: |
-        sed -i "s|%%MODULE_PATH%%|$(basename "$MODULE_PATH")|g" "${MODULE_PATH}/docs/header.md"
+        sed -i "s|%%MODULE_NAME%%|$(basename "$MODULE_PATH")|g" "${MODULE_PATH}/docs/header.md"
+      shell: bash
+      env:
+        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: |
+        sed -i "s|%%MODULE_PATH%%|$MODULE_PATH|g" "${MODULE_PATH}/docs/header.md"
       shell: bash
       env:
         MODULE_PATH: ${{inputs.module_path}}
@@ -59,7 +65,7 @@ runs:
         MODULE_PATH: ${{inputs.module_path}}
 
     - run: |
-        sed -i "s|%%REF%%|module_${MODULE_PATH/\//_}|g" "${MODULE_PATH}/docs/header.md"
+        sed -i "s|%%REF%%|module_${MODULE_PATH/\//_}_v0.1.0|g" "${MODULE_PATH}/docs/header.md"
       shell: bash
       env:
         MODULE_PATH: ${{inputs.module_path}}
@@ -105,7 +111,7 @@ runs:
         MODULE_PATH: ${{inputs.module_path}}
 
     - run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by GitHub Actions workflow_dispatch event https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
+        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
