@@ -1,7 +1,7 @@
 # https://github.com/terraform-linters/tflint-ruleset-aws
 plugin "aws" {
   enabled = true
-  version = "0.13.1" # renovate: depName=terraform-linters/tflint-ruleset-aws
+  version = "0.13.2" # renovate: depName=terraform-linters/tflint-ruleset-aws
   source  = "github.com/terraform-linters/tflint-ruleset-aws"
 
   # https://github.com/terraform-linters/tflint-ruleset-aws/blob/master/docs/deep_checking.md
