@@ -21,4 +21,3 @@ tasks:
   script: |
     mkdir -p build
     generate-schema-doc --expand-buttons --link-to-reused-ref schema build
-
