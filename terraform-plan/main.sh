@@ -3,8 +3,13 @@
 set -eu
 set -o pipefail
 
+TFCMT_PLAN_OPTS=""
+if [ "$TFCMT_PLAN_PATCH" = "true" ]; then
+  TFCMT_PLAN_OPTS="-patch"
+fi
+
 set +e
-tfcmt -var "target:$TFACTION_TARGET" plan -- \
+tfcmt -var "target:$TFACTION_TARGET" plan $TFCMT_PLAN_OPTS -- \
 	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false
 code=$?
 set -e
