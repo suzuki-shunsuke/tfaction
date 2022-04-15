@@ -32,39 +32,7 @@ runs:
     - run: aqua init
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-    - run: |
-        echo '- import: aqua/*.yaml' >> aqua.yaml
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-    - run: mkdir -p aqua
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-
-    - run: echo "packages:" > aqua/conftest.yaml
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-    - run: aqua g open-policy-agent/conftest >> aqua/conftest.yaml
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-
-    - run: echo "packages:" > aqua/tflint.yaml
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-    - run: aqua g terraform-linters/tflint >> aqua/tflint.yaml
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-
-    - run: echo "packages:" > aqua/tfsec.yaml
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-    - run: aqua g aquasecurity/tfsec >> aqua/tfsec.yaml
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-
-    - run: echo "packages:" > aqua/terraform.yaml
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-    - run: aqua g hashicorp/terraform >> aqua/terraform.yaml
+    - run: aqua g -i open-policy-agent/conftest terraform-linters/tflint aquasecurity/tfsec hashicorp/terraform
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
