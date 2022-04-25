@@ -3,7 +3,7 @@
     "build": "ncc build src/index.ts --license LICENSE"
   },
   "dependencies": {
-    "@actions/core": "1.6.0",
+    "@actions/core": "1.7.0",
     "@aws-sdk/client-secrets-manager": "3.76.0",
     "@types/js-yaml": "4.0.5",
     "@types/node": "17.0.8",
