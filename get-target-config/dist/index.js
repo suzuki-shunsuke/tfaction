@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 836:
+/***/ 351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -28,7 +28,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
 const os = __importStar(__nccwpck_require__(37));
-const utils_1 = __nccwpck_require__(171);
+const utils_1 = __nccwpck_require__(278);
 /**
  * Commands
  *
@@ -100,7 +100,7 @@ function escapeProperty(s) {
 
 /***/ }),
 
-/***/ 324:
+/***/ 186:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -135,12 +135,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
-const command_1 = __nccwpck_require__(836);
-const file_command_1 = __nccwpck_require__(965);
-const utils_1 = __nccwpck_require__(171);
+const command_1 = __nccwpck_require__(351);
+const file_command_1 = __nccwpck_require__(717);
+const utils_1 = __nccwpck_require__(278);
 const os = __importStar(__nccwpck_require__(37));
 const path = __importStar(__nccwpck_require__(17));
-const oidc_utils_1 = __nccwpck_require__(76);
+const oidc_utils_1 = __nccwpck_require__(41);
 /**
  * The code to exit an action
  */
@@ -415,11 +415,21 @@ function getIDToken(aud) {
     });
 }
 exports.getIDToken = getIDToken;
+/**
+ * Summary exports
+ */
+var summary_1 = __nccwpck_require__(327);
+Object.defineProperty(exports, "summary", ({ enumerable: true, get: function () { return summary_1.summary; } }));
+/**
+ * @deprecated use core.summary
+ */
+var summary_2 = __nccwpck_require__(327);
+Object.defineProperty(exports, "markdownSummary", ({ enumerable: true, get: function () { return summary_2.markdownSummary; } }));
 //# sourceMappingURL=core.js.map
 
 /***/ }),
 
-/***/ 965:
+/***/ 717:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -450,7 +460,7 @@ exports.issueCommand = void 0;
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__nccwpck_require__(147));
 const os = __importStar(__nccwpck_require__(37));
-const utils_1 = __nccwpck_require__(171);
+const utils_1 = __nccwpck_require__(278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
@@ -468,7 +478,7 @@ exports.issueCommand = issueCommand;
 
 /***/ }),
 
-/***/ 76:
+/***/ 41:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -484,9 +494,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OidcClient = void 0;
-const http_client_1 = __nccwpck_require__(209);
-const auth_1 = __nccwpck_require__(89);
-const core_1 = __nccwpck_require__(324);
+const http_client_1 = __nccwpck_require__(925);
+const auth_1 = __nccwpck_require__(702);
+const core_1 = __nccwpck_require__(186);
 class OidcClient {
     static createHttpClient(allowRetry = true, maxRetry = 10) {
         const requestOptions = {
@@ -552,7 +562,297 @@ exports.OidcClient = OidcClient;
 
 /***/ }),
 
-/***/ 171:
+/***/ 327:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.summary = exports.markdownSummary = exports.SUMMARY_DOCS_URL = exports.SUMMARY_ENV_VAR = void 0;
+const os_1 = __nccwpck_require__(37);
+const fs_1 = __nccwpck_require__(147);
+const { access, appendFile, writeFile } = fs_1.promises;
+exports.SUMMARY_ENV_VAR = 'GITHUB_STEP_SUMMARY';
+exports.SUMMARY_DOCS_URL = 'https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary';
+class Summary {
+    constructor() {
+        this._buffer = '';
+    }
+    /**
+     * Finds the summary file path from the environment, rejects if env var is not found or file does not exist
+     * Also checks r/w permissions.
+     *
+     * @returns step summary file path
+     */
+    filePath() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this._filePath) {
+                return this._filePath;
+            }
+            const pathFromEnv = process.env[exports.SUMMARY_ENV_VAR];
+            if (!pathFromEnv) {
+                throw new Error(`Unable to find environment variable for $${exports.SUMMARY_ENV_VAR}. Check if your runtime environment supports job summaries.`);
+            }
+            try {
+                yield access(pathFromEnv, fs_1.constants.R_OK | fs_1.constants.W_OK);
+            }
+            catch (_a) {
+                throw new Error(`Unable to access summary file: '${pathFromEnv}'. Check if the file has correct read/write permissions.`);
+            }
+            this._filePath = pathFromEnv;
+            return this._filePath;
+        });
+    }
+    /**
+     * Wraps content in an HTML tag, adding any HTML attributes
+     *
+     * @param {string} tag HTML tag to wrap
+     * @param {string | null} content content within the tag
+     * @param {[attribute: string]: string} attrs key-value list of HTML attributes to add
+     *
+     * @returns {string} content wrapped in HTML element
+     */
+    wrap(tag, content, attrs = {}) {
+        const htmlAttrs = Object.entries(attrs)
+            .map(([key, value]) => ` ${key}="${value}"`)
+            .join('');
+        if (!content) {
+            return `<${tag}${htmlAttrs}>`;
+        }
+        return `<${tag}${htmlAttrs}>${content}</${tag}>`;
+    }
+    /**
+     * Writes text in the buffer to the summary buffer file and empties buffer. Will append by default.
+     *
+     * @param {SummaryWriteOptions} [options] (optional) options for write operation
+     *
+     * @returns {Promise<Summary>} summary instance
+     */
+    write(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const overwrite = !!(options === null || options === void 0 ? void 0 : options.overwrite);
+            const filePath = yield this.filePath();
+            const writeFunc = overwrite ? writeFile : appendFile;
+            yield writeFunc(filePath, this._buffer, { encoding: 'utf8' });
+            return this.emptyBuffer();
+        });
+    }
+    /**
+     * Clears the summary buffer and wipes the summary file
+     *
+     * @returns {Summary} summary instance
+     */
+    clear() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.emptyBuffer().write({ overwrite: true });
+        });
+    }
+    /**
+     * Returns the current summary buffer as a string
+     *
+     * @returns {string} string of summary buffer
+     */
+    stringify() {
+        return this._buffer;
+    }
+    /**
+     * If the summary buffer is empty
+     *
+     * @returns {boolen} true if the buffer is empty
+     */
+    isEmptyBuffer() {
+        return this._buffer.length === 0;
+    }
+    /**
+     * Resets the summary buffer without writing to summary file
+     *
+     * @returns {Summary} summary instance
+     */
+    emptyBuffer() {
+        this._buffer = '';
+        return this;
+    }
+    /**
+     * Adds raw text to the summary buffer
+     *
+     * @param {string} text content to add
+     * @param {boolean} [addEOL=false] (optional) append an EOL to the raw text (default: false)
+     *
+     * @returns {Summary} summary instance
+     */
+    addRaw(text, addEOL = false) {
+        this._buffer += text;
+        return addEOL ? this.addEOL() : this;
+    }
+    /**
+     * Adds the operating system-specific end-of-line marker to the buffer
+     *
+     * @returns {Summary} summary instance
+     */
+    addEOL() {
+        return this.addRaw(os_1.EOL);
+    }
+    /**
+     * Adds an HTML codeblock to the summary buffer
+     *
+     * @param {string} code content to render within fenced code block
+     * @param {string} lang (optional) language to syntax highlight code
+     *
+     * @returns {Summary} summary instance
+     */
+    addCodeBlock(code, lang) {
+        const attrs = Object.assign({}, (lang && { lang }));
+        const element = this.wrap('pre', this.wrap('code', code), attrs);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML list to the summary buffer
+     *
+     * @param {string[]} items list of items to render
+     * @param {boolean} [ordered=false] (optional) if the rendered list should be ordered or not (default: false)
+     *
+     * @returns {Summary} summary instance
+     */
+    addList(items, ordered = false) {
+        const tag = ordered ? 'ol' : 'ul';
+        const listItems = items.map(item => this.wrap('li', item)).join('');
+        const element = this.wrap(tag, listItems);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML table to the summary buffer
+     *
+     * @param {SummaryTableCell[]} rows table rows
+     *
+     * @returns {Summary} summary instance
+     */
+    addTable(rows) {
+        const tableBody = rows
+            .map(row => {
+            const cells = row
+                .map(cell => {
+                if (typeof cell === 'string') {
+                    return this.wrap('td', cell);
+                }
+                const { header, data, colspan, rowspan } = cell;
+                const tag = header ? 'th' : 'td';
+                const attrs = Object.assign(Object.assign({}, (colspan && { colspan })), (rowspan && { rowspan }));
+                return this.wrap(tag, data, attrs);
+            })
+                .join('');
+            return this.wrap('tr', cells);
+        })
+            .join('');
+        const element = this.wrap('table', tableBody);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds a collapsable HTML details element to the summary buffer
+     *
+     * @param {string} label text for the closed state
+     * @param {string} content collapsable content
+     *
+     * @returns {Summary} summary instance
+     */
+    addDetails(label, content) {
+        const element = this.wrap('details', this.wrap('summary', label) + content);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML image tag to the summary buffer
+     *
+     * @param {string} src path to the image you to embed
+     * @param {string} alt text description of the image
+     * @param {SummaryImageOptions} options (optional) addition image attributes
+     *
+     * @returns {Summary} summary instance
+     */
+    addImage(src, alt, options) {
+        const { width, height } = options || {};
+        const attrs = Object.assign(Object.assign({}, (width && { width })), (height && { height }));
+        const element = this.wrap('img', null, Object.assign({ src, alt }, attrs));
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML section heading element
+     *
+     * @param {string} text heading text
+     * @param {number | string} [level=1] (optional) the heading level, default: 1
+     *
+     * @returns {Summary} summary instance
+     */
+    addHeading(text, level) {
+        const tag = `h${level}`;
+        const allowedTag = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag)
+            ? tag
+            : 'h1';
+        const element = this.wrap(allowedTag, text);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML thematic break (<hr>) to the summary buffer
+     *
+     * @returns {Summary} summary instance
+     */
+    addSeparator() {
+        const element = this.wrap('hr', null);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML line break (<br>) to the summary buffer
+     *
+     * @returns {Summary} summary instance
+     */
+    addBreak() {
+        const element = this.wrap('br', null);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML blockquote to the summary buffer
+     *
+     * @param {string} text quote text
+     * @param {string} cite (optional) citation url
+     *
+     * @returns {Summary} summary instance
+     */
+    addQuote(text, cite) {
+        const attrs = Object.assign({}, (cite && { cite }));
+        const element = this.wrap('blockquote', text, attrs);
+        return this.addRaw(element).addEOL();
+    }
+    /**
+     * Adds an HTML anchor tag to the summary buffer
+     *
+     * @param {string} text link text/content
+     * @param {string} href hyperlink
+     *
+     * @returns {Summary} summary instance
+     */
+    addLink(text, href) {
+        const element = this.wrap('a', text, { href });
+        return this.addRaw(element).addEOL();
+    }
+}
+const _summary = new Summary();
+/**
+ * @deprecated use `core.summary`
+ */
+exports.markdownSummary = _summary;
+exports.summary = _summary;
+//# sourceMappingURL=summary.js.map
+
+/***/ }),
+
+/***/ 278:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -599,7 +899,7 @@ exports.toCommandProperties = toCommandProperties;
 
 /***/ }),
 
-/***/ 89:
+/***/ 702:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -665,7 +965,7 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 
 /***/ }),
 
-/***/ 209:
+/***/ 925:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -673,7 +973,7 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const http = __nccwpck_require__(685);
 const https = __nccwpck_require__(687);
-const pm = __nccwpck_require__(986);
+const pm = __nccwpck_require__(443);
 let tunnel;
 var HttpCodes;
 (function (HttpCodes) {
@@ -1092,7 +1392,7 @@ class HttpClient {
         if (useProxy) {
             // If using proxy, need tunnel
             if (!tunnel) {
-                tunnel = __nccwpck_require__(700);
+                tunnel = __nccwpck_require__(294);
             }
             const agentOptions = {
                 maxSockets: maxSockets,
@@ -1210,7 +1510,7 @@ exports.HttpClient = HttpClient;
 
 /***/ }),
 
-/***/ 986:
+/***/ 443:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -1275,15 +1575,15 @@ exports.checkBypass = checkBypass;
 
 /***/ }),
 
-/***/ 502:
+/***/ 917:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
 
-var loader = __nccwpck_require__(355);
-var dumper = __nccwpck_require__(953);
+var loader = __nccwpck_require__(161);
+var dumper = __nccwpck_require__(866);
 
 
 function renamed(from, to) {
@@ -1294,32 +1594,32 @@ function renamed(from, to) {
 }
 
 
-module.exports.Type = __nccwpck_require__(973);
-module.exports.Schema = __nccwpck_require__(300);
-module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(367);
-module.exports.JSON_SCHEMA = __nccwpck_require__(449);
-module.exports.CORE_SCHEMA = __nccwpck_require__(499);
-module.exports.DEFAULT_SCHEMA = __nccwpck_require__(520);
+module.exports.Type = __nccwpck_require__(73);
+module.exports.Schema = __nccwpck_require__(82);
+module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(562);
+module.exports.JSON_SCHEMA = __nccwpck_require__(35);
+module.exports.CORE_SCHEMA = __nccwpck_require__(11);
+module.exports.DEFAULT_SCHEMA = __nccwpck_require__(759);
 module.exports.load                = loader.load;
 module.exports.loadAll             = loader.loadAll;
 module.exports.dump                = dumper.dump;
-module.exports.YAMLException = __nccwpck_require__(397);
+module.exports.YAMLException = __nccwpck_require__(179);
 
 // Re-export all types in case user wants to create custom schema
 module.exports.types = {
-  binary:    __nccwpck_require__(212),
-  float:     __nccwpck_require__(649),
-  map:       __nccwpck_require__(51),
-  null:      __nccwpck_require__(935),
-  pairs:     __nccwpck_require__(406),
-  set:       __nccwpck_require__(13),
-  timestamp: __nccwpck_require__(382),
-  bool:      __nccwpck_require__(641),
-  int:       __nccwpck_require__(920),
-  merge:     __nccwpck_require__(215),
-  omap:      __nccwpck_require__(352),
-  seq:       __nccwpck_require__(720),
-  str:       __nccwpck_require__(952)
+  binary:    __nccwpck_require__(900),
+  float:     __nccwpck_require__(705),
+  map:       __nccwpck_require__(150),
+  null:      __nccwpck_require__(721),
+  pairs:     __nccwpck_require__(860),
+  set:       __nccwpck_require__(548),
+  timestamp: __nccwpck_require__(212),
+  bool:      __nccwpck_require__(993),
+  int:       __nccwpck_require__(615),
+  merge:     __nccwpck_require__(104),
+  omap:      __nccwpck_require__(46),
+  seq:       __nccwpck_require__(283),
+  str:       __nccwpck_require__(619)
 };
 
 // Removed functions from JS-YAML 3.0.x
@@ -1330,7 +1630,7 @@ module.exports.safeDump            = renamed('safeDump', 'dump');
 
 /***/ }),
 
-/***/ 643:
+/***/ 829:
 /***/ ((module) => {
 
 "use strict";
@@ -1397,7 +1697,7 @@ module.exports.extend         = extend;
 
 /***/ }),
 
-/***/ 953:
+/***/ 866:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -1405,9 +1705,9 @@ module.exports.extend         = extend;
 
 /*eslint-disable no-use-before-define*/
 
-var common              = __nccwpck_require__(643);
-var YAMLException       = __nccwpck_require__(397);
-var DEFAULT_SCHEMA      = __nccwpck_require__(520);
+var common              = __nccwpck_require__(829);
+var YAMLException       = __nccwpck_require__(179);
+var DEFAULT_SCHEMA      = __nccwpck_require__(759);
 
 var _toString       = Object.prototype.toString;
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -2370,7 +2670,7 @@ module.exports.dump = dump;
 
 /***/ }),
 
-/***/ 397:
+/***/ 179:
 /***/ ((module) => {
 
 "use strict";
@@ -2433,7 +2733,7 @@ module.exports = YAMLException;
 
 /***/ }),
 
-/***/ 355:
+/***/ 161:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -2441,10 +2741,10 @@ module.exports = YAMLException;
 
 /*eslint-disable max-len,no-use-before-define*/
 
-var common              = __nccwpck_require__(643);
-var YAMLException       = __nccwpck_require__(397);
-var makeSnippet         = __nccwpck_require__(431);
-var DEFAULT_SCHEMA      = __nccwpck_require__(520);
+var common              = __nccwpck_require__(829);
+var YAMLException       = __nccwpck_require__(179);
+var makeSnippet         = __nccwpck_require__(975);
+var DEFAULT_SCHEMA      = __nccwpck_require__(759);
 
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -4168,7 +4468,7 @@ module.exports.load    = load;
 
 /***/ }),
 
-/***/ 300:
+/***/ 82:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4176,8 +4476,8 @@ module.exports.load    = load;
 
 /*eslint-disable max-len*/
 
-var YAMLException = __nccwpck_require__(397);
-var Type          = __nccwpck_require__(973);
+var YAMLException = __nccwpck_require__(179);
+var Type          = __nccwpck_require__(73);
 
 
 function compileList(schema, name) {
@@ -4297,7 +4597,7 @@ module.exports = Schema;
 
 /***/ }),
 
-/***/ 499:
+/***/ 11:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4311,12 +4611,12 @@ module.exports = Schema;
 
 
 
-module.exports = __nccwpck_require__(449);
+module.exports = __nccwpck_require__(35);
 
 
 /***/ }),
 
-/***/ 520:
+/***/ 759:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4330,23 +4630,23 @@ module.exports = __nccwpck_require__(449);
 
 
 
-module.exports = (__nccwpck_require__(499).extend)({
+module.exports = (__nccwpck_require__(11).extend)({
   implicit: [
-    __nccwpck_require__(382),
-    __nccwpck_require__(215)
+    __nccwpck_require__(212),
+    __nccwpck_require__(104)
   ],
   explicit: [
-    __nccwpck_require__(212),
-    __nccwpck_require__(352),
-    __nccwpck_require__(406),
-    __nccwpck_require__(13)
+    __nccwpck_require__(900),
+    __nccwpck_require__(46),
+    __nccwpck_require__(860),
+    __nccwpck_require__(548)
   ]
 });
 
 
 /***/ }),
 
-/***/ 367:
+/***/ 562:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4357,21 +4657,21 @@ module.exports = (__nccwpck_require__(499).extend)({
 
 
 
-var Schema = __nccwpck_require__(300);
+var Schema = __nccwpck_require__(82);
 
 
 module.exports = new Schema({
   explicit: [
-    __nccwpck_require__(952),
-    __nccwpck_require__(720),
-    __nccwpck_require__(51)
+    __nccwpck_require__(619),
+    __nccwpck_require__(283),
+    __nccwpck_require__(150)
   ]
 });
 
 
 /***/ }),
 
-/***/ 449:
+/***/ 35:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4386,26 +4686,26 @@ module.exports = new Schema({
 
 
 
-module.exports = (__nccwpck_require__(367).extend)({
+module.exports = (__nccwpck_require__(562).extend)({
   implicit: [
-    __nccwpck_require__(935),
-    __nccwpck_require__(641),
-    __nccwpck_require__(920),
-    __nccwpck_require__(649)
+    __nccwpck_require__(721),
+    __nccwpck_require__(993),
+    __nccwpck_require__(615),
+    __nccwpck_require__(705)
   ]
 });
 
 
 /***/ }),
 
-/***/ 431:
+/***/ 975:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
 
-var common = __nccwpck_require__(643);
+var common = __nccwpck_require__(829);
 
 
 // get snippet for a single line, respecting maxLength
@@ -4507,13 +4807,13 @@ module.exports = makeSnippet;
 
 /***/ }),
 
-/***/ 973:
+/***/ 73:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var YAMLException = __nccwpck_require__(397);
+var YAMLException = __nccwpck_require__(179);
 
 var TYPE_CONSTRUCTOR_OPTIONS = [
   'kind',
@@ -4581,7 +4881,7 @@ module.exports = Type;
 
 /***/ }),
 
-/***/ 212:
+/***/ 900:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4590,7 +4890,7 @@ module.exports = Type;
 /*eslint-disable no-bitwise*/
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 
 // [ 64, 65, 66 ] -> [ padding, CR, LF ]
@@ -4714,13 +5014,13 @@ module.exports = new Type('tag:yaml.org,2002:binary', {
 
 /***/ }),
 
-/***/ 641:
+/***/ 993:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 function resolveYamlBoolean(data) {
   if (data === null) return false;
@@ -4757,14 +5057,14 @@ module.exports = new Type('tag:yaml.org,2002:bool', {
 
 /***/ }),
 
-/***/ 649:
+/***/ 705:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var common = __nccwpck_require__(643);
-var Type   = __nccwpck_require__(973);
+var common = __nccwpck_require__(829);
+var Type   = __nccwpck_require__(73);
 
 var YAML_FLOAT_PATTERN = new RegExp(
   // 2.5e4, 2.5 and integers
@@ -4862,14 +5162,14 @@ module.exports = new Type('tag:yaml.org,2002:float', {
 
 /***/ }),
 
-/***/ 920:
+/***/ 615:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var common = __nccwpck_require__(643);
-var Type   = __nccwpck_require__(973);
+var common = __nccwpck_require__(829);
+var Type   = __nccwpck_require__(73);
 
 function isHexCode(c) {
   return ((0x30/* 0 */ <= c) && (c <= 0x39/* 9 */)) ||
@@ -5026,13 +5326,13 @@ module.exports = new Type('tag:yaml.org,2002:int', {
 
 /***/ }),
 
-/***/ 51:
+/***/ 150:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 module.exports = new Type('tag:yaml.org,2002:map', {
   kind: 'mapping',
@@ -5042,13 +5342,13 @@ module.exports = new Type('tag:yaml.org,2002:map', {
 
 /***/ }),
 
-/***/ 215:
+/***/ 104:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 function resolveYamlMerge(data) {
   return data === '<<' || data === null;
@@ -5062,13 +5362,13 @@ module.exports = new Type('tag:yaml.org,2002:merge', {
 
 /***/ }),
 
-/***/ 935:
+/***/ 721:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 function resolveYamlNull(data) {
   if (data === null) return true;
@@ -5105,13 +5405,13 @@ module.exports = new Type('tag:yaml.org,2002:null', {
 
 /***/ }),
 
-/***/ 352:
+/***/ 46:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 var _toString       = Object.prototype.toString;
@@ -5157,13 +5457,13 @@ module.exports = new Type('tag:yaml.org,2002:omap', {
 
 /***/ }),
 
-/***/ 406:
+/***/ 860:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 var _toString = Object.prototype.toString;
 
@@ -5218,13 +5518,13 @@ module.exports = new Type('tag:yaml.org,2002:pairs', {
 
 /***/ }),
 
-/***/ 720:
+/***/ 283:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 module.exports = new Type('tag:yaml.org,2002:seq', {
   kind: 'sequence',
@@ -5234,13 +5534,13 @@ module.exports = new Type('tag:yaml.org,2002:seq', {
 
 /***/ }),
 
-/***/ 13:
+/***/ 548:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -5271,13 +5571,13 @@ module.exports = new Type('tag:yaml.org,2002:set', {
 
 /***/ }),
 
-/***/ 952:
+/***/ 619:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 module.exports = new Type('tag:yaml.org,2002:str', {
   kind: 'scalar',
@@ -5287,13 +5587,13 @@ module.exports = new Type('tag:yaml.org,2002:str', {
 
 /***/ }),
 
-/***/ 382:
+/***/ 212:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-var Type = __nccwpck_require__(973);
+var Type = __nccwpck_require__(73);
 
 var YAML_DATE_REGEXP = new RegExp(
   '^([0-9][0-9][0-9][0-9])'          + // [1] year
@@ -5383,15 +5683,15 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 
 /***/ }),
 
-/***/ 700:
+/***/ 294:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-module.exports = __nccwpck_require__(617);
+module.exports = __nccwpck_require__(219);
 
 
 /***/ }),
 
-/***/ 617:
+/***/ 219:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -5663,14 +5963,18 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 192:
+/***/ 144:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -5688,36 +5992,50 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(324));
-const lib = __importStar(__nccwpck_require__(463));
+const core = __importStar(__nccwpck_require__(186));
+const lib = __importStar(__nccwpck_require__(730));
 const path = __importStar(__nccwpck_require__(17));
 try {
     const config = lib.getConfig();
-    const target = lib.getTarget();
     const isApply = lib.getIsApply();
     const jobType = lib.getJobType();
     const workingDirectoryFile = config.working_directory_file ? config.working_directory_file : 'tfaction.yaml';
-    for (let i = 0; i < config.target_groups.length; i++) {
-        const targetConfig = config.target_groups[i];
-        if (!target.startsWith(targetConfig.target)) {
-            continue;
+    let target = process.env.TFACTION_TARGET;
+    let workingDir = process.env.TFACTION_WORKING_DIR;
+    let targetConfig = null;
+    if (target) {
+        targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
+        if (targetConfig === null) {
+            throw 'target config is not found in target_groups';
         }
-        const workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
-        core.setOutput('working_directory', workingDir);
-        core.setOutput('providers_lock_opts', '-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64');
-        lib.setOutputs(['template_dir'], [targetConfig]);
-        if (jobType == 'scaffold_working_dir') {
-            lib.setOutputs([
-                's3_bucket_name_plan_file',
-                's3_bucket_name_tfmigrate_history',
-                'gcs_bucket_name_plan_file',
-                'aws_region',
-                'aws_assume_role_arn',
-                'gcp_service_account',
-                'gcp_workload_identity_provider',
-            ], [targetConfig]);
-            break;
+        workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
+    }
+    else if (workingDir) {
+        targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, workingDir);
+        if (targetConfig === null) {
+            throw 'target config is not found in target_groups';
         }
+        target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
+        core.exportVariable('TFACTION_TARGET', target);
+    }
+    else {
+        throw 'Either TFACTION_TARGET or TFACTION_WORKING_DIR is required';
+    }
+    core.setOutput('working_directory', workingDir);
+    core.setOutput('providers_lock_opts', '-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64');
+    lib.setOutputs(['template_dir'], [targetConfig]);
+    if (jobType == 'scaffold_working_dir') {
+        lib.setOutputs([
+            's3_bucket_name_plan_file',
+            's3_bucket_name_tfmigrate_history',
+            'gcs_bucket_name_plan_file',
+            'aws_region',
+            'aws_assume_role_arn',
+            'gcp_service_account',
+            'gcp_workload_identity_provider',
+        ], [targetConfig]);
+    }
+    else {
         const rootJobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
         const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
         const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
@@ -5733,7 +6051,6 @@ try {
             'gcp_service_account',
             'gcp_workload_identity_provider',
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
-        break;
     }
 }
 catch (error) {
@@ -5743,14 +6060,18 @@ catch (error) {
 
 /***/ }),
 
-/***/ 463:
+/***/ 730:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -5768,27 +6089,39 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setOutputs = exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.getTarget = exports.readTargetConfig = exports.getConfig = void 0;
+exports.setOutputs = exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getConfig = void 0;
 const fs = __importStar(__nccwpck_require__(147));
-const core = __importStar(__nccwpck_require__(324));
-const yaml = __nccwpck_require__(502);
+const core = __importStar(__nccwpck_require__(186));
+const yaml = __nccwpck_require__(917);
 function getConfig() {
     const configFilePath = process.env.TFACTION_CONFIG ? process.env.TFACTION_CONFIG : 'tfaction-root.yaml';
     return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
 }
 exports.getConfig = getConfig;
+function getTargetFromTargetGroups(targetGroups, target) {
+    for (let i = 0; i < targetGroups.length; i++) {
+        const targetConfig = targetGroups[i];
+        if (target.startsWith(targetConfig.target)) {
+            return targetConfig;
+        }
+    }
+    return null;
+}
+exports.getTargetFromTargetGroups = getTargetFromTargetGroups;
+function getTargetFromTargetGroupsByWorkingDir(targetGroups, wd) {
+    for (let i = 0; i < targetGroups.length; i++) {
+        const targetConfig = targetGroups[i];
+        if (wd.startsWith(targetConfig.working_directory)) {
+            return targetConfig;
+        }
+    }
+    return null;
+}
+exports.getTargetFromTargetGroupsByWorkingDir = getTargetFromTargetGroupsByWorkingDir;
 function readTargetConfig(p) {
     return yaml.load(fs.readFileSync(p, 'utf8'));
 }
 exports.readTargetConfig = readTargetConfig;
-function getTarget() {
-    const target = process.env.TFACTION_TARGET;
-    if (target == '' || target == undefined) {
-        throw 'the environment variable TFACTION_TARGET is required';
-    }
-    return target;
-}
-exports.getTarget = getTarget;
 function getIsApply() {
     return process.env.TFACTION_IS_APPLY == 'true';
 }
@@ -5973,7 +6306,7 @@ module.exports = require("util");
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(192);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(144);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
