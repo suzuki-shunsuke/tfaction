@@ -44,16 +44,28 @@ export function getConfig(): Config {
   return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
 }
 
-export function readTargetConfig(p: string): TargetConfig {
-  return yaml.load(fs.readFileSync(p, 'utf8'));
+export function getTargetFromTargetGroups(targetGroups: Array<TargetConfig>, target: string) {
+  for (let i = 0; i < targetGroups.length; i++) {
+    const targetConfig = targetGroups[i];
+    if (target.startsWith(targetConfig.target)) {
+      return targetConfig;
+    }
+  }
+  return null;
 }
 
-export function getTarget(): string {
-  const target = process.env.TFACTION_TARGET;
-  if (target == '' || target == undefined) {
-    throw 'the environment variable TFACTION_TARGET is required';
+export function getTargetFromTargetGroupsByWorkingDir(targetGroups: Array<TargetConfig>, wd: string) {
+  for (let i = 0; i < targetGroups.length; i++) {
+    const targetConfig = targetGroups[i];
+    if (wd.startsWith(targetConfig.working_directory)) {
+      return targetConfig;
+    }
   }
-  return target;
+  return null;
+}
+
+export function readTargetConfig(p: string): TargetConfig {
+  return yaml.load(fs.readFileSync(p, 'utf8'));
 }
 
 export function getIsApply(): boolean {
