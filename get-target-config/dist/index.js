@@ -6016,6 +6016,7 @@ try {
             throw 'target config is not found in target_groups';
         }
         target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
+        core.exportVariable('TFACTION_TARGET', target);
     }
     else {
         throw 'Either TFACTION_TARGET or TFACTION_WORKING_DIR is required';
