@@ -60,6 +60,8 @@ try {
       'gcp_service_account',
       'gcp_workload_identity_provider',
     ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
+
+    lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
   }
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
