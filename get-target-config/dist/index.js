@@ -6186,7 +6186,7 @@ function setEnvs(...objs) {
     for (let j = 0; j < objs.length; j++) {
         const obj = objs[j];
         if (obj != undefined && obj != null && obj['env'] != undefined) {
-            for (const [key, value] of obj['env']) {
+            for (const [key, value] of Object.entries(obj.env)) {
                 env.set(key, value);
             }
         }
