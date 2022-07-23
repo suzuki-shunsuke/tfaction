@@ -6051,6 +6051,7 @@ try {
             'gcp_service_account',
             'gcp_workload_identity_provider',
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
+        lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
     }
 }
 catch (error) {
@@ -6089,7 +6090,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setOutputs = exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getConfig = void 0;
+exports.setEnvs = exports.setOutputs = exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getConfig = void 0;
 const fs = __importStar(__nccwpck_require__(147));
 const core = __importStar(__nccwpck_require__(186));
 const yaml = __nccwpck_require__(917);
@@ -6180,6 +6181,21 @@ function setOutputs(keys, objs) {
     }
 }
 exports.setOutputs = setOutputs;
+function setEnvs(...objs) {
+    const env = new Map();
+    for (let j = 0; j < objs.length; j++) {
+        const obj = objs[j];
+        if (obj != undefined && obj != null && obj['env'] != undefined) {
+            for (const [key, value] of Object.entries(obj.env)) {
+                env.set(key, value);
+            }
+        }
+    }
+    for (const [key, value] of env) {
+        core.exportVariable(key, value);
+    }
+}
+exports.setEnvs = setEnvs;
 
 
 /***/ }),

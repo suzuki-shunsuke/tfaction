@@ -6,6 +6,7 @@ const yaml = require('js-yaml');
 interface Config {
   working_directory_file: string | undefined
   target_groups: Array<TargetConfig>
+  env: Record<string, string> | undefined
 }
 
 interface TargetConfig {
@@ -28,6 +29,7 @@ interface TargetConfig {
   tfmigrate_plan_config: JobConfig | undefined
   terraform_apply_config: JobConfig | undefined
   tfmigrate_apply_config: JobConfig | undefined
+  env: Record<string, string> | undefined
 }
 
 export interface JobConfig {
@@ -37,6 +39,7 @@ export interface JobConfig {
   environment: object | string | undefined
   secrets: object | undefined
   runs_on: string | undefined
+  env: Record<string, string> | undefined
 }
 
 export function getConfig(): Config {
@@ -123,5 +126,24 @@ export function setOutputs(keys: Array<string>, objs: Array<any>) {
         break;
       }
     }
+  }
+}
+
+interface HasEnv {
+  env: Record<string, string> | undefined;
+}
+
+export function setEnvs(...objs: Array<HasEnv | undefined>) {
+  const env = new Map<string, string>();
+  for (let j = 0; j < objs.length; j++) {
+    const obj = objs[j];
+    if (obj != undefined && obj != null && obj['env'] != undefined) {
+      for (const [key, value] of Object.entries(obj.env)) {
+        env.set(key, value);
+      }
+    }
+  }
+  for (const [key, value] of env) {
+    core.exportVariable(key, value);
   }
 }
