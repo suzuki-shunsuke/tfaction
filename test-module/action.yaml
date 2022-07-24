@@ -12,13 +12,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: github-comment exec -var "tfaction_target:${TFACTION_TARGET}" -- terraform init -input=false
+    - run: github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform init -input=false
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - run: github-comment exec -var "tfaction_target:${TFACTION_TARGET}" -- terraform validate
+    - run: github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform validate
       working-directory: ${{ env.TFACTION_TARGET }}
       shell: bash
       env:
@@ -50,7 +50,7 @@ runs:
         if ! [ -f README.md ]; then
           created=true
         fi
-        github-comment exec -var "tfaction_target:${TFACTION_TARGET}" -- terraform-docs . > README.md
+        github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform-docs . > README.md
         if [ "$created" = "true" ] || ! git diff --quiet README.md; then
           if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
             echo "::error ::Please generate Module's README.md with terraform-docs."
