@@ -31,4 +31,9 @@ if [ "$TFACTION_DRAFT_PR" = "true" ]; then
 	create_opts+=( -d )
 fi
 
-github-comment post -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -k skip-create-follow-up-pr -var "mentions:${mention}" -var "opts:${create_opts[*]}"
+github-comment post \
+	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+	-k skip-create-follow-up-pr \
+	-var "tfaction_target:$TFACTION_TARGET" \
+	-var "mentions:${mention}" \
+	-var "opts:${create_opts[*]}"
