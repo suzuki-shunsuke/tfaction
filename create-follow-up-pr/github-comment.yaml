@@ -3,7 +3,7 @@
 post:
   create-follow-up-pr:
     template: |
-      ## {{if (env "TFACTION_TARGET")}}{{env "TFACTION_TARGET"}}: {{end}}Follow up PR was created
+      ## {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Follow up PR was created
 
       {{template "link" .}}
 
@@ -16,7 +16,7 @@ post:
 
   skip-create-follow-up-pr:
     template: |
-      ## {{if (env "TFACTION_TARGET")}}{{env "TFACTION_TARGET"}}: {{end}}Please create a follow up pull request
+      ## {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Please create a follow up pull request
 
       {{template "link" .}}
       

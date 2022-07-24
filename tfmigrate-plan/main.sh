@@ -23,4 +23,8 @@ if [ ! -f .tfmigrate.hcl ]; then
 	exit 1
 fi
 
-github-comment exec --config "${GITHUB_ACTION_PATH}/github-comment.yaml" -k tfmigrate-plan -- tfmigrate plan
+github-comment exec \
+	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+	-k tfmigrate-plan \
+	-var "tfaction_target:$TFACTION_TARGET" \
+	-- tfmigrate plan

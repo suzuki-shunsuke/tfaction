@@ -51,4 +51,4 @@ create_opts+=( -b "$pr_body" )
 
 follow_up_pr_url=$(env GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh pr create "${create_opts[@]}")
 
-github-comment post -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "follow_up_pr_url:$follow_up_pr_url" -k create-follow-up-pr
+github-comment post -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:$TFACTION_TARGET" -var "follow_up_pr_url:$follow_up_pr_url" -k create-follow-up-pr

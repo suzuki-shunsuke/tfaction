@@ -4,7 +4,7 @@ exec:
   tfmigrate-plan:
   - when: true
     template: |
-      ## {{template "status" .}} {{if (env "TFACTION_TARGET")}}{{env "TFACTION_TARGET"}}: {{end}} tfmigrate plan
+      ## {{template "status" .}} {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}} tfmigrate plan
 
       {{template "link" .}}
 

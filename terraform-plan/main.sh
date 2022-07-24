@@ -32,6 +32,7 @@ if [ -d "$ROOT_DIR/policy" ]; then
 	conftest -v # Install conftest in advance to exclude aqua lazy install log from github-comment's comment
 	github-comment exec \
 		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+		-var "tfaction_target:$TFACTION_TARGET" \
 		-k conftest -- \
 			conftest test --no-color -p "$ROOT_DIR/policy" tfplan.json
 fi
@@ -44,7 +45,10 @@ fi
 # If you allow changes, please set the pull request label `renovate-change`.
 if [ "$CI_INFO_PR_AUTHOR" = "$RENOVATE_LOGIN" ]; then
 	if ! grep -x renovate-change "$CI_INFO_TEMP_DIR/labels.txt" >/dev/null 2>&1; then
-		github-comment post --config "${GITHUB_ACTION_PATH}/github-comment.yaml" -k renovate-plan-change
+		github-comment post \
+			--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+			-var "tfaction_target:$TFACTION_TARGET" \
+			-k renovate-plan-change
 		exit 1
 	fi
 fi
