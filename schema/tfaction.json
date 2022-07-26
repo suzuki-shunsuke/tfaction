@@ -41,6 +41,10 @@
       "$ref": "#/$defs/AWSSecretsManager"
     },
 
+    "envs": {
+      "$ref": "#/$defs/Envs"
+    },
+
     "terraform_plan_config": {
       "$ref": "#/$defs/JobConfig",
       "description": "configuration which is used in the job for 'terraform plan'"
@@ -177,8 +181,15 @@
         },
         "aws_secrets_manager": {
           "$ref": "#/$defs/AWSSecretsManager"
+        },
+        "envs": {
+          "$ref": "#/$defs/Envs"
         }
       }
+    },
+    "Envs": {
+      "type": "object",
+      "description": "environment variables"
     }
   }
 }
