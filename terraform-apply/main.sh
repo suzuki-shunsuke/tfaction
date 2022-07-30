@@ -9,9 +9,9 @@ if [ -n "${S3_BUCKET_NAME_PLAN_FILE:-}" ]; then
 		-var "tfaction_target:$TFACTION_TARGET" -- \
 		aws s3 cp "s3://$S3_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TFACTION_TARGET/tfplan.binary" tfplan.binary
 elif [ -n "${GCS_BUCKET_NAME_PLAN_FILE:-}" ]; then
-	github-comment exec -- \
+	github-comment exec \
 		-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-		-var "tfaction_target:$TFACTION_TARGET" \
+		-var "tfaction_target:$TFACTION_TARGET" -- \
 		gsutil cp "gs://$GCS_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TFACTION_TARGET/tfplan.binary" tfplan.binary
 fi
 
