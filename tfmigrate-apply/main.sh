@@ -6,7 +6,7 @@ set -o pipefail
 set +e
 github-comment exec \
 	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-	-var "tfaction_target:$TFACION_TARGET" \
+	-var "tfaction_target:$TFACTION_TARGET" \
 	-k tfmigrate-apply -- \
 		tfmigrate apply
 code=$?
