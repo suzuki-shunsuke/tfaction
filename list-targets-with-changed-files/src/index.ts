@@ -156,8 +156,13 @@ try {
     terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, followupTarget, isApply, 'terraform'));
   }
 
+  // Exclude tfmigrate targets from terraform targets
+  const filterdTerraformTargetObjs = terraformTargetObjs.filter(
+    item => !tfmigrates.has(item.target)
+  )
+
   core.setOutput('tfmigrate_targets', tfmigrateObjs);
-  core.setOutput('terraform_targets', terraformTargetObjs);
+  core.setOutput('terraform_targets', filterdTerraformTargetObjs);
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
 }
