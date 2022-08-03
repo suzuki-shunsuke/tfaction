@@ -157,10 +157,7 @@ try {
   }
 
   core.setOutput('tfmigrate_targets', tfmigrateObjs);
-  if (tfmigrateObjs.length == 0) {
-    // Running terraform when tfmigrate has nothing to do
-    core.setOutput('terraform_targets', terraformTargetObjs);
-  }
+  core.setOutput('terraform_targets', terraformTargetObjs);
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
 }
