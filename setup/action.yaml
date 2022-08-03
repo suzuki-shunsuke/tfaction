@@ -56,7 +56,7 @@ runs:
     - run: cat "${{steps.ci-info.outputs.path}}/env" | sed 's|^CI_INFO_TEMP_DIR=.*$|CI_INFO_TEMP_DIR=${{steps.ci-info.outputs.path}}|' >> "$GITHUB_ENV"
       shell: bash
 
-    - uses: aws-actions/configure-aws-credentials@v1.6.1
+    - uses: aws-actions/configure-aws-credentials@v1.7.0
       if: steps.target-config.outputs.aws_assume_role_arn != ''
       with:
         role-to-assume: ${{ steps.target-config.outputs.aws_assume_role_arn }}
