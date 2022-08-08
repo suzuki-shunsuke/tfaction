@@ -3,7 +3,7 @@
     "build": "ncc build src/index.ts --license LICENSE"
   },
   "dependencies": {
-    "@actions/core": "1.9.0",
+    "@actions/core": "1.9.1",
     "@types/node": "17.0.8"
   },
   "devDependencies": {
