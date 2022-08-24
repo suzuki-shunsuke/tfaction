@@ -15,11 +15,11 @@ outputs:
     description: Google Cloud Platform Identity Provider for GCP Workload Identity Federation
 
   s3_bucket_name_plan_file:
-    description: S3 Buckte name for plan files
+    description: S3 Bucket name for plan files
   s3_bucket_name_tfmigrate_history:
-    description: S3 Buckte name for tfmigrate history files
+    description: S3 Bucket name for tfmigrate history files
   gcs_bucket_name_plan_file:
-    description: Google Cloud Storage Buckte name for plan files
+    description: Google Cloud Storage Bucket name for plan files
   template_dir:
     description: Template Directory path for scaffolding a working directory
 
