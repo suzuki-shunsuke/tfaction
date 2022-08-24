@@ -17,10 +17,10 @@ outputs:
     description: working directory
     value: ${{ steps.target-config.outputs.working_directory }}
   s3_bucket_name_plan_file:
-    description: S3 Buckte name for plan files
+    description: S3 Bucket name for plan files
     value: ${{ steps.target-config.outputs.s3_bucket_name_plan_file}}
   s3_bucket_name_tfmigrate_history:
-    description: S3 Buckte name for tfmigrate history files
+    description: S3 Bucket name for tfmigrate history files
     value: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}
 runs:
   using: composite
