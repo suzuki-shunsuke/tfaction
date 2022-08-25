@@ -38,6 +38,7 @@ try {
       's3_bucket_name_plan_file',
       's3_bucket_name_tfmigrate_history',
       'gcs_bucket_name_plan_file',
+      'gcs_bucket_name_tfmigrate_history',
       'aws_region',
       'aws_assume_role_arn',
       'gcp_service_account',
@@ -52,6 +53,7 @@ try {
       's3_bucket_name_plan_file',
       's3_bucket_name_tfmigrate_history',
       'gcs_bucket_name_plan_file',
+      'gcs_bucket_name_tfmigrate_history',
       'providers_lock_opts',
     ], [wdConfig, targetConfig, config]);
     lib.setOutputs([

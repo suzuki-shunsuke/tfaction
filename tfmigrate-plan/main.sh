@@ -12,14 +12,26 @@ if [ -n "${GCS_BUCKET_NAME_PLAN_FILE:-}" ]; then
 fi
 
 if [ ! -f .tfmigrate.hcl ]; then
-	sed "s|%%TARGET%%|$TFACTION_TARGET|g" \
-		"$GITHUB_ACTION_PATH/tfmigrate.hcl" |
-		sed "s|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|$S3_BUCKET_NAME_TFMIGRATE_HISTORY|g" >.tfmigrate.hcl
-	github-comment exec -- \
-		ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
-		-m "chore(tfmigrate): add .tfmigrate.hcl" \
-		-C "$ROOT_DIR" "$WORKING_DIR/.tfmigrate.hcl" \
-		--token "$GITHUB_APP_TOKEN"
+	if [ -n "${S3_BUCKET_NAME_PLAN_FILE:-}" ]; then
+		sed "s|%%TARGET%%|$TFACTION_TARGET|g" \
+			"$GITHUB_ACTION_PATH/tfmigrate.hcl" |
+			sed "s|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|$S3_BUCKET_NAME_TFMIGRATE_HISTORY|g" >.tfmigrate.hcl
+		github-comment exec -- \
+			ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
+			-m "chore(tfmigrate): add .tfmigrate.hcl" \
+			-C "$ROOT_DIR" "$WORKING_DIR/.tfmigrate.hcl" \
+			--token "$GITHUB_APP_TOKEN"
+	fi
+	if [ -n "${GCS_BUCKET_NAME_PLAN_FILE:-}" ]; then
+		sed "s|%%TARGET%%|$TFACTION_TARGET|g" \
+			"$GITHUB_ACTION_PATH/tfmigrate-gcs.hcl" |
+			sed "s|%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%|$GCS_BUCKET_NAME_TFMIGRATE_HISTORY|g" >.tfmigrate.hcl
+		github-comment exec -- \
+			ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
+			-m "chore(tfmigrate): add .tfmigrate.hcl" \
+			-C "$ROOT_DIR" "$WORKING_DIR/.tfmigrate.hcl" \
+			--token "$GITHUB_APP_TOKEN"
+	fi
 	exit 1
 fi
 
