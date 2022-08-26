@@ -1,5 +1,14 @@
 ---
 # https://github.com/suzuki-shunsuke/github-comment
+post:
+  tfmigrate-hcl-not-found:
+    template: |
+      ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}.tfmigrate.hcl isn't found
+
+      {{template "link" .}}
+      
+      To run `tfmigrate plan`, `.tfmigrate.hcl` is required.
+
 exec:
   tfmigrate-plan:
   - when: true

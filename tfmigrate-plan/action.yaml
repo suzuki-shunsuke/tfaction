@@ -25,3 +25,5 @@ runs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         S3_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}
         S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
+        GCS_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}
+        GCS_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}
