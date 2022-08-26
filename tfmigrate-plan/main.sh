@@ -21,10 +21,14 @@ if [ ! -f .tfmigrate.hcl ]; then
 			"$GITHUB_ACTION_PATH/tfmigrate-gcs.hcl" |
 			sed "s|%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%|$GCS_BUCKET_NAME_TFMIGRATE_HISTORY|g" >.tfmigrate.hcl
 	else
-		github-comment post -k tfmigrate-hcl-not-found -var "tfaction_target:$TFACTION_TARGET"
+		github-comment post \
+			--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+			-k tfmigrate-hcl-not-found -var "tfaction_target:$TFACTION_TARGET"
 		exit 1
 	fi
-	github-comment exec -- \
+	github-comment exec \
+		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+		-- \
 		ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
 		-m "chore(tfmigrate): add .tfmigrate.hcl" \
 		-C "$ROOT_DIR" "$WORKING_DIR/.tfmigrate.hcl" \
