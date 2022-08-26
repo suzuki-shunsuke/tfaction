@@ -125,6 +125,9 @@
           "gcs_bucket_name_plan_file": {
             "$ref": "#/$defs/GCSBucketNamePlanFile"
           },
+          "gcs_bucket_name_tfmigrate_history": {
+            "$ref": "#/$defs/GCSBucketNameTfmigrateHistory"
+          },
 
           "s3_bucket_name_plan_file": {
             "$ref": "#/$defs/S3BucketNamePlanFile"
@@ -185,6 +188,10 @@
     "GCSBucketNamePlanFile": {
       "type": "string",
       "description": "GCS Bucket Name to store Terraform Plan files"
+    },
+    "GCSBucketNameTfmigrateHistory": {
+      "type": "string",
+      "description": "GCS Bucket name to store tfmigrate History files"
     },
     "TemplateDir": {
       "type": "string",
