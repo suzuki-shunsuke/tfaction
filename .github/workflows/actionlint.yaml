@@ -4,9 +4,19 @@ on:
   pull_request:
     branches:
     - main
+    paths:
+    - aqua/actionlint.yaml
+    - aqua/reviewdog.yaml
+    - aqua.yaml
+    - .github/**/*.yaml
   push:
     branches:
     - main
+    paths:
+    - aqua/actionlint.yaml
+    - aqua/reviewdog.yaml
+    - aqua.yaml
+    - .github/**/*.yaml
 
 jobs:
   test:
