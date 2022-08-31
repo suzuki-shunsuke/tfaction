@@ -28,8 +28,8 @@ jobs:
       - run: gh pr checkout "$PR_NUMBER"
       - run: echo "::set-output name=base_sha::$(git rev-parse HEAD)"
         id: base_sha
-      - run: git fetch origin pull/${{inputs.pr}}/merge
-      - run: git checkout -B "$PR_BRANCH" origin/pull/${{inputs.pr}}/merge
+      - run: git fetch origin "pull/$PR_NUMBER/merge:$PR_BRANCH"
+      - run: git checkout "$PR_BRANCH"
 
       - run: |
           git ls-files | grep -E "/action\.yaml$" |
