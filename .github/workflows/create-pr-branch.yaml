@@ -8,7 +8,7 @@ on:
         required: true
 permissions:
   id-token: write
-  contents: read
+  contents: write
   pull-requests: write
 env:
   GITHUB_TOKEN: ${{github.token}}
