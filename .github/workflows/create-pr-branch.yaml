@@ -28,15 +28,15 @@ jobs:
       - run: gh pr checkout "$PR_NUMBER"
       - run: echo "::set-output name=base_sha::$(git rev-parse HEAD)"
         id: base_sha
-      - run: git checkout -B "$PR_BRANCH"
-      - run: git fetch origin main
-      - run: git merge origin/main
+      - run: git fetch origin pull/${{inputs.pr}}/merge
+      - run: git checkout -B "$PR_BRANCH" pull/${{inputs.pr}}/merge
+
       - run: |
           git ls-files | grep -E "/action\.yaml$" |
             xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@$branch|"
       - run: git ls-files | grep -E "/action\.yaml$" | xargs git add
       - run: |
-          git commit -m "chore: test $pr
+          git commit -m "chore: test $PR_NUMBER
           base revision: ${{steps.base_sha.outputs.base_sha}}"
       - run: git push origin "$PR_BRANCH" --force
       - run: echo "[Pull Request](https://github.com/suzuki-shunsuke/tfaction/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
