@@ -18,7 +18,10 @@ runs:
     - run: mkdir -p "$(dirname "${{steps.target-config.outputs.working_directory}}")"
       shell: bash
 
-    - run: cp -R "${{steps.target-config.outputs.template_dir}}/." "${{steps.target-config.outputs.working_directory}}"
+    - run: |
+        if [ ! -d "${{steps.target-config.outputs.working_directory}}" ]; then
+          cp -R "${{steps.target-config.outputs.template_dir}}" "${{steps.target-config.outputs.working_directory}}"
+        fi
       shell: bash
 
     - run: echo '{}' > '${{steps.global-config.outputs.working_directory_file}}'
