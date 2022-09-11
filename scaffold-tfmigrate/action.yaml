@@ -93,7 +93,7 @@ runs:
         CODE_BLOCK: "```"
 
     - run: |
-        opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$TFACTION_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
+        opts=( -H "${{steps.branch.outputs.branch}}" -a "$TFACTION_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$TFACTION_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$TFACTION_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
         About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
         [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
         Please fix the generated migration file." )
