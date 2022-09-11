@@ -14,6 +14,7 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/set-env@main
     - run: |
         echo "::error ::module_path is required"
         exit 1

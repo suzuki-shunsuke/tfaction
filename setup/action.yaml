@@ -25,6 +25,7 @@ outputs:
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/set-env@main
     - run: |
         curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ github.event.pull_request.number }}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
