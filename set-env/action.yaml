@@ -11,6 +11,7 @@ runs:
         TFACTION_EVENT_NAME=$GHA_EVENT_NAME
         TFACTION_HEAD_REF=$GHA_HEAD_REF
         TFACTION_ACTOR=$GHA_ACTOR
+        TFACTION_SHA=$GHA_SHA
         EOS
       shell: bash
       if: env.GHA_REPOSITORY
@@ -20,6 +21,7 @@ runs:
         TFACTION_EVENT_NAME=$GITHUB_EVENT_NAME
         TFACTION_HEAD_REF=$GITHUB_HEAD_REF
         TFACTION_ACTOR=$GITHUB_ACTOR
+        TFACTION_SHA=$GITHUB_SHA
         EOS
       shell: bash
       if: "! env.GHA_REPOSITORY"
