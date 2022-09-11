@@ -56,7 +56,7 @@ runs:
             echo "::error ::Please generate Module's README.md with terraform-docs."
             exit 1
           fi
-          ghcp commit -r "$TFACTION_REPOSITORY" -b "$GITHUB_HEAD_REF" \
+          ghcp commit -r "$TFACTION_REPOSITORY" -b "$TFACTION_HEAD_REF" \
             -m "docs($TFACTION_TARGET): generate Terraform Module document by terraform-docs" \
             -C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md" \
             --token "$GITHUB_APP_TOKEN"
