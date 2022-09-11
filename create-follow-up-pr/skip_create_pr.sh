@@ -11,15 +11,15 @@ gh api "repos/{owner}/{repo}/labels" -f name="${target_label}" || :
 
 follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
 GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
-	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
+	-r "$TFACTION_REPOSITORY" -b "$follow_up_branch" \
 	-m "chore: empty commit to open follow up pull request
 
 Follow up #$CI_INFO_PR_NUMBER
-https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+https://github.com/$TFACTION_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
-create_opts=( -l "\"$target_label\"" -R "$GITHUB_REPOSITORY" -H "$follow_up_branch" -t "\"$pr_title\"" -b "\"Follow up #$CI_INFO_PR_NUMBER\"" )
+create_opts=( -l "\"$target_label\"" -R "$TFACTION_REPOSITORY" -H "$follow_up_branch" -t "\"$pr_title\"" -b "\"Follow up #$CI_INFO_PR_NUMBER\"" )
 mention=""
 if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
 	mention="@$CI_INFO_PR_AUTHOR"

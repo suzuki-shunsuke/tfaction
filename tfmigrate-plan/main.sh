@@ -29,7 +29,7 @@ if [ ! -f .tfmigrate.hcl ]; then
 	github-comment exec \
 		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 		-- \
-		ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
+		ghcp commit -r "$TFACTION_REPOSITORY" -b "$GITHUB_HEAD_REF" \
 		-m "chore(tfmigrate): add .tfmigrate.hcl" \
 		-C "$ROOT_DIR" "$WORKING_DIR/.tfmigrate.hcl" \
 		--token "$GITHUB_APP_TOKEN"
