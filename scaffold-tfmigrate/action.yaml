@@ -54,7 +54,7 @@ runs:
 
     - run: |
         git diff --cached --name-only |
-          xargs ghcp commit -r "$GITHUB_REPOSITORY" \
+          xargs ghcp commit -r "$TFACTION_REPOSITORY" \
             -b "${{steps.branch.outputs.branch}}" \
             -m "chore: scaffold a tfmigrate migration (${TFACTION_TARGET})"
       shell: bash
@@ -76,11 +76,11 @@ runs:
         Please run the following command in your terminal.
 
         $CODE_BLOCK
-        gh pr create -R "$GITHUB_REPOSITORY" $draft_pr\\
+        gh pr create -R "$TFACTION_REPOSITORY" $draft_pr\\
           -l "$label" \\
           -H "${{steps.branch.outputs.branch}}" \\
           -t "Scaffold tfmigrate migration (${TFACTION_TARGET})" \\
-          -b "This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
+          -b "This pull request was created by [GitHub Actions](https://github.com/$TFACTION_REPOSITORY/actions/runs/$GITHUB_RUN_ID). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
         $CODE_BLOCK
 
         Then please fix the generated migration file.
@@ -93,7 +93,7 @@ runs:
         CODE_BLOCK: "```"
 
     - run: |
-        opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
+        opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$TFACTION_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
         About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
         [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
         Please fix the generated migration file." )
@@ -111,7 +111,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
 
     - run: |
-        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ steps.create_pr.outputs.pr_number }}/labels" \
+        curl -X POST "https://api.github.com/repos/$TFACTION_REPOSITORY/issues/${{ steps.create_pr.outputs.pr_number }}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Accept: application/json" \
           -H "Content-type: application/json" \
