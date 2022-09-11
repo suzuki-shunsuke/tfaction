@@ -1,0 +1,25 @@
+name: Set environment variables
+description: Set environment variables
+inputs:
+runs:
+  using: composite
+  steps:
+    - run: |
+        # Support gha-trigger https://gha-trigger.github.io/
+        cat << EOS >> "$GITHUB_ENV"
+        TFACTION_REPOSITORY=$GHA_REPOSITORY
+        TFACTION_EVENT_NAME=$GHA_EVENT_NAME
+        TFACTION_HEAD_REF=$GHA_HEAD_REF
+        TFACTION_ACTOR=$GHA_ACTOR
+        EOS
+      shell: bash
+      if: env.GHA_REPOSITORY
+    - run: |
+        cat << EOS >> "$GITHUB_ENV"
+        TFACTION_REPOSITORY=$GITHUB_REPOSITORY
+        TFACTION_EVENT_NAME=$GITHUB_EVENT_NAME
+        TFACTION_HEAD_REF=$GITHUB_HEAD_REF
+        TFACTION_ACTOR=$GITHUB_ACTOR
+        EOS
+      shell: bash
+      if: "! env.GHA_REPOSITORY"
