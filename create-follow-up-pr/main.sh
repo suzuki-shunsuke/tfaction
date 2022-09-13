@@ -9,11 +9,11 @@ set -o pipefail
 
 follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
 GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
-	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
+	-r "$TFACTION_REPOSITORY" -b "$follow_up_branch" \
 	-m "chore: empty commit to open follow up pull request
 
 Follow up #$CI_INFO_PR_NUMBER
-https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+https://github.com/$TFACTION_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
 git pull origin "$follow_up_branch"
 git fetch origin "$follow_up_branch"
@@ -27,9 +27,9 @@ if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
 	create_opts+=( -a "$CI_INFO_PR_AUTHOR" )
 	mention="@$CI_INFO_PR_AUTHOR"
 fi
-if ! [[ "$GITHUB_ACTOR" =~ \[bot\] ]] && [ "$CI_INFO_PR_AUTHOR" != "$GITHUB_ACTOR" ]; then
-	create_opts+=( -a "$GITHUB_ACTOR" )
-	mention="@$GITHUB_ACTOR $mention"
+if ! [[ "$TFACTION_ACTOR" =~ \[bot\] ]] && [ "$CI_INFO_PR_AUTHOR" != "$TFACTION_ACTOR" ]; then
+	create_opts+=( -a "$TFACTION_ACTOR" )
+	mention="@$TFACTION_ACTOR $mention"
 fi
 if [ "$TFACTION_DRAFT_PR" = "true" ]; then
 	create_opts+=( -d )
@@ -40,7 +40,7 @@ $mention
 
 This pull request was created automatically to follow up the failure of apply.
 
-Follow up #$CI_INFO_PR_NUMBER ([failed workflow](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))
+Follow up #$CI_INFO_PR_NUMBER ([failed workflow](https://github.com/$TFACTION_REPOSITORY/actions/runs/$GITHUB_RUN_ID))
 
 1. Check the error message #$CI_INFO_PR_NUMBER
 1. Check the result of \`terraform plan\`
