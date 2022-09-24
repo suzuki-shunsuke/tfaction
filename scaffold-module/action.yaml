@@ -122,7 +122,7 @@ runs:
         gh pr create -R "$GITHUB_REPOSITORY" $draft_pr\\
           -H "${{steps.branch.outputs.branch}}" \\
           -t "Scaffold a Terraform Module (${MODULE_PATH})" \\
-          -b "This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"
+          -b "This pull request was created by [GitHub Actions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"
         $CODE_BLOCK
 
         [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
@@ -134,7 +134,7 @@ runs:
         CODE_BLOCK: "```"
 
     - run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
+        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi

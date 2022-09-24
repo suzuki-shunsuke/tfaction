@@ -15,7 +15,7 @@ GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
 	-m "chore: empty commit to open follow up pull request
 
 Follow up #$CI_INFO_PR_NUMBER
-https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
