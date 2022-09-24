@@ -49,8 +49,8 @@ runs:
         note="module: $MODULE_PATH
         version: $MODULE_VERSION
 
-        [Source code](https://github.com/$GITHUB_REPOSITORY/tree/${{steps.get-tag.outputs.tag}}/$MODULE_PATH)
-        [Versions](https://github.com/$GITHUB_REPOSITORY/releases?q=$MODULE_PATH)"
+        [Source code]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/${{steps.get-tag.outputs.tag}}/$MODULE_PATH)
+        [Versions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases?q=$MODULE_PATH)"
         gh release create "${{steps.get-tag.outputs.tag}}" --title "${{steps.get-tag.outputs.tag}}" -n "${note}"
       shell: bash
       env:

@@ -79,7 +79,7 @@ runs:
           -l "$label" \\
           -H "${{steps.branch.outputs.branch}}" \\
           -t "Scaffold tfmigrate migration (${TFACTION_TARGET})" \\
-          -b "This pull request was created by [GitHub Actions](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
+          -b "This pull request was created by [GitHub Actions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
         $CODE_BLOCK
 
         Then please fix the generated migration file.
@@ -92,7 +92,7 @@ runs:
         CODE_BLOCK: "```"
 
     - run: |
-        opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event](https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
+        opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
         About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
         [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
         Please fix the generated migration file." )
