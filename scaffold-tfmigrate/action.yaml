@@ -47,7 +47,7 @@ runs:
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
     - run: |
-        echo "::set-output name=branch::scaffold-tfmigrate-${TFACTION_TARGET}-$(date +%Y%m%dT%H%M%S)"
+        echo "branch=scaffold-tfmigrate-${TFACTION_TARGET}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
       id: branch
       shell: bash
 
@@ -101,7 +101,7 @@ runs:
         fi
         tempfile=$(mktemp)
         gh pr create "${opts[@]}" | tee "$tempfile"
-        echo "::set-output name=pr_number::$(cat "$tempfile" | xargs basename)"
+        echo "pr_number=$(cat "$tempfile" | xargs basename)" >> "$GITHUB_OUTPUT"
         rm "$tempfile"
       shell: bash
       if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"

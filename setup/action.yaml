@@ -46,7 +46,7 @@ runs:
     - run: |
         tempfile=$(mktemp)
         rm "$tempfile"
-        echo "::set-output name=path::${tempfile}"
+        echo "path=${tempfile}" >> "$GITHUB_OUTPUT"
       shell: bash
       id: ci-info
     - uses: actions/download-artifact@v3

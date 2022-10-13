@@ -35,7 +35,7 @@ runs:
 
     - run: |
         module_name=${MODULE_PATH/\//_}
-        echo "::set-output name=tag::module_${module_name}_${{inputs.version}}"
+        echo "tag=module_${module_name}_${{inputs.version}}" >> "$GITHUB_OUTPUT"
       id: get-tag
       shell: bash
       env:

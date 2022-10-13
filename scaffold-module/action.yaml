@@ -86,7 +86,7 @@ runs:
       working-directory: ${{inputs.module_path}}
 
     - run: |
-        echo "::set-output name=branch::scaffold-module-${MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)"
+        echo "branch=scaffold-module-${MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
       id: branch
       shell: bash
       env:
