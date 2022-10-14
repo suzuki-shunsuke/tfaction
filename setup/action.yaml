@@ -71,7 +71,7 @@ runs:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
         service_account: ${{ steps.target-config.outputs.gcp_service_account }}
 
-    - uses: google-github-actions/setup-gcloud@v0.6.1
+    - uses: google-github-actions/setup-gcloud@v0.6.2
       if: steps.target-config.outputs.gcp_service_account != ''
 
     - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
