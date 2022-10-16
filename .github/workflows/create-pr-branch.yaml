@@ -26,7 +26,7 @@ jobs:
       - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - run: gh pr checkout "$PR_NUMBER"
-      - run: echo "::set-output name=base_sha::$(git rev-parse HEAD)"
+      - run: echo "base_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
         id: base_sha
       - run: git fetch origin "pull/$PR_NUMBER/merge:$PR_BRANCH"
       - run: git checkout "$PR_BRANCH"

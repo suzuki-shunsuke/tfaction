@@ -15,14 +15,14 @@ runs:
     - run: |
         tempfile=$(mktemp)
         git ls-files "${{ steps.global-config.outputs.base_working_directory }}" | grep -E "/${{ steps.global-config.outputs.working_directory_file }}$" > "$tempfile" || :
-        echo "::set-output name=file::$tempfile"
+        echo "file=$tempfile" >> "$GITHUB_OUTPUT"
         cat "$tempfile" >&2
       shell: bash
       id: main
     - run: |
         tempfile=$(mktemp)
         git ls-files "${{ steps.global-config.outputs.module_base_directory }}" | grep -E "/${{ steps.global-config.outputs.module_file }}$" > "$tempfile" || :
-        echo "::set-output name=module_file::$tempfile"
+        echo "module_file=$tempfile" >> "$GITHUB_OUTPUT"
         cat "$tempfile" >&2
       shell: bash
       id: module
