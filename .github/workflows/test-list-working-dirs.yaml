@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: aquaproj/aqua-installer@v1.1.2
       with:
-        aqua_version: v1.20.2
+        aqua_version: v1.21.0
     - uses: ./list-working-dirs
       id: working_dirs
       env:
