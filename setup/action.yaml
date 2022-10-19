@@ -49,14 +49,14 @@ runs:
         echo "path=${tempfile}" >> "$GITHUB_OUTPUT"
       shell: bash
       id: ci-info
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # tag=v3
       with:
         name: tfaction-ci-info
         path: ${{steps.ci-info.outputs.path}}
     - run: cat "${{steps.ci-info.outputs.path}}/env" | sed 's|^CI_INFO_TEMP_DIR=.*$|CI_INFO_TEMP_DIR=${{steps.ci-info.outputs.path}}|' >> "$GITHUB_ENV"
       shell: bash
 
-    - uses: aws-actions/configure-aws-credentials@v1.7.0
+    - uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # tag=v1.7.0
       if: steps.target-config.outputs.aws_assume_role_arn != ''
       with:
         role-to-assume: ${{ steps.target-config.outputs.aws_assume_role_arn }}
@@ -65,13 +65,13 @@ runs:
 
     - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
 
-    - uses: google-github-actions/auth@v0
+    - uses: google-github-actions/auth@c4799db9111fba4461e9f9da8732e5057b394f72 # tag=v0
       if: steps.target-config.outputs.gcp_service_account != ''
       with:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
         service_account: ${{ steps.target-config.outputs.gcp_service_account }}
 
-    - uses: google-github-actions/setup-gcloud@v0.6.2
+    - uses: google-github-actions/setup-gcloud@ee9693ff89cdf73862b8a13988f6a71070e8fc58 # tag=v0.6.2
       if: steps.target-config.outputs.gcp_service_account != ''
 
     - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
@@ -79,7 +79,7 @@ runs:
       with:
        ssh_key: ${{ inputs.ssh_key }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@v0.1.4
+    - uses: suzuki-shunsuke/github-action-terraform-init@2938445484362c1546311279b036e25dbb265a50 # tag=v0.1.4
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}

@@ -24,13 +24,13 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/github-action-tfsec@v0.1.7
+    - uses: suzuki-shunsuke/github-action-tfsec@07dc756febfc0f4440e37e5d20252676510a3a65 # tag=v0.1.7
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: 'true'
 
-    - uses: suzuki-shunsuke/github-action-tflint@v0.1.4
+    - uses: suzuki-shunsuke/github-action-tflint@f4156f79aed10e9f8356cc417ca9a560e5286557 # tag=v0.1.4
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
@@ -63,7 +63,7 @@ runs:
           exit 1
         fi
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@v0.1.1
+    - uses: suzuki-shunsuke/github-action-terraform-fmt@08fddcbf90a48b11e54962c287efa4449bb8da8c # tag=v0.1.1
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_token: ${{ inputs.github_app_token }}
