@@ -49,7 +49,7 @@ runs:
         echo "path=${tempfile}" >> "$GITHUB_OUTPUT"
       shell: bash
       id: ci-info
-    - uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # tag=v3
+    - uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # tag=v3.1.0
       with:
         name: tfaction-ci-info
         path: ${{steps.ci-info.outputs.path}}
@@ -65,7 +65,7 @@ runs:
 
     - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
 
-    - uses: google-github-actions/auth@c4799db9111fba4461e9f9da8732e5057b394f72 # tag=v0
+    - uses: google-github-actions/auth@c4799db9111fba4461e9f9da8732e5057b394f72 # tag=v0.8.3
       if: steps.target-config.outputs.gcp_service_account != ''
       with:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
