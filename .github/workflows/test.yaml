@@ -7,13 +7,13 @@ on:
         required: true
       app_private_key:
         required: true
-      github_token:
+      gh_token:
         required: true
       terraform_private_module_ssh_key:
         required: false
 
 env:
-  GITHUB_TOKEN: ${{ secrets.github_token }}
+  GITHUB_TOKEN: ${{ secrets.gh_token }}
   TFACTION_IS_APPLY: 'false'
 
 permissions:
