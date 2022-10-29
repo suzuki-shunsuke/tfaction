@@ -101,7 +101,7 @@ jobs:
 
       - uses: suzuki-shunsuke/tfaction/export-secrets@v0.5.19
         with:
-          secrets: ${{ toJSON(secrets.secrets) }}
+          secrets: ${{ secrets.secrets }}
 
       # This is required to download private modules in `terraform init`
       - run: gh auth setup-git
