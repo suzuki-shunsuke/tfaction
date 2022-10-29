@@ -100,7 +100,6 @@ jobs:
           aqua_version: v1.21.0
 
       - uses: suzuki-shunsuke/tfaction/export-secrets@v0.5.19
-        if: secrets.secrets
         with:
           secrets: ${{ toJSON(secrets.secrets) }}
 
