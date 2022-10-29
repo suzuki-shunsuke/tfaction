@@ -9,6 +9,8 @@ on:
         required: true
       gh_token:
         required: true
+      secrets:
+        required: false
       terraform_private_module_ssh_key:
         required: false
 
@@ -98,8 +100,9 @@ jobs:
           aqua_version: v1.21.0
 
       - uses: suzuki-shunsuke/tfaction/export-secrets@v0.5.19
+        if: secrets.secrets
         with:
-          secrets: ${{ toJSON(secrets) }}
+          secrets: ${{ toJSON(secrets.secrets) }}
 
       # This is required to download private modules in `terraform init`
       - run: gh auth setup-git
