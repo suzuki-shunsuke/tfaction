@@ -1,0 +1,122 @@
+---
+name: test-ci
+on:
+  pull_request:
+    # branches: [main]
+    branches: [dummy] # Disabled
+env:
+  TFACTION_IS_APPLY: 'false'
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      tfmigrate_targets: ${{ steps.list-targets.outputs.tfmigrate_targets }}
+      terraform_targets: ${{ steps.list-targets.outputs.terraform_targets }}
+    steps:
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3.1.0
+      - uses: aquaproj/aqua-installer@c553e04154f1f3b7e5eb35da058db3bb782bee8a # tag=v1.1.2
+        with:
+          aqua_version: v1.21.0
+      - uses: ./list-targets
+        id: list-targets
+
+  tfmigrate-plan:
+    name: "tfmigrate-plan (${{matrix.target.target}})"
+    runs-on: ${{matrix.target.runs_on}}
+    needs: setup
+    # if services is empty, the build job is skipped
+    if: "join(fromJSON(needs.setup.outputs.tfmigrate_targets), '') != ''"
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{fromJSON(needs.setup.outputs.tfmigrate_targets)}}
+    env:
+      TFACTION_TARGET: ${{matrix.target.target}}
+      TFACTION_JOB_TYPE: tfmigrate
+    steps:
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3.1.0
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c # tag=v1.7.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: aquaproj/aqua-installer@c553e04154f1f3b7e5eb35da058db3bb782bee8a # tag=v1.1.2
+        with:
+          aqua_version: v1.21.0
+
+      - uses: ./export-secrets
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
+      - uses: ./setup
+        id: setup
+        with:
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+          ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
+
+      - uses: ./test
+        with:
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+
+      - uses: ./tfmigrate-plan
+        with:
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+
+  terraform-plan:
+    name: "terraform-plan (${{matrix.target.target}})"
+    runs-on: ${{matrix.target.runs_on}}
+    needs: setup
+    # if services is empty, the build job is skipped
+    if: "join(fromJSON(needs.setup.outputs.terraform_targets), '') != ''"
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{fromJSON(needs.setup.outputs.terraform_targets)}}
+    env:
+      TFACTION_TARGET: ${{matrix.target.target}}
+      TFACTION_JOB_TYPE: terraform
+    steps:
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3.1.0
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c # tag=v1.7.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: aquaproj/aqua-installer@c553e04154f1f3b7e5eb35da058db3bb782bee8a # tag=v1.1.2
+        with:
+          aqua_version: v1.21.0
+
+      - uses: ./export-secrets
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
+      - uses: ./setup
+        id: setup
+        with:
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+          ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
+
+      - uses: ./test
+        with:
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+
+      - uses: ./terraform-plan
+        with:
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+
+  # This job is used for branch protection rule
+  # Add this job to `Status checks that are required`
+  status-check:
+    runs-on: ubuntu-latest
+    needs: [terraform-plan, tfmigrate-plan, setup]
+    if: failure()
+    steps:
+      - run: exit 1
