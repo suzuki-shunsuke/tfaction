@@ -28,7 +28,7 @@ runs:
         github_comment: 'true'
 
     # deep check requires AWS credentials
-    - uses: suzuki-shunsuke/github-action-tflint@v0.1.4
+    - uses: suzuki-shunsuke/github-action-tflint@8537c87946e37702b4c6137bf65afdc8b049b34b # v0.1.5
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}

@@ -30,7 +30,7 @@ runs:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: 'true'
 
-    - uses: suzuki-shunsuke/github-action-tflint@f4156f79aed10e9f8356cc417ca9a560e5286557 # tag=v0.1.4
+    - uses: suzuki-shunsuke/github-action-tflint@8537c87946e37702b4c6137bf65afdc8b049b34b # v0.1.5
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
