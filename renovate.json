@@ -11,5 +11,8 @@
     "github>suzuki-shunsuke/renovate-config",
     "github>aquaproj/aqua-renovate-config#1.3.0",
     "github>aquaproj/aqua-renovate-config:file#1.3.0(aqua/.*\\.yaml)"
-  ]
+  ],
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "branchConcurrentLimit": 0
 }
