@@ -1,6 +1,12 @@
 {
   "extends": [
-    "config:base",
+    ":dependencyDashboard",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":autodetectPinVersions",
+    "group:monorepos",
+    "group:recommended",
+    "workarounds:all",
+
     "helpers:pinGitHubActionDigests",
     "github>suzuki-shunsuke/renovate-config",
     "github>aquaproj/aqua-renovate-config#1.3.0",
