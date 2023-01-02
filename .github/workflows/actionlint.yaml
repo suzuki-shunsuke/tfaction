@@ -25,5 +25,5 @@ jobs:
     - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
     - uses: aquaproj/aqua-installer@61e2563dfe7674cbf74fe6ec212e444198a3bb00 # v2.0.2
       with:
-        aqua_version: v1.28.0
+        aqua_version: v1.29.0
     - uses: suzuki-shunsuke/github-action-actionlint@764a394381fb91f87ca8a8ad022bbeb49232df8b # tag=v0.1.2
