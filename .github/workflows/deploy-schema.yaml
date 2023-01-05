@@ -21,7 +21,7 @@ jobs:
     - run: mkdir build
     - run: generate-schema-doc --expand-buttons --link-to-reused-ref schema build
 
-    - uses: peaceiris/actions-gh-pages@de7ea6f8efb354206b205ef54722213d99067935 # tag=v3.9.0
+    - uses: peaceiris/actions-gh-pages@64b46b4226a4a12da2239ba3ea5aa73e3163c75b # v3.9.1
       if: github.event_name != 'pull_request'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
