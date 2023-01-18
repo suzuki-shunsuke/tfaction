@@ -32,7 +32,7 @@ runs:
       env:
         MODULE_PATH: ${{inputs.module_path}}
 
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v0.5.21
       id: global-config
 
     - run: |
