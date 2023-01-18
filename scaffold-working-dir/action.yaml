@@ -26,7 +26,7 @@ runs:
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
     - run: cp ${{ github.action_path }}/tfmigrate.hcl .tfmigrate.hcl
-      if: steps.target-config.outputs.gcs_bucket_name_tfmigrate_history == ''
+      if: steps.target-config.outputs.s3_bucket_name_tfmigrate_history != ''
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: cp ${{ github.action_path }}/tfmigrate-gcp.hcl .tfmigrate.hcl
@@ -46,7 +46,7 @@ runs:
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
     - run: git ls-files | xargs -n 1 sed -i 's|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}|g'
-      if: steps.target-config.outputs.gcs_bucket_name_tfmigrate_history == ''
+      if: steps.target-config.outputs.s3_bucket_name_tfmigrate_history != ''
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: git ls-files | xargs -n 1 sed -i 's|%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.gcs_bucket_name_tfmigrate_history}}|g'
