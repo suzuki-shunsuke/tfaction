@@ -6,13 +6,14 @@ on:
     branches: [dummy] # Disabled
 env:
   TFACTION_IS_APPLY: 'false'
-permissions:
-  id-token: write
-  contents: read
-  pull-requests: write
+permissions: {}
 jobs:
   setup:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
     outputs:
       tfmigrate_targets: ${{ steps.list-targets.outputs.tfmigrate_targets }}
       terraform_targets: ${{ steps.list-targets.outputs.terraform_targets }}
@@ -26,6 +27,10 @@ jobs:
 
   tfmigrate-plan:
     name: "tfmigrate-plan (${{matrix.target.target}})"
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
     runs-on: ${{matrix.target.runs_on}}
     needs: setup
     # if services is empty, the build job is skipped
@@ -70,6 +75,10 @@ jobs:
 
   terraform-plan:
     name: "terraform-plan (${{matrix.target.target}})"
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
     runs-on: ${{matrix.target.runs_on}}
     needs: setup
     # if services is empty, the build job is skipped
@@ -110,12 +119,13 @@ jobs:
 
       - uses: ./terraform-plan
         with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
+          github_token: ${{ steps.generate_token.outputs.token }}
 
   # This job is used for branch protection rule
   # Add this job to `Status checks that are required`
   status-check:
     runs-on: ubuntu-latest
+    permissions: {}
     needs: [terraform-plan, tfmigrate-plan, setup]
     if: failure()
     steps:

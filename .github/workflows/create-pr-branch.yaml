@@ -6,10 +6,7 @@ on:
       pr:
         description: 'Pull Request Number'
         required: true
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
+permissions: {}
 env:
   GITHUB_TOKEN: ${{github.token}}
   PR_NUMBER: ${{inputs.pr}}
@@ -17,6 +14,10 @@ env:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
