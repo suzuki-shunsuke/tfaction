@@ -119,7 +119,7 @@ jobs:
 
       - uses: ./terraform-plan
         with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
+          github_token: ${{ steps.generate_token.outputs.token }}
 
   # This job is used for branch protection rule
   # Add this job to `Status checks that are required`
