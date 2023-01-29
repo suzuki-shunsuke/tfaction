@@ -9,13 +9,14 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TFACTION_TARGET: ${{github.event.inputs.target}}
-permissions:
-  id-token: write
-  contents: read
-  pull-requests: write
+permissions: {}
 jobs:
   scaffold:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
       - uses: aquaproj/aqua-installer@61e2563dfe7674cbf74fe6ec212e444198a3bb00 # v2.0.2

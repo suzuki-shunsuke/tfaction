@@ -6,14 +6,15 @@ on:
     branches: [dummy] # Disabled
 env:
   TFACTION_IS_APPLY: 'true'
-permissions:
-  id-token: write
-  contents: read
-  issues: read # this is required to `gh pr list`'s `-l` option
-  pull-requests: write
+permissions: {}
 jobs:
   setup:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      issues: read # this is required to `gh pr list`'s `-l` option
+      pull-requests: write
     outputs:
       tfmigrate_targets: ${{ steps.list-targets.outputs.tfmigrate_targets }}
       terraform_targets: ${{ steps.list-targets.outputs.terraform_targets }}
@@ -28,6 +29,11 @@ jobs:
 
   tfmigrate-apply:
     name: "tfmigrate-apply (${{matrix.target.target}})"
+    permissions:
+      id-token: write
+      contents: read
+      issues: read # this is required to `gh pr list`'s `-l` option
+      pull-requests: write
     runs-on: ${{matrix.target.runs_on}}
     needs: setup
     # if services is empty, the build job is skipped
@@ -73,6 +79,11 @@ jobs:
 
   terraform-apply:
     name: "terraform-apply (${{matrix.target.target}})"
+    permissions:
+      id-token: write
+      contents: read
+      issues: read # this is required to `gh pr list`'s `-l` option
+      pull-requests: write
     runs-on: ${{matrix.target.runs_on}}
     needs: setup
     # if services is empty, the build job is skipped

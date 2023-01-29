@@ -9,11 +9,12 @@ on:
       pr:
         description: 'pr number'
         required: true
-permissions:
-  contents: write
+permissions: {}
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # To push a commit and create a release
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
       - run: gh pr checkout ${{github.event.inputs.pr}}
