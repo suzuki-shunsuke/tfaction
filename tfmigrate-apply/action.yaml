@@ -12,6 +12,8 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
     - run: bash ${{ github.action_path }}/main.sh
@@ -20,3 +22,4 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
+        UPDATE_ONLY_ONE_PR: ${{ steps.global-config.outputs.update_only_one_pr }}
