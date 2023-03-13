@@ -19,6 +19,8 @@ outputs:
     description: label prefix to skip terraform plan and apply
   skip_create_pr:
     description: Whether skip creating pull requests
+  update_only_one_pr:
+    description: If true, at most one related pull request is updated after terraform apply is run
 runs:
   using: 'node16'
   main: 'dist/index.js'
