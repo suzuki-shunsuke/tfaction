@@ -31,7 +31,7 @@ if [ "$UPDATE_ONLY_ONE_PR" = "true" ] && [ "$(wc -l < "$prs_txt")" -gt 1 ]; then
 			continue
 		fi
 		echo "===> Post a comment to PR $pr_number" >&2
-		github-comment post -pr "$pr_number" -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "pr_number:CI_INFO_PR_NUMBER" -var "tfaction_target:$TFACTION_TARGET" -k rerun-plan
+		github-comment post -pr "$pr_number" -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "pr_number:$CI_INFO_PR_NUMBER" -var "tfaction_target:$TFACTION_TARGET" -k rerun-plan
 	done < <(tail -n +2 "$prs_txt")
 	exit 0
 fi
