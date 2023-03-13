@@ -1,4 +1,15 @@
 # https://github.com/suzuki-shunsuke/github-comment
+post:
+  rerun-plan:
+    template: |
+      # :warning: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Remote state was updated
+
+      {{template "link" .}}
+
+      Remote state was updated by #{{.Vars.pr_number}}, so this pull request's plan file became stale.
+      Please rerun `terraform plan` to update a plan file, otherwise `terraform apply` would fail.
+      For the detail, please see [Remote state was updated](https://suzuki-shunsuke.github.io/tfaction/docs/feature/auto-update-related-prs).
+
 exec:
   default:
   - when: ExitCode != 0

@@ -31,3 +31,4 @@ runs:
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
         S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
         GCS_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}
+        UPDATE_ONLY_ONE_PR: ${{ steps.global-config.outputs.update_only_one_pr }}
