@@ -49,7 +49,7 @@ runs:
         echo "path=${tempfile}" >> "$GITHUB_OUTPUT"
       shell: bash
       id: ci-info
-    - uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # tag=v3.1.0
+    - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # tag=v3.0.2
       with:
         name: tfaction-ci-info
         path: ${{steps.ci-info.outputs.path}}
