@@ -1,0 +1,54 @@
+name: detect-drift
+description: Detect Terraform drift
+inputs:
+  github_app_token:
+    description: 'GitHub Access Token'
+    required: true
+
+  github_token:
+    description: 'GitHub Access Token'
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - name: Find an issue
+      shell: bash
+      id: issue
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        REPO: ""
+      run: |
+        gh search issues \
+          --json state,number \
+          -L 1 \
+          --repo "$REPO" \
+          --label terraform-drift \
+          --sort updated \
+          --order asc \
+          > issues.json
+        cat issues.json
+        length=$(jq length < issues.json)
+        echo "length=$length" >> "$GITHUB_OUTPUT"
+        if [ 1 -eq "$length" ]; then
+          echo state=$(jq -r ".[0].state" < issues.json) >> "$GITHUB_OUTPUT"
+          echo number=$(jq -r ".[0].number" < issues.json) >> "$GITHUB_OUTPUT"
+        fi
+
+    - uses: suzuki-shunsuke/tfaction/setup-base@main
+      id: setup-base
+
+    - shell: bash
+      run: |
+        github-comment exec \
+          -org "$(dirname $REPO)" \
+          -repo "$(basename $REPO)" \
+          -pr "$number" \
+          -- \
+          terraform init -input=false
+
+    - run: bash plan.sh
+      id: plan
+      shell: bash
+
+    - uses: suzuki-shunsuke/tfaction/update-drift-issue@main

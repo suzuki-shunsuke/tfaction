@@ -1,0 +1,53 @@
+name: update-drift-issue
+description: Update a drift issue
+inputs:
+  github_token:
+    description: 'GitHub Access Token'
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - name: Create an issue
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        REPO: ""
+      run: |
+        gh issue create \
+          --repo "$REPO" \
+          --label terraform-drift \
+          --title "Terraform Drift ($TFACTION_TARGET)" \
+          --body ""
+
+    - name: Close an issue
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        REPO: ""
+      run: |
+        gh issue close \
+          --repo "$REPO" \
+          "$number"
+
+    - name: Reopen an issue
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        REPO: ""
+      run: |
+        gh issue reopen \
+          --repo "$REPO" \
+          "$number"
+
+    - name: Post a comment
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        REPO: ""
+      run: |
+        github-comment post \
+          -k "" \
+          -org "$(dirname $REPO)" \
+          -repo "$(basename $REPO)" \
+          -pr "$number"
