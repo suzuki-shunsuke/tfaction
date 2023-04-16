@@ -36,8 +36,10 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
+    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+      id: target-config
+
     - uses: suzuki-shunsuke/tfaction/setup-base@main
-      id: setup-base
 
     - run: |
         tempfile=$(mktemp)

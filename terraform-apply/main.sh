@@ -24,7 +24,7 @@ set -e
 
 if [ -n "$DRIFT_ISSUE_NUMBER" ]; then
 	tfcmt \
-		-c "$GITHUB_ACTION_PATH/tfcmt-drift.yaml" \
+		-config "$GITHUB_ACTION_PATH/tfcmt-drift.yaml" \
 		-owner "$DRIFT_ISSUE_REPO_OWNER" \
 		-repo "$DRIFT_ISSUE_REPO_NAME" \
 		-pr "$DRIFT_ISSUE_NUMBER" \
