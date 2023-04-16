@@ -19,6 +19,8 @@ exec:
 
       [Pull Request]({{.Vars.pr_url}}) | {{template "link" .}}
 
-      {{template "join_command" .}}
+      ```console
+      $ tfmigrate apply
+      ```
 
       {{template "hidden_combined_output" .}}

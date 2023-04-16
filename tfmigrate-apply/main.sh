@@ -20,7 +20,7 @@ if [ -n "$DRIFT_ISSUE_NUMBER" ]; then
 		-org "$DRIFT_ISSUE_REPO_OWNER" \
 		-repo "$DRIFT_ISSUE_REPO_NAME" \
 		-pr "$DRIFT_ISSUE_NUMBER" \
-		-var "pr_url:$GITHUB_SERVER_URL/pull/$CI_INFO_PR_NUMBER" \
+		-var "pr_url:$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$CI_INFO_PR_NUMBER" \
 		-var "target:$TFACTION_TARGET" \
 		-k drift-apply \
 		-- cat "$apply_output" || : # Ignore the failure
