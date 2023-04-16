@@ -31,7 +31,16 @@ if [ -n "$DRIFT_ISSUE_NUMBER" ]; then
 		-var "pr_url:$GITHUB_SERVER_URL/pull/$CI_INFO_PR_NUMBER" \
 		-var "target:$TFACTION_TARGET" \
 		apply -- cat "$apply_output" || : # Ignore the failure
-	echo "drift_commented=true" >> "$GITHUB_OUTPUT"
+
+	if [ "$code" -eq 0 ] && [ "$DRIFT_ISSUE_STATE" = "open" ]; then
+		gh issue close \
+			--repo "$DRIFT_ISSUE_REPO_OWENR/$DRIFT_ISSUE_REPO_NAME" \
+			"$DRIFT_ISSUE_NUMBER"
+	elif [ "$code" -ne 0 ] && [ "$DRIFT_ISSUE_STATE" = "closed" ]; then
+		gh issue reopen \
+			--repo "$DRIFT_ISSUE_REPO_OWENR/$DRIFT_ISSUE_REPO_NAME" \
+			"$DRIFT_ISSUE_NUMBER"
+	fi
 fi
 
 rm "$apply_output" || : # Ignore the failure

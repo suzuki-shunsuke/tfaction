@@ -10,11 +10,6 @@ inputs:
     required: false
     default: ${{ github.token }}
 
-outputs:
-  drift_commented:
-    description: whether a comment is posted to the drift issue
-    value: ${{ steps.apply.outputs.drift_commented }}
-
 runs:
   using: composite
   steps:
@@ -40,5 +35,6 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
         DRIFT_ISSUE_NUMBER: ${{ steps.drift-issue.outputs.issue_number }}
+        DRIFT_ISSUE_STATE: ${{ steps.drift-issue.outputs.issue_state }}
         DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
         DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
