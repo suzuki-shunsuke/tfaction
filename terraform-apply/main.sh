@@ -34,11 +34,11 @@ if [ -n "$DRIFT_ISSUE_NUMBER" ]; then
 
 	if [ "$code" -eq 0 ] && [ "$DRIFT_ISSUE_STATE" = "open" ]; then
 		gh issue close \
-			--repo "$DRIFT_ISSUE_REPO_OWENR/$DRIFT_ISSUE_REPO_NAME" \
+			--repo "$DRIFT_ISSUE_REPO_OWNER/$DRIFT_ISSUE_REPO_NAME" \
 			"$DRIFT_ISSUE_NUMBER"
 	elif [ "$code" -ne 0 ] && [ "$DRIFT_ISSUE_STATE" = "closed" ]; then
 		gh issue reopen \
-			--repo "$DRIFT_ISSUE_REPO_OWENR/$DRIFT_ISSUE_REPO_NAME" \
+			--repo "$DRIFT_ISSUE_REPO_OWNER/$DRIFT_ISSUE_REPO_NAME" \
 			"$DRIFT_ISSUE_NUMBER"
 	fi
 fi
