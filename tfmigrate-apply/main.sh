@@ -23,7 +23,7 @@ if [ -n "$DRIFT_ISSUE_NUMBER" ]; then
 		-var "pr_url:$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$CI_INFO_PR_NUMBER" \
 		-var "target:$TFACTION_TARGET" \
 		-k drift-apply \
-		-- cat "$apply_output" || : # Ignore the failure
+		-- bash -c "cat $apply_output && exit $code" || : # Ignore the failure
 
 	if [ "$code" -eq 0 ] && [ "$DRIFT_ISSUE_STATE" = "open" ]; then
 		gh issue close \
