@@ -21,26 +21,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Create an issue
-      if: inputs.action == 'create'
-      id: create-issue
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ${{inputs.issue_repo}}
-      run: |
-        body="This issus was created by tfaction.
-
-        $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-
-        issue_url=$(gh issue create \
-          --repo "$REPO" \
-          --label terraform-drift \
-          --title "Terraform Drift ($TFACTION_TARGET)" \
-          --body "$body")
-        number=$(basename "$issue_url")
-        echo "number=$number" >> "$GITHUB_OUTPUT"
-
     - name: Close an issue
       shell: bash
       if: inputs.action == 'close'

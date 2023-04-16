@@ -5,6 +5,14 @@ inputs:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
+outputs:
+  issue_number:
+    description: GitHub Issue number
+    value: ${{ steps.issue.outputs.number }}
+  issue_number:
+    description: GitHub Issue number
+    value: ${{ steps.issue.outputs.state }}
+
 runs:
   using: composite
   steps:
@@ -15,5 +23,5 @@ runs:
       id: issue
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ${{steps.global-config.outputs.drift_issue_repo}}
+        REPO: ${{steps.global-config.outputs.drift_issue_repo_owner}}/${{steps.global-config.outputs.drift_issue_repo_name}}
       run: bash ${{github.action_path}}/find_issue.sh

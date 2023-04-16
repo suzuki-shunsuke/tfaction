@@ -7,7 +7,6 @@ gh search issues \
 	--json state,number \
 	-L 1 \
 	--repo "$REPO" \
-	--label terraform-drift \
 	--sort updated \
 	--order asc \
 	> issues.json
