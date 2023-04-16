@@ -40,3 +40,4 @@ jobs:
           base revision: ${{steps.base_sha.outputs.base_sha}}"
       - run: git push origin "$PR_BRANCH" --force
       - run: echo "[Pull Request](https://github.com/suzuki-shunsuke/tfaction/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
+      - run: github-comment post -pr "$PR_NUMBER" -k create-pr-branch
