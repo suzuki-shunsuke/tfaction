@@ -2,7 +2,7 @@ templates:
   plan_title: |
     {{if eq .ExitCode 0}}
     ## :white_check_mark: No drift is found
-    {{else if .ExitCode 1}}
+    {{else if eq .ExitCode 1}}
     ## :x: Failed to run `terraform plan`
     {{else}}
     ## :x: Drift is detected
