@@ -18,6 +18,8 @@ runs:
       id: global-config
     - uses: suzuki-shunsuke/tfaction/setup-base@main
       id: setup-base
+      env:
+        TFACTION_JOB_TYPE: terraform
 
     - shell: bash
       working-directory: ${{steps.setup-base.outputs.working_directory}}
