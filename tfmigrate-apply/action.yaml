@@ -9,14 +9,36 @@ inputs:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
+
+outputs:
+  drift_commented:
+    description: whether a comment is posted to the drift issue
+    value: ${{ steps.apply.outputs.drift_commented }}
+
 runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
+
+    - run: |
+        if tfaction -v >/dev/null 2>&1; then
+          tfaction get-or-create-drift-issue
+        fi
+      id: drift-issue
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+
     - run: bash ${{ github.action_path }}/main.sh
+      id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
+        DRIFT_ISSUE_NUMBER: ${{ steps.drift-issue.outputs.issue_number }}
+        DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
+        DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
