@@ -22,8 +22,8 @@ runs:
       id: detect-drift-issue
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ${{steps.global-config.outputs.drift_issue_repo}}
-        SUCCCESS: ${{inputs.job_status}}
+        REPO: ${{steps.global-config.outputs.drift_issue_repo_owner}}/${{steps.global-config.outputs.drift_issue_repo_name}}
+        JOB_STATUS: ${{inputs.job_status}}
 
     - uses: suzuki-shunsuke/tfaction/update-drift-issue@main
       id: update-drift-issue
@@ -37,15 +37,16 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ${{steps.global-config.outputs.drift_issue_repo}}
-        SUCCCESS: ${{inputs.job_status}}
+        ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
+        ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
+        JOB_STATUS: ${{inputs.job_status}}
         NUMBER: ${{steps.detect-drift-issue.outputs.number}}
         NEW_ISSUE_NUMBER: ${{steps.update-drift-issue.outputs.issue_number}}
       run: |
         github-comment post \
           -k post-apply \
-          -org "$(dirname $REPO)" \
-          -repo "$(basename $REPO)" \
+          -org "$ISSUE_REPO_OWNER" \
+          -repo "$ISSUE_REPO_NAME" \
           -pr "${NUMBER:-$NEW_ISSUE_NUMBER}" \
           -var "pr_url:$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$CI_INFO_PR_NUMBER" \
           -var "job_status:$SUCCESS"

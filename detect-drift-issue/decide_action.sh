@@ -27,11 +27,11 @@ state=$(jq -r ".[0].state" < "$ISSUE_PATH")
 echo "state=$state" >> "$GITHUB_OUTPUT"
 
 if [ "$state" = open ]; then
-	if [ "$SUCCESS" = true ]; then
+	if [ "$JOB_STATUS" = success ]; then
 		action=close
 	fi
 else
-	if [ "$SUCCESS" != true ]; then
+	if [ "$JOB_STATUS" != success ]; then
 		action=reopen
 	fi
 fi
