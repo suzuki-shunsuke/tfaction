@@ -27,6 +27,7 @@ runs:
         ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
         ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
         ISSUE_NUMBER: ${{inputs.issue_number}}
+        GITHUB_TOKEN: ${{github.token}}
       run: |
         github-comment exec \
           -org "$ISSUE_REPO_OWNER" \
@@ -42,3 +43,4 @@ runs:
         ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
         ISSUE_NUMBER: ${{inputs.issue_number}}
         ISSUE_STATE: ${{inputs.issue_state}}
+        GITHUB_TOKEN: ${{github.token}}
