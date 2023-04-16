@@ -6846,8 +6846,25 @@ try {
         core.setOutput('label_prefix_tfmigrate', 'tfmigrate:');
         core.setOutput('label_prefix_skip', 'skip:');
     }
-    core.setOutput('drift_issue_repo_owner', config.drift_detection.issue_repo_owner ? config.drift_detection.issue_repo_owner : '');
-    core.setOutput('drift_issue_repo_name', config.drift_detection.issue_repo_name ? config.drift_detection.issue_repo_name : '');
+    if (config.drift_detection && config.drift_detection.issue_repo_owner) {
+        core.setOutput('drift_issue_repo_owner', config.drift_detection.issue_repo_owner);
+    }
+    else {
+        if (process.env.GITHUB_REPOSITORY) {
+            core.setOutput('drift_issue_repo_owner', process.env.GITHUB_REPOSITORY.split('/')[0]);
+        }
+    }
+    if (config.drift_detection && config.drift_detection.issue_repo_name) {
+        core.setOutput('drift_issue_repo_name', config.drift_detection.issue_repo_name);
+    }
+    else {
+        if (process.env.GITHUB_REPOSITORY) {
+            const a = process.env.GITHUB_REPOSITORY.split('/');
+            if (a.length > 1) {
+                core.setOutput('drift_issue_repo_name', a[1]);
+            }
+        }
+    }
 }
 catch (error) {
     core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
