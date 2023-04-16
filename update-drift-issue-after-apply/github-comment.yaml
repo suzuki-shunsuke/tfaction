@@ -2,7 +2,7 @@
 post:
   post-apply:
     template: |
-      {{if eq .Vars.success "true"}}
+      {{if eq .Vars.job_status "true"}}
       ## :o: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}} Apply succeeded
       {{else}}
       ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}} Apply failed

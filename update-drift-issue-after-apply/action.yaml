@@ -10,7 +10,7 @@ inputs:
     required: false
     default: ${{ github.token }}
 
-  success:
+  job_status:
     description: Job status
     required: true
 runs:
@@ -23,7 +23,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
         REPO: ${{steps.global-config.outputs.drift_issue_repo}}
-        SUCCCESS: ${{inputs.success}}
+        SUCCCESS: ${{inputs.job_status}}
 
     - uses: suzuki-shunsuke/tfaction/update-drift-issue@main
       id: update-drift-issue
@@ -38,8 +38,8 @@ runs:
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
         REPO: ${{steps.global-config.outputs.drift_issue_repo}}
-        SUCCCESS: ${{inputs.success}}
-        NUMBER: ${{steps.update-drift-issue.outputs.number}}
+        SUCCCESS: ${{inputs.job_status}}
+        NUMBER: ${{steps.detect-drift-issue.outputs.number}}
         NEW_ISSUE_NUMBER: ${{steps.update-drift-issue.outputs.issue_number}}
       run: |
         github-comment post \
@@ -48,4 +48,4 @@ runs:
           -repo "$(basename $REPO)" \
           -pr "${NUMBER:-$NEW_ISSUE_NUMBER}" \
           -var "pr_url:$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$CI_INFO_PR_NUMBER" \
-          -var "success:$SUCCESS"
+          -var "job_status:$SUCCESS"
