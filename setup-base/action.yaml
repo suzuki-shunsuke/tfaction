@@ -1,5 +1,5 @@
-name: setup
-description: setup
+name: setup-base
+description: setup-base
 inputs:
   github_app_token:
     description: 'GitHub Access Token'

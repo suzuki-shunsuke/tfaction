@@ -2,35 +2,50 @@ name: update-drift-issue-after-apply
 description: Update a drift issue after apply
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: GitHub Access Token
     required: true
 
   github_token:
-    description: 'GitHub Access Token'
+    description: GitHub Access Token
     required: false
     default: ${{ github.token }}
+
+  success:
+    description: Job status
+    required: true
 runs:
   using: composite
   steps:
-    - name: Find an issue
-      shell: bash
-      id: issue
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
+    - uses: suzuki-shunsuke/tfaction/detect-drift-issue@main
+      id: detect-drift-issue
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ""
-      run: |
-        gh search issues \
-          --json state,number \
-          -L 1 \
-          --repo "$REPO" \
-          --label terraform-drift \
-          --match title "Terraform Drift ($TFACTION_TARGET)" > issues.json
-        cat issues.json
-        length=$(jq length < issues.json)
-        echo "length=$length" >> "$GITHUB_OUTPUT"
-        if [ 1 -eq "$length" ]; then
-          echo state=$(jq -r ".[0].state" < issues.json) >> "$GITHUB_OUTPUT"
-          echo number=$(jq -r ".[0].number" < issues.json) >> "$GITHUB_OUTPUT"
-        fi
+        REPO: ${{steps.global-config.outputs.drift_issue_repo}}
+        SUCCCESS: ${{inputs.success}}
 
     - uses: suzuki-shunsuke/tfaction/update-drift-issue@main
+      id: update-drift-issue
+      with:
+        github_token: ${{inputs.github_token}}
+        action: ${{steps.drift-detect-issue.outputs.action}}
+        number: ${{steps.drift-detect-issue.outputs.number}}
+        issue_repo: ${{steps.global-config.outputs.drift_issue_repo}}
+
+    - name: Post a comment
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        REPO: ${{steps.global-config.outputs.drift_issue_repo}}
+        SUCCCESS: ${{inputs.success}}
+        NUMBER: ${{steps.update-drift-issue.outputs.number}}
+        NEW_ISSUE_NUMBER: ${{steps.update-drift-issue.outputs.issue_number}}
+      run: |
+        github-comment post \
+          -k post-apply \
+          -org "$(dirname $REPO)" \
+          -repo "$(basename $REPO)" \
+          -pr "${NUMBER:-$NEW_ISSUE_NUMBER}" \
+          -var "pr_url:$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$CI_INFO_PR_NUMBER" \
+          -var "success:$SUCCESS"

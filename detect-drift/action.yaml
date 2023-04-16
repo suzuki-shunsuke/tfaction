@@ -1,54 +1,41 @@
 name: detect-drift
 description: Detect Terraform drift
 inputs:
-  github_app_token:
-    description: 'GitHub Access Token'
-    required: true
-
   github_token:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
+  issue_owner:
+    description: 'GitHub Issue Owner'
+    required: true
+  issue_repo:
+    description: 'GitHub Issue Repository name'
+    required: true
+  issue_number:
+    description: 'GitHub Issue number'
+    required: true
 runs:
   using: composite
+  env:
+    ISSUE_OWNER: ${{inputs.issue_owner}}
+    ISSUE_REPO: ${{inputs.issue_repo}}
+    ISSUE_NUMBER: ${{inputs.issue_number}}
   steps:
-    - name: Find an issue
-      shell: bash
-      id: issue
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ""
-      run: |
-        gh search issues \
-          --json state,number \
-          -L 1 \
-          --repo "$REPO" \
-          --label terraform-drift \
-          --sort updated \
-          --order asc \
-          > issues.json
-        cat issues.json
-        length=$(jq length < issues.json)
-        echo "length=$length" >> "$GITHUB_OUTPUT"
-        if [ 1 -eq "$length" ]; then
-          echo state=$(jq -r ".[0].state" < issues.json) >> "$GITHUB_OUTPUT"
-          echo number=$(jq -r ".[0].number" < issues.json) >> "$GITHUB_OUTPUT"
-        fi
-
     - uses: suzuki-shunsuke/tfaction/setup-base@main
       id: setup-base
 
     - shell: bash
+      working-directory: ${{steps.setup-base.outputs.working_directory}}
+      env:
+        REPO: ${{steps.global-config.outputs.drift_issue_repo}}
       run: |
         github-comment exec \
-          -org "$(dirname $REPO)" \
-          -repo "$(basename $REPO)" \
-          -pr "$number" \
+          -org "$ISSUE_OWNER" \
+          -repo "$ISSUE_NUMBER" \
+          -pr "$ISSUE_NUMBER" \
           -- \
           terraform init -input=false
 
-    - run: bash plan.sh
+    - run: bash ${{github.action_path}}/plan.sh
       id: plan
       shell: bash
-
-    - uses: suzuki-shunsuke/tfaction/update-drift-issue@main

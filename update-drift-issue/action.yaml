@@ -5,49 +5,61 @@ inputs:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
+  issue_repo:
+    description: Issue repository
+    required: true
+  number:
+    description: Issue number
+    required: true
+  action:
+    description: action
+    required: true
+outputs:
+  issue_number:
+    description: Created Issue number
+    value: ${{steps.create-issue.outputs.number}}
 runs:
   using: composite
   steps:
     - name: Create an issue
+      if: inputs.action == 'create'
+      id: create-issue
       shell: bash
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ""
+        REPO: ${{inputs.issue_repo}}
       run: |
-        gh issue create \
+        body="This issus was created by tfaction.
+
+        $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+        issue_url=$(gh issue create \
           --repo "$REPO" \
           --label terraform-drift \
           --title "Terraform Drift ($TFACTION_TARGET)" \
-          --body ""
+          --body "$body")
+        number=$(basename "$issue_url")
+        echo "number=$number" >> "$GITHUB_OUTPUT"
 
     - name: Close an issue
       shell: bash
+      if: inputs.action == 'close'
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ""
+        REPO: ${{inputs.issue_repo}}
+        NUMBER: ${{inputs.number}}
       run: |
         gh issue close \
           --repo "$REPO" \
-          "$number"
+          "$NUMBER"
 
     - name: Reopen an issue
       shell: bash
+      if: inputs.action == 'reopen'
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ""
+        NUMBER: ${{inputs.number}}
       run: |
         gh issue reopen \
           --repo "$REPO" \
-          "$number"
-
-    - name: Post a comment
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        REPO: ""
-      run: |
-        github-comment post \
-          -k "" \
-          -org "$(dirname $REPO)" \
-          -repo "$(basename $REPO)" \
-          -pr "$number"
+          "$NUMBER"
