@@ -1,3 +1,6 @@
+terraform:
+  plan:
+    disable_label: true
 templates:
   plan_title: |
     {{if eq .ExitCode 0}}
