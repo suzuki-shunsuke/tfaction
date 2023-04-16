@@ -1,0 +1,19 @@
+---
+post:
+  create-pr-branch:
+    template: |
+      # :rocket: Pull Request Branch was created or updated
+      
+      {{template "link" .}}
+      
+      The pull request branch [pr/{{.PRNumber}}](https://github.com/suzuki-shunsuke/tfaction/tree/pr/{{.PRNumber}}) was created or updated.
+
+      You can try this pull request in your workflows by changing tfaction version to `pr/{{.PRNumber}}`.
+
+      e.g.
+
+      ```yaml
+      - uses: suzuki-shunsuke/tfaction/setup@pr/{{.PRNumber}}
+      ```
+
+      To update the pull request branch again, please run [the workflow](https://github.com/suzuki-shunsuke/tfaction/actions/workflows/create-pr-branch.yaml).
