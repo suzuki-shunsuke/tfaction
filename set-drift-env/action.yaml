@@ -31,6 +31,6 @@ runs:
       env:
         REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
         REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
-        ISSUE_NUMBER: ${{fromJSON(inputs).number}}
-        ISSUE_STATE: ${{fromJSON(inputs).state}}
-        TARGET: ${{fromJSON(inputs).target}}
+        ISSUE_NUMBER: ${{fromJSON(inputs.issue).number}}
+        ISSUE_STATE: ${{fromJSON(inputs.issue).state}}
+        TARGET: ${{fromJSON(inputs.issue).target}}
