@@ -22,25 +22,15 @@ tfcmt -var "target:$TFACTION_TARGET" apply -- terraform apply -auto-approve -no-
 code=$?
 set -e
 
-if [ -n "$DRIFT_ISSUE_NUMBER" ]; then
+if [ -n "$TFACTION_DRIFT_ISSUE_NUMBER" ]; then
 	tfcmt \
 		-config "$GITHUB_ACTION_PATH/tfcmt-drift.yaml" \
-		-owner "$DRIFT_ISSUE_REPO_OWNER" \
-		-repo "$DRIFT_ISSUE_REPO_NAME" \
-		-pr "$DRIFT_ISSUE_NUMBER" \
+		-owner "$TFACTION_DRIFT_ISSUE_REPO_OWNER" \
+		-repo "$TFACTION_DRIFT_ISSUE_REPO_NAME" \
+		-pr "$TFACTION_DRIFT_ISSUE_NUMBER" \
 		-var "pr_url:$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$CI_INFO_PR_NUMBER" \
 		-var "target:$TFACTION_TARGET" \
 		apply -- bash -c "cat $apply_output && exit $code" || : # Ignore the failure
-
-	if [ "$code" -eq 0 ] && [ "$DRIFT_ISSUE_STATE" = "open" ]; then
-		gh issue close \
-			--repo "$DRIFT_ISSUE_REPO_OWNER/$DRIFT_ISSUE_REPO_NAME" \
-			"$DRIFT_ISSUE_NUMBER"
-	elif [ "$code" -ne 0 ] && [ "$DRIFT_ISSUE_STATE" = "closed" ]; then
-		gh issue reopen \
-			--repo "$DRIFT_ISSUE_REPO_OWNER/$DRIFT_ISSUE_REPO_NAME" \
-			"$DRIFT_ISSUE_NUMBER"
-	fi
 fi
 
 rm "$apply_output" || : # Ignore the failure

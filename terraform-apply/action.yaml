@@ -32,16 +32,6 @@ runs:
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
-    - run: |
-        if tfaction -v >/dev/null 2>&1; then
-          tfaction get-or-create-drift-issue
-        fi
-      id: drift-issue
-      shell: bash
-      if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-
     - run: bash ${{ github.action_path }}/main.sh
       id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
@@ -52,7 +42,5 @@ runs:
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
         S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
         GCS_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}
-        DRIFT_ISSUE_NUMBER: ${{ steps.drift-issue.outputs.issue_number }}
-        DRIFT_ISSUE_STATE: ${{ steps.drift-issue.outputs.issue_state }}
-        DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
-        DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
+        TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
+        TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
