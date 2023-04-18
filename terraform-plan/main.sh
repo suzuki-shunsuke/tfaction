@@ -33,3 +33,8 @@ fi
 if [ -z "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	bash "$GITHUB_ACTION_PATH/renovate_change.sh"
 fi
+
+if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
+	# If `terraform plan` has changes, drift is detected and the job fails.
+	exit "$code"
+fi
