@@ -24,9 +24,13 @@ runs:
         echo "TFACTION_DRIFT_ISSUE_NUMBER=$ISSUE_NUMBER" >> "$GITHUB_ENV"
         echo "TFACTION_DRIFT_ISSUE_STATE=$ISSUE_STATE" >> "$GITHUB_ENV"
 
+        echo "TFACTION_JOB_TYPE=terraform" >> "$GITHUB_ENV"
+        echo "TFACTION_TARGET=$TARGET" >> "$GITHUB_ENV"
+
       shell: bash
       env:
         REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
         REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
         ISSUE_NUMBER: ${{fromJSON(inputs}.number}}
         ISSUE_STATE: ${{fromJSON(inputs}.state}}
+        TARGET: ${{fromJSON(inputs}.target}}
