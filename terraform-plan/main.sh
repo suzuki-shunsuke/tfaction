@@ -3,6 +3,10 @@
 set -eu
 set -o pipefail
 
+if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
+	export TFCMT_CONFIG=$GITHUB_ACTION_PATH/tfcmt-drift.yaml
+fi
+
 set +e
 tfcmt -var "target:$TFACTION_TARGET" plan -- \
 	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false
