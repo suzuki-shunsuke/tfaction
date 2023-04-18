@@ -40,8 +40,6 @@ runs:
       id: target-config
 
     - uses: suzuki-shunsuke/tfaction/setup-base@main
-    - uses: suzuki-shunsuke/tfaction/set-drift-env@main
-      if: env.TFACTION_DRIFT_ISSUE_NUMBER
 
     - run: |
         tempfile=$(mktemp)
