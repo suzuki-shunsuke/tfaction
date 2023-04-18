@@ -1,5 +1,9 @@
 name: set-drift-env
 description: Set environment variables for drift detection
+inputs:
+  issue:
+    description: Drift Issue
+    required: true
 runs:
   using: composite
   steps:
@@ -14,7 +18,15 @@ runs:
         echo "GH_COMMENT_REPO_NAME=$REPO_NAME" >> "$GITHUB_ENV"
         echo "GH_COMMENT_PR_NUMBER=$TFACTION_DRIFT_ISSUE_NUMBER" >> "$GITHUB_ENV"
 
+        echo "TFACTION_DRIFT_ISSUE_REPO_OWNER=$REPO_OWNER" >> "$GITHUB_ENV"
+        echo "TFACTION_DRIFT_ISSUE_REPO_NAME=$REPO_NAME" >> "$GITHUB_ENV"
+        echo "TFACTION_DRIFT_ISSUE_REPO_FULLNAME=$REPO_OWNER/$REPO_NAME" >> "$GITHUB_ENV"
+        echo "TFACTION_DRIFT_ISSUE_NUMBER=$ISSUE_NUMBER" >> "$GITHUB_ENV"
+        echo "TFACTION_DRIFT_ISSUE_STATE=$ISSUE_STATE" >> "$GITHUB_ENV"
+
       shell: bash
       env:
         REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
         REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
+        ISSUE_NUMBER: ${{fromJSON(inputs}.number}}
+        ISSUE_STATE: ${{fromJSON(inputs}.state}}
