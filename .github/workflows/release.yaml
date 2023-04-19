@@ -38,7 +38,6 @@ jobs:
           base revision: $GITHUB_SHA"
       - run: git tag "${{github.event.inputs.tag}}"
       - run: git push origin "${{github.event.inputs.tag}}"
-      - run: git checkout main
       - run: |
           note_template='[Issues](https://github.com/suzuki-shunsuke/tfaction/issues?q=is%3Aissue+is%3Aclosed+milestone%3A${{github.event.inputs.tag}}) | [Pull Requests](https://github.com/suzuki-shunsuke/tfaction/pulls?q=is%3Apr+is%3Aclosed+milestone%3A${{github.event.inputs.tag}}) | https://github.com/suzuki-shunsuke/tfaction/compare/${{github.event.inputs.tag}}...${{github.event.inputs.tag}} | [Base revision](https://github.com/suzuki-shunsuke/tfaction/tree/BASE_REVISION)'
           gh release create "${{github.event.inputs.tag}}" -p --title "${{github.event.inputs.tag}}" -n "${note_template//BASE_REVISION/$GITHUB_SHA}"
