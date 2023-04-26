@@ -109,7 +109,7 @@ jobs:
       contents: write
 
   create-pr-branch:
-    uses: .github/workflows/wc-create-pr-branch.yaml
+    uses: ./.github/workflows/wc-create-pr-branch.yaml
     if: github.event.pull_request.user.login == 'suzuki-shunsuke'
     permissions:
       contents: write
