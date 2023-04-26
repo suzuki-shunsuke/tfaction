@@ -1,76 +1,19 @@
 ---
 name: Create Pull Request Branch
 on:
-  workflow_call:
-    inputs:
-      pr:
-        description: 'Pull Request Number'
-        required: true
-        type: number
-      is_post:
-        description: If true, post a comment
-        required: true
-        type: boolean
-
   workflow_dispatch:
     inputs:
       pr:
         description: 'Pull Request Number'
         required: true
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
-env:
-  PR_NUMBER: ${{inputs.pr}}
-  PR_BRANCH: pr/${{inputs.pr}}
 jobs:
   create-pr-branch:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-
-      - id: generate_token
-        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92 # v1.8.0
-        with:
-          app_id: ${{secrets.APP_ID}}
-          private_key: ${{secrets.APP_PRIVATE_KEY}}
-
-      - uses: aquaproj/aqua-installer@61e2563dfe7674cbf74fe6ec212e444198a3bb00 # v2.0.2
-        with:
-          aqua_version: v2.3.6
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-
-      - run: gh auth setup-git
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      # https://github.community/t/github-actions-bot-email-address/17204/5
-      - run: git config user.name "github-actions[bot]"
-      - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - run: gh pr checkout "$PR_NUMBER"
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      - run: echo "base_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-        id: base_sha
-      - run: git fetch origin "pull/$PR_NUMBER/merge:$PR_BRANCH"
-      - run: git checkout "$PR_BRANCH"
-
-      - run: |
-          git ls-files | grep -E "/action\.yaml$" |
-            xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@$PR_BRANCH|"
-      - run: git ls-files | grep -E "/action\.yaml$" | xargs git add
-      - run: |
-          git commit -m "chore: test $PR_NUMBER
-          base revision: ${{steps.base_sha.outputs.base_sha}}"
-      - run: git push origin "$PR_BRANCH" --force
-        env:
-          GITHUB_TOKEN: ${{steps.generate_token.outputs.token}}
-
-      - run: echo "[Pull Request](https://github.com/suzuki-shunsuke/tfaction/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
-
-      - run: github-comment post -pr "$PR_NUMBER" -k create-pr-branch
-        if: github.event_name == 'workflow_dispatch' || inputs.is_post
-        env:
-          GITHUB_TOKEN: ${{github.token}}
+    uses: ./.github/workflows/wc-create-pr-branch.yaml
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      pr: ${{inputs.pr}}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
