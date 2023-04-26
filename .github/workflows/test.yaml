@@ -42,6 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     # "! failure() && ! cancelled()" is required. success() returns false if dependent jobs are skipped. https://github.com/community/community/discussions/45058
     # By default success() is used so we have to override success() by "! failure() && ! cancelled()"
+    permissions: {}
     steps:
       - name: Generate token
         id: generate_token
