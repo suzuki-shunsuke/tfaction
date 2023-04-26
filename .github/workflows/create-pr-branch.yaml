@@ -1,6 +1,17 @@
 ---
 name: Create Pull Request Branch
 on:
+  workflow_call:
+    inputs:
+      pr:
+        description: 'Pull Request Number'
+        required: true
+        type: number
+      is_post:
+        description: If true, post a comment
+        required: true
+        type: boolean
+
   workflow_dispatch:
     inputs:
       pr:
@@ -56,7 +67,10 @@ jobs:
       - run: git push origin "$PR_BRANCH" --force
         env:
           GITHUB_TOKEN: ${{steps.generate_token.outputs.token}}
+
       - run: echo "[Pull Request](https://github.com/suzuki-shunsuke/tfaction/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
+
       - run: github-comment post -pr "$PR_NUMBER" -k create-pr-branch
+        if: github.event_name == 'workflow_dispatch' || inputs.is_post
         env:
           GITHUB_TOKEN: ${{github.token}}

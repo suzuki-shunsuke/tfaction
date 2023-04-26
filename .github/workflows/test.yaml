@@ -1,122 +1,108 @@
----
 name: test
-on:
-  pull_request:
-    # branches: [main]
-    branches: [dummy] # Disabled
-env:
-  TFACTION_IS_APPLY: 'false'
-permissions:
-  id-token: write
-  contents: read
-  pull-requests: write
+
+on: pull_request
+
 jobs:
-  setup:
-    runs-on: ubuntu-latest
+  path-filter:
+    # Get changed files to filter jobs
     outputs:
-      tfmigrate_targets: ${{ steps.list-targets.outputs.tfmigrate_targets }}
-      terraform_targets: ${{ steps.list-targets.outputs.terraform_targets }}
-    steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - uses: aquaproj/aqua-installer@294926f94b4233f202a2f03875c604f840cfed70 # v2.1.1
-        with:
-          aqua_version: v2.3.6
-      - uses: ./list-targets
-        id: list-targets
-
-  tfmigrate-plan:
-    name: "tfmigrate-plan (${{matrix.target.target}})"
-    runs-on: ${{matrix.target.runs_on}}
-    needs: setup
-    # if services is empty, the build job is skipped
-    if: "join(fromJSON(needs.setup.outputs.tfmigrate_targets), '') != ''"
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ${{fromJSON(needs.setup.outputs.tfmigrate_targets)}}
-    env:
-      TFACTION_TARGET: ${{matrix.target.target}}
-      TFACTION_JOB_TYPE: tfmigrate
-    steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Generate token
-        id: generate_token
-        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92 # v1.8.0
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      - uses: aquaproj/aqua-installer@294926f94b4233f202a2f03875c604f840cfed70 # v2.1.1
-        with:
-          aqua_version: v2.3.6
-
-      - uses: ./export-secrets
-        with:
-          secrets: ${{ toJSON(secrets) }}
-
-      - uses: ./setup
-        id: setup
-        with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
-          ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
-
-      - uses: ./test
-        with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
-
-      - uses: ./tfmigrate-plan
-        with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
-
-  terraform-plan:
-    name: "terraform-plan (${{matrix.target.target}})"
-    runs-on: ${{matrix.target.runs_on}}
-    needs: setup
-    # if services is empty, the build job is skipped
-    if: "join(fromJSON(needs.setup.outputs.terraform_targets), '') != ''"
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ${{fromJSON(needs.setup.outputs.terraform_targets)}}
-    env:
-      TFACTION_TARGET: ${{matrix.target.target}}
-      TFACTION_JOB_TYPE: terraform
-    steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Generate token
-        id: generate_token
-        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92 # v1.8.0
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      - uses: aquaproj/aqua-installer@294926f94b4233f202a2f03875c604f840cfed70 # v2.1.1
-        with:
-          aqua_version: v2.3.6
-
-      - uses: ./export-secrets
-        with:
-          secrets: ${{ toJSON(secrets) }}
-
-      - uses: ./setup
-        id: setup
-        with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
-          ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
-
-      - uses: ./test
-        with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
-
-      - uses: ./terraform-plan
-        with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
-
-  # This job is used for branch protection rule
-  # Add this job to `Status checks that are required`
-  status-check:
+      update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
+      renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
+      ghalint: ${{steps.changes.outputs.ghalint}}
     runs-on: ubuntu-latest
-    needs: [terraform-plan, tfmigrate-plan, setup]
+    permissions: {}
+    steps:
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 # v2.11.1
+        id: changes
+        with:
+          filters: |
+            update-aqua-checksums:
+              - aqua/aqua.yaml
+              - aqua/*.yaml
+              - aqua/aqua-checksums.json
+              - .github/workflows/test.yaml
+            renovate-config-validator:
+              - renovate.json5
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-renovate-config-validator.yaml
+            ghalint:
+              - .github/workflows/*.yaml
+              - aqua/ghalint.yaml
+            build-schema:
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-deploy-schema.yaml
+              - schema/**
+
+  enable-automerge:
+    needs:
+      - status-check
+    if: |
+      ! failure() && ! cancelled() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
+    # Enable automerge to merge pull requests from Renovate automatically.
+    runs-on: ubuntu-latest
+    # "! failure() && ! cancelled()" is required. success() returns false if dependent jobs are skipped. https://github.com/community/community/discussions/45058
+    # By default success() is used so we have to override success() by "! failure() && ! cancelled()"
+    permissions: {}
+    steps:
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c # v1
+        with:
+          app_id: ${{secrets.APP_ID}}
+          private_key: ${{secrets.APP_PRIVATE_KEY}}
+      - run: gh -R "$GITHUB_REPOSITORY" pr merge --merge --auto --delete-branch "$PR_NUMBER"
+        env:
+          GITHUB_TOKEN: ${{steps.generate_token.outputs.token}} # Use GitHub App to trigger GitHub Actions Workflow by merge commit.
+          PR_NUMBER: ${{github.event.pull_request.number}}
+
+  status-check:
+    # This job is used for main branch's branch protection rule's status check.
+    # If all dependent jobs succeed or are skipped this job succeeds.
+    runs-on: ubuntu-latest
+    needs:
+      - update-aqua-checksums
+      - test-get-target-config
+      - test-list-working-dirs
+      - renovate-config-validator
+      - ghalint
+      - build-schema
+    permissions: {}
     if: failure()
     steps:
       - run: exit 1
+
+  update-aqua-checksums:
+    needs: path-filter
+    if: needs.path-filter.outputs.update-aqua-checksums == 'true'
+    uses: ./.github/workflows/wc-update-aqua-checksums.yaml
+    permissions:
+      contents: read
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+
+  renovate-config-validator:
+    uses: ./.github/workflows/wc-renovate-config-validator.yaml
+    needs: path-filter
+    if: needs.path-filter.outputs.renovate-config-validator == 'true'
+    permissions:
+      contents: read
+
+  ghalint:
+    needs: path-filter
+    if: needs.path-filter.outputs.ghalint == 'true'
+    uses: ./.github/workflows/wc-ghalint.yaml
+    permissions: {}
+
+  test-get-target-config:
+    uses: ./.github/workflows/wc-test-get-target-config.yaml
+    permissions: {}
+
+  test-list-working-dirs:
+    uses: ./.github/workflows/wc-test-list-working-dirs.yaml
+    permissions: {}
+
+  build-schema:
+    uses: ./.github/workflows/wc-deploy-schema.yaml
+    permissions:
+      contents: write
