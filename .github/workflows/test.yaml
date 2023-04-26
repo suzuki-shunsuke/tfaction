@@ -109,10 +109,13 @@ jobs:
       contents: write
 
   create-pr-branch:
-    uses: ./.github/workflows/create-pr-branch.yaml
+    uses: .github/workflows/wc-create-pr-branch.yaml
     if: github.event.pull_request.user.login == 'suzuki-shunsuke'
     permissions:
       contents: write
       pull-requests: write
     with:
       pr: ${{github.event.pull_request.number}}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
