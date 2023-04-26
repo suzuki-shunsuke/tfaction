@@ -20,6 +20,10 @@ tfcmt -var "target:$TFACTION_TARGET" apply -- terraform apply -auto-approve -no-
 code=$?
 set -e
 
+if [ "$DISABLE_UPDATE_RELATED_PULL_REQUESTS" = true ]; then
+	exit "$code"
+fi
+
 while read -r pr_number; do
 	if [ "$CI_INFO_PR_NUMBER" = "$pr_number" ]; then
 		# To prevent infinite loop

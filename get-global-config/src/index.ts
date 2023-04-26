@@ -22,6 +22,11 @@ try {
     core.setOutput('label_prefix_tfmigrate', 'tfmigrate:');
     core.setOutput('label_prefix_skip', 'skip:');
   }
+  if (config.update_related_pull_requests != undefined) {
+    core.setOutput('disable_update_related_pull_requests', config.update_related_pull_requests.enabled ? 'false' : 'true');
+  } else {
+    core.setOutput('disable_update_related_pull_requests', 'false');
+  }
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
 }
