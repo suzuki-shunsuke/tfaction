@@ -7,10 +7,6 @@ on:
         description: 'Pull Request Number'
         required: true
         type: number
-      is_post:
-        description: If true, post a comment
-        required: true
-        type: boolean
 
   workflow_dispatch:
     inputs:
@@ -18,7 +14,6 @@ on:
         description: 'Pull Request Number'
         required: true
 permissions:
-  id-token: write
   contents: write
   pull-requests: write
 env:
@@ -71,6 +66,6 @@ jobs:
       - run: echo "[Pull Request](https://github.com/suzuki-shunsuke/tfaction/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
 
       - run: github-comment post -pr "$PR_NUMBER" -k create-pr-branch
-        if: github.event_name == 'workflow_dispatch' || inputs.is_post
+        if: github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{github.token}}

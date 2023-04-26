@@ -66,6 +66,7 @@ jobs:
       - renovate-config-validator
       - ghalint
       - build-schema
+      - create-pr-branch
     permissions: {}
     if: failure()
     steps:
@@ -106,3 +107,12 @@ jobs:
     uses: ./.github/workflows/wc-deploy-schema.yaml
     permissions:
       contents: write
+
+  create-pr-branch:
+    uses: ./.github/workflows/create-pr-branch.yaml
+    if: github.event.pull_request.user.login == 'suzuki-shunsuke'
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      pr: ${{github.event.pull_request.number}}
