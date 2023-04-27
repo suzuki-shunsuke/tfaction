@@ -28,6 +28,11 @@ fi
 
 rm "$apply_output" || : # Ignore the failure
 
+if [ "$DISABLE_UPDATE_RELATED_PULL_REQUESTS" = true ]; then
+	echo "::notice ::Skip updating related pull requests"
+	exit "$code"
+fi
+
 while read -r pr_number; do
 	if [ "$CI_INFO_PR_NUMBER" = "$pr_number" ]; then
 		# To prevent infinite loop

@@ -22,6 +22,7 @@ try {
     core.setOutput('label_prefix_tfmigrate', 'tfmigrate:');
     core.setOutput('label_prefix_skip', 'skip:');
   }
+  
   if (config.drift_detection && config.drift_detection.issue_repo_owner) {
     core.setOutput('drift_issue_repo_owner', config.drift_detection.issue_repo_owner);
   } else {
@@ -29,6 +30,7 @@ try {
       core.setOutput('drift_issue_repo_owner', process.env.GITHUB_REPOSITORY.split('/')[0]);
     }
   }
+  
   if (config.drift_detection && config.drift_detection.issue_repo_name) {
     core.setOutput('drift_issue_repo_name', config.drift_detection.issue_repo_name);
   } else {
@@ -38,6 +40,12 @@ try {
         core.setOutput('drift_issue_repo_name', a[1]);
       }
     }
+  }
+  
+  if (config.update_related_pull_requests != undefined) {
+    core.setOutput('disable_update_related_pull_requests', config.update_related_pull_requests.enabled ? 'false' : 'true');
+  } else {
+    core.setOutput('disable_update_related_pull_requests', 'false');
   }
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
