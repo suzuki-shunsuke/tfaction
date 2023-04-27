@@ -6846,7 +6846,6 @@ try {
         core.setOutput('label_prefix_tfmigrate', 'tfmigrate:');
         core.setOutput('label_prefix_skip', 'skip:');
     }
-
     if (config.drift_detection && config.drift_detection.issue_repo_owner) {
         core.setOutput('drift_issue_repo_owner', config.drift_detection.issue_repo_owner);
     }
