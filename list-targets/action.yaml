@@ -32,16 +32,16 @@ runs:
         name: tfaction-ci-info
         path: ${{env.CI_INFO_TEMP_DIR}}
 
-    - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
+    - uses: suzuki-shunsuke/tfaction/list-working-dirs@v0.5.23
       id: list-working-directory-configs
-    - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
+    - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@v0.5.23
       id: list-targets
       with:
         changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
-    - uses: suzuki-shunsuke/tfaction/list-changed-modules@main
+    - uses: suzuki-shunsuke/tfaction/list-changed-modules@v0.5.23
       id: list-modules
       with:
         changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
