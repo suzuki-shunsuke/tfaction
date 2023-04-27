@@ -72,17 +72,17 @@ runs:
         echo "path=${tempfile}" >> "$GITHUB_OUTPUT"
       shell: bash
       if: |
-        ! contains(['workflow_dispatch', 'schedule'], github.event_name)
+        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
       id: ci-info
     - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # tag=v3.0.2
       if: |
-        ! contains(['workflow_dispatch', 'schedule'], github.event_name)
+        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
       with:
         name: tfaction-ci-info
         path: ${{steps.ci-info.outputs.path}}
     - run: cat "${{steps.ci-info.outputs.path}}/env" | sed 's|^CI_INFO_TEMP_DIR=.*$|CI_INFO_TEMP_DIR=${{steps.ci-info.outputs.path}}|' >> "$GITHUB_ENV"
       if: |
-        ! contains(['workflow_dispatch', 'schedule'], github.event_name)
+        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
       shell: bash
 
     - uses: suzuki-shunsuke/github-action-terraform-init@2938445484362c1546311279b036e25dbb265a50 # tag=v0.1.4
