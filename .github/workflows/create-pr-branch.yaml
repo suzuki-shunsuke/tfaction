@@ -13,7 +13,7 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      pr: ${{inputs.pr}}
+      pr: ${{fromJSON(inputs.pr)}}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
       gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
