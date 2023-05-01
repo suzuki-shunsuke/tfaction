@@ -150,8 +150,20 @@ runs:
 
     - name: Add a label to the pull request
       shell: bash
+      if: inputs.pr_number
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+      run: |
+        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ inputs.pr_number }}/labels" \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H "Accept: application/json" \
+          -H "Content-type: application/json" \
+          -d "[{\"name\":\"${{steps.global-config.outputs.label_prefix_tfmigrate}}${TFACTION_TARGET}\"}]"
+
+    - name: Add a label to the pull request
+      shell: bash
       if: |
-        !fromJSON(steps.global-config.outputs.skip_create_pr) || inputs.pr_number
+        !fromJSON(steps.global-config.outputs.skip_create_pr) && !inputs.pr_number
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
       run: |
