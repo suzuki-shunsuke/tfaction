@@ -76,6 +76,28 @@
         }
       }
     },
+    "update_related_pull_requests": {
+      "type": "object",
+      "description": "update related pull requests",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, related pull requests are updated",
+          "default": "true"
+        }
+      }
+    },
+    "scaffold_working_directory": {
+      "type": "object",
+      "description": "configuration about scaffold-working-directory",
+      "properties": {
+        "skip_adding_aqua_packages": {
+          "type": "boolean",
+          "description": "If true, creating aqua.yaml and adding packages is skipped",
+          "default": "false"
+        }
+      }
+    },
     "target_groups": {
       "type": "array",
       "description": "the list of target group configuration",
