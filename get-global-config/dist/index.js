@@ -6852,6 +6852,7 @@ try {
     else {
         core.setOutput('disable_update_related_pull_requests', 'false');
     }
+    core.exportVariable('TFACTION_SKIP_ADDING_AQUA_PACKAGES', config.scaffold_working_directory && config.scaffold_working_directory.skip_adding_aqua_packages);
 }
 catch (error) {
     core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
