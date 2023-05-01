@@ -1,9 +1,5 @@
 name: Scaffold a working directory
 description: Scaffold a working directory
-inputs:
-  skip_adding_aqua_packages:
-    description: If this is true, adding required packages to aqua.yaml is skipped
-    required: false
 outputs:
   working_directory:
     description: Working Directory
@@ -44,7 +40,7 @@ runs:
     - run: aqua g -i open-policy-agent/conftest terraform-linters/tflint aquasecurity/tfsec hashicorp/terraform
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: !fromJSON(inputs.skip_adding_aqua_packages)
+      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES == '' || !fromJSON(env.TFACTION_SKIP_ADDING_AQUA_PACKAGES)
 
     - run: git add .
       shell: bash
