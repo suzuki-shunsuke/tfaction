@@ -1,0 +1,57 @@
+title: Feature Request
+body:
+  - type: textarea
+    id: feature-overview
+    attributes:
+      label: Feature Overview
+      value:
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is the feature needed?
+      description: Please explain the problem you want to solve.
+    validations:
+      required: true
+  - type: textarea
+    id: has-breaking-change
+    attributes:
+      label: Does the feature include Breaking Changes?
+      description: Please explain the problem you want to solve.
+    validations:
+      required: true
+  - type: textarea
+    id: example-code
+    attributes:
+      label: Example Code
+      description: |
+        Please explain the feature with code
+      value: |
+        GitHub Actions
+
+        ```yaml
+
+        ```
+
+        tfaction-root.yaml
+
+        ```yaml
+
+        ```
+
+        tfaction.yaml
+
+        ```yaml
+
+        ```
+    validations:
+      required: false
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference
+      value: |
+        *
+    validations:
+      required: false
