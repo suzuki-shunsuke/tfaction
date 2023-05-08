@@ -17,7 +17,7 @@ runs:
           --repo "$TFACTION_DRIFT_ISSUE_REPO_FULLNAME" \
           "$TFACTION_DRIFT_ISSUE_NUMBER"
       shell: bash
-      if: env.TFACTION_DRIFT_ISSUE_STATE == 'open' && inputs.status == 'success'
+      if: env.TFACTION_DRIFT_ISSUE_STATE == 'open' && inputs.status == 'success' && env.TFACTION_SKIP_TERRAFORM != 'true'
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
@@ -28,6 +28,6 @@ runs:
           "$TFACTION_DRIFT_ISSUE_NUMBER"
       shell: bash
       if: |
-        env.TFACTION_DRIFT_ISSUE_STATE == 'closed' && inputs.status != 'success'
+        env.TFACTION_DRIFT_ISSUE_STATE == 'closed' && inputs.status != 'success' && env.TFACTION_SKIP_TERRAFORM != 'true'
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}

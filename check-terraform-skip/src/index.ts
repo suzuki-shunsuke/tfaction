@@ -34,7 +34,9 @@ function getSkipTerraform(): boolean {
 }
 
 try {
-  core.setOutput('skip_terraform', getSkipTerraform());
+  const isSkip = getSkipTerraform();
+  core.exportVariable('TFACTION_SKIP_TERRAFORM', isSkip);
+  core.setOutput('skip_terraform', isSkip);
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
 }
