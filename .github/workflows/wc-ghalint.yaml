@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3
       - uses: aquaproj/aqua-installer@294926f94b4233f202a2f03875c604f840cfed70 # v2.1.1
         with:
-          aqua_version: v2.5.0
+          aqua_version: v2.5.1
         env:
           AQUA_GITHUB_TOKEN: ${{github.token}}
       - run: ghalint run
