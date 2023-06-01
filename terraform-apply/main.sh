@@ -22,7 +22,7 @@ tfcmt -var "target:$TFACTION_TARGET" apply -- terraform apply -auto-approve -no-
 code=$?
 set -e
 
-if [ -n "$TFACTION_DRIFT_ISSUE_NUMBER" ]; then
+if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	tfcmt \
 		-config "$GITHUB_ACTION_PATH/tfcmt-drift.yaml" \
 		-owner "$TFACTION_DRIFT_ISSUE_REPO_OWNER" \

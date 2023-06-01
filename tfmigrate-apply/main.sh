@@ -14,7 +14,7 @@ github-comment exec \
 code=$?
 set -e
 
-if [ -n "$TFACTION_DRIFT_ISSUE_NUMBER" ]; then
+if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	github-comment exec \
 	  --config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 		-org "$TFACTION_DRIFT_ISSUE_REPO_OWNER" \
