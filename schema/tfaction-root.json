@@ -23,6 +23,11 @@
       "type": "object",
       "description": "Drift Detection",
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, drift detection is enabled in all working directories",
+          "default": "true"
+        },
         "issue_repo_owner": {
           "type": "string",
           "description": "Repository owner of GitHub Issues",
@@ -144,6 +149,18 @@
           "target": {
             "type": "string",
             "description": "the prefix of the target"
+          },
+
+          "drift_detection": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "If true, drift detection is enabled in the target group",
+                "default": "false"
+              }
+            }
           },
 
           "template_dir": {
