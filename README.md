@@ -1,6 +1,6 @@
 # tfaction
 
-Framework for Monorepo to build full-featured Terraform Workflow by GitHub Actions
+Framework for Monorepo to build high level Terraform Workflows by GitHub Actions
 
 ## Document
 
