@@ -43,19 +43,6 @@ runs:
       shell: bash
       working-directory: ${{ steps.target-config.outputs.working_directory }}
 
-    - run: |
-        tempfile=$(mktemp)
-        rm "$tempfile"
-        echo "path=${tempfile}" >> "$GITHUB_OUTPUT"
-      shell: bash
-      id: ci-info
-    - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # tag=v3.0.2
-      with:
-        name: tfaction-ci-info
-        path: ${{steps.ci-info.outputs.path}}
-    - run: cat "${{steps.ci-info.outputs.path}}/env" | sed 's|^CI_INFO_TEMP_DIR=.*$|CI_INFO_TEMP_DIR=${{steps.ci-info.outputs.path}}|' >> "$GITHUB_ENV"
-      shell: bash
-
     - uses: aws-actions/configure-aws-credentials@5727f247b64f324ec403ac56ae05e220fd02b65f # v2.1.0
       if: steps.target-config.outputs.aws_assume_role_arn != ''
       with:
@@ -78,6 +65,25 @@ runs:
       if: inputs.ssh_key != ''
       with:
        ssh_key: ${{ inputs.ssh_key }}
+
+    - run: |
+        tempfile=$(mktemp)
+        rm "$tempfile"
+        echo "path=${tempfile}" >> "$GITHUB_OUTPUT"
+      shell: bash
+      if: |
+        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
+      id: ci-info
+    - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # tag=v3.0.2
+      if: |
+        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
+      with:
+        name: tfaction-ci-info
+        path: ${{steps.ci-info.outputs.path}}
+    - run: cat "${{steps.ci-info.outputs.path}}/env" | sed 's|^CI_INFO_TEMP_DIR=.*$|CI_INFO_TEMP_DIR=${{steps.ci-info.outputs.path}}|' >> "$GITHUB_ENV"
+      if: |
+        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
+      shell: bash
 
     - uses: suzuki-shunsuke/github-action-terraform-init@2938445484362c1546311279b036e25dbb265a50 # tag=v0.1.4
       with:

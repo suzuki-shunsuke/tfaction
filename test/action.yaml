@@ -15,7 +15,12 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
 
-    - run: github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform validate
+    - name: terraform validate
+      run: |
+        github-comment exec \
+          -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+          -var "tfaction_target:${TFACTION_TARGET}" \
+          -- terraform validate
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:

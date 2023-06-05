@@ -19,6 +19,38 @@
       "default": false
     },
 
+    "drift_detection": {
+      "type": "object",
+      "description": "Drift Detection",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, drift detection is enabled in all working directories",
+          "default": "true"
+        },
+        "issue_repo_owner": {
+          "type": "string",
+          "description": "Repository owner of GitHub Issues",
+          "default": "Repository where GitHub Actions is run"
+        },
+        "issue_repo_name": {
+          "type": "string",
+          "description": "Repository name of GitHub Issues",
+          "default": "Repository where GitHub Actions is run"
+        },
+        "num_of_issues": {
+          "type": "integer",
+          "description": "The number of issues that scheduled job handles",
+          "default": 1
+        },
+        "minimum_detection_interval": {
+          "type": "integer",
+          "description": "The scheduled workflow picks out working directories whose issues were updated before `minimum_detection_interval` hours",
+          "default": 168
+        }
+      }
+    },
+
     "envs": {
       "$ref": "#/$defs/Envs"
     },
@@ -117,6 +149,18 @@
           "target": {
             "type": "string",
             "description": "the prefix of the target"
+          },
+
+          "drift_detection": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "If true, drift detection is enabled in the target group",
+                "default": "false"
+              }
+            }
           },
 
           "template_dir": {

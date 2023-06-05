@@ -16,8 +16,10 @@ runs:
       id: target-config
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
+
     - uses: suzuki-shunsuke/tfaction/check-terraform-skip@main
       id: check-terraform-skip
+      if: "! env.TFACTION_DRIFT_ISSUE_NUMBER"
       with:
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
@@ -25,7 +27,8 @@ runs:
     - run: bash ${{ github.action_path }}/main.sh
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
-      if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
+      if: |
+        env.TFACTION_DRIFT_ISSUE_NUMBER || !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         ROOT_DIR: ${{ github.workspace }}

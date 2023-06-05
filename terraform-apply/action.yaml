@@ -9,6 +9,15 @@ inputs:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
+
+outputs:
+  issue_number:
+    description: Drift Issue number
+    value: ${{ steps.drift-issue.outputs.issue_number }}
+  issue_state:
+    description: Drift Issue state
+    value: ${{ steps.drift-issue.outputs.issue_state }}
+
 runs:
   using: composite
   steps:
@@ -22,7 +31,9 @@ runs:
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
+
     - run: bash ${{ github.action_path }}/main.sh
+      id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
@@ -31,4 +42,6 @@ runs:
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
         S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
         GCS_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}
+        TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
+        TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
         DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}

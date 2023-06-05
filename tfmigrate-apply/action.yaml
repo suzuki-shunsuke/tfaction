@@ -9,6 +9,7 @@ inputs:
     description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
+
 runs:
   using: composite
   steps:
@@ -16,10 +17,14 @@ runs:
       id: global-config
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
+
     - run: bash ${{ github.action_path }}/main.sh
+      id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
+        TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
+        TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
         DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}
