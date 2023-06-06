@@ -36,7 +36,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/get-target-config@v0.6.1
       id: target-config
 
     - run: aqua i -l -a
@@ -50,7 +50,7 @@ runs:
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
+    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@v0.6.1
 
     - uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033 # v1.1.1
       if: steps.target-config.outputs.gcp_service_account != ''
@@ -61,7 +61,7 @@ runs:
     - uses: google-github-actions/setup-gcloud@e30db14379863a8c79331b04a9969f4c1e225e0b # v1.1.1
       if: steps.target-config.outputs.gcp_service_account != ''
 
-    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
+    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@v0.6.1
       if: inputs.ssh_key != ''
       with:
        ssh_key: ${{ inputs.ssh_key }}
