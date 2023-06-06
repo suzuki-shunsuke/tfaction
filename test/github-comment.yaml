@@ -3,7 +3,7 @@ exec:
   default:
   - when: ExitCode != 0
     template: |
-      :x: {{.Vars.tfaction_target}}
+      ## :x: {{.Vars.tfaction_target}}: terraform validate
 
       {{template "link" .}}
 
