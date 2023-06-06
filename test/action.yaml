@@ -19,6 +19,7 @@ runs:
       run: |
         github-comment exec \
           -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+          -k terraform-validate \
           -var "tfaction_target:${TFACTION_TARGET}" \
           -- terraform validate
       working-directory: ${{ steps.target-config.outputs.working_directory }}

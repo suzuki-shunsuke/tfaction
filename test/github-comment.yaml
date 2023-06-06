@@ -1,6 +1,6 @@
 # https://github.com/suzuki-shunsuke/github-comment
 exec:
-  default:
+  terraform-validate:
   - when: ExitCode != 0
     template: |
       ## :x: {{.Vars.tfaction_target}}: terraform validate
