@@ -1,6 +1,6 @@
 # tfaction
 
-GitHub Actions collection for Opinionated Terraform Workflow
+Framework for Monorepo to build high level Terraform Workflows by GitHub Actions
 
 ## Document
 

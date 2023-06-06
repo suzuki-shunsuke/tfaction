@@ -19,6 +19,10 @@ outputs:
     description: label prefix to skip terraform plan and apply
   skip_create_pr:
     description: Whether skip creating pull requests
+  drift_issue_repo_owner:
+    description: Drift Issue Repository owner
+  drift_issue_repo_name:
+    description: Drift Issue Repository name
 runs:
   using: 'node16'
   main: 'dist/index.js'

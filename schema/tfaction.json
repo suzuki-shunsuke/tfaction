@@ -17,6 +17,18 @@
       "$ref": "#/$defs/TerraformProvidersLockOptions"
     },
 
+    "drift_detection": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, drift detection is enabled in the working directory",
+          "default": "false"
+        }
+      }
+    },
+
     "gcs_bucket_name_plan_file": {
       "$ref": "#/$defs/GCSBucketNamePlanFile"
     },

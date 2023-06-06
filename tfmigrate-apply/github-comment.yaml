@@ -11,3 +11,16 @@ exec:
       {{template "join_command" .}}
 
       {{template "hidden_combined_output" .}}
+
+  drift-apply:
+  - when: true
+    template: |
+      ## {{template "status" .}} tfmigrate apply
+
+      [Pull Request]({{.Vars.pr_url}}) | {{template "link" .}}
+
+      ```console
+      $ tfmigrate apply
+      ```
+
+      {{template "hidden_combined_output" .}}
