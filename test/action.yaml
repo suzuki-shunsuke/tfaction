@@ -27,7 +27,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/github-action-tfsec@feat/add-ignore-hcl-errors
+    - uses: suzuki-shunsuke/github-action-tfsec@122c054cace4044e52656e25ef9592b7fafecd89 # v0.1.8
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
