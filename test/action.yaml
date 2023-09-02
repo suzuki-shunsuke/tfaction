@@ -27,11 +27,12 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/github-action-tfsec@07dc756febfc0f4440e37e5d20252676510a3a65 # v0.1.7
+    - uses: suzuki-shunsuke/github-action-tfsec@feat/add-ignore-hcl-errors
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: 'true'
+        ignore_hcl_errors: 'true'
 
     # deep check requires AWS credentials
     - uses: suzuki-shunsuke/github-action-tflint@4c64bc69d01df97ddb0a1f87ffab0c732f1c86de # v0.1.6
