@@ -27,7 +27,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/github-action-tfsec@07dc756febfc0f4440e37e5d20252676510a3a65 # v0.1.7
+    - uses: suzuki-shunsuke/github-action-tfsec@122c054cace4044e52656e25ef9592b7fafecd89 # v0.1.8
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
