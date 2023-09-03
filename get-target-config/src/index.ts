@@ -64,6 +64,10 @@ try {
     ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
 
     lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
+
+    core.setOutput('enable_tfsec', config.tfsec == null || config.tfsec.enabled == null || config.tfsec.enabled);
+    core.setOutput('enable_tflint', config.tflint == null || config.tflint.enabled == null || config.tflint.enabled);
+    core.setOutput('enable_trivy', config.trivy != null && config.trivy.enabled);
   }
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));

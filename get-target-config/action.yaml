@@ -27,6 +27,13 @@ outputs:
 
   providers_lock_opts:
     description: terraform providers lock options
+
+  enable_tfsec:
+    description: If tfsec is enabled in test action
+  enable_tflint:
+    description: If tflint is enabled in test action
+  enable_trivy:
+    description: If trivy is enabled in test action
 runs:
   using: 'node16'
   main: 'dist/index.js'
