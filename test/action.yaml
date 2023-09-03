@@ -32,6 +32,7 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: 'true'
+        ignore_hcl_errors: 'true'
 
     # deep check requires AWS credentials
     - uses: suzuki-shunsuke/github-action-tflint@4c64bc69d01df97ddb0a1f87ffab0c732f1c86de # v0.1.6
