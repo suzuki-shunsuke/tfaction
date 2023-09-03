@@ -19,6 +19,37 @@
       "default": false
     },
 
+    "tfsec": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, test action runs tfsec",
+          "default": "true"
+        }
+      }
+    },
+    "tflint": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, test action runs tflint",
+          "default": "true"
+        }
+      }
+    },
+    "trivy": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, test action runs Trivy",
+          "default": "false"
+        }
+      }
+    },
+
     "drift_detection": {
       "type": "object",
       "description": "Drift Detection",
