@@ -7,6 +7,9 @@ interface Config {
   working_directory_file: string | undefined
   target_groups: Array<TargetConfig>
   env: Record<string, string> | undefined
+  tfsec: TfsecConfig | undefined
+  trivy: TrivyConfig | undefined
+  tflint: TflintConfig | undefined
 }
 
 interface TargetConfig {
@@ -31,6 +34,19 @@ interface TargetConfig {
   terraform_apply_config: JobConfig | undefined
   tfmigrate_apply_config: JobConfig | undefined
   env: Record<string, string> | undefined
+  tfsec: TfsecConfig | undefined
+}
+
+export interface TfsecConfig {
+  enabled: boolean
+}
+
+export interface TflintConfig {
+  enabled: boolean
+}
+
+export interface TrivyConfig {
+  enabled: boolean
 }
 
 export interface JobConfig {

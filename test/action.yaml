@@ -27,7 +27,15 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
+    - uses: suzuki-shunsuke/trivy-config-action@98c78ddbed860a39a12772c43412006b628553a8 # v0.1.0
+      if: fromJSON(steps.target-config.outputs.enable_trivy)
+      with:
+        github_token: ${{ inputs.github_token }}
+        working_directory: ${{ steps.target-config.outputs.working_directory }}
+        github_comment: 'true'
+
     - uses: suzuki-shunsuke/github-action-tfsec@122c054cace4044e52656e25ef9592b7fafecd89 # v0.1.8
+      if: fromJSON(steps.target-config.outputs.enable_tfsec)
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
@@ -36,6 +44,7 @@ runs:
 
     # deep check requires AWS credentials
     - uses: suzuki-shunsuke/github-action-tflint@4c64bc69d01df97ddb0a1f87ffab0c732f1c86de # v0.1.6
+      if: fromJSON(steps.target-config.outputs.enable_tflint)
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
