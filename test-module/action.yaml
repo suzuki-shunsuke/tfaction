@@ -12,6 +12,9 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
+
     - run: github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform init -input=false
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
@@ -24,13 +27,22 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
+    - uses: suzuki-shunsuke/trivy-config-action@98c78ddbed860a39a12772c43412006b628553a8 # v0.1.0
+      if: fromJSON(steps.global-config.outputs.enable_trivy)
+      with:
+        github_token: ${{ inputs.github_token }}
+        working_directory: ${{ env.TFACTION_TARGET }}
+        github_comment: 'true'
+
     - uses: suzuki-shunsuke/github-action-tfsec@122c054cace4044e52656e25ef9592b7fafecd89 # v0.1.8
+      if: fromJSON(steps.global-config.outputs.enable_tfsec)
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: 'true'
 
     - uses: suzuki-shunsuke/github-action-tflint@4c64bc69d01df97ddb0a1f87ffab0c732f1c86de # v0.1.6
+      if: fromJSON(steps.global-config.outputs.enable_tflint)
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
@@ -46,6 +58,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
       run: |
+        set -euo pipefail
         created=false
         if ! [ -f README.md ]; then
           created=true

@@ -23,6 +23,13 @@ outputs:
     description: Drift Issue Repository owner
   drift_issue_repo_name:
     description: Drift Issue Repository name
+
+  enable_tfsec:
+    description: If true, tfsec is enabled in test action
+  enable_tflint:
+    description: If true, tflint is enabled in test action
+  enable_trivy:
+    description: If true, trivy is enabled in test action
 runs:
   using: 'node16'
   main: 'dist/index.js'
