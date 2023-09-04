@@ -46,6 +46,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_app_token }}
       run: |
+        set -euo pipefail
         created=false
         if ! [ -f README.md ]; then
           created=true
