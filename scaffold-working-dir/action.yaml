@@ -43,23 +43,22 @@ runs:
     - run: aqua g -i open-policy-agent/conftest hashicorp/terraform
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: |
-        env.TFACTION_SKIP_ADDING_AQUA_PACKAGES == '' || env.TFACTION_SKIP_ADDING_AQUA_PACKAGES == 'false'
+      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true'
 
     - run: aqua g -i terraform-linters/tflint
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: (env.TFACTION_SKIP_ADDING_AQUA_PACKAGES == '' || !fromJSON(env.TFACTION_SKIP_ADDING_AQUA_PACKAGES)) && fromJSON(steps.target-config.outputs.enable_tflint)
+      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_tflint)
 
     - run: aqua g -i aquasecurity/tfsec
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: (env.TFACTION_SKIP_ADDING_AQUA_PACKAGES == '' || !fromJSON(env.TFACTION_SKIP_ADDING_AQUA_PACKAGES)) && fromJSON(steps.target-config.outputs.enable_tfsec)
+      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_tfsec)
 
     - run: aqua g -i aquasecurity/trivy
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: (env.TFACTION_SKIP_ADDING_AQUA_PACKAGES == '' || !fromJSON(env.TFACTION_SKIP_ADDING_AQUA_PACKAGES)) && fromJSON(steps.target-config.outputs.enable_trivy)
+      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_trivy)
 
     - run: git add .
       shell: bash
