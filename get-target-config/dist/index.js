@@ -6857,6 +6857,9 @@ try {
     core.setOutput('working_directory', workingDir);
     core.setOutput('providers_lock_opts', '-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64');
     lib.setOutputs(['template_dir'], [targetConfig]);
+    core.setOutput('enable_tfsec', config.tfsec == null || config.tfsec.enabled == null || config.tfsec.enabled);
+    core.setOutput('enable_tflint', config.tflint == null || config.tflint.enabled == null || config.tflint.enabled);
+    core.setOutput('enable_trivy', config.trivy != null && config.trivy.enabled);
     if (jobType == 'scaffold_working_dir') {
         lib.setOutputs([
             's3_bucket_name_plan_file',
@@ -6887,9 +6890,6 @@ try {
             'gcp_workload_identity_provider',
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
         lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
-        core.setOutput('enable_tfsec', config.tfsec == null || config.tfsec.enabled == null || config.tfsec.enabled);
-        core.setOutput('enable_tflint', config.tflint == null || config.tflint.enabled == null || config.tflint.enabled);
-        core.setOutput('enable_trivy', config.trivy != null && config.trivy.enabled);
     }
 }
 catch (error) {
