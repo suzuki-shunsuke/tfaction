@@ -47,8 +47,7 @@ try {
   } else {
     core.setOutput('disable_update_related_pull_requests', 'false');
   }
-  core.exportVariable('TFACTION_SKIP_ADDING_AQUA_PACKAGES', config.scaffold_working_directory && config.scaffold_working_directory.skip_adding_aqua_packages);
-
+  core.exportVariable('TFACTION_SKIP_ADDING_AQUA_PACKAGES', JSON.stringify(config.scaffold_working_directory && config.scaffold_working_directory.skip_adding_aqua_packages));
 
   core.setOutput('enable_tfsec', config.tfsec == null || config.tfsec.enabled == null || config.tfsec.enabled);
   core.setOutput('enable_tflint', config.tflint == null || config.tflint.enabled == null || config.tflint.enabled);
