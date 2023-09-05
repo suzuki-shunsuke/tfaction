@@ -37,12 +37,6 @@ runs:
     - run: aqua init
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: |
-        env.TFACTION_SKIP_ADDING_AQUA_PACKAGES == '' || !fromJSON(env.TFACTION_SKIP_ADDING_AQUA_PACKAGES)
-
-    - run: aqua g -i open-policy-agent/conftest hashicorp/terraform
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true'
 
     - run: aqua g -i terraform-linters/tflint
@@ -59,6 +53,11 @@ runs:
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_trivy)
+
+    - run: aqua g -i open-policy-agent/conftest hashicorp/terraform
+      shell: bash
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true'
 
     - run: git add .
       shell: bash
