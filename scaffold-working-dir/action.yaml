@@ -34,16 +34,6 @@ runs:
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
-    - run: echo "${{env.TFACTION_SKIP_ADDING_AQUA_PACKAGES}}"
-      shell: bash
-
-    - run: |
-        set -euo pipefail
-        if [ -n "${{env.TFACTION_SKIP_ADDING_AQUA_PACKAGES}}" ]; then
-          echo "TFACTION_SKIP_ADDING_AQUA_PACKAGES isn't empty"
-        fi
-      shell: bash
-
     - run: aqua init
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
@@ -54,20 +44,20 @@ runs:
       working-directory: ${{steps.target-config.outputs.working_directory}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true'
 
-    - run: aqua g -i terraform-linters/tflint
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_tflint)
+        # - run: aqua g -i terraform-linters/tflint
+        #   shell: bash
+        #   working-directory: ${{steps.target-config.outputs.working_directory}}
+        #   if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_tflint)
 
-    - run: aqua g -i aquasecurity/tfsec
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_tfsec)
+        # - run: aqua g -i aquasecurity/tfsec
+        #   shell: bash
+        #   working-directory: ${{steps.target-config.outputs.working_directory}}
+        #   if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_tfsec)
 
-    - run: aqua g -i aquasecurity/trivy
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-      if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_trivy)
+        # - run: aqua g -i aquasecurity/trivy
+        #   shell: bash
+        #   working-directory: ${{steps.target-config.outputs.working_directory}}
+        #   if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.target-config.outputs.enable_trivy)
 
     - run: git add .
       shell: bash
