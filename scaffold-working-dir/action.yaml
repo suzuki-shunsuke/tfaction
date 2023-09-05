@@ -34,6 +34,16 @@ runs:
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
+    - run: echo "${{env.TFACTION_SKIP_ADDING_AQUA_PACKAGES}}"
+      shell: bash
+
+    - run: |
+        set -euo pipefail
+        if [ -n "${{env.TFACTION_SKIP_ADDING_AQUA_PACKAGES}}" ]; then
+          echo "TFACTION_SKIP_ADDING_AQUA_PACKAGES isn't empty"
+        fi
+      shell: bash
+
     - run: aqua init
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
