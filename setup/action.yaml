@@ -43,12 +43,10 @@ runs:
       id: target-config
 
     - uses: aquaproj/update-checksum-action@2fb7f676d407d4fb8c2c466c19d09d3ddec4f82f # v0.2.2
-      # if: steps.global-config.outputs.enable_aqua_update_checksum == 'true'
+      if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'
       with:
-        skip_push: "false"
-        prune: "true"
-        # skip_push: ${{steps.global-config.outputs.aqua_update_checksum_skip_push}}
-        # prune: ${{steps.global-config.outputs.aqua_update_checksum_prune}}
+        skip_push: ${{ steps.global-config.outputs.aqua_update_checksum_skip_push }}
+        prune: ${{ steps.global-config.outputs.aqua_update_checksum_prune }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
       env:
         GITHUB_TOKEN: ${{inputs.github_app_token}}
