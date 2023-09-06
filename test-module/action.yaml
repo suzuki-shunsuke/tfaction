@@ -71,8 +71,7 @@ runs:
           fi
           ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
             -m "docs($TFACTION_TARGET): generate Terraform Module document by terraform-docs" \
-            -C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md" \
-            --token "$GITHUB_APP_TOKEN"
+            -C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md"
           exit 1
         fi
 
