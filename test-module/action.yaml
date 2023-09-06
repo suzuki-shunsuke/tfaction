@@ -12,7 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v0.6.6
       id: global-config
 
     - run: github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform init -input=false
