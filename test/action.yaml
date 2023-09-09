@@ -34,7 +34,7 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: 'true'
 
-    - uses: suzuki-shunsuke/github-action-tfsec@122c054cace4044e52656e25ef9592b7fafecd89 # v0.1.8
+    - uses: suzuki-shunsuke/github-action-tfsec@dc436b306c457b815531877a7013925dc11a3cf6 # v0.1.9
       if: fromJSON(steps.target-config.outputs.enable_tfsec)
       with:
         github_token: ${{ inputs.github_token }}
