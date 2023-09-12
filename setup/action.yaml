@@ -43,7 +43,7 @@ runs:
       shell: bash
       working-directory: ${{ steps.target-config.outputs.working_directory }}
 
-    - uses: aws-actions/configure-aws-credentials@50ac8dd1e1b10d09dac7b8727528b91bed831ac0 # v3.0.2
+    - uses: aws-actions/configure-aws-credentials@8c3f20df09ac63af7b3ae3d7c91f105f857d8497 # v4.0.0
       if: steps.target-config.outputs.aws_assume_role_arn != ''
       with:
         role-to-assume: ${{ steps.target-config.outputs.aws_assume_role_arn }}
