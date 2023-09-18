@@ -39,8 +39,18 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
+    - run: echo "$GLOBAL_CONFIG"
+      shell: bash
+      env:
+        GLOBAL_CONFIG: ${{toJSON(steps.global-config.outputs)}}
+
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
+
+    - run: echo "$TARGET_CONFIG"
+      shell: bash
+      env:
+        TARGET_CONFIG: ${{toJSON(steps.target-config.outputs)}}
 
     - uses: aquaproj/update-checksum-action@0fef5fa12e81e046bb29078f76b99bb29fa4e696 # v0.2.3
       if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'

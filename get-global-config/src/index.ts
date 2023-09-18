@@ -47,15 +47,32 @@ try {
   } else {
     core.setOutput('disable_update_related_pull_requests', 'false');
   }
-  core.exportVariable('TFACTION_SKIP_ADDING_AQUA_PACKAGES', JSON.stringify(config.scaffold_working_directory && config.scaffold_working_directory.skip_adding_aqua_packages));
+  core.exportVariable('TFACTION_SKIP_ADDING_AQUA_PACKAGES', getBool(config, false, 'scaffold_working_directory', 'skip_adding_aqua_packages'));
 
-  core.setOutput('aqua_update_checksum_enabled', config.aqua && config.aqua.update_checksum && config.aqua.update_checksum.enabled !== false);
-  core.setOutput('aqua_update_checksum_skip_push', config.aqua && config.aqua.update_checksum && config.aqua.update_checksum.skip_push && !process.env.TFACTION_DRIFT_ISSUE_NUMBER);
-  core.setOutput('aqua_update_checksum_prune', config.aqua && config.aqua.update_checksum && config.aqua.update_checksum.prune);
+  core.setOutput('aqua_update_checksum_enabled', getBool(config, false, 'aqua', 'update_checksum', 'enabled'));
 
-  core.setOutput('enable_tfsec', config.tfsec == null || config.tfsec.enabled == null || config.tfsec.enabled);
-  core.setOutput('enable_tflint', config.tflint == null || config.tflint.enabled == null || config.tflint.enabled);
-  core.setOutput('enable_trivy', config.trivy != null && config.trivy.enabled);
+  core.setOutput('aqua_update_checksum_skip_push', getBool(config, false, 'aqua', 'update_checksum', 'skip_push') || !!process.env.TFACTION_DRIFT_ISSUE_NUMBER);
+
+  core.setOutput('aqua_update_checksum_prune', getBool(config, false, 'aqua', 'update_checksum', 'prune'));
+
+  core.setOutput('enable_tfsec', getBool(config, true, 'tfsec', 'enabled'));
+  core.setOutput('enable_tflint', getBool(config, true, 'tflint', 'enabled'));
+  core.setOutput('enable_trivy', getBool(config, false, 'trivy', 'enabled'));
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
+}
+
+function getBool(a: any, defaultValue: boolean, ...keys: string[]): boolean {
+  try {
+    let value = a;
+    for (let i = 0; i < keys.length; i++) {
+      value = value[keys[i]];
+    }
+    if (value === undefined) {
+      return defaultValue;
+    }
+    return value === true;
+  } catch (_error) {
+    return defaultValue;
+  }
 }
