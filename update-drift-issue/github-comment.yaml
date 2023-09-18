@@ -1,0 +1,7 @@
+# https://github.com/suzuki-shunsuke/github-comment
+post:
+  notification:
+    template: |
+      ## :x: CI failed
+
+      {{template "link" .}}
