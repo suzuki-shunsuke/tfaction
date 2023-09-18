@@ -11,6 +11,14 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Post a comment
+      run: bash ${{ github.action_path }}/post-comment.sh
+      shell: bash
+      if: |
+        inputs.status != 'success'
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+
     - name: Close the drift issue
       run: |
         gh issue close \
@@ -28,6 +36,6 @@ runs:
           "$TFACTION_DRIFT_ISSUE_NUMBER"
       shell: bash
       if: |
-        env.TFACTION_DRIFT_ISSUE_STATE == 'closed' && inputs.status != 'success' && env.TFACTION_SKIP_TERRAFORM != 'true'
+        env.TFACTION_DRIFT_ISSUE_STATE == 'closed' && inputs.status != 'success'
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
