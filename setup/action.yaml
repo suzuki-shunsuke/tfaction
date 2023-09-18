@@ -40,6 +40,7 @@ runs:
       id: global-config
 
     - run: echo "$GLOBAL_CONFIG"
+      shell: bash
       env:
         GLOBAL_CONFIG: ${{toJSON(steps.global-config.outputs)}}
 
