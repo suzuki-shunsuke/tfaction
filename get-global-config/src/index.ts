@@ -51,7 +51,7 @@ try {
 
   core.setOutput('aqua_update_checksum_enabled', getBool(config, false, 'aqua', 'update_checksum', 'enabled'));
 
-  core.setOutput('aqua_update_checksum_skip_push', getBool(config, false, 'aqua', 'update_checksum', 'skip_push') && !!process.env.TFACTION_DRIFT_ISSUE_NUMBER);
+  core.setOutput('aqua_update_checksum_skip_push', getBool(config, false, 'aqua', 'update_checksum', 'skip_push') || !!process.env.TFACTION_DRIFT_ISSUE_NUMBER);
 
   core.setOutput('aqua_update_checksum_prune', getBool(config, false, 'aqua', 'update_checksum', 'prune'));
 
