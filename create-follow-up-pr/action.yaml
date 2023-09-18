@@ -12,7 +12,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v0.6.8
       id: global-config
 
     - run: bash ${{ github.action_path }}/skip_create_pr.sh
