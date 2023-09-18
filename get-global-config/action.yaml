@@ -30,6 +30,13 @@ outputs:
     description: If true, tflint is enabled in test action
   enable_trivy:
     description: If true, trivy is enabled in test action
+
+  aqua_update_checksum_enabled:
+    description: If true, aqua-checksums.json on working directories is updated
+  aqua_update_checksum_skip_push:
+    description: aqua update-checksum's `skip_push`
+  aqua_update_checksum_prune:
+    description: aqua update-checksum's `prune`
 runs:
   using: 'node16'
   main: 'dist/index.js'
