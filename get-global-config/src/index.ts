@@ -50,7 +50,7 @@ try {
   core.exportVariable('TFACTION_SKIP_ADDING_AQUA_PACKAGES', JSON.stringify(config.scaffold_working_directory && config.scaffold_working_directory.skip_adding_aqua_packages));
 
   core.setOutput('aqua_update_checksum_enabled', config.aqua && config.aqua.update_checksum && config.aqua.update_checksum.enabled !== false);
-  core.setOutput('aqua_update_checksum_skip_push', config.aqua && config.aqua.update_checksum && config.aqua.update_checksum.skip_push);
+  core.setOutput('aqua_update_checksum_skip_push', config.aqua && config.aqua.update_checksum && config.aqua.update_checksum.skip_push && !process.env.TFACTION_DRIFT_ISSUE_NUMBER);
   core.setOutput('aqua_update_checksum_prune', config.aqua && config.aqua.update_checksum && config.aqua.update_checksum.prune);
 
   core.setOutput('enable_tfsec', config.tfsec == null || config.tfsec.enabled == null || config.tfsec.enabled);
