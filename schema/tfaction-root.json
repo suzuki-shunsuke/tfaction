@@ -161,6 +161,33 @@
         }
       }
     },
+    "aqua": {
+      "type": "object",
+      "description": "configuration about aqua",
+      "properties": {
+        "update_checksum": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "If true, update-checksum is enabled.",
+              "default": "false"
+            },
+            "skip_push": {
+              "type": "boolean",
+              "description": "update-checksum-action's skip_push",
+              "default": "false"
+            },
+            "prune": {
+              "type": "boolean",
+              "description": "update-checksum-action's prune",
+              "default": "false"
+            }
+          }
+        }
+      }
+    },
     "target_groups": {
       "type": "array",
       "description": "the list of target group configuration",
