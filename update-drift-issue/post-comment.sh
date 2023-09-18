@@ -26,6 +26,9 @@ if [[ "$body" =~ .*$job_url.* ]]; then
 	exit 0
 fi
 
-github-comment post \
-	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-	-k notification
+comment="## :x: CI failed
+
+[Build link]($job_url)
+"
+
+gh -R "$TFACTION_DRIFT_ISSUE_REPO_OWNER/$TFACTION_DRIFT_ISSUE_REPO_NAME" issue comment "$TFACTION_DRIFT_ISSUE_NUMBER" --body "$comment"
