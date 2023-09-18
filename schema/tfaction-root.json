@@ -8,159 +8,6 @@
     "target_groups"
   ],
   "properties": {
-    "draft_pr": {
-      "type": "boolean",
-      "description": "If this is true, tfaction creates pull requests as draft",
-      "default": false
-    },
-    "skip_create_pr": {
-      "type": "boolean",
-      "description": "If this is true, tfaction skips creating pull requests. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)",
-      "default": false
-    },
-
-    "tfsec": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "If true, test action runs tfsec",
-          "default": "true"
-        }
-      }
-    },
-    "tflint": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "If true, test action runs tflint",
-          "default": "true"
-        }
-      }
-    },
-    "trivy": {
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "If true, test action runs Trivy",
-          "default": "false"
-        }
-      }
-    },
-
-    "drift_detection": {
-      "type": "object",
-      "description": "Drift Detection",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "If true, drift detection is enabled in all working directories",
-          "default": "true"
-        },
-        "issue_repo_owner": {
-          "type": "string",
-          "description": "Repository owner of GitHub Issues",
-          "default": "Repository where GitHub Actions is run"
-        },
-        "issue_repo_name": {
-          "type": "string",
-          "description": "Repository name of GitHub Issues",
-          "default": "Repository where GitHub Actions is run"
-        },
-        "num_of_issues": {
-          "type": "integer",
-          "description": "The number of issues that scheduled job handles",
-          "default": 1
-        },
-        "minimum_detection_interval": {
-          "type": "integer",
-          "description": "The scheduled workflow picks out working directories whose issues were updated before `minimum_detection_interval` hours",
-          "default": 168
-        }
-      }
-    },
-
-    "envs": {
-      "$ref": "#/$defs/Envs"
-    },
-
-    "skip_terraform_by_renovate": {
-      "type": "boolean",
-      "description": "If this is true, `terraform plan` and `terraform apply` are skipped in case of pull request by Renovate. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr)",
-      "default": false
-    },
-    "renovate_terraform_labels": {
-      "type": "array",
-      "description": "This attribute is ignored if `skip_terraform_by_renovate` is false. If any one of labels in `renovate_terraform_labels` is set to the pull request, tfaction would run `terraform plan` and `terraform apply`. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr)",
-      "items": {
-        "type": "string",
-        "description": "Pull Request label name"
-      }
-    },
-
-    "providers_lock_opts": {
-      "$ref": "#/$defs/TerraformProvidersLockOptions"
-    },
-    "base_working_directory": {
-      "type": "string",
-      "description": "tfaction searches working directories in this directory",
-      "default": "current directory"
-    },
-    "working_directory_file": {
-      "type": "string",
-      "description": "working directory configuration file name",
-      "default": "tfaction.yaml"
-    },
-    "renovate_login": {
-      "type": "string",
-      "description": "Renovate App login",
-      "default": "renovate[bot]"
-    },
-    "label_prefixes": {
-      "type": "object",
-      "description": "Pull Request label prefixes",
-      "properties": {
-        "target": {
-          "type": "string",
-          "description": "Pull Request label prefix to specify the target",
-          "default": "target:"
-        },
-        "tfmigrate": {
-          "type": "string",
-          "description": "Pull Request label prefix to specify the tfmigrate target",
-          "default": "tfmigrate:"
-        },
-        "skip": {
-          "type": "string",
-          "description": "Pull Request label prefix to skip terraform plan and apply. This is used to migrate states across states with tfmigrate",
-          "default": "skip:"
-        }
-      }
-    },
-    "update_related_pull_requests": {
-      "type": "object",
-      "description": "update related pull requests",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "If true, related pull requests are updated",
-          "default": "true"
-        }
-      }
-    },
-    "scaffold_working_directory": {
-      "type": "object",
-      "description": "configuration about scaffold-working-directory",
-      "properties": {
-        "skip_adding_aqua_packages": {
-          "type": "boolean",
-          "description": "If true, creating aqua.yaml and adding packages is skipped",
-          "default": "false"
-        }
-      }
-    },
     "target_groups": {
       "type": "array",
       "description": "the list of target group configuration",
@@ -182,6 +29,18 @@
             "description": "the prefix of the target"
           },
 
+          "aws_assume_role_arn": {
+            "$ref": "#/$defs/AWSAssumeRoleARN"
+          },
+
+          "aws_region": {
+            "$ref": "#/$defs/AWSRegion"
+          },
+
+          "aws_secrets_manager": {
+            "$ref": "#/$defs/AWSSecretsManager"
+          },
+
           "drift_detection": {
             "type": "object",
             "required": [],
@@ -194,23 +53,8 @@
             }
           },
 
-          "template_dir": {
-            "$ref": "#/$defs/TemplateDir"
-          },
-
-          "providers_lock_opts": {
-            "$ref": "#/$defs/TerraformProvidersLockOptions"
-          },
-
           "envs": {
             "$ref": "#/$defs/Envs"
-          },
-
-          "aws_region": {
-            "$ref": "#/$defs/AWSRegion"
-          },
-          "aws_assume_role_arn": {
-            "$ref": "#/$defs/AWSAssumeRoleARN"
           },
 
           "gcp_service_account": {
@@ -226,6 +70,10 @@
             "$ref": "#/$defs/GCSBucketNameTfmigrateHistory"
           },
 
+          "providers_lock_opts": {
+            "$ref": "#/$defs/TerraformProvidersLockOptions"
+          },
+
           "s3_bucket_name_plan_file": {
             "$ref": "#/$defs/S3BucketNamePlanFile"
           },
@@ -236,8 +84,9 @@
           "secrets": {
             "$ref": "#/$defs/Secrets"
           },
-          "aws_secrets_manager": {
-            "$ref": "#/$defs/AWSSecretsManager"
+
+          "template_dir": {
+            "$ref": "#/$defs/TemplateDir"
           },
 
           "terraform_plan_config": {
@@ -258,6 +107,198 @@
           }
         }
       }
+    },
+
+    "aqua": {
+      "type": "object",
+      "description": "configuration about aqua",
+      "properties": {
+        "update_checksum": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "If true, update-checksum is enabled.",
+              "default": "false"
+            },
+            "prune": {
+              "type": "boolean",
+              "description": "update-checksum-action's prune",
+              "default": "false"
+            },
+            "skip_push": {
+              "type": "boolean",
+              "description": "update-checksum-action's skip_push",
+              "default": "false"
+            }
+          }
+        }
+      }
+    },
+
+    "base_working_directory": {
+      "type": "string",
+      "description": "tfaction searches working directories in this directory",
+      "default": "current directory"
+    },
+
+    "draft_pr": {
+      "type": "boolean",
+      "description": "If this is true, tfaction creates pull requests as draft",
+      "default": false
+    },
+
+    "drift_detection": {
+      "type": "object",
+      "description": "Drift Detection",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, drift detection is enabled in all working directories",
+          "default": "true"
+        },
+        "issue_repo_name": {
+          "type": "string",
+          "description": "Repository name of GitHub Issues",
+          "default": "Repository where GitHub Actions is run"
+        },
+        "issue_repo_owner": {
+          "type": "string",
+          "description": "Repository owner of GitHub Issues",
+          "default": "Repository where GitHub Actions is run"
+        },
+        "minimum_detection_interval": {
+          "type": "integer",
+          "description": "The scheduled workflow picks out working directories whose issues were updated before `minimum_detection_interval` hours",
+          "default": 168
+        },
+        "num_of_issues": {
+          "type": "integer",
+          "description": "The number of issues that scheduled job handles",
+          "default": 1
+        }
+      }
+    },
+
+    "envs": {
+      "$ref": "#/$defs/Envs"
+    },
+
+    "label_prefixes": {
+      "type": "object",
+      "description": "Pull Request label prefixes",
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "Pull Request label prefix to specify the target",
+          "default": "target:"
+        },
+        "tfmigrate": {
+          "type": "string",
+          "description": "Pull Request label prefix to specify the tfmigrate target",
+          "default": "tfmigrate:"
+        },
+        "skip": {
+          "type": "string",
+          "description": "Pull Request label prefix to skip terraform plan and apply. This is used to migrate states across states with tfmigrate",
+          "default": "skip:"
+        }
+      }
+    },
+
+    "providers_lock_opts": {
+      "$ref": "#/$defs/TerraformProvidersLockOptions"
+    },
+
+    "renovate_login": {
+      "type": "string",
+      "description": "Renovate App login",
+      "default": "renovate[bot]"
+    },
+
+    "renovate_terraform_labels": {
+      "type": "array",
+      "description": "This attribute is ignored if `skip_terraform_by_renovate` is false. If any one of labels in `renovate_terraform_labels` is set to the pull request, tfaction would run `terraform plan` and `terraform apply`. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr)",
+      "items": {
+        "type": "string",
+        "description": "Pull Request label name"
+      }
+    },
+
+    "scaffold_working_directory": {
+      "type": "object",
+      "description": "configuration about scaffold-working-directory",
+      "properties": {
+        "skip_adding_aqua_packages": {
+          "type": "boolean",
+          "description": "If true, creating aqua.yaml and adding packages is skipped",
+          "default": "false"
+        }
+      }
+    },
+
+    "skip_create_pr": {
+      "type": "boolean",
+      "description": "If this is true, tfaction skips creating pull requests. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)",
+      "default": false
+    },
+
+    "skip_terraform_by_renovate": {
+      "type": "boolean",
+      "description": "If this is true, `terraform plan` and `terraform apply` are skipped in case of pull request by Renovate. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr)",
+      "default": false
+    },
+
+    "tflint": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, test action runs tflint",
+          "default": "true"
+        }
+      }
+    },
+
+    "tfsec": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, test action runs tfsec",
+          "default": "true"
+        }
+      }
+    },
+
+    "trivy": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, test action runs Trivy",
+          "default": "false"
+        }
+      }
+    },
+
+    "update_related_pull_requests": {
+      "type": "object",
+      "description": "update related pull requests",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "If true, related pull requests are updated",
+          "default": "true"
+        }
+      }
+    },
+
+    "working_directory_file": {
+      "type": "string",
+      "description": "working directory configuration file name",
+      "default": "tfaction.yaml"
     }
   },
   "$defs": {
