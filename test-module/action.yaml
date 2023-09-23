@@ -21,12 +21,6 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - run: github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform validate
-      working-directory: ${{ env.TFACTION_TARGET }}
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-
     - uses: suzuki-shunsuke/trivy-config-action@98c78ddbed860a39a12772c43412006b628553a8 # v0.1.0
       if: fromJSON(steps.global-config.outputs.enable_trivy)
       with:
