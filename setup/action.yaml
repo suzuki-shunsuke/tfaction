@@ -25,6 +25,27 @@ outputs:
 runs:
   using: composite
   steps:
+    - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
+      shell: bash
+      if: |
+        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+
+    - name: Check if the commit is latest
+      shell: bash
+      if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
+      run: |
+        set -euo pipefail
+
+        latest_head_sha=$(jq -r ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
+        if [ "$HEAD_SHA" != "$latest_head_sha" ]; then
+          echo "::error::The head sha ($HEAD_SHA) isn't latest ($latest_head_sha)."
+          exit 1
+        fi
+      env:
+        HEAD_SHA: ${{github.event.pull_request.head.sha}}
+
     - run: |
         curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ github.event.pull_request.number }}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
@@ -87,25 +108,6 @@ runs:
       if: inputs.ssh_key != ''
       with:
        ssh_key: ${{ inputs.ssh_key }}
-
-    - run: |
-        tempfile=$(mktemp)
-        rm "$tempfile"
-        echo "path=${tempfile}" >> "$GITHUB_OUTPUT"
-      shell: bash
-      if: |
-        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      id: ci-info
-    - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # tag=v3.0.2
-      if: |
-        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      with:
-        name: tfaction-ci-info
-        path: ${{steps.ci-info.outputs.path}}
-    - run: cat "${{steps.ci-info.outputs.path}}/env" | sed 's|^CI_INFO_TEMP_DIR=.*$|CI_INFO_TEMP_DIR=${{steps.ci-info.outputs.path}}|' >> "$GITHUB_ENV"
-      if: |
-        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      shell: bash
 
     - uses: suzuki-shunsuke/github-action-terraform-init@2938445484362c1546311279b036e25dbb265a50 # tag=v0.1.4
       with:

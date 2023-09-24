@@ -13,13 +13,8 @@ tfcmt -var "target:$TFACTION_TARGET" plan -- \
 code=$?
 set -e
 
-if [ -z "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ] && [ "$code" = "1" ]; then
-	bash "$GITHUB_ACTION_PATH/delete_old_plan.sh"
+if [ "$code" -eq 1 ]; then
 	exit 1
-fi
-
-if [ -z "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
-	bash "$GITHUB_ACTION_PATH/upload_plan.sh"
 fi
 
 if [ -d "$ROOT_DIR/policy" ]; then

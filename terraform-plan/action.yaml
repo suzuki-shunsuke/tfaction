@@ -33,6 +33,18 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         ROOT_DIR: ${{ github.workspace }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
-        S3_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.s3_bucket_name_plan_file }}
-        GCS_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}
         RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
+        HEAD_SHA: ${{github.event.pull_request.head.sha}}
+
+    - run: echo "value=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
+      id: artifact_name
+      shell: bash
+      if: |
+        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
+
+    - uses: actions/upload-artifact@v3
+      if: |
+        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
+      with:
+        name: ${{ steps.artifact_name.outputs.value }}
+        path: ${{ steps.target-config.outputs.working_directory }}/tfplan.binary
