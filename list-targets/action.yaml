@@ -31,7 +31,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        LATEST_HEAD_SHA=$(jq ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
+        LATEST_HEAD_SHA=$(jq -r ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
         if [ "$HEAD_SHA" != "$LATEST_HEAD_SHA" ]; then
           echo "::error::The head sha ($HEAD_SHA) isn't latest ($LATEST_HEAD_SHA)."
           github-comment post -k old-sha \
