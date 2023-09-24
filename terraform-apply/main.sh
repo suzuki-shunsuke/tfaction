@@ -3,16 +3,18 @@
 set -eu
 set -o pipefail
 
+pr_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
+obj_path="$CI_INFO_PR_NUMBER/$TFACTION_TARGET/$pr_head_sha/tfplan.binary"
 if [ -n "${S3_BUCKET_NAME_PLAN_FILE:-}" ]; then
 	github-comment exec \
 		-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 		-var "tfaction_target:$TFACTION_TARGET" -- \
-		aws s3 cp "s3://$S3_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TFACTION_TARGET/tfplan.binary" tfplan.binary
+		aws s3 cp "s3://$S3_BUCKET_NAME_PLAN_FILE/$obj_path" tfplan.binary
 elif [ -n "${GCS_BUCKET_NAME_PLAN_FILE:-}" ]; then
 	github-comment exec \
 		-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 		-var "tfaction_target:$TFACTION_TARGET" -- \
-		gsutil cp "gs://$GCS_BUCKET_NAME_PLAN_FILE/$CI_INFO_PR_NUMBER/$TFACTION_TARGET/tfplan.binary" tfplan.binary
+		gsutil cp "gs://$GCS_BUCKET_NAME_PLAN_FILE/$obj_path" tfplan.binary
 fi
 
 apply_output=$(mktemp)
