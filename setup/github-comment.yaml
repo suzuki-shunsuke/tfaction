@@ -1,9 +1,0 @@
-# https://github.com/suzuki-shunsuke/github-comment
-post:
-  old-sha:
-    template: |
-      ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Head SHA is old
-
-      {{template "link" .}}
-
-      The head sha ({{.Vars.head_sha}}) isn't latest ({{.Vars.latest_head_sha}}).

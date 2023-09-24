@@ -34,9 +34,6 @@ runs:
         LATEST_HEAD_SHA=$(jq -r ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
         if [ "$HEAD_SHA" != "$LATEST_HEAD_SHA" ]; then
           echo "::error::The head sha ($HEAD_SHA) isn't latest ($LATEST_HEAD_SHA)."
-          github-comment post -k old-sha \
-            -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-            -var "head_sha:$HEAD_SHA" -var "latest_head_sha:$LATEST_HEAD_SHA"
           exit 1
         fi
       env:
