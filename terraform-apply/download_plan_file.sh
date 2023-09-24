@@ -3,7 +3,7 @@
 set -euo pipefail
 
 filename=tfplan.binary
-artifact_name=terraform_plan_file
+artifact_name=terraform_plan_file_${TFACTION_TARGET//\//__}
 branch=$CI_INFO_HEAD_REF
 workflow=$PLAN_WORKFLOW_NAME
 

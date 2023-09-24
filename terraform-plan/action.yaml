@@ -38,7 +38,15 @@ runs:
         RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
+    - run: echo "value=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
+      id: artifact_name
+      shell: bash
+      if: |
+        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
+
     - uses: actions/upload-artifact@v3
+      if: |
+        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       with:
-        name: terraform_plan_file
+        name: ${{ steps.artifact_name.outputs.value }}
         path: ${{ steps.target-config.outputs.working_directory }}/tfplan.binary
