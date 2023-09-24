@@ -17,10 +17,6 @@ if [ "$code" -eq 1 ]; then
 	exit 1
 fi
 
-if [ -z "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
-	bash "$GITHUB_ACTION_PATH/upload_plan.sh"
-fi
-
 if [ -d "$ROOT_DIR/policy" ]; then
 	bash "$GITHUB_ACTION_PATH/conftest.sh"
 fi

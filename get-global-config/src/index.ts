@@ -58,6 +58,12 @@ try {
   core.setOutput('enable_tfsec', getBool(config, true, 'tfsec', 'enabled'));
   core.setOutput('enable_tflint', getBool(config, true, 'tflint', 'enabled'));
   core.setOutput('enable_trivy', getBool(config, false, 'trivy', 'enabled'));
+
+  if (!config.plan_workflow_name) {
+    core.error('The setting "plan_workflow_name" is required in tfaction-root.yaml');
+    throw 'The setting "plan_workflow_name" is required in tfaction-root.yaml';
+  }
+  core.setOutput('plan_workflow_name', config.plan_workflow_name);
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
 }

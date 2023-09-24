@@ -37,3 +37,8 @@ runs:
         GCS_BUCKET_NAME_PLAN_FILE: ${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}
         RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: terraform_plan_file
+        path: ${{ steps.target-config.outputs.working_directory }}/tfplan.binary
