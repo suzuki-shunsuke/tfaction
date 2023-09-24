@@ -60,7 +60,6 @@ try {
   core.setOutput('enable_trivy', getBool(config, false, 'trivy', 'enabled'));
 
   if (!config.plan_workflow_name) {
-    core.error('The setting "plan_workflow_name" is required in tfaction-root.yaml');
     throw 'The setting "plan_workflow_name" is required in tfaction-root.yaml';
   }
   core.setOutput('plan_workflow_name', config.plan_workflow_name);
