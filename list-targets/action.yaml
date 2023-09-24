@@ -18,31 +18,26 @@ outputs:
 runs:
   using: composite
   steps:
-    - run: |
-        tempfile="$(mktemp)"
-        github-comment exec -- ci-info run | sed "s/^export //" > "${tempfile}"
-        cat "$tempfile" >> "$GITHUB_ENV"
-        . "$tempfile"
-        cp "$tempfile" "${CI_INFO_TEMP_DIR}/env"
+    - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
+      if: |
+        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+
     - name: Check if the commit is latest
       shell: bash
+      if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
       run: |
         set -euo pipefail
-        LATEST_HEAD_SHA=$(jq -r ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
-        if [ "$HEAD_SHA" != "$LATEST_HEAD_SHA" ]; then
-          echo "::error::The head sha ($HEAD_SHA) isn't latest ($LATEST_HEAD_SHA)."
+
+        latest_head_sha=$(jq -r ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
+        if [ "$HEAD_SHA" != "$latest_head_sha" ]; then
+          echo "::error::The head sha ($HEAD_SHA) isn't latest ($latest_head_sha)."
           exit 1
         fi
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
-
-    - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
-      with:
-        name: tfaction-ci-info
-        path: ${{env.CI_INFO_TEMP_DIR}}
 
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
