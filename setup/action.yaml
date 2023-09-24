@@ -50,7 +50,7 @@ runs:
         set -euo pipefail
         LATEST_HEAD_SHA=$(jq ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
         if [ "$HEAD_SHA" != "$LATEST_HEAD_SHA" ]; then
-          echo "::error::The head sha ($HEAD_SHA) isn't latest ($LATEST_SHA)."
+          echo "::error::The head sha ($HEAD_SHA) isn't latest ($LATEST_HEAD_SHA)."
           github-comment post -k old-sha \
             -config "${GITHUB_ACTION_PATH}/github-comment.yaml"
           exit 1
