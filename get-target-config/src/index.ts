@@ -40,9 +40,7 @@ try {
 
   if (jobType == 'scaffold_working_dir') {
     lib.setOutputs([
-      's3_bucket_name_plan_file',
       's3_bucket_name_tfmigrate_history',
-      'gcs_bucket_name_plan_file',
       'gcs_bucket_name_tfmigrate_history',
       'aws_region',
       'aws_assume_role_arn',
@@ -55,9 +53,7 @@ try {
     const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
     const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
     lib.setOutputs([
-      's3_bucket_name_plan_file',
       's3_bucket_name_tfmigrate_history',
-      'gcs_bucket_name_plan_file',
       'gcs_bucket_name_tfmigrate_history',
       'providers_lock_opts',
     ], [wdConfig, targetConfig, config]);

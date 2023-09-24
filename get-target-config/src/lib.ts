@@ -16,10 +16,8 @@ interface TargetConfig {
   target: string
   working_directory: string
   aws_region: string
-  s3_bucket_name_plan_file: string
   s3_bucket_name_tfmigrate_history: string
   template_dir: string
-  gcs_bucket_name_plan_file: string
   gcs_bucket_name_tfmigrate_history: string
 
   aws_assume_role_arn: string | undefined

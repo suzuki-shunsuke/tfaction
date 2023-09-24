@@ -14,12 +14,8 @@ outputs:
   gcp_workload_identity_provider:
     description: Google Cloud Platform Identity Provider for GCP Workload Identity Federation
 
-  s3_bucket_name_plan_file:
-    description: S3 Bucket name for plan files
   s3_bucket_name_tfmigrate_history:
     description: S3 Bucket name for tfmigrate history files
-  gcs_bucket_name_plan_file:
-    description: Google Cloud Storage Bucket name for plan files
   gcs_bucket_name_tfmigrate_history:
     description: GCS Bucket name for tfmigrate history files
   template_dir:
