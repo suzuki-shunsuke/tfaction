@@ -1,0 +1,9 @@
+# https://github.com/suzuki-shunsuke/github-comment
+post:
+  old-sha:
+    template: |
+      ## :x: Head SHA is old
+
+      {{template "link" .}}
+
+      The head sha ({{.Vars.head_sha}}) isn't latest ({{.Vars.latest_head_sha}}).
