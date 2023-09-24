@@ -45,6 +45,7 @@ runs:
       shell: bash
 
     - name: Check if the commit is latest
+      shell: bash
       run: |
         set -euo pipefail
         LATEST_HEAD_SHA=$(jq ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
