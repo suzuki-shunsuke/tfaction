@@ -7,10 +7,6 @@ if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	export TFCMT_CONFIG=$GITHUB_ACTION_PATH/tfcmt-drift.yaml
 fi
 
-if [ -z "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
-	bash "$GITHUB_ACTION_PATH/delete_old_plan.sh"
-fi
-
 set +e
 tfcmt -var "target:$TFACTION_TARGET" plan -- \
 	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false
