@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+set -euo pipefail
 
 filename=tfplan.binary
 artifact_name=terraform_plan_file
