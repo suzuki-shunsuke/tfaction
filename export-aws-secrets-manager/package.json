@@ -7,7 +7,7 @@
     "@aws-sdk/client-secrets-manager": "3.430.0",
     "@types/js-yaml": "4.0.8",
     "@types/node": "18.18.6",
-    "@vercel/ncc": "0.38.0",
+    "@vercel/ncc": "0.38.1",
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
