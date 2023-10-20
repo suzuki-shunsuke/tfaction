@@ -37,7 +37,6 @@ try {
   core.setOutput('enable_tflint', getBool(config, true, 'tflint', 'enabled'));
   core.setOutput('enable_trivy', getBool(config, false, 'trivy', 'enabled'));
 
-
   if (jobType == 'scaffold_working_dir') {
     lib.setOutputs([
       's3_bucket_name_tfmigrate_history',
