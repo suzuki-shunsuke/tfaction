@@ -53,7 +53,7 @@ runs:
           -H "Content-type: application/json" \
           -d "[{\"name\":\"${TFACTION_TARGET}\"}]"
       shell: bash
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
@@ -109,9 +109,10 @@ runs:
       with:
        ssh_key: ${{ inputs.ssh_key }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@2938445484362c1546311279b036e25dbb265a50 # tag=v0.1.4
+    - uses: suzuki-shunsuke/github-action-terraform-init@f30204183f50ed18edb01b9f18e896a64eb73b79 # v1.0.0
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
         github_app_token: ${{ inputs.github_app_token }}
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
+        skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
