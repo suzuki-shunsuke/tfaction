@@ -21,7 +21,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/trivy-config-action@98c78ddbed860a39a12772c43412006b628553a8 # v0.1.0
+    - uses: suzuki-shunsuke/trivy-config-action@53935fc85b2ba4e195ad91b3be0ef454e33f905d # v0.2.0
       if: fromJSON(steps.global-config.outputs.enable_trivy)
       with:
         github_token: ${{ inputs.github_token }}
