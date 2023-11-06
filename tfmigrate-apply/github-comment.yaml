@@ -1,6 +1,17 @@
 ---
 # https://github.com/suzuki-shunsuke/github-comment
 exec:
+  default:
+  - when: ExitCode != 0
+    template: |
+      :x: {{.Vars.tfaction_target}}
+
+      {{template "link" .}}
+
+      {{template "join_command" .}}
+
+      {{template "hidden_combined_output" .}}
+
   tfmigrate-apply:
   - when: true
     template: |
