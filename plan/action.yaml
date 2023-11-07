@@ -12,13 +12,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/terraform-plan@main
+    - uses: suzuki-shunsuke/tfaction/terraform-plan@v0.7.3
       if: env.TFACTION_JOB_TYPE == 'terraform'
       with:
         github_app_token: ${{inputs.github_app_token}}
         github_token: ${{inputs.github_token}}
 
-    - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@main
+    - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@v0.7.3
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
       with:
         github_app_token: ${{inputs.github_app_token}}
