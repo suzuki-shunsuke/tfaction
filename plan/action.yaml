@@ -1,0 +1,25 @@
+name: plan
+description: plan
+inputs:
+  github_app_token:
+    description: 'GitHub Access Token'
+    required: true
+
+  github_token:
+    description: 'GitHub Access Token'
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/terraform-plan@main
+      if: env.TFACTION_JOB_TYPE == 'terraform'
+      with:
+        github_app_token: ${{inputs.github_app_token}}
+        github_token: ${{inputs.github_token}}
+
+    - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@main
+      if: env.TFACTION_JOB_TYPE == 'tfmigrate'
+      with:
+        github_app_token: ${{inputs.github_app_token}}
+        github_token: ${{inputs.github_token}}

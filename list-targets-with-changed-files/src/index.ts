@@ -7,6 +7,7 @@ import * as lib from './lib';
 interface TargetConfig {
   target: string
   runs_on: string
+  job_type: string
   environment: string | object | null
   secrets: object | undefined
 }
@@ -24,6 +25,7 @@ function getTargetConfigByTarget(targets: Array<lib.TargetConfig>, target: strin
         runs_on: t.runs_on ? t.runs_on : 'ubuntu-latest',
         environment: t.environment ? t.environment : null,
         secrets: t.secrets,
+        job_type: jobType,
       };
     }
     return {
@@ -31,6 +33,7 @@ function getTargetConfigByTarget(targets: Array<lib.TargetConfig>, target: strin
       runs_on: jobConfig.runs_on ? jobConfig.runs_on : (t.runs_on ? t.runs_on : 'ubuntu-latest'),
       environment: jobConfig.environment ? jobConfig.environment : (t.environment ? t.environment : null),
       secrets: jobConfig.secrets ? jobConfig.secrets : t.secrets,
+      job_type: jobType,
     };
   }
   throw 'target is invalid';
@@ -158,6 +161,7 @@ try {
 
   core.setOutput('tfmigrate_targets', tfmigrateObjs);
   core.setOutput('terraform_targets', terraformTargetObjs);
+  core.setOutput('targets', terraformTargetObjs.concat(tfmigrateObjs));
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
 }
