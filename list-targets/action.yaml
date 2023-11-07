@@ -15,6 +15,10 @@ outputs:
   modules:
     description: list of changed modules
     value: ${{ steps.list-modules.outputs.modules }}
+
+  targets:
+    description: list of targets
+    value: ${{ steps.list-targets.outputs.targets }}
 runs:
   using: composite
   steps:
