@@ -2,11 +2,15 @@ name: tfmigrate plan
 description: tfmigrate plan
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      contents:write - Push commits
     required: true
 
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments
     required: false
     default: ${{ github.token }}
 runs:

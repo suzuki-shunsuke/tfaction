@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
-set -o pipefail
+set -euo pipefail
 
 # In the pull request created by Renovate, the result of `terraform plan` must be `No change` to enable automerge safely.
 # If you allow changes, please set the pull request label `renovate-change`.

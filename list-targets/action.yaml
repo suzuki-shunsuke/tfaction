@@ -2,7 +2,9 @@ name: List targets
 description: List targets
 inputs:
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments. Get pull requests
     required: false
     default: ${{ github.token }}
 outputs:

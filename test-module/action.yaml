@@ -2,11 +2,16 @@ name: Test Module
 description: Test Module
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments
+      contents:write - Push commits
     required: true
 
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments and reviews
     required: false
     default: ${{ github.token }}
 runs:
@@ -15,7 +20,11 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
-    - run: github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform init -input=false
+    - run: |
+        github-comment exec \
+          -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+          -var "tfaction_target:${TFACTION_TARGET}" \
+          -- terraform init -input=false
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
@@ -57,7 +66,10 @@ runs:
         if ! [ -f README.md ]; then
           created=true
         fi
-        github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:${TFACTION_TARGET}" -- terraform-docs . > README.md
+        github-comment exec \
+          -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+          -var "tfaction_target:${TFACTION_TARGET}" \
+          -- terraform-docs . > README.md
         if [ "$created" = "true" ] || ! git diff --quiet README.md; then
           if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
             echo "::error ::Please generate Module's README.md with terraform-docs."

@@ -2,7 +2,11 @@ name: Create a pull request to scaffold a working directory
 description: Create a pull request to scaffold a working directory
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      contents:write - Create branches
+      If skip_create_pr is false
+      pull-requests:write - Create pull requests
     required: true
 runs:
   using: composite

@@ -2,7 +2,15 @@ name: Scaffold tfmigrate migration pull request
 description: Scaffold tfmigrate migration pull request
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      pull-requests:read - Checkout pull requests
+      pull-requests:write - Add labels to pull requests
+      issues:write - Create labels
+      contents:write - Create branches
+      If skip_create_pr is false
+      pull-requests:write - Create pull requests
+
     required: true
 
   migration_name:
@@ -72,8 +80,7 @@ runs:
 
     - name: Get a branch name
       run: |
-        set -eu
-        set -o pipefail
+        set -euo pipefail
         if [ -n "${PR_NUMBER:-}" ]; then
           branch=$(git branch | grep "^\* " | sed -e "s/^\* \(.*\)/\1/")
         else

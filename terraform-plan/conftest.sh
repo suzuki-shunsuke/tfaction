@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
-set -o pipefail
+set -euo pipefail
 
 github-comment exec -- terraform show -json tfplan.binary >tfplan.json
 conftest -v # Install conftest in advance to exclude aqua lazy install log from github-comment's comment

@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 
-set -eu
-set -o pipefail
+set -euo pipefail
 
 # create a branch with empty commit
 # 1. create a remote branch
 
 target_label=${TFACTION_TARGET_LABEL_PREFIX}${TFACTION_TARGET}
-gh api "repos/{owner}/{repo}/labels" -f name="${target_label}" || :
+# Create a label in advance because if the label doesn't exist gh pr create command fails
+gh api "repos/{owner}/{repo}/labels" \
+	-f name="${target_label}" || :
 
 follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
-GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
+env GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
 	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
 	-m "chore: empty commit to open follow up pull request
 

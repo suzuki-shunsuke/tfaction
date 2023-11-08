@@ -2,7 +2,11 @@ name: Scaffold Terraform Module
 description: Scaffold Terraform Module
 inputs:
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      contents:write - Create branches
+      If skip_create_pr is false
+      pull-requests:write - Create pull requests
     required: true
 
   module_path:
