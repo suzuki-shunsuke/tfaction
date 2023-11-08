@@ -2,11 +2,17 @@ name: setup
 description: setup
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      contents:write - Push commits
     required: true
 
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      pull-requests:read - Get pull requests
+      pull-requests:write - Create pull request comments and labels
+      issues:write - Create labels
     required: false
     default: ${{ github.token }}
   ssh_key:
@@ -85,6 +91,8 @@ runs:
     - run: aqua i -l -a
       shell: bash
       working-directory: ${{ steps.target-config.outputs.working_directory }}
+      env:
+        AQUA_GITHUB_TOKEN: ${{inputs.github_token}}
 
     - uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
       if: steps.target-config.outputs.aws_assume_role_arn != ''

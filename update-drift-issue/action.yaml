@@ -2,7 +2,10 @@ name: update-drift-issue
 description: Reopen or close a Drift Issue
 inputs:
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      issues:read - Get issues
+      issues:write - Create issue comments and close and reopen issues
     required: false
     default: ${{ github.token }}
   status:

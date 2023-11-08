@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
-set -o pipefail
+set -euo pipefail
 
 bash "$GITHUB_ACTION_PATH/download_plan_file.sh"
 

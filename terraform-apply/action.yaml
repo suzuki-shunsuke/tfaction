@@ -2,11 +2,17 @@ name: terraform apply
 description: terraform apply
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      contents:write - Update pull request branches
     required: true
 
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments and labels
+      issues:write - Create labels
+      actions:read - Download artifacts
     required: false
     default: ${{ github.token }}
 

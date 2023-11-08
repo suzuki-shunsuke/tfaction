@@ -2,11 +2,16 @@ name: terraform plan
 description: terraform plan
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      This input is unused.
     required: true
 
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments and labels
+      issues:write - Create labels
     required: false
     default: ${{ github.token }}
 runs:

@@ -2,11 +2,20 @@ name: create follow up pull request
 description: create follow up pull request
 inputs:
   github_app_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      contents:write - Create branches
+      If skip_create_pr is false
+      pull-requests:write - Create pull requests
     required: true
 
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      permissions:
+        pull-requests:write - Create pull request comments
+        If skip_create_pr is true
+        issues:write - Create labels
     required: false
     default: ${{ github.token }}
 runs:

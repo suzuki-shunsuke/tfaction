@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
-set -o pipefail
+set -euo pipefail
 
 if [ ! -f .tfmigrate.hcl ]; then
 	if [ -n "${S3_BUCKET_NAME_TFMIGRATE_HISTORY:-}" ]; then

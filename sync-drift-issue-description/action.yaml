@@ -2,7 +2,9 @@ name: Synchronize drift issue description
 description: Synchronize drift issue description
 inputs:
   github_token:
-    description: GitHub Access Token
+    description: |
+      GitHub Access Token
+      issues:write - Update issue description
     required: false
     default: ${{github.token}}
 runs:

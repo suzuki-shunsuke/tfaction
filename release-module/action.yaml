@@ -8,7 +8,9 @@ inputs:
     description: 'module version'
     required: true
   github_token:
-    description: 'GitHub Access Token'
+    description: |
+      GitHub Access Token
+      contents:write - Create tags and releases
     required: false
     default: ${{ github.token }}
 runs:
