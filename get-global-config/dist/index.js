@@ -6871,7 +6871,7 @@ try {
     else {
         core.setOutput('disable_update_related_pull_requests', 'false');
     }
-    core.exportVariable('TFACTION_SKIP_ADDING_AQUA_PACKAGES', getBool(config, false, 'scaffold_working_directory', 'skip_adding_aqua_packages'));
+    core.exportVariable('TFACTION_SKIP_ADDING_AQUA_PACKAGES', getBool(config, true, 'scaffold_working_directory', 'skip_adding_aqua_packages'));
     core.setOutput('aqua_update_checksum_enabled', getBool(config, false, 'aqua', 'update_checksum', 'enabled'));
     core.setOutput('aqua_update_checksum_skip_push', getBool(config, false, 'aqua', 'update_checksum', 'skip_push') || !!process.env.TFACTION_DRIFT_ISSUE_NUMBER);
     core.setOutput('aqua_update_checksum_prune', getBool(config, false, 'aqua', 'update_checksum', 'prune'));
