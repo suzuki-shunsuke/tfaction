@@ -1,12 +1,6 @@
 name: terraform plan
 description: terraform plan
 inputs:
-  github_app_token:
-    description: |
-      GitHub Access Token
-      This input is unused.
-    required: true
-
   github_token:
     description: |
       GitHub Access Token

@@ -1,16 +1,11 @@
 name: test
 description: test
 inputs:
-  github_app_token:
-    description: |
-      GitHub Access Token
-      contents:write - Push commits
-    required: true
-
   github_token:
     description: |
       GitHub Access Token
       pull-requests:write - Create pull request comments and reviews
+      contents:write - Push commits
     required: false
     default: ${{ github.token }}
 runs:
@@ -57,4 +52,4 @@ runs:
     - uses: suzuki-shunsuke/github-action-terraform-fmt@08fddcbf90a48b11e54962c287efa4449bb8da8c # v0.1.1
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
-        github_token: ${{ inputs.github_app_token }}
+        github_token: ${{ inputs.github_token }}

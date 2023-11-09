@@ -1,17 +1,11 @@
 name: Test Module
 description: Test Module
 inputs:
-  github_app_token:
-    description: |
-      GitHub Access Token
-      pull-requests:write - Create pull request comments
-      contents:write - Push commits
-    required: true
-
   github_token:
     description: |
       GitHub Access Token
       pull-requests:write - Create pull request comments and reviews
+      contents:write - Push commits
     required: false
     default: ${{ github.token }}
 runs:
@@ -59,7 +53,7 @@ runs:
     - shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
-        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
         set -euo pipefail
         created=false
@@ -84,4 +78,4 @@ runs:
     - uses: suzuki-shunsuke/github-action-terraform-fmt@08fddcbf90a48b11e54962c287efa4449bb8da8c # tag=v0.1.1
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_token: ${{ inputs.github_app_token }}
+        github_token: ${{ inputs.github_token }}
