@@ -41,5 +41,5 @@ outputs:
   plan_workflow_name:
     description: GitHub Actions Workflow name running tfaction/terraform-plan action
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

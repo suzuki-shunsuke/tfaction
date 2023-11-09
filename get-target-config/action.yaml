@@ -31,5 +31,5 @@ outputs:
   enable_trivy:
     description: If true, trivy is enabled in test action
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

@@ -14,5 +14,5 @@ outputs:
   skip_terraform:
     description: whether terraform is skipped
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
