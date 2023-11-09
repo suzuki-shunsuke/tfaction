@@ -8,12 +8,6 @@ inputs:
     required: false
     default: ${{ github.token }}
 outputs:
-  tfmigrate_targets:
-    description: list of tfmigrate targets
-    value: ${{ steps.list-targets.outputs.tfmigrate_targets }}
-  terraform_targets:
-    description: list of terraform targets
-    value: ${{ steps.list-targets.outputs.terraform_targets }}
   modules:
     description: list of changed modules
     value: ${{ steps.list-modules.outputs.modules }}

@@ -159,8 +159,6 @@ try {
     terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, followupTarget, isApply, 'terraform'));
   }
 
-  core.setOutput('tfmigrate_targets', tfmigrateObjs);
-  core.setOutput('terraform_targets', terraformTargetObjs);
   core.setOutput('targets', terraformTargetObjs.concat(tfmigrateObjs));
 } catch (error) {
   core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
