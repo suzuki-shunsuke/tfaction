@@ -6875,9 +6875,9 @@ try {
     core.setOutput('aqua_update_checksum_enabled', getBool(config, false, 'aqua', 'update_checksum', 'enabled'));
     core.setOutput('aqua_update_checksum_skip_push', getBool(config, false, 'aqua', 'update_checksum', 'skip_push') || !!process.env.TFACTION_DRIFT_ISSUE_NUMBER);
     core.setOutput('aqua_update_checksum_prune', getBool(config, false, 'aqua', 'update_checksum', 'prune'));
-    core.setOutput('enable_tfsec', getBool(config, true, 'tfsec', 'enabled'));
+    core.setOutput('enable_tfsec', getBool(config, false, 'tfsec', 'enabled'));
     core.setOutput('enable_tflint', getBool(config, true, 'tflint', 'enabled'));
-    core.setOutput('enable_trivy', getBool(config, false, 'trivy', 'enabled'));
+    core.setOutput('enable_trivy', getBool(config, true, 'trivy', 'enabled'));
     if (!config.plan_workflow_name) {
         throw 'The setting "plan_workflow_name" is required in tfaction-root.yaml';
     }
