@@ -103,7 +103,7 @@ runs:
 
     - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
 
-    - uses: google-github-actions/auth@35b0e87d162680511bf346c299f71c9c5c379033 # v1.1.1
+    - uses: google-github-actions/auth@f105ef0cdb3b102a020be1767fcc8a974898b7c6 # v1.2.0
       if: steps.target-config.outputs.gcp_service_account != ''
       with:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
