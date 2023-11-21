@@ -14,6 +14,9 @@ https://suzuki-shunsuke.github.io/tfaction/docs/
 > If you want to add your company or organization to the list, please send a pull request!
 
 - [Topotal Inc](https://topotal.com/)
+- [StudySapuri / Quipper team](https://github.com/quipper)
+  - [Terraform の CI を AWS CodeBuild から GitHub Actions + tfaction に移行しました](https://blog.studysapuri.jp/entry/2022/02/04/080000)
+  - [Migrate Terraform CI from AWS CodeBuild to GitHub Actions](https://devs.quipper.com/2022/02/25/terraform-github-actions.html)
 
 ## LICENSE
 
