@@ -36,7 +36,7 @@ runs:
       env:
         MODULE_PATH: ${{inputs.module_path}}
 
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@pr/1330
       id: global-config
 
     - run: |
