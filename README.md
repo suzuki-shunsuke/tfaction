@@ -20,6 +20,7 @@ https://suzuki-shunsuke.github.io/tfaction/docs/
 - [Henry, Inc.](https://corp.henry-app.jp/)
   - Contributed to make [tfaction](https://github.com/suzuki-shunsuke/tfaction/releases/tag/v0.5.16) and [tfmigrate](https://github.com/minamijoyo/tfmigrate/releases/tag/v0.3.7) GoogleCloud-ready
 - [Macbee Planet, Inc.](https://macbee-planet.com)
+- [Gunosy Inc.](https://gunosy.co.jp/)
 
 ## LICENSE
 
