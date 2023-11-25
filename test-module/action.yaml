@@ -14,16 +14,6 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
-    - run: |
-        github-comment exec \
-          -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-          -var "tfaction_target:${TFACTION_TARGET}" \
-          -- terraform init -input=false
-      shell: bash
-      working-directory: ${{ env.TFACTION_TARGET }}
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-
     - uses: suzuki-shunsuke/trivy-config-action@53935fc85b2ba4e195ad91b3be0ef454e33f905d # v0.2.0
       if: fromJSON(steps.global-config.outputs.enable_trivy)
       with:
