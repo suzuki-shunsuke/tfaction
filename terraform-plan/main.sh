@@ -8,10 +8,11 @@ fi
 
 opts=""
 if [ "${DESTROY:-}" = true ]; then
-  opts=-destroy
+	opts=-destroy
+	echo "::warning::The destroy option is enabled"
 fi
 set +e
-tfcmt -var "target:$TFACTION_TARGET" plan -- \
+tfcmt -var "target:$TFACTION_TARGET" -var "destroy:${DESTROY:-}" plan -- \
 	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false $opts
 code=$?
 set -e
