@@ -9,10 +9,6 @@ inputs:
       pull-requests:write - Create pull requests
     required: true
 
-  module_path:
-    description: 'Module path'
-    required: true
-
 runs:
   using: composite
   steps:
@@ -22,87 +18,93 @@ runs:
       shell: bash
       if: inputs.github_token == ''
     - run: |
-        echo "::error ::module_path is required"
+        echo "::error ::env.TFACTION_MODULE_PATH is required"
         exit 1
       shell: bash
-      if: inputs.module_path == ''
+      if: env.TFACTION_MODULE_PATH == ''
+    - run: |
+        echo "::error ::env.TFACTION_MODULE_TEMPLATE_DIR is required"
+        exit 1
+      shell: bash
+      if: env.TFACTION_MODULE_TEMPLATE_DIR == ''
 
     - run: |
-        if [ -e "${MODULE_PATH}" ]; then
+        if [ -e "${TFACTION_MODULE_PATH}" ]; then
           echo "::error ::file exists"
           exit 1
         fi
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
+
+    - run: |
+        if [ ! -d "${TFACTION_MODULE_TEMPLATE_DIR}" ]; then
+          echo "::error ::$TFACTION_MODULE_TEMPLATE_DIR doesn't exist"
+          exit 1
+        fi
+      shell: bash
 
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
     - run: |
-        mkdir -p "$(dirname "$MODULE_PATH")"
+        mkdir -p "$(dirname "$TFACTION_MODULE_PATH")"
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
 
-    - run: cp -R "${GITHUB_ACTION_PATH}/template" "$MODULE_PATH"
+    - run: cp -R "${TFACTION_MODULE_TEMPLATE_DIR}" "$TFACTION_MODULE_PATH"
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
 
-    - run: |
-        sed -i "s|%%MODULE_NAME%%|$(basename "$MODULE_PATH")|g" "${MODULE_PATH}/docs/header.md"
+    - run: git add .
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: |
-        sed -i "s|%%MODULE_PATH%%|$MODULE_PATH|g" "${MODULE_PATH}/docs/header.md"
+        git ls-files | xargs -n 1 sed -i "s|%%MODULE_NAME%%|$(basename "$TFACTION_MODULE_PATH")|g"
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: |
-        sed -i "s|%%GITHUB_REPOSITORY%%|$GITHUB_REPOSITORY|g" "${MODULE_PATH}/docs/header.md"
+        git ls-files | xargs -n 1 sed -i "s|%%MODULE_PATH%%|$MODULE_PATH|g"
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: |
-        sed -i "s|%%REF%%|module_${MODULE_PATH/\//_}_v0.1.0|g" "${MODULE_PATH}/docs/header.md"
+        git ls-files | xargs -n 1 sed -i "s|%%GITHUB_REPOSITORY%%|$GITHUB_REPOSITORY|g"
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
+
+    - run: |
+        git ls-files | xargs -n 1 sed -i "s|%%REF%%|module_${MODULE_PATH/\//_}_v0.1.0|g"
+      shell: bash
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: aqua init
       shell: bash
-      working-directory: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true'
 
     - run: aqua g -i hashicorp/terraform
       shell: bash
-      working-directory: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true'
 
     - run: aqua g -i aquasecurity/tfsec
       shell: bash
-      working-directory: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.global-config.outputs.enable_tfsec)
 
     - run: aqua g -i aquasecurity/trivy
       shell: bash
-      working-directory: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.global-config.outputs.enable_trivy)
 
     - run: aqua g -i terraform-linters/tflint
       shell: bash
-      working-directory: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true' && fromJSON(steps.global-config.outputs.enable_tflint)
 
     - run: aqua i -l -a
       shell: bash
-      working-directory: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: terraform-docs . > README.md
       shell: bash
-      working-directory: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
