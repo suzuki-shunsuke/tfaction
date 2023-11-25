@@ -6,9 +6,14 @@ if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	export TFCMT_CONFIG=$GITHUB_ACTION_PATH/tfcmt-drift.yaml
 fi
 
+opts=""
+if [ "${DESTROY:-}" = true ]; then
+	opts=-destroy
+	echo "::warning::The destroy option is enabled"
+fi
 set +e
-tfcmt -var "target:$TFACTION_TARGET" plan -- \
-	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false
+tfcmt -var "target:$TFACTION_TARGET" -var "destroy:${DESTROY:-}" plan -- \
+	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false $opts
 code=$?
 set -e
 

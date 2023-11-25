@@ -62,7 +62,7 @@ try {
       'gcp_service_account',
       'gcp_workload_identity_provider',
     ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
-
+    core.setOutput('destroy', wdConfig.destroy ? true : false);
     lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
   }
 } catch (error) {
