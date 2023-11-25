@@ -9,10 +9,6 @@ inputs:
       pull-requests:write - Create pull requests
     required: true
 
-  module_path:
-    description: 'Module path'
-    required: true
-
 runs:
   using: composite
   steps:
@@ -22,39 +18,34 @@ runs:
       shell: bash
       if: inputs.github_token == ''
     - run: |
-        echo "::error ::module_path is required"
+        echo "::error ::env.TFACTION_MODULE_PATH is required"
         exit 1
       shell: bash
-      if: inputs.module_path == ''
+      if: env.TFACTION_MODULE_PATH == ''
 
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
     - run: aqua i -l -a
       shell: bash
-      working-directory: ${{inputs.module_path}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: |
-        echo "branch=scaffold-module-${MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
+        echo "branch=scaffold-module-${TFACTION_MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
       id: branch
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
 
-    - run: git add "$MODULE_PATH"
+    - run: git add "$TFACTION_MODULE_PATH"
       shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
 
     - run: |
         git diff --cached --name-only |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "${{steps.branch.outputs.branch}}" \
-            -m "chore($MODULE_PATH): scaffold a Terraform Module"
+            -m "chore($TFACTION_MODULE_PATH): scaffold a Terraform Module"
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        MODULE_PATH: ${{inputs.module_path}}
 
     - run: |
         draft_pr=""
@@ -70,7 +61,7 @@ runs:
         $CODE_BLOCK
         gh pr create -R "$GITHUB_REPOSITORY" $draft_pr\\
           -H "${{steps.branch.outputs.branch}}" \\
-          -t "Scaffold a Terraform Module (${MODULE_PATH})" \\
+          -t "Scaffold a Terraform Module (${TFACTION_MODULE_PATH})" \\
           -b "This pull request was created by [GitHub Actions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"
         $CODE_BLOCK
 
@@ -79,11 +70,10 @@ runs:
       if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
       shell: bash
       env:
-        MODULE_PATH: ${{inputs.module_path}}
         CODE_BLOCK: "```"
 
     - run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
+        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${TFACTION_MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
@@ -92,4 +82,3 @@ runs:
       if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        MODULE_PATH: ${{inputs.module_path}}
