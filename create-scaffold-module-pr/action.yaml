@@ -27,7 +27,7 @@ runs:
       shell: bash
       if: inputs.module_path == ''
 
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@pr/1340
       id: global-config
 
     - run: aqua i -l -a
