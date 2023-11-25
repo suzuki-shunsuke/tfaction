@@ -33,6 +33,7 @@ interface TargetConfig {
   tfmigrate_apply_config: JobConfig | undefined
   env: Record<string, string> | undefined
   tfsec: TfsecConfig | undefined
+  destroy: boolean | undefined
 }
 
 export interface TfsecConfig {

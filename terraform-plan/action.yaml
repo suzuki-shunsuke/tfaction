@@ -34,6 +34,7 @@ runs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
+        DESTROY: ${{ steps.target-config.outputs.destroy }}
 
     - run: echo "value=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
       id: artifact_name
