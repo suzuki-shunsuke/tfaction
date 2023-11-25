@@ -52,6 +52,9 @@ runs:
     - run: cp -R "${TFACTION_MODULE_TEMPLATE_DIR}" "$TFACTION_MODULE_PATH"
       shell: bash
 
+    - run: echo "{}" > "$TFACTION_MODULE_PATH/tfaction_module.yaml"
+      shell: bash
+
     - run: git add .
       shell: bash
       working-directory: ${{env.TFACTION_MODULE_PATH}}

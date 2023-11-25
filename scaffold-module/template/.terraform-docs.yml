@@ -1,4 +1,0 @@
-# https://terraform-docs.io/
-formatter: markdown
-header-from: docs/header.md
-footer-from: docs/footer.md
