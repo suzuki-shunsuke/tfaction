@@ -11,7 +11,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@pr/1341
       id: global-config
 
     - uses: suzuki-shunsuke/trivy-config-action@53935fc85b2ba4e195ad91b3be0ef454e33f905d # v0.2.0
