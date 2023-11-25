@@ -6,9 +6,13 @@ if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	export TFCMT_CONFIG=$GITHUB_ACTION_PATH/tfcmt-drift.yaml
 fi
 
+opts=""
+if [ "${DESTROY:-}" = true ]; then
+  opts=-destroy
+fi
 set +e
 tfcmt -var "target:$TFACTION_TARGET" plan -- \
-	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false
+	terraform plan -no-color -detailed-exitcode -out tfplan.binary -input=false $opts
 code=$?
 set -e
 

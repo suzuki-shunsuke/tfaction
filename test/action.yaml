@@ -27,14 +27,14 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - uses: suzuki-shunsuke/trivy-config-action@53935fc85b2ba4e195ad91b3be0ef454e33f905d # v0.2.0
-      if: fromJSON(steps.target-config.outputs.enable_trivy)
+      if: fromJSON(steps.target-config.outputs.enable_trivy) && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: 'true'
 
     - uses: suzuki-shunsuke/github-action-tfsec@6b4afce3060c0d8865d269de0c5fabc90e1b20f7 # v1.0.0
-      if: fromJSON(steps.target-config.outputs.enable_tfsec)
+      if: fromJSON(steps.target-config.outputs.enable_tfsec) && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
@@ -43,13 +43,14 @@ runs:
 
     # deep check requires AWS credentials
     - uses: suzuki-shunsuke/github-action-tflint@b12ad80ebcd02fc75188a4fdcf5f0623d59ac521 # v1.0.0
-      if: fromJSON(steps.target-config.outputs.enable_tflint)
+      if: fromJSON(steps.target-config.outputs.enable_tflint) && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: 'true'
 
     - uses: suzuki-shunsuke/github-action-terraform-fmt@08fddcbf90a48b11e54962c287efa4449bb8da8c # v0.1.1
+      if: steps.target-config.outputs.destroy != 'true'
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
