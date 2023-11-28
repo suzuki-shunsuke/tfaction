@@ -22,6 +22,7 @@ https://suzuki-shunsuke.github.io/tfaction/docs/
 - [Macbee Planet, Inc.](https://macbee-planet.com)
 - [Gunosy Inc.](https://gunosy.co.jp/)
 - [Luup, Inc.](https://luup.sc/)
+- [Wantedly, Inc.](https://wantedlyinc.com/)
 
 ## LICENSE
 
