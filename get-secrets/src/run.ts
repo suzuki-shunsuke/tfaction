@@ -4,12 +4,12 @@ import { SecretsManagerClient, GetSecretValueCommand, GetSecretValueCommandInput
 
 function exportSecret(envName: string, secretID: string, secretValue: string, secretKey: string) {
   if (secretKey) {
-    core.info(`export the secret as the environment variable: secret_id=${secretID} env_name=${envName} secret_key=${secretKey}`);
+    core.info(`output the secret: secret_id=${secretID} env_name=${envName} secret_key=${secretKey}`);
   } else {
-    core.info(`export the secret as the environment variable: secret_id=${secretID} env_name=${envName}`);
+    core.info(`output the secret: secret_id=${secretID} env_name=${envName}`);
   }
   core.setSecret(secretValue);
-  core.exportVariable(envName, secretValue);
+  core.setOutput(envName, secretValue);
 }
 
 async function exportSecrets(client: SecretsManagerClient, secrets: Array<lib.AWSSecretsManagerSecret>) {

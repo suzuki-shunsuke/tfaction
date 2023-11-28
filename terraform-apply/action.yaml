@@ -10,6 +10,9 @@ inputs:
       contents:write - Update pull request branches
     required: false
     default: ${{ github.token }}
+  secrets:
+    required: false
+    default: "{}"
 
 outputs:
   issue_number:
@@ -33,14 +36,21 @@ runs:
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      id: env
+      with:
+        script: |
+          return Object.assign(JSON.Parse(${{inputs.secrets}}), {
+            GITHUB_TOKEN: ${{inputs.github_token}},
+            TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}},
+            TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}},
+            DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{steps.global-config.outputs.disable_update_related_pull_requests}},
+            PLAN_WORKFLOW_NAME: ${{steps.global-config.outputs.plan_workflow_name}},
+          })
+
     - run: bash ${{ github.action_path }}/main.sh
       id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
-        TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
-        DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}
-        PLAN_WORKFLOW_NAME: ${{ steps.global-config.outputs.plan_workflow_name }}
+      env: ${{fromJSON(steps.env.outputs.result)}}

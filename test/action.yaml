@@ -8,6 +8,9 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
+  secrets:
+    required: false
+    default: "{}"
 runs:
   using: composite
   steps:
@@ -23,8 +26,7 @@ runs:
           -- terraform validate
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+      env: ${{fromJSON(inputs.secrets)}}
 
     - uses: suzuki-shunsuke/trivy-config-action@9cb8a8558fb82684e7f66b0cdfaecef033b264ac # v0.2.1
       if: fromJSON(steps.target-config.outputs.enable_trivy) && steps.target-config.outputs.destroy != 'true'

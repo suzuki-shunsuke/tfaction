@@ -23,6 +23,9 @@ outputs:
   s3_bucket_name_tfmigrate_history:
     description: S3 Bucket name for tfmigrate history files
     value: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}
+  secrets:
+    description: Secrets from AWS Secrets Manager
+    value: ${{toJSON(steps.secrets.outputs)}}
 runs:
   using: composite
   steps:
@@ -96,8 +99,6 @@ runs:
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
-
     - uses: google-github-actions/auth@f105ef0cdb3b102a020be1767fcc8a974898b7c6 # v1.2.0
       if: steps.target-config.outputs.gcp_service_account != ''
       with:
@@ -112,6 +113,11 @@ runs:
       with:
        ssh_key: ${{ inputs.ssh_key }}
 
+    - uses: suzuki-shunsuke/tfaction/get-secrets@main
+      id: secrets
+      with:
+        github_token: ${{inputs.github_token}}
+
     - uses: suzuki-shunsuke/github-action-terraform-init@f30204183f50ed18edb01b9f18e896a64eb73b79 # v1.0.0
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
@@ -119,3 +125,4 @@ runs:
         github_app_token: ${{ inputs.github_token }}
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
+      env: ${{steps.secrets.outputs}}
