@@ -115,8 +115,6 @@ runs:
 
     - uses: suzuki-shunsuke/tfaction/get-secrets@main
       id: secrets
-      with:
-        github_token: ${{inputs.github_token}}
 
     - uses: suzuki-shunsuke/github-action-terraform-init@f30204183f50ed18edb01b9f18e896a64eb73b79 # v1.0.0
       with:
