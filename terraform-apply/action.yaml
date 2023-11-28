@@ -40,7 +40,7 @@ runs:
       id: env
       with:
         script: |
-          return Object.assign(JSON.parse(${{inputs.secrets}}), {
+          return Object.assign(JSON.parse(process.env.SECRETS,), {
             GITHUB_TOKEN: process.env.GITHUB_TOKEN,
             TFACTION_DRIFT_ISSUE_REPO_OWNER: process.env.TFACTION_DRIFT_ISSUE_REPO_OWNER,
             TFACTION_DRIFT_ISSUE_REPO_NAME: process.env.TFACTION_DRIFT_ISSUE_REPO_NAME,
