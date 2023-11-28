@@ -23526,12 +23526,14 @@ function exportSecrets(client, secrets) {
                 throw `SecretString is empty: secret_id=${secret.secret_id}`;
             }
             let secretJSON = null;
+            const secretMap = new Map();
             for (let j = 0; j < secret.envs.length; j++) {
                 const e = secret.envs[j];
                 if (!e.env_name) {
                     throw `env_name is required: secret_id=${secret.secret_id}`;
                 }
                 if (!e.secret_key) {
+                    secretMap.set(e.env_name, response.SecretString);
                     exportSecret(e.env_name, secret.secret_id, response.SecretString, '');
                     continue;
                 }
@@ -23541,8 +23543,13 @@ function exportSecrets(client, secrets) {
                 if (!secretJSON[e.secret_key]) {
                     throw `secret key isn't found: secret_key=${e.secret_key} secret_id=${secret.secret_id}`;
                 }
-                exportSecret(e.env_name, secret.secret_id, secretJSON[e.secret_key], e.secret_key);
+                const secretValue = secretJSON[e.secret_key];
+                secretMap.set(e.env_name, secretValue);
+                exportSecret(e.env_name, secret.secret_id, secretValue, e.secret_key);
             }
+            const secretMapJSON = JSON.stringify(secretMap);
+            core.setSecret(secretMapJSON);
+            core.setOutput('secrets', secretMapJSON);
         }
     });
 }

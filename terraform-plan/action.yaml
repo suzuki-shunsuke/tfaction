@@ -32,13 +32,21 @@ runs:
       with:
         script: |
           return Object.assign(JSON.Parse(${{inputs.secrets}}), {
-            GITHUB_TOKEN: ${{inputs.github_token}},
-            ROOT_DIR: ${{github.workspace}},
-            PR_NUMBER: ${{github.event.pull_request.number}},
-            RENOVATE_LOGIN: ${{steps.global-config.outputs.renovate_login}},
-            HEAD_SHA: ${{github.event.pull_request.head.sha}},
-            DESTROY: ${{steps.target-config.outputs.destroy}},
+            GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+            ROOT_DIR: process.env.ROOT_DIR,
+            PR_NUMBER: process.env.PR_NUMBER,
+            RENOVATE_LOGIN: process.env.RENOVATE_LOGIN,
+            HEAD_SHA: process.env.HEAD_SHA,
+            DESTROY: process.env.DESTROY,
           })
+      env:
+        SECRETS: ${{inputs.secrets}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        ROOT_DIR: ${{github.workspace}}
+        PR_NUMBER: ${{github.event.pull_request.number}}
+        RENOVATE_LOGIN: ${{steps.global-config.outputs.renovate_login}}
+        HEAD_SHA: ${{github.event.pull_request.head.sha}}
+        DESTROY: ${{steps.target-config.outputs.destroy}}
 
     - run: bash ${{ github.action_path }}/main.sh
       working-directory: ${{ steps.target-config.outputs.working_directory }}

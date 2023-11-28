@@ -41,12 +41,18 @@ runs:
       with:
         script: |
           return Object.assign(JSON.Parse(${{inputs.secrets}}), {
-            GITHUB_TOKEN: ${{inputs.github_token}},
-            TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}},
-            TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}},
-            DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{steps.global-config.outputs.disable_update_related_pull_requests}},
-            PLAN_WORKFLOW_NAME: ${{steps.global-config.outputs.plan_workflow_name}},
+            GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+            TFACTION_DRIFT_ISSUE_REPO_OWNER: process.env.TFACTION_DRIFT_ISSUE_REPO_OWNER,
+            TFACTION_DRIFT_ISSUE_REPO_NAME: process.env.TFACTION_DRIFT_ISSUE_REPO_NAME,
+            DISABLE_UPDATE_RELATED_PULL_REQUESTS: process.env.DISABLE_UPDATE_RELATED_PULL_REQUESTS,
+            PLAN_WORKFLOW_NAME: process.env.PLAN_WORKFLOW_NAME,
           })
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
+        TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
+        DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{steps.global-config.outputs.disable_update_related_pull_requests}}
+        PLAN_WORKFLOW_NAME: ${{steps.global-config.outputs.plan_workflow_name}}
 
     - run: bash ${{ github.action_path }}/main.sh
       id: apply
