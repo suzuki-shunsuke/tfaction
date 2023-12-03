@@ -26,6 +26,14 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          permissions: >-
+            {
+              "contents": "write"
+            }
+          repositories: >-
+            [
+              "${{github.event.repository.name}}"
+            ]
 
       - run: gh auth setup-git
         env:
