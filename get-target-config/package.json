@@ -8,11 +8,8 @@
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
-    "@types/node": "18.18.13",
+    "@types/node": "18.19.3",
     "@vercel/ncc": "0.38.1",
     "typescript": "5.3.2"
-  },
-  "volta": {
-    "node": "20.10.0"
   }
 }

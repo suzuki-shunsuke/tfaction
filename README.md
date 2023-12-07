@@ -21,6 +21,8 @@ https://suzuki-shunsuke.github.io/tfaction/docs/
   - Contributed to make [tfaction](https://github.com/suzuki-shunsuke/tfaction/releases/tag/v0.5.16) and [tfmigrate](https://github.com/minamijoyo/tfmigrate/releases/tag/v0.3.7) GoogleCloud-ready
 - [Macbee Planet, Inc.](https://macbee-planet.com)
 - [Gunosy Inc.](https://gunosy.co.jp/)
+- [Luup, Inc.](https://luup.sc/)
+- [Wantedly, Inc.](https://wantedlyinc.com/)
 
 ## LICENSE
 
