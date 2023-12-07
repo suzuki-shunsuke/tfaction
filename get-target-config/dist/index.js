@@ -28832,9 +28832,9 @@ try {
     core.setOutput('working_directory', workingDir);
     core.setOutput('providers_lock_opts', '-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64');
     lib.setOutputs(['template_dir'], [targetConfig]);
-    core.setOutput('enable_tfsec', getBool(config, true, 'tfsec', 'enabled'));
+    core.setOutput('enable_tfsec', getBool(config, false, 'tfsec', 'enabled'));
     core.setOutput('enable_tflint', getBool(config, true, 'tflint', 'enabled'));
-    core.setOutput('enable_trivy', getBool(config, false, 'trivy', 'enabled'));
+    core.setOutput('enable_trivy', getBool(config, true, 'trivy', 'enabled'));
     if (jobType == 'scaffold_working_dir') {
         lib.setOutputs([
             's3_bucket_name_tfmigrate_history',
