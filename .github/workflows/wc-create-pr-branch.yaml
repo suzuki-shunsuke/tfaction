@@ -32,6 +32,14 @@ jobs:
         with:
           app_id: ${{secrets.gh_app_id}}
           private_key: ${{secrets.gh_app_private_key}}
+          permissions: >-
+            {
+              "contents": "write"
+            }
+          repositories: >-
+            [
+              "${{github.event.repository.name}}"
+            ]
 
       - uses: aquaproj/aqua-installer@928a2ee4243a9ee8312d80dc8cbaca88fb602a91 # v2.2.0
         with:
