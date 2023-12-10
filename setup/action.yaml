@@ -99,8 +99,6 @@ runs:
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
-
     - uses: google-github-actions/auth@67e9c72af6e0492df856527b474995862b7b6591 # v2.0.0
       if: steps.target-config.outputs.gcp_service_account != ''
       with:
