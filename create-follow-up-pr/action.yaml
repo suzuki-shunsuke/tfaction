@@ -1,23 +1,15 @@
 name: create follow up pull request
 description: create follow up pull request
 inputs:
-  github_app_token:
+  github_token:
+    required: false
+    default: ${{ github.token }}
     description: |
       GitHub Access Token
       contents:write - Create branches
-      If skip_create_pr is false
-      pull-requests:write - Create pull requests
-    required: true
-
-  github_token:
-    description: |
-      GitHub Access Token
-      permissions:
-        pull-requests:write - Create pull request comments
-        If skip_create_pr is true
-        issues:write - Create labels
-    required: false
-    default: ${{ github.token }}
+      pull-requests:write - Create pull request comments
+      If skip_create_pr is true
+      issues:write - Create labels
 runs:
   using: composite
   steps:
@@ -29,7 +21,6 @@ runs:
       if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
         TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
         TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
 
@@ -38,5 +29,4 @@ runs:
       if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        GITHUB_APP_TOKEN: ${{ inputs.github_app_token }}
         TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}

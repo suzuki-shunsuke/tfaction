@@ -1,7 +1,7 @@
 name: Scaffold tfmigrate migration pull request
 description: Scaffold tfmigrate migration pull request
 inputs:
-  github_app_token:
+  github_token:
     description: |
       GitHub Access Token
       pull-requests:read - Checkout pull requests
@@ -40,7 +40,7 @@ runs:
       shell: bash
       if: inputs.pr_number
       env:
-        GITHUB_TOKEN: ${{inputs.github_app_token}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
 
     - run: mkdir -p "$(dirname "${{steps.target-config.outputs.working_directory}}")"
       shell: bash
@@ -100,7 +100,7 @@ runs:
             -m "chore: scaffold a tfmigrate migration (${TFACTION_TARGET})"
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - name: Create a label to the repository and output the guide to GitHub Step Summary
       if: |
@@ -141,7 +141,7 @@ runs:
         !fromJSON(steps.global-config.outputs.skip_create_pr) && !inputs.pr_number
       id: create_pr
       env:
-        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
         opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
         About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
@@ -159,7 +159,7 @@ runs:
       shell: bash
       if: inputs.pr_number
       env:
-        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
         curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ inputs.pr_number }}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
@@ -172,7 +172,7 @@ runs:
       if: |
         !fromJSON(steps.global-config.outputs.skip_create_pr) && !inputs.pr_number
       env:
-        GITHUB_TOKEN: ${{ inputs.github_app_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
         curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ steps.create_pr.outputs.pr_number }}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \

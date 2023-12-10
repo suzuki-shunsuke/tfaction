@@ -11,7 +11,7 @@ gh api "repos/{owner}/{repo}/labels" \
 	-f name="${target_label}" || :
 
 follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
-env GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
+ghcp empty-commit \
 	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
 	-m "chore: empty commit to open follow up pull request
 

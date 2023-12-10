@@ -1,15 +1,10 @@
 name: setup
 description: setup
 inputs:
-  github_app_token:
-    description: |
-      GitHub Access Token
-      contents:write - Push commits
-    required: true
-
   github_token:
     description: |
       GitHub Access Token
+      contents:write - Push commits
       pull-requests:read - Get pull requests
       pull-requests:write - Create pull request comments and labels
       issues:write - Create labels
@@ -86,7 +81,7 @@ runs:
         prune: ${{ steps.global-config.outputs.aqua_update_checksum_prune }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
       env:
-        GITHUB_TOKEN: ${{inputs.github_app_token}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
 
     - run: aqua i -l -a
       shell: bash
@@ -121,6 +116,6 @@ runs:
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
-        github_app_token: ${{ inputs.github_app_token }}
+        github_app_token: ${{ inputs.github_token }}
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
