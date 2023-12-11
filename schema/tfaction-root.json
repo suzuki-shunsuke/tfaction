@@ -4,7 +4,9 @@
   "title": "tfaction-root.yaml",
   "type": "object",
   "description": "tfaction-root.yaml",
-  "required": ["target_groups"],
+  "required": [
+    "target_groups"
+  ],
   "properties": {
     "target_groups": {
       "type": "array",
@@ -13,7 +15,10 @@
       "items": {
         "type": "object",
         "description": "target group configuration",
-        "required": ["working_directory", "target"],
+        "required": [
+          "working_directory",
+          "target"
+        ],
         "properties": {
           "working_directory": {
             "type": "string",
@@ -23,19 +28,15 @@
             "type": "string",
             "description": "the prefix of the target"
           },
-
           "aws_assume_role_arn": {
             "$ref": "#/$defs/AWSAssumeRoleARN"
           },
-
           "aws_region": {
             "$ref": "#/$defs/AWSRegion"
           },
-
           "aws_secrets_manager": {
             "$ref": "#/$defs/AWSSecretsManager"
           },
-
           "drift_detection": {
             "type": "object",
             "required": [],
@@ -47,43 +48,30 @@
               }
             }
           },
-
           "envs": {
             "$ref": "#/$defs/Envs"
           },
-
           "gcp_service_account": {
             "$ref": "#/$defs/GCPServiceAccount"
           },
           "gcp_workload_identity_provider": {
             "$ref": "#/$defs/GCPWorkloadIdentityProvider"
           },
-          "gcs_bucket_name_plan_file": {
-            "$ref": "#/$defs/GCSBucketNamePlanFile"
-          },
           "gcs_bucket_name_tfmigrate_history": {
             "$ref": "#/$defs/GCSBucketNameTfmigrateHistory"
           },
-
           "providers_lock_opts": {
             "$ref": "#/$defs/TerraformProvidersLockOptions"
-          },
-
-          "s3_bucket_name_plan_file": {
-            "$ref": "#/$defs/S3BucketNamePlanFile"
           },
           "s3_bucket_name_tfmigrate_history": {
             "$ref": "#/$defs/S3BucketNameTfmigrateHistory"
           },
-
           "secrets": {
             "$ref": "#/$defs/Secrets"
           },
-
           "template_dir": {
             "$ref": "#/$defs/TemplateDir"
           },
-
           "terraform_plan_config": {
             "$ref": "#/$defs/JobConfig",
             "description": "configuration which is used in the job for 'terraform plan'"
@@ -103,7 +91,6 @@
         }
       }
     },
-
     "aqua": {
       "type": "object",
       "description": "configuration about aqua",
@@ -131,19 +118,16 @@
         }
       }
     },
-
     "base_working_directory": {
       "type": "string",
       "description": "tfaction searches working directories in this directory",
       "default": "current directory"
     },
-
     "draft_pr": {
       "type": "boolean",
       "description": "If this is true, tfaction creates pull requests as draft",
       "default": false
     },
-
     "drift_detection": {
       "type": "object",
       "description": "Drift Detection",
@@ -175,11 +159,9 @@
         }
       }
     },
-
     "envs": {
       "$ref": "#/$defs/Envs"
     },
-
     "label_prefixes": {
       "type": "object",
       "description": "Pull Request label prefixes",
@@ -201,17 +183,14 @@
         }
       }
     },
-
     "providers_lock_opts": {
       "$ref": "#/$defs/TerraformProvidersLockOptions"
     },
-
     "renovate_login": {
       "type": "string",
       "description": "Renovate App login",
       "default": "renovate[bot]"
     },
-
     "renovate_terraform_labels": {
       "type": "array",
       "description": "This attribute is ignored if `skip_terraform_by_renovate` is false. If any one of labels in `renovate_terraform_labels` is set to the pull request, tfaction would run `terraform plan` and `terraform apply`. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr)",
@@ -220,7 +199,6 @@
         "description": "Pull Request label name"
       }
     },
-
     "scaffold_working_directory": {
       "type": "object",
       "description": "configuration about scaffold-working-directory",
@@ -232,19 +210,16 @@
         }
       }
     },
-
     "skip_create_pr": {
       "type": "boolean",
       "description": "If this is true, tfaction skips creating pull requests. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)",
       "default": false
     },
-
     "skip_terraform_by_renovate": {
       "type": "boolean",
       "description": "If this is true, `terraform plan` and `terraform apply` are skipped in case of pull request by Renovate. [Detail](https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr)",
       "default": false
     },
-
     "tflint": {
       "type": "object",
       "properties": {
@@ -255,7 +230,6 @@
         }
       }
     },
-
     "tfsec": {
       "type": "object",
       "properties": {
@@ -266,7 +240,6 @@
         }
       }
     },
-
     "trivy": {
       "type": "object",
       "properties": {
@@ -277,7 +250,6 @@
         }
       }
     },
-
     "update_related_pull_requests": {
       "type": "object",
       "description": "update related pull requests",
@@ -289,7 +261,6 @@
         }
       }
     },
-
     "working_directory_file": {
       "type": "string",
       "description": "working directory configuration file name",
@@ -364,7 +335,10 @@
       "items": {
         "type": "object",
         "description": "target group configuration",
-        "required": ["secret_id", "envs"],
+        "required": [
+          "secret_id",
+          "envs"
+        ],
         "properties": {
           "secret_id": {
             "type": "string",
@@ -376,7 +350,9 @@
             "items": {
               "type": "object",
               "description": "exported environment variable",
-              "required": ["env_name"],
+              "required": [
+                "env_name"
+              ],
               "properties": {
                 "env_name": {
                   "type": "string",
