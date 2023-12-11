@@ -10,6 +10,9 @@ declare const GitHubEnvironment: z.ZodUnion<[z.ZodString, z.ZodObject<{
     name: string;
 }>]>;
 export type GitHubEnvironment = z.infer<typeof GitHubEnvironment>;
+declare const JobType: z.ZodUnion<[z.ZodLiteral<"terraform">, z.ZodLiteral<"tfmigrate">, z.ZodLiteral<"scaffold_working_dir">]>;
+export type JobType = z.infer<typeof JobType>;
+export declare const getJobType: () => JobType;
 declare const TfsecConfig: z.ZodObject<{
     enabled: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
@@ -1703,8 +1706,7 @@ export declare const setValue: (name: string, value: string | undefined, default
 export declare const getTargetFromTargetGroups: (targetGroups: Array<TargetGroup>, target: string) => TargetGroup | undefined;
 export declare const getTargetFromTargetGroupsByWorkingDir: (targetGroups: Array<TargetGroup>, wd: string) => TargetGroup | undefined;
 export declare const readTargetConfig: (p: string) => TargetConfig;
-export declare const getJobType: () => string;
-export declare const getJobConfig: (config: TargetConfig | undefined, isApply: boolean, jobType: string) => JobConfig | undefined;
+export declare const getJobConfig: (config: TargetConfig | undefined, isApply: boolean, jobType: JobType) => JobConfig | undefined;
 export declare const setValues: (name: string, values: Array<any>) => void;
 export declare const setOutputs: (keys: Array<string>, objs: Array<any>) => void;
 type HasEnv = {

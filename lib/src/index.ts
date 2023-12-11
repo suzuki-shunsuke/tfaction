@@ -13,6 +13,21 @@ const GitHubEnvironment = z.union([
 
 export type GitHubEnvironment = z.infer<typeof GitHubEnvironment>;
 
+const JobType = z.union([
+  z.literal("terraform"),
+  z.literal("tfmigrate"),
+  z.literal("scaffold_working_dir"),
+]);
+
+export type JobType = z.infer<typeof JobType>;
+
+export const getJobType = (): JobType => {
+  if (process.env.TFACTION_JOB_TYPE === undefined) {
+    throw new Error("environment variable TFACTION_JOB_TYPE is required");
+  }
+  return JobType.parse(process.env.TFACTION_JOB_TYPE);
+};
+
 const TfsecConfig = z.object({
   enabled: z.optional(z.boolean()),
 });
@@ -216,17 +231,10 @@ export const readTargetConfig = (p: string): TargetConfig => {
   return TargetConfig.parse(load(fs.readFileSync(p, "utf8")));
 };
 
-export const getJobType = (): string => {
-  if (process.env.TFACTION_JOB_TYPE) {
-    return process.env.TFACTION_JOB_TYPE;
-  }
-  throw "environment variable TFACTION_JOB_TYPE is required";
-};
-
 export const getJobConfig = (
   config: TargetConfig | undefined,
   isApply: boolean,
-  jobType: string,
+  jobType: JobType,
 ): JobConfig | undefined => {
   if (config == undefined) {
     return undefined;
@@ -237,8 +245,6 @@ export const getJobConfig = (
         return config.terraform_apply_config;
       case "tfmigrate":
         return config.tfmigrate_apply_config;
-      default:
-        throw `unknown type: ${jobType}`;
     }
   }
   switch (jobType) {
@@ -246,8 +252,6 @@ export const getJobConfig = (
       return config.terraform_plan_config;
     case "tfmigrate":
       return config.tfmigrate_plan_config;
-    default:
-      throw `unknown type: ${jobType}`;
   }
 };
 

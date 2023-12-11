@@ -16,7 +16,7 @@ const getTargetConfigByTarget = (
   targets: Array<lib.TargetGroup>,
   target: string,
   isApply: boolean,
-  jobType: string,
+  jobType: lib.JobType,
 ): TargetConfig => {
   for (const t of targets) {
     if (!target.startsWith(t.target)) {
