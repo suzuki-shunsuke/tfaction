@@ -19,24 +19,24 @@ runs:
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_comment: 'true'
+        github_comment: "true"
 
     - uses: suzuki-shunsuke/github-action-tfsec@6b4afce3060c0d8865d269de0c5fabc90e1b20f7 # v1.0.0
       if: fromJSON(steps.global-config.outputs.enable_tfsec)
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_comment: 'true'
+        github_comment: "true"
 
     - uses: suzuki-shunsuke/github-action-tflint@b12ad80ebcd02fc75188a4fdcf5f0623d59ac521 # v1.0.0
       if: fromJSON(steps.global-config.outputs.enable_tflint)
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_comment: 'true'
+        github_comment: "true"
 
     # Remove .terraform.lock.hcl created by `terraform init` before running terraform-docs
-    - run: '! test -f .terraform.lock.hcl || rm .terraform.lock.hcl'
+    - run: "! test -f .terraform.lock.hcl || rm .terraform.lock.hcl"
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
 

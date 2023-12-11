@@ -1,12 +1,12 @@
 # https://github.com/suzuki-shunsuke/github-comment
 exec:
   default:
-  - when: ExitCode != 0
-    template: |
-      :x: {{.Vars.tfaction_target}}
+    - when: ExitCode != 0
+      template: |
+        :x: {{.Vars.tfaction_target}}
 
-      {{template "link" .}}
+        {{template "link" .}}
 
-      {{template "join_command" .}}
+        {{template "join_command" .}}
 
-      {{template "hidden_combined_output" .}}
+        {{template "hidden_combined_output" .}}

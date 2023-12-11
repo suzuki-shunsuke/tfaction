@@ -1,12 +1,15 @@
-import * as fs from 'fs';
-import * as core from '@actions/core';
-import { load } from 'js-yaml';
-import { z } from 'zod';
+import * as fs from "fs";
+import * as core from "@actions/core";
+import { load } from "js-yaml";
+import { z } from "zod";
 
-const GitHubEnvironment = z.union([z.string(), z.object({
-  name: z.string(),
-  url: z.string(),
-})]);
+const GitHubEnvironment = z.union([
+  z.string(),
+  z.object({
+    name: z.string(),
+    url: z.string(),
+  }),
+]);
 
 export type GitHubEnvironment = z.infer<typeof GitHubEnvironment>;
 
@@ -28,10 +31,12 @@ const TrivyConfig = z.object({
 
 export type TrivyConfig = z.infer<typeof TrivyConfig>;
 
-const GitHubSecrets = z.array(z.object({
-  env_name: z.string(),
-  secret_name: z.string(),
-}));
+const GitHubSecrets = z.array(
+  z.object({
+    env_name: z.string(),
+    secret_name: z.string(),
+  }),
+);
 
 export type GitHubSecrets = z.infer<typeof GitHubSecrets>;
 
@@ -71,44 +76,56 @@ const TargetConfig = z.object({
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
 const Config = z.object({
-  aqua: z.optional(z.object({
-    update_checksum: z.optional(z.object({
-      enabled: z.optional(z.boolean()),
-      skip_push: z.optional(z.boolean()),
-      prune: z.optional(z.boolean()),
-    })),
-  })),
+  aqua: z.optional(
+    z.object({
+      update_checksum: z.optional(
+        z.object({
+          enabled: z.optional(z.boolean()),
+          skip_push: z.optional(z.boolean()),
+          prune: z.optional(z.boolean()),
+        }),
+      ),
+    }),
+  ),
   base_working_directory: z.optional(z.string()),
   draft_pr: z.optional(z.boolean()),
-  drift_detection: z.optional(z.object({
-    issue_repo_owner: z.optional(z.string()),
-    issue_repo_name: z.optional(z.string()),
-    num_of_issues: z.optional(z.number()),
-    minimum_detection_interval: z.optional(z.number()),
-  })),
+  drift_detection: z.optional(
+    z.object({
+      issue_repo_owner: z.optional(z.string()),
+      issue_repo_name: z.optional(z.string()),
+      num_of_issues: z.optional(z.number()),
+      minimum_detection_interval: z.optional(z.number()),
+    }),
+  ),
   env: z.optional(z.record(z.string())),
-  label_prefixes: z.optional(z.object({
-    target: z.optional(z.string()),
-    tfmigrate: z.optional(z.string()),
-    skip: z.optional(z.string()),
-  })),
+  label_prefixes: z.optional(
+    z.object({
+      target: z.optional(z.string()),
+      tfmigrate: z.optional(z.string()),
+      skip: z.optional(z.string()),
+    }),
+  ),
   module_base_directory: z.optional(z.string()),
   module_file: z.optional(z.string()),
   plan_workflow_name: z.string(),
   renovate_login: z.optional(z.string()),
   renovate_terraform_labels: z.optional(z.array(z.string())),
-  scaffold_working_directory: z.optional(z.object({
-    skip_adding_aqua_packages: z.optional(z.boolean()),
-  })),
+  scaffold_working_directory: z.optional(
+    z.object({
+      skip_adding_aqua_packages: z.optional(z.boolean()),
+    }),
+  ),
   skip_create_pr: z.optional(z.boolean()),
   skip_terraform_by_renovate: z.optional(z.boolean()),
   target_groups: z.array(TargetConfig),
   tflint: z.optional(TflintConfig),
   tfsec: z.optional(TfsecConfig),
   trivy: z.optional(TrivyConfig),
-  update_related_pull_requests: z.optional(z.object({
-    enabled: z.optional(z.boolean()),
-  })),
+  update_related_pull_requests: z.optional(
+    z.object({
+      enabled: z.optional(z.boolean()),
+    }),
+  ),
   working_directory_file: z.optional(z.string()),
 });
 
@@ -117,9 +134,9 @@ export type Config = z.infer<typeof Config>;
 export const getConfig = (): Config => {
   let configFilePath = process.env.TFACTION_CONFIG;
   if (!configFilePath) {
-    configFilePath = 'tfaction-root.yaml';
+    configFilePath = "tfaction-root.yaml";
   }
-  return Config.parse(load(fs.readFileSync(configFilePath, 'utf8')));
+  return Config.parse(load(fs.readFileSync(configFilePath, "utf8")));
 };
 
 export const getTarget = (): string => {
@@ -127,18 +144,28 @@ export const getTarget = (): string => {
   if (target) {
     return target;
   }
-  throw 'the environment variable TFACTION_TARGET is required';
+  throw "the environment variable TFACTION_TARGET is required";
 };
 
 export const getIsApply = (): boolean => {
-  return process.env.TFACTION_IS_APPLY === 'true';
+  return process.env.TFACTION_IS_APPLY === "true";
 };
 
-export const setValue = (name: string, value: string | undefined, defaultValue: string): void => {
-  core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
+export const setValue = (
+  name: string,
+  value: string | undefined,
+  defaultValue: string,
+): void => {
+  core.setOutput(
+    name,
+    value == "" || value == undefined ? defaultValue : value,
+  );
 };
 
-export const getTargetFromTargetGroups = (targetGroups: Array<TargetConfig>, target: string): TargetConfig | undefined => {
+export const getTargetFromTargetGroups = (
+  targetGroups: Array<TargetConfig>,
+  target: string,
+): TargetConfig | undefined => {
   for (let i = 0; i < targetGroups.length; i++) {
     const targetConfig = targetGroups[i];
     if (target.startsWith(targetConfig.target)) {
@@ -148,7 +175,10 @@ export const getTargetFromTargetGroups = (targetGroups: Array<TargetConfig>, tar
   return undefined;
 };
 
-export const getTargetFromTargetGroupsByWorkingDir = (targetGroups: Array<TargetConfig>, wd: string): TargetConfig | undefined => {
+export const getTargetFromTargetGroupsByWorkingDir = (
+  targetGroups: Array<TargetConfig>,
+  wd: string,
+): TargetConfig | undefined => {
   for (let i = 0; i < targetGroups.length; i++) {
     const targetConfig = targetGroups[i];
     if (wd.startsWith(targetConfig.working_directory)) {
@@ -159,34 +189,38 @@ export const getTargetFromTargetGroupsByWorkingDir = (targetGroups: Array<Target
 };
 
 export const readTargetConfig = (p: string): TargetConfig => {
-  return TargetConfig.parse(load(fs.readFileSync(p, 'utf8')));
+  return TargetConfig.parse(load(fs.readFileSync(p, "utf8")));
 };
 
 export const getJobType = (): string => {
   if (process.env.TFACTION_JOB_TYPE) {
     return process.env.TFACTION_JOB_TYPE;
   }
-  throw 'environment variable TFACTION_JOB_TYPE is required';
+  throw "environment variable TFACTION_JOB_TYPE is required";
 };
 
-export const getJobConfig = (config: TargetConfig | undefined, isApply: boolean, jobType: string): JobConfig | undefined => {
+export const getJobConfig = (
+  config: TargetConfig | undefined,
+  isApply: boolean,
+  jobType: string,
+): JobConfig | undefined => {
   if (config == undefined) {
     return undefined;
   }
   if (isApply) {
     switch (jobType) {
-      case 'terraform':
+      case "terraform":
         return config.terraform_apply_config;
-      case 'tfmigrate':
+      case "tfmigrate":
         return config.tfmigrate_apply_config;
       default:
         throw `unknown type: ${jobType}`;
     }
   }
   switch (jobType) {
-    case 'terraform':
+    case "terraform":
       return config.terraform_plan_config;
-    case 'tfmigrate':
+    case "tfmigrate":
       return config.tfmigrate_plan_config;
     default:
       throw `unknown type: ${jobType}`;
@@ -216,7 +250,7 @@ export const setOutputs = (keys: Array<string>, objs: Array<any>): void => {
 };
 
 type HasEnv = {
-  env?: Record<string, string>
+  env?: Record<string, string>;
 };
 
 export const setEnvs = (...objs: Array<HasEnv | undefined>): void => {

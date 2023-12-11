@@ -2,17 +2,17 @@ name: Check if terraform plan and apply are skipped
 description: Check if terraform plan and apply are skipped
 inputs:
   labels:
-    description: 'Labels File'
+    description: "Labels File"
     required: true
   skip_label_prefix:
-    description: 'Skip Label Prefix'
+    description: "Skip Label Prefix"
     required: true
   pr_author:
-    description: 'Pull Request Author'
+    description: "Pull Request Author"
     required: true
 outputs:
   skip_terraform:
     description: whether terraform is skipped
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

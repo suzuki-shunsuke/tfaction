@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       pr:
-        description: 'Pull Request Number'
+        description: "Pull Request Number"
         required: true
         type: number
     secrets:

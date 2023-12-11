@@ -34,5 +34,5 @@ outputs:
   destroy:
     description: If true, terraform plan is run with the `-destroy` option
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

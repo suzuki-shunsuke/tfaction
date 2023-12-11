@@ -11,7 +11,7 @@ inputs:
     required: false
     default: ${{ github.token }}
   ssh_key:
-    description: 'SSH Key for Terraform Private Module'
+    description: "SSH Key for Terraform Private Module"
     required: false
 outputs:
   working_directory:
@@ -111,7 +111,7 @@ runs:
     - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
       if: inputs.ssh_key != ''
       with:
-       ssh_key: ${{ inputs.ssh_key }}
+        ssh_key: ${{ inputs.ssh_key }}
 
     - uses: suzuki-shunsuke/tfaction/get-secrets@main
       id: secrets
