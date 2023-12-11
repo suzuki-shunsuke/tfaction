@@ -24736,31 +24736,31 @@ const fs = __importStar(__nccwpck_require__(7147));
 const path = __importStar(__nccwpck_require__(1017));
 try {
     const inputs = {
-        changedFiles: core.getInput('changed_files', { required: true }),
-        configFiles: core.getInput('config_files', { required: true }),
+        changedFiles: core.getInput("changed_files", { required: true }),
+        configFiles: core.getInput("config_files", { required: true }),
     };
-    const changedFiles = fs.readFileSync(inputs.changedFiles, 'utf8').split('\n');
-    const configFiles = fs.readFileSync(inputs.configFiles, 'utf8').split('\n');
+    const changedFiles = fs.readFileSync(inputs.changedFiles, "utf8").split("\n");
+    const configFiles = fs.readFileSync(inputs.configFiles, "utf8").split("\n");
     const workingDirs = new Set();
     for (const configFile of configFiles) {
-        if (configFile === '') {
+        if (configFile === "") {
             continue;
         }
         workingDirs.add(path.dirname(configFile));
     }
     const modules = new Set();
     for (const changedFile of changedFiles) {
-        if (changedFile === '') {
+        if (changedFile === "") {
             continue;
         }
         for (let workingDir of workingDirs) {
-            if (changedFile.startsWith(workingDir + '/')) {
+            if (changedFile.startsWith(workingDir + "/")) {
                 modules.add(workingDir);
             }
         }
     }
     core.info(`modules: ${Array.from(modules)}`);
-    core.setOutput('modules', Array.from(modules));
+    core.setOutput("modules", Array.from(modules));
 }
 catch (error) {
     core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));

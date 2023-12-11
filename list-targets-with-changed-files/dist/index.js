@@ -35,10 +35,13 @@ const fs = __importStar(__nccwpck_require__(7147));
 const core = __importStar(__nccwpck_require__(5329));
 const js_yaml_1 = __nccwpck_require__(1168);
 const zod_1 = __nccwpck_require__(2189);
-const GitHubEnvironment = zod_1.z.union([zod_1.z.string(), zod_1.z.object({
+const GitHubEnvironment = zod_1.z.union([
+    zod_1.z.string(),
+    zod_1.z.object({
         name: zod_1.z.string(),
         url: zod_1.z.string(),
-    })]);
+    }),
+]);
 const TfsecConfig = zod_1.z.object({
     enabled: zod_1.z.optional(zod_1.z.boolean()),
 });
@@ -125,9 +128,9 @@ const Config = zod_1.z.object({
 const getConfig = () => {
     let configFilePath = process.env.TFACTION_CONFIG;
     if (!configFilePath) {
-        configFilePath = 'tfaction-root.yaml';
+        configFilePath = "tfaction-root.yaml";
     }
-    return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, 'utf8')));
+    return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, "utf8")));
 };
 exports.getConfig = getConfig;
 const getTarget = () => {
@@ -135,15 +138,15 @@ const getTarget = () => {
     if (target) {
         return target;
     }
-    throw 'the environment variable TFACTION_TARGET is required';
+    throw "the environment variable TFACTION_TARGET is required";
 };
 exports.getTarget = getTarget;
 const getIsApply = () => {
-    return process.env.TFACTION_IS_APPLY === 'true';
+    return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
 const setValue = (name, value, defaultValue) => {
-    core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
+    core.setOutput(name, value == "" || value == undefined ? defaultValue : value);
 };
 exports.setValue = setValue;
 const getTargetFromTargetGroups = (targetGroups, target) => {
@@ -167,14 +170,14 @@ const getTargetFromTargetGroupsByWorkingDir = (targetGroups, wd) => {
 };
 exports.getTargetFromTargetGroupsByWorkingDir = getTargetFromTargetGroupsByWorkingDir;
 const readTargetConfig = (p) => {
-    return TargetConfig.parse((0, js_yaml_1.load)(fs.readFileSync(p, 'utf8')));
+    return TargetConfig.parse((0, js_yaml_1.load)(fs.readFileSync(p, "utf8")));
 };
 exports.readTargetConfig = readTargetConfig;
 const getJobType = () => {
     if (process.env.TFACTION_JOB_TYPE) {
         return process.env.TFACTION_JOB_TYPE;
     }
-    throw 'environment variable TFACTION_JOB_TYPE is required';
+    throw "environment variable TFACTION_JOB_TYPE is required";
 };
 exports.getJobType = getJobType;
 const getJobConfig = (config, isApply, jobType) => {
@@ -183,18 +186,18 @@ const getJobConfig = (config, isApply, jobType) => {
     }
     if (isApply) {
         switch (jobType) {
-            case 'terraform':
+            case "terraform":
                 return config.terraform_apply_config;
-            case 'tfmigrate':
+            case "tfmigrate":
                 return config.tfmigrate_apply_config;
             default:
                 throw `unknown type: ${jobType}`;
         }
     }
     switch (jobType) {
-        case 'terraform':
+        case "terraform":
             return config.terraform_plan_config;
-        case 'tfmigrate':
+        case "tfmigrate":
             return config.tfmigrate_plan_config;
         default:
             throw `unknown type: ${jobType}`;
@@ -62161,7 +62164,7 @@ const getTargetConfigByTarget = (targets, target, isApply, jobType) => {
         if (jobConfig === undefined) {
             return {
                 target: target,
-                runs_on: t.runs_on ? t.runs_on : 'ubuntu-latest',
+                runs_on: t.runs_on ? t.runs_on : "ubuntu-latest",
                 environment: t === null || t === void 0 ? void 0 : t.environment,
                 secrets: t.secrets,
                 job_type: jobType,
@@ -62169,25 +62172,33 @@ const getTargetConfigByTarget = (targets, target, isApply, jobType) => {
         }
         return {
             target: target,
-            runs_on: jobConfig.runs_on ? jobConfig.runs_on : (t.runs_on ? t.runs_on : 'ubuntu-latest'),
-            environment: jobConfig.environment ? jobConfig.environment : t === null || t === void 0 ? void 0 : t.environment,
+            runs_on: jobConfig.runs_on
+                ? jobConfig.runs_on
+                : t.runs_on
+                    ? t.runs_on
+                    : "ubuntu-latest",
+            environment: jobConfig.environment
+                ? jobConfig.environment
+                : t === null || t === void 0 ? void 0 : t.environment,
             secrets: jobConfig.secrets ? jobConfig.secrets : t.secrets,
             job_type: jobType,
         };
     }
-    throw 'target is invalid';
+    throw "target is invalid";
 };
 const getPRBody = () => {
     if (github.context.payload.pull_request) {
-        return github.context.payload.pull_request.body ? github.context.payload.pull_request.body : '';
+        return github.context.payload.pull_request.body
+            ? github.context.payload.pull_request.body
+            : "";
     }
-    const prPath = core.getInput('pull_request');
+    const prPath = core.getInput("pull_request");
     if (!prPath) {
-        return '';
+        return "";
     }
-    const pr = JSON.parse(fs.readFileSync(prPath, 'utf8'));
+    const pr = JSON.parse(fs.readFileSync(prPath, "utf8"));
     if (!pr || !pr.body) {
-        return '';
+        return "";
     }
     return pr.body;
 };
@@ -62201,45 +62212,60 @@ try {
         configWorkingDirMap.set(target.working_directory, target);
         configTargetMap.set(target.target, target);
     }
-    const labels = fs.readFileSync(core.getInput('labels'), 'utf8').split('\n');
-    const changedFiles = fs.readFileSync(core.getInput('changed_files'), 'utf8').split('\n');
-    const configFiles = fs.readFileSync(core.getInput('config_files'), 'utf8').split('\n');
+    const labels = fs.readFileSync(core.getInput("labels"), "utf8").split("\n");
+    const changedFiles = fs
+        .readFileSync(core.getInput("changed_files"), "utf8")
+        .split("\n");
+    const configFiles = fs
+        .readFileSync(core.getInput("config_files"), "utf8")
+        .split("\n");
     const workingDirs = new Set();
     for (let i = 0; i < configFiles.length; i++) {
         const configFile = configFiles[i];
-        if (configFile == '') {
+        if (configFile == "") {
             continue;
         }
         workingDirs.add(path.dirname(configFile));
     }
     // <!-- tfaction follow up pr target=foo -->
-    let followupTarget = '';
-    const followupPRBodyPrefix = '<!-- tfaction follow up pr target=';
+    let followupTarget = "";
+    const followupPRBodyPrefix = "<!-- tfaction follow up pr target=";
     const prBody = getPRBody();
     if (prBody.startsWith(followupPRBodyPrefix)) {
-        followupTarget = prBody.split('\n')[0].slice(followupPRBodyPrefix.length, -' -->'.length);
+        followupTarget = prBody
+            .split("\n")[0]
+            .slice(followupPRBodyPrefix.length, -" -->".length);
     }
     const terraformTargets = new Set();
     const tfmigrates = new Set();
     const skips = new Set();
     const terraformTargetObjs = new Array();
     const tfmigrateObjs = new Array();
-    const targetPrefix = (config.label_prefixes != undefined && config.label_prefixes.target != undefined && config.label_prefixes.target != '') ?
-        config.label_prefixes.target : 'target:';
-    const skipPrefix = (config.label_prefixes != undefined && config.label_prefixes.skip != undefined && config.label_prefixes.skip != '') ?
-        config.label_prefixes.skip : 'skip:';
-    const tfmigratePrefix = (config.label_prefixes != undefined && config.label_prefixes.tfmigrate != undefined && config.label_prefixes.tfmigrate != '') ?
-        config.label_prefixes.tfmigrate : 'tfmigrate:';
+    const targetPrefix = config.label_prefixes != undefined &&
+        config.label_prefixes.target != undefined &&
+        config.label_prefixes.target != ""
+        ? config.label_prefixes.target
+        : "target:";
+    const skipPrefix = config.label_prefixes != undefined &&
+        config.label_prefixes.skip != undefined &&
+        config.label_prefixes.skip != ""
+        ? config.label_prefixes.skip
+        : "skip:";
+    const tfmigratePrefix = config.label_prefixes != undefined &&
+        config.label_prefixes.tfmigrate != undefined &&
+        config.label_prefixes.tfmigrate != ""
+        ? config.label_prefixes.tfmigrate
+        : "tfmigrate:";
     for (let i = 0; i < labels.length; i++) {
         const label = labels[i];
-        if (label == '') {
+        if (label == "") {
             continue;
         }
         if (label.startsWith(targetPrefix)) {
             const target = label.slice(targetPrefix.length);
             if (!terraformTargets.has(target)) {
                 terraformTargets.add(target);
-                terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, target, isApply, 'terraform'));
+                terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, target, isApply, "terraform"));
             }
             continue;
         }
@@ -62247,7 +62273,7 @@ try {
             const target = label.slice(tfmigratePrefix.length);
             if (!tfmigrates.has(target)) {
                 tfmigrates.add(target);
-                tfmigrateObjs.push(getTargetConfigByTarget(config.target_groups, target, isApply, 'tfmigrate'));
+                tfmigrateObjs.push(getTargetConfigByTarget(config.target_groups, target, isApply, "tfmigrate"));
             }
             continue;
         }
@@ -62259,11 +62285,11 @@ try {
     const changedWorkingDirs = new Set();
     for (let i = 0; i < changedFiles.length; i++) {
         const changedFile = changedFiles[i];
-        if (changedFile == '') {
+        if (changedFile == "") {
             continue;
         }
         for (let workingDir of workingDirs) {
-            if (changedFile.startsWith(workingDir + '/')) {
+            if (changedFile.startsWith(workingDir + "/")) {
                 changedWorkingDirs.add(workingDir);
             }
         }
@@ -62273,19 +62299,22 @@ try {
             const target = config.target_groups[i];
             if (changedWorkingDir.startsWith(target.working_directory)) {
                 const changedTarget = changedWorkingDir.replace(target.working_directory, target.target);
-                if (!terraformTargets.has(changedTarget) && !tfmigrates.has(changedTarget)) {
+                if (!terraformTargets.has(changedTarget) &&
+                    !tfmigrates.has(changedTarget)) {
                     terraformTargets.add(changedTarget);
-                    terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedTarget, isApply, 'terraform'));
+                    terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedTarget, isApply, "terraform"));
                 }
                 break;
             }
         }
     }
-    if (followupTarget && !tfmigrates.has(followupTarget) && !terraformTargets.has(followupTarget)) {
+    if (followupTarget &&
+        !tfmigrates.has(followupTarget) &&
+        !terraformTargets.has(followupTarget)) {
         terraformTargets.add(followupTarget);
-        terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, followupTarget, isApply, 'terraform'));
+        terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, followupTarget, isApply, "terraform"));
     }
-    core.setOutput('targets', terraformTargetObjs.concat(tfmigrateObjs));
+    core.setOutput("targets", terraformTargetObjs.concat(tfmigrateObjs));
 }
 catch (error) {
     core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));

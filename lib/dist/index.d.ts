@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 declare const GitHubEnvironment: z.ZodUnion<[z.ZodString, z.ZodObject<{
     name: z.ZodString;
     url: z.ZodString;

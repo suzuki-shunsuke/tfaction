@@ -24736,10 +24736,13 @@ const fs = __importStar(__nccwpck_require__(7147));
 const core = __importStar(__nccwpck_require__(5329));
 const js_yaml_1 = __nccwpck_require__(1168);
 const zod_1 = __nccwpck_require__(2189);
-const GitHubEnvironment = zod_1.z.union([zod_1.z.string(), zod_1.z.object({
+const GitHubEnvironment = zod_1.z.union([
+    zod_1.z.string(),
+    zod_1.z.object({
         name: zod_1.z.string(),
         url: zod_1.z.string(),
-    })]);
+    }),
+]);
 const TfsecConfig = zod_1.z.object({
     enabled: zod_1.z.optional(zod_1.z.boolean()),
 });
@@ -24826,9 +24829,9 @@ const Config = zod_1.z.object({
 const getConfig = () => {
     let configFilePath = process.env.TFACTION_CONFIG;
     if (!configFilePath) {
-        configFilePath = 'tfaction-root.yaml';
+        configFilePath = "tfaction-root.yaml";
     }
-    return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, 'utf8')));
+    return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, "utf8")));
 };
 exports.getConfig = getConfig;
 const getTarget = () => {
@@ -24836,15 +24839,15 @@ const getTarget = () => {
     if (target) {
         return target;
     }
-    throw 'the environment variable TFACTION_TARGET is required';
+    throw "the environment variable TFACTION_TARGET is required";
 };
 exports.getTarget = getTarget;
 const getIsApply = () => {
-    return process.env.TFACTION_IS_APPLY === 'true';
+    return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
 const setValue = (name, value, defaultValue) => {
-    core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
+    core.setOutput(name, value == "" || value == undefined ? defaultValue : value);
 };
 exports.setValue = setValue;
 const getTargetFromTargetGroups = (targetGroups, target) => {
@@ -24868,14 +24871,14 @@ const getTargetFromTargetGroupsByWorkingDir = (targetGroups, wd) => {
 };
 exports.getTargetFromTargetGroupsByWorkingDir = getTargetFromTargetGroupsByWorkingDir;
 const readTargetConfig = (p) => {
-    return TargetConfig.parse((0, js_yaml_1.load)(fs.readFileSync(p, 'utf8')));
+    return TargetConfig.parse((0, js_yaml_1.load)(fs.readFileSync(p, "utf8")));
 };
 exports.readTargetConfig = readTargetConfig;
 const getJobType = () => {
     if (process.env.TFACTION_JOB_TYPE) {
         return process.env.TFACTION_JOB_TYPE;
     }
-    throw 'environment variable TFACTION_JOB_TYPE is required';
+    throw "environment variable TFACTION_JOB_TYPE is required";
 };
 exports.getJobType = getJobType;
 const getJobConfig = (config, isApply, jobType) => {
@@ -24884,18 +24887,18 @@ const getJobConfig = (config, isApply, jobType) => {
     }
     if (isApply) {
         switch (jobType) {
-            case 'terraform':
+            case "terraform":
                 return config.terraform_apply_config;
-            case 'tfmigrate':
+            case "tfmigrate":
                 return config.tfmigrate_apply_config;
             default:
                 throw `unknown type: ${jobType}`;
         }
     }
     switch (jobType) {
-        case 'terraform':
+        case "terraform":
             return config.terraform_plan_config;
-        case 'tfmigrate':
+        case "tfmigrate":
             return config.tfmigrate_plan_config;
         default:
             throw `unknown type: ${jobType}`;
@@ -57955,42 +57958,44 @@ try {
     const config = lib.getConfig();
     const isApply = lib.getIsApply();
     const jobType = lib.getJobType();
-    const workingDirectoryFile = config.working_directory_file ? config.working_directory_file : 'tfaction.yaml';
+    const workingDirectoryFile = config.working_directory_file
+        ? config.working_directory_file
+        : "tfaction.yaml";
     let target = inputs.target;
     let workingDir = inputs.workingDir;
     let targetConfig = null;
     if (target) {
         targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
         if (!targetConfig) {
-            throw 'target config is not found in target_groups';
+            throw "target config is not found in target_groups";
         }
         workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
     }
     else if (workingDir) {
         targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, workingDir);
         if (!targetConfig) {
-            throw 'target config is not found in target_groups';
+            throw "target config is not found in target_groups";
         }
         target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
-        core.exportVariable('TFACTION_TARGET', target);
+        core.exportVariable("TFACTION_TARGET", target);
     }
     else {
-        throw 'Either TFACTION_TARGET or TFACTION_WORKING_DIR is required';
+        throw "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required";
     }
-    core.setOutput('working_directory', workingDir);
-    core.setOutput('providers_lock_opts', '-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64');
-    lib.setOutputs(['template_dir'], [targetConfig]);
-    core.setOutput('enable_tfsec', (_b = (_a = config === null || config === void 0 ? void 0 : config.tfsec) === null || _a === void 0 ? void 0 : _a.enabled) !== null && _b !== void 0 ? _b : false);
-    core.setOutput('enable_tflint', (_d = (_c = config === null || config === void 0 ? void 0 : config.tflint) === null || _c === void 0 ? void 0 : _c.enabled) !== null && _d !== void 0 ? _d : true);
-    core.setOutput('enable_trivy', (_f = (_e = config === null || config === void 0 ? void 0 : config.trivy) === null || _e === void 0 ? void 0 : _e.enabled) !== null && _f !== void 0 ? _f : true);
-    if (jobType === 'scaffold_working_dir') {
+    core.setOutput("working_directory", workingDir);
+    core.setOutput("providers_lock_opts", "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64");
+    lib.setOutputs(["template_dir"], [targetConfig]);
+    core.setOutput("enable_tfsec", (_b = (_a = config === null || config === void 0 ? void 0 : config.tfsec) === null || _a === void 0 ? void 0 : _a.enabled) !== null && _b !== void 0 ? _b : false);
+    core.setOutput("enable_tflint", (_d = (_c = config === null || config === void 0 ? void 0 : config.tflint) === null || _c === void 0 ? void 0 : _c.enabled) !== null && _d !== void 0 ? _d : true);
+    core.setOutput("enable_trivy", (_f = (_e = config === null || config === void 0 ? void 0 : config.trivy) === null || _e === void 0 ? void 0 : _e.enabled) !== null && _f !== void 0 ? _f : true);
+    if (jobType === "scaffold_working_dir") {
         lib.setOutputs([
-            's3_bucket_name_tfmigrate_history',
-            'gcs_bucket_name_tfmigrate_history',
-            'aws_region',
-            'aws_assume_role_arn',
-            'gcp_service_account',
-            'gcp_workload_identity_provider',
+            "s3_bucket_name_tfmigrate_history",
+            "gcs_bucket_name_tfmigrate_history",
+            "aws_region",
+            "aws_assume_role_arn",
+            "gcp_service_account",
+            "gcp_workload_identity_provider",
         ], [targetConfig]);
     }
     else {
@@ -57998,17 +58003,17 @@ try {
         const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
         const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
         lib.setOutputs([
-            's3_bucket_name_tfmigrate_history',
-            'gcs_bucket_name_tfmigrate_history',
-            'providers_lock_opts',
+            "s3_bucket_name_tfmigrate_history",
+            "gcs_bucket_name_tfmigrate_history",
+            "providers_lock_opts",
         ], [wdConfig, targetConfig, config]);
         lib.setOutputs([
-            'aws_region',
-            'aws_assume_role_arn',
-            'gcp_service_account',
-            'gcp_workload_identity_provider',
+            "aws_region",
+            "aws_assume_role_arn",
+            "gcp_service_account",
+            "gcp_workload_identity_provider",
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
-        core.setOutput('destroy', wdConfig.destroy ? true : false);
+        core.setOutput("destroy", wdConfig.destroy ? true : false);
         lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
     }
 }

@@ -24736,10 +24736,13 @@ const fs = __importStar(__nccwpck_require__(7147));
 const core = __importStar(__nccwpck_require__(5329));
 const js_yaml_1 = __nccwpck_require__(1168);
 const zod_1 = __nccwpck_require__(2189);
-const GitHubEnvironment = zod_1.z.union([zod_1.z.string(), zod_1.z.object({
+const GitHubEnvironment = zod_1.z.union([
+    zod_1.z.string(),
+    zod_1.z.object({
         name: zod_1.z.string(),
         url: zod_1.z.string(),
-    })]);
+    }),
+]);
 const TfsecConfig = zod_1.z.object({
     enabled: zod_1.z.optional(zod_1.z.boolean()),
 });
@@ -24826,9 +24829,9 @@ const Config = zod_1.z.object({
 const getConfig = () => {
     let configFilePath = process.env.TFACTION_CONFIG;
     if (!configFilePath) {
-        configFilePath = 'tfaction-root.yaml';
+        configFilePath = "tfaction-root.yaml";
     }
-    return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, 'utf8')));
+    return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, "utf8")));
 };
 exports.getConfig = getConfig;
 const getTarget = () => {
@@ -24836,15 +24839,15 @@ const getTarget = () => {
     if (target) {
         return target;
     }
-    throw 'the environment variable TFACTION_TARGET is required';
+    throw "the environment variable TFACTION_TARGET is required";
 };
 exports.getTarget = getTarget;
 const getIsApply = () => {
-    return process.env.TFACTION_IS_APPLY === 'true';
+    return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
 const setValue = (name, value, defaultValue) => {
-    core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
+    core.setOutput(name, value == "" || value == undefined ? defaultValue : value);
 };
 exports.setValue = setValue;
 const getTargetFromTargetGroups = (targetGroups, target) => {
@@ -24868,14 +24871,14 @@ const getTargetFromTargetGroupsByWorkingDir = (targetGroups, wd) => {
 };
 exports.getTargetFromTargetGroupsByWorkingDir = getTargetFromTargetGroupsByWorkingDir;
 const readTargetConfig = (p) => {
-    return TargetConfig.parse((0, js_yaml_1.load)(fs.readFileSync(p, 'utf8')));
+    return TargetConfig.parse((0, js_yaml_1.load)(fs.readFileSync(p, "utf8")));
 };
 exports.readTargetConfig = readTargetConfig;
 const getJobType = () => {
     if (process.env.TFACTION_JOB_TYPE) {
         return process.env.TFACTION_JOB_TYPE;
     }
-    throw 'environment variable TFACTION_JOB_TYPE is required';
+    throw "environment variable TFACTION_JOB_TYPE is required";
 };
 exports.getJobType = getJobType;
 const getJobConfig = (config, isApply, jobType) => {
@@ -24884,18 +24887,18 @@ const getJobConfig = (config, isApply, jobType) => {
     }
     if (isApply) {
         switch (jobType) {
-            case 'terraform':
+            case "terraform":
                 return config.terraform_apply_config;
-            case 'tfmigrate':
+            case "tfmigrate":
                 return config.tfmigrate_apply_config;
             default:
                 throw `unknown type: ${jobType}`;
         }
     }
     switch (jobType) {
-        case 'terraform':
+        case "terraform":
             return config.terraform_plan_config;
-        case 'tfmigrate':
+        case "tfmigrate":
             return config.tfmigrate_plan_config;
         default:
             throw `unknown type: ${jobType}`;
@@ -57948,11 +57951,13 @@ const fs = __importStar(__nccwpck_require__(7147));
 const lib = __importStar(__nccwpck_require__(8022));
 const getSkipTerraform = (inputs) => {
     const config = lib.getConfig();
-    const renovateLogin = config.renovate_login ? config.renovate_login : 'renovate[bot]';
-    const labels = fs.readFileSync(inputs.labels, 'utf8').split('\n');
+    const renovateLogin = config.renovate_login
+        ? config.renovate_login
+        : "renovate[bot]";
+    const labels = fs.readFileSync(inputs.labels, "utf8").split("\n");
     const target = inputs.target;
     if (!target) {
-        throw 'TFACTION_TARGET is required';
+        throw "TFACTION_TARGET is required";
     }
     if (renovateLogin != inputs.prAuthor) {
         for (let i = 0; i < labels.length; i++) {
@@ -57965,7 +57970,9 @@ const getSkipTerraform = (inputs) => {
     if (!config.skip_terraform_by_renovate) {
         return false;
     }
-    const renovateTerraformLabels = new Set(config.renovate_terraform_labels ? config.renovate_terraform_labels : ['terraform']);
+    const renovateTerraformLabels = new Set(config.renovate_terraform_labels
+        ? config.renovate_terraform_labels
+        : ["terraform"]);
     for (let i = 0; i < labels.length; i++) {
         const label = labels[i];
         if (renovateTerraformLabels.has(label)) {
@@ -57976,13 +57983,13 @@ const getSkipTerraform = (inputs) => {
 };
 try {
     const isSkip = getSkipTerraform({
-        skipLabelPrefix: core.getInput('skip_label_prefix', { required: true }),
-        labels: core.getInput('labels', { required: true }),
-        prAuthor: core.getInput('pr_author', { required: true }),
+        skipLabelPrefix: core.getInput("skip_label_prefix", { required: true }),
+        labels: core.getInput("labels", { required: true }),
+        prAuthor: core.getInput("pr_author", { required: true }),
         target: process.env.TFACTION_TARGET,
     });
-    core.exportVariable('TFACTION_SKIP_TERRAFORM', isSkip);
-    core.setOutput('skip_terraform', isSkip);
+    core.exportVariable("TFACTION_SKIP_TERRAFORM", isSkip);
+    core.setOutput("skip_terraform", isSkip);
 }
 catch (error) {
     core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
