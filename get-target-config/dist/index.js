@@ -24749,65 +24749,40 @@ const TflintConfig = zod_1.z.object({
 const TrivyConfig = zod_1.z.object({
     enabled: zod_1.z.optional(zod_1.z.boolean()),
 });
+const GitHubSecrets = zod_1.z.array(zod_1.z.object({
+    env_name: zod_1.z.string(),
+    secret_name: zod_1.z.string(),
+}));
 const JobConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
-    secrets: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
+    secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
     env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
 });
 const TargetConfig = zod_1.z.object({
-    target: zod_1.z.string(),
-    working_directory: zod_1.z.string(),
     aws_region: zod_1.z.optional(zod_1.z.string()),
-    s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
-    template_dir: zod_1.z.optional(zod_1.z.string()),
-    gcs_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
+    destroy: zod_1.z.optional(zod_1.z.boolean()),
+    env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
+    environment: zod_1.z.optional(GitHubEnvironment),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
-    environment: zod_1.z.optional(GitHubEnvironment),
+    gcs_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
     runs_on: zod_1.z.optional(zod_1.z.string()),
-    terraform_plan_config: zod_1.z.optional(JobConfig),
-    tfmigrate_plan_config: zod_1.z.optional(JobConfig),
+    secrets: zod_1.z.optional(GitHubSecrets),
+    s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
+    target: zod_1.z.string(),
+    template_dir: zod_1.z.optional(zod_1.z.string()),
     terraform_apply_config: zod_1.z.optional(JobConfig),
+    terraform_plan_config: zod_1.z.optional(JobConfig),
     tfmigrate_apply_config: zod_1.z.optional(JobConfig),
-    env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
-    destroy: zod_1.z.optional(zod_1.z.boolean()),
+    tfmigrate_plan_config: zod_1.z.optional(JobConfig),
+    working_directory: zod_1.z.string(),
 });
 const Config = zod_1.z.object({
-    plan_workflow_name: zod_1.z.string(),
-    base_working_directory: zod_1.z.optional(zod_1.z.string()),
-    working_directory_file: zod_1.z.optional(zod_1.z.string()),
-    module_base_directory: zod_1.z.optional(zod_1.z.string()),
-    module_file: zod_1.z.optional(zod_1.z.string()),
-    renovate_login: zod_1.z.optional(zod_1.z.string()),
-    draft_pr: zod_1.z.optional(zod_1.z.boolean()),
-    skip_create_pr: zod_1.z.optional(zod_1.z.boolean()),
-    target_groups: zod_1.z.array(TargetConfig),
-    env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
-    tfsec: zod_1.z.optional(TfsecConfig),
-    trivy: zod_1.z.optional(TrivyConfig),
-    tflint: zod_1.z.optional(TflintConfig),
-    label_prefixes: zod_1.z.optional(zod_1.z.object({
-        target: zod_1.z.optional(zod_1.z.string()),
-        tfmigrate: zod_1.z.optional(zod_1.z.string()),
-        skip: zod_1.z.optional(zod_1.z.string()),
-    })),
-    drift_detection: zod_1.z.optional(zod_1.z.object({
-        issue_repo_owner: zod_1.z.optional(zod_1.z.string()),
-        issue_repo_name: zod_1.z.optional(zod_1.z.string()),
-        num_of_issues: zod_1.z.optional(zod_1.z.number()),
-        minimum_detection_interval: zod_1.z.optional(zod_1.z.number()),
-    })),
-    update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
-        enabled: zod_1.z.optional(zod_1.z.boolean()),
-    })),
-    scaffold_working_directory: zod_1.z.optional(zod_1.z.object({
-        skip_adding_aqua_packages: zod_1.z.optional(zod_1.z.boolean()),
-    })),
     aqua: zod_1.z.optional(zod_1.z.object({
         update_checksum: zod_1.z.optional(zod_1.z.object({
             enabled: zod_1.z.optional(zod_1.z.boolean()),
@@ -24815,6 +24790,38 @@ const Config = zod_1.z.object({
             prune: zod_1.z.optional(zod_1.z.boolean()),
         })),
     })),
+    base_working_directory: zod_1.z.optional(zod_1.z.string()),
+    draft_pr: zod_1.z.optional(zod_1.z.boolean()),
+    drift_detection: zod_1.z.optional(zod_1.z.object({
+        issue_repo_owner: zod_1.z.optional(zod_1.z.string()),
+        issue_repo_name: zod_1.z.optional(zod_1.z.string()),
+        num_of_issues: zod_1.z.optional(zod_1.z.number()),
+        minimum_detection_interval: zod_1.z.optional(zod_1.z.number()),
+    })),
+    env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
+    label_prefixes: zod_1.z.optional(zod_1.z.object({
+        target: zod_1.z.optional(zod_1.z.string()),
+        tfmigrate: zod_1.z.optional(zod_1.z.string()),
+        skip: zod_1.z.optional(zod_1.z.string()),
+    })),
+    module_base_directory: zod_1.z.optional(zod_1.z.string()),
+    module_file: zod_1.z.optional(zod_1.z.string()),
+    plan_workflow_name: zod_1.z.string(),
+    renovate_login: zod_1.z.optional(zod_1.z.string()),
+    renovate_terraform_labels: zod_1.z.optional(zod_1.z.array(zod_1.z.string())),
+    scaffold_working_directory: zod_1.z.optional(zod_1.z.object({
+        skip_adding_aqua_packages: zod_1.z.optional(zod_1.z.boolean()),
+    })),
+    skip_create_pr: zod_1.z.optional(zod_1.z.boolean()),
+    skip_terraform_by_renovate: zod_1.z.optional(zod_1.z.boolean()),
+    target_groups: zod_1.z.array(TargetConfig),
+    tflint: zod_1.z.optional(TflintConfig),
+    tfsec: zod_1.z.optional(TfsecConfig),
+    trivy: zod_1.z.optional(TrivyConfig),
+    update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
+        enabled: zod_1.z.optional(zod_1.z.boolean()),
+    })),
+    working_directory_file: zod_1.z.optional(zod_1.z.string()),
 });
 const getConfig = () => {
     let configFilePath = process.env.TFACTION_CONFIG;
@@ -57936,17 +57943,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const lib = __importStar(__nccwpck_require__(8022));
 const path = __importStar(__nccwpck_require__(1017));
 try {
+    const inputs = {
+        target: process.env.TFACTION_TARGET,
+        workingDir: process.env.TFACTION_WORKING_DIR,
+    };
     const config = lib.getConfig();
     const isApply = lib.getIsApply();
     const jobType = lib.getJobType();
     const workingDirectoryFile = config.working_directory_file ? config.working_directory_file : 'tfaction.yaml';
-    let target = process.env.TFACTION_TARGET;
-    let workingDir = process.env.TFACTION_WORKING_DIR;
+    let target = inputs.target;
+    let workingDir = inputs.workingDir;
     let targetConfig = null;
     if (target) {
         targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
@@ -57969,10 +57981,10 @@ try {
     core.setOutput('working_directory', workingDir);
     core.setOutput('providers_lock_opts', '-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64');
     lib.setOutputs(['template_dir'], [targetConfig]);
-    core.setOutput('enable_tfsec', getBool(config, false, 'tfsec', 'enabled'));
-    core.setOutput('enable_tflint', getBool(config, true, 'tflint', 'enabled'));
-    core.setOutput('enable_trivy', getBool(config, true, 'trivy', 'enabled'));
-    if (jobType == 'scaffold_working_dir') {
+    core.setOutput('enable_tfsec', (_b = (_a = config === null || config === void 0 ? void 0 : config.tfsec) === null || _a === void 0 ? void 0 : _a.enabled) !== null && _b !== void 0 ? _b : false);
+    core.setOutput('enable_tflint', (_d = (_c = config === null || config === void 0 ? void 0 : config.tflint) === null || _c === void 0 ? void 0 : _c.enabled) !== null && _d !== void 0 ? _d : true);
+    core.setOutput('enable_trivy', (_f = (_e = config === null || config === void 0 ? void 0 : config.trivy) === null || _e === void 0 ? void 0 : _e.enabled) !== null && _f !== void 0 ? _f : true);
+    if (jobType === 'scaffold_working_dir') {
         lib.setOutputs([
             's3_bucket_name_tfmigrate_history',
             'gcs_bucket_name_tfmigrate_history',
@@ -58003,21 +58015,6 @@ try {
 }
 catch (error) {
     core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
-}
-function getBool(a, defaultValue, ...keys) {
-    try {
-        let value = a;
-        for (let i = 0; i < keys.length; i++) {
-            value = value[keys[i]];
-        }
-        if (value === undefined) {
-            return defaultValue;
-        }
-        return value === true;
-    }
-    catch (_error) {
-        return defaultValue;
-    }
 }
 
 

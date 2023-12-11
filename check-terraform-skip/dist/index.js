@@ -24749,33 +24749,38 @@ const TflintConfig = zod_1.z.object({
 const TrivyConfig = zod_1.z.object({
     enabled: zod_1.z.optional(zod_1.z.boolean()),
 });
+const GitHubSecrets = zod_1.z.array(zod_1.z.object({
+    env_name: zod_1.z.string(),
+    secret_name: zod_1.z.string(),
+}));
 const JobConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
-    secrets: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
+    secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
     env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
 });
 const TargetConfig = zod_1.z.object({
-    target: zod_1.z.string(),
-    working_directory: zod_1.z.string(),
     aws_region: zod_1.z.optional(zod_1.z.string()),
-    s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
-    template_dir: zod_1.z.optional(zod_1.z.string()),
-    gcs_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
+    destroy: zod_1.z.optional(zod_1.z.boolean()),
+    env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
+    environment: zod_1.z.optional(GitHubEnvironment),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
-    environment: zod_1.z.optional(GitHubEnvironment),
+    gcs_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
     runs_on: zod_1.z.optional(zod_1.z.string()),
-    terraform_plan_config: zod_1.z.optional(JobConfig),
-    tfmigrate_plan_config: zod_1.z.optional(JobConfig),
+    secrets: zod_1.z.optional(GitHubSecrets),
+    s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
+    target: zod_1.z.string(),
+    template_dir: zod_1.z.optional(zod_1.z.string()),
     terraform_apply_config: zod_1.z.optional(JobConfig),
+    terraform_plan_config: zod_1.z.optional(JobConfig),
     tfmigrate_apply_config: zod_1.z.optional(JobConfig),
-    env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
-    destroy: zod_1.z.optional(zod_1.z.boolean()),
+    tfmigrate_plan_config: zod_1.z.optional(JobConfig),
+    working_directory: zod_1.z.string(),
 });
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
