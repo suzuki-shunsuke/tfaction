@@ -13,7 +13,7 @@ type TargetConfig = {
 };
 
 const getTargetConfigByTarget = (
-  targets: Array<lib.TargetConfig>,
+  targets: Array<lib.TargetGroup>,
   target: string,
   isApply: boolean,
   jobType: string,

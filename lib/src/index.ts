@@ -52,7 +52,7 @@ const JobConfig = z.object({
 
 export type JobConfig = z.infer<typeof JobConfig>;
 
-const TargetConfig = z.object({
+const TargetGroup = z.object({
   aws_region: z.optional(z.string()),
   aws_assume_role_arn: z.optional(z.string()),
   destroy: z.optional(z.boolean()),
@@ -71,6 +71,30 @@ const TargetConfig = z.object({
   tfmigrate_apply_config: z.optional(JobConfig),
   tfmigrate_plan_config: z.optional(JobConfig),
   working_directory: z.string(),
+});
+
+export type TargetGroup = z.infer<typeof TargetGroup>;
+
+const TargetConfig = z.object({
+  aws_assume_role_arn: z.optional(z.string()),
+  aws_region: z.optional(z.string()),
+  destroy: z.optional(z.boolean()),
+  drift_detection: z.optional(
+    z.object({
+      enabled: z.optional(z.boolean()),
+    }),
+  ),
+  env: z.optional(z.record(z.string())),
+  gcs_bucket_name_tfmigrate_history: z.optional(z.string()),
+  gcp_service_account: z.optional(z.string()),
+  gcp_workload_identity_provider: z.optional(z.string()),
+  providers_lock_opts: z.optional(z.string()),
+  s3_bucket_name_tfmigrate_history: z.optional(z.string()),
+  secrets: z.optional(GitHubSecrets),
+  terraform_apply_config: z.optional(JobConfig),
+  terraform_plan_config: z.optional(JobConfig),
+  tfmigrate_apply_config: z.optional(JobConfig),
+  tfmigrate_plan_config: z.optional(JobConfig),
 });
 
 export type TargetConfig = z.infer<typeof TargetConfig>;
@@ -117,7 +141,7 @@ const Config = z.object({
   ),
   skip_create_pr: z.optional(z.boolean()),
   skip_terraform_by_renovate: z.optional(z.boolean()),
-  target_groups: z.array(TargetConfig),
+  target_groups: z.array(TargetGroup),
   tflint: z.optional(TflintConfig),
   tfsec: z.optional(TfsecConfig),
   trivy: z.optional(TrivyConfig),
@@ -163,9 +187,9 @@ export const setValue = (
 };
 
 export const getTargetFromTargetGroups = (
-  targetGroups: Array<TargetConfig>,
+  targetGroups: Array<TargetGroup>,
   target: string,
-): TargetConfig | undefined => {
+): TargetGroup | undefined => {
   for (let i = 0; i < targetGroups.length; i++) {
     const targetConfig = targetGroups[i];
     if (target.startsWith(targetConfig.target)) {
@@ -176,9 +200,9 @@ export const getTargetFromTargetGroups = (
 };
 
 export const getTargetFromTargetGroupsByWorkingDir = (
-  targetGroups: Array<TargetConfig>,
+  targetGroups: Array<TargetGroup>,
   wd: string,
-): TargetConfig | undefined => {
+): TargetGroup | undefined => {
   for (let i = 0; i < targetGroups.length; i++) {
     const targetConfig = targetGroups[i];
     if (wd.startsWith(targetConfig.working_directory)) {
