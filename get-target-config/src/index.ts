@@ -23,13 +23,13 @@ try {
 
   if (target) {
     targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
-    if (targetConfig === null) {
+    if (!targetConfig) {
       throw 'target config is not found in target_groups';
     }
     workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
   } else if (workingDir) {
     targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, workingDir);
-    if (targetConfig === null) {
+    if (!targetConfig) {
       throw 'target config is not found in target_groups';
     }
     target = workingDir.replace(targetConfig.working_directory, targetConfig.target);

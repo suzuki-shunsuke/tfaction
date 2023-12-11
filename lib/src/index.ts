@@ -138,24 +138,24 @@ export const setValue = (name: string, value: string | undefined, defaultValue: 
   core.setOutput(name, (value == '' || value == undefined) ? defaultValue : value);
 };
 
-export const getTargetFromTargetGroups = (targetGroups: Array<TargetConfig>, target: string): TargetConfig | null => {
+export const getTargetFromTargetGroups = (targetGroups: Array<TargetConfig>, target: string): TargetConfig | undefined => {
   for (let i = 0; i < targetGroups.length; i++) {
     const targetConfig = targetGroups[i];
     if (target.startsWith(targetConfig.target)) {
       return targetConfig;
     }
   }
-  return null;
+  return undefined;
 };
 
-export const getTargetFromTargetGroupsByWorkingDir = (targetGroups: Array<TargetConfig>, wd: string): TargetConfig | null => {
+export const getTargetFromTargetGroupsByWorkingDir = (targetGroups: Array<TargetConfig>, wd: string): TargetConfig | undefined => {
   for (let i = 0; i < targetGroups.length; i++) {
     const targetConfig = targetGroups[i];
     if (wd.startsWith(targetConfig.working_directory)) {
       return targetConfig;
     }
   }
-  return null;
+  return undefined;
 };
 
 export const readTargetConfig = (p: string): TargetConfig => {
@@ -206,8 +206,7 @@ export const setValues = (name: string, values: Array<any>): void => {
 export const setOutputs = (keys: Array<string>, objs: Array<any>): void => {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
-    for (let j = 0; j < objs.length; j++) {
-      const obj = objs[j];
+    for (const obj of objs) {
       if (obj != undefined && obj != null && obj[key] != undefined) {
         core.setOutput(key, obj[key]);
         break;
