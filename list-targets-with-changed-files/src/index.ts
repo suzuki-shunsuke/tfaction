@@ -2,28 +2,27 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as lib from './lib';
+import * as lib from 'lib';
 
-interface TargetConfig {
+type TargetConfig = {
   target: string
   runs_on: string
   job_type: string
-  environment: string | object | null
-  secrets: object | undefined
-}
+  environment?: lib.GitHubEnvironment
+  secrets?: lib.GitHubSecrets
+};
 
-function getTargetConfigByTarget(targets: Array<lib.TargetConfig>, target: string, isApply: boolean, jobType: string): TargetConfig {
-  for (let i = 0; i < targets.length; i++) {
-    const t = targets[i];
+const getTargetConfigByTarget = (targets: Array<lib.TargetConfig>, target: string, isApply: boolean, jobType: string): TargetConfig => {
+  for (const t of targets) {
     if (!target.startsWith(t.target)) {
       continue;
     }
     const jobConfig = lib.getJobConfig(t, isApply, jobType);
-    if (jobConfig == undefined) {
+    if (jobConfig === undefined) {
       return {
         target: target,
         runs_on: t.runs_on ? t.runs_on : 'ubuntu-latest',
-        environment: t.environment ? t.environment : null,
+        environment: t?.environment,
         secrets: t.secrets,
         job_type: jobType,
       };
@@ -31,15 +30,15 @@ function getTargetConfigByTarget(targets: Array<lib.TargetConfig>, target: strin
     return {
       target: target,
       runs_on: jobConfig.runs_on ? jobConfig.runs_on : (t.runs_on ? t.runs_on : 'ubuntu-latest'),
-      environment: jobConfig.environment ? jobConfig.environment : (t.environment ? t.environment : null),
+      environment: jobConfig.environment ? jobConfig.environment : t?.environment,
       secrets: jobConfig.secrets ? jobConfig.secrets : t.secrets,
       job_type: jobType,
     };
   }
   throw 'target is invalid';
-}
+};
 
-function getPRBody(): string {
+const getPRBody = (): string => {
   if (github.context.payload.pull_request) {
     return github.context.payload.pull_request.body ? github.context.payload.pull_request.body : '';
   }
@@ -52,7 +51,7 @@ function getPRBody(): string {
     return '';
   }
   return pr.body;
-}
+};
 
 try {
   const config = lib.getConfig();
@@ -81,7 +80,7 @@ try {
 
   // <!-- tfaction follow up pr target=foo -->
   let followupTarget = '';
-  const followupPRBodyPrefix='<!-- tfaction follow up pr target=';
+  const followupPRBodyPrefix = '<!-- tfaction follow up pr target=';
   const prBody = getPRBody();
   if (prBody.startsWith(followupPRBodyPrefix)) {
     followupTarget = prBody.split('\n')[0].slice(followupPRBodyPrefix.length, - ' -->'.length);
