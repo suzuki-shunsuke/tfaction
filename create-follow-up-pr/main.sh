@@ -7,7 +7,7 @@ set -euo pipefail
 # 2. open pull request
 
 follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
-GITHUB_TOKEN="$GITHUB_APP_TOKEN" ghcp empty-commit \
+ghcp empty-commit \
 	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
 	-m "chore: empty commit to open follow up pull request
 
@@ -48,7 +48,7 @@ Follow up #$CI_INFO_PR_NUMBER ([failed workflow]($GITHUB_SERVER_URL/$GITHUB_REPO
 
 create_opts+=( -b "$pr_body" )
 
-follow_up_pr_url=$(env GITHUB_TOKEN="$GITHUB_APP_TOKEN" gh pr create "${create_opts[@]}")
+follow_up_pr_url=$(gh pr create "${create_opts[@]}")
 
 github-comment post \
 	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \

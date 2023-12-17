@@ -45,7 +45,7 @@ runs:
       env:
         AQUA_GITHUB_TOKEN: ${{inputs.github_token}}
 
-    - run: aqua g -i open-policy-agent/conftest hashicorp/terraform
+    - run: aqua g -i hashicorp/terraform
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
       if: env.TFACTION_SKIP_ADDING_AQUA_PACKAGES != 'true'

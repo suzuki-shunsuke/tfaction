@@ -22,8 +22,7 @@ if [ ! -f .tfmigrate.hcl ]; then
 		-- \
 		ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
 		-m "chore(tfmigrate): add .tfmigrate.hcl" \
-		-C "$ROOT_DIR" "$WORKING_DIR/.tfmigrate.hcl" \
-		--token "$GITHUB_APP_TOKEN"
+		-C "$ROOT_DIR" "$WORKING_DIR/.tfmigrate.hcl"
 	exit 1
 fi
 

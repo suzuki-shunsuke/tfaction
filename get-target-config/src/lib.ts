@@ -4,12 +4,12 @@ import * as core from '@actions/core';
 const yaml = require('js-yaml');
 
 interface Config {
-  working_directory_file: string | undefined
+  working_directory_file?: string
   target_groups: Array<TargetConfig>
-  env: Record<string, string> | undefined
-  tfsec: TfsecConfig | undefined
-  trivy: TrivyConfig | undefined
-  tflint: TflintConfig | undefined
+  env?: Record<string, string>
+  tfsec?: TfsecConfig
+  trivy?: TrivyConfig
+  tflint?: TflintConfig
 }
 
 interface TargetConfig {
@@ -20,19 +20,20 @@ interface TargetConfig {
   template_dir: string
   gcs_bucket_name_tfmigrate_history: string
 
-  aws_assume_role_arn: string | undefined
-  gcp_service_account: string | undefined
-  gcp_workload_identity_provider: string | undefined
-  environment: object | string | undefined
-  secrets: object | undefined
-  runs_on: string | undefined
+  aws_assume_role_arn?: string
+  gcp_service_account?: string
+  gcp_workload_identity_provider?: string
+  environment?: object | string
+  secrets?: object
+  runs_on?: string
 
-  terraform_plan_config: JobConfig | undefined
-  tfmigrate_plan_config: JobConfig | undefined
-  terraform_apply_config: JobConfig | undefined
-  tfmigrate_apply_config: JobConfig | undefined
-  env: Record<string, string> | undefined
-  tfsec: TfsecConfig | undefined
+  terraform_plan_config?: JobConfig
+  tfmigrate_plan_config?: JobConfig
+  terraform_apply_config?: JobConfig
+  tfmigrate_apply_config?: JobConfig
+  env?: Record<string, string>
+  tfsec?: TfsecConfig
+  destroy?: boolean
 }
 
 export interface TfsecConfig {
@@ -48,13 +49,13 @@ export interface TrivyConfig {
 }
 
 export interface JobConfig {
-  aws_assume_role_arn: string | undefined
-  gcp_service_account: string | undefined
-  gcp_workload_identity_provider: string | undefined
-  environment: object | string | undefined
-  secrets: object | undefined
-  runs_on: string | undefined
-  env: Record<string, string> | undefined
+  aws_assume_role_arn?: string
+  gcp_service_account?: string
+  gcp_workload_identity_provider?: string
+  environment?: object | string
+  secrets?: object
+  runs_on?: string
+  env?: Record<string, string>
 }
 
 export function getConfig(): Config {
@@ -145,7 +146,7 @@ export function setOutputs(keys: Array<string>, objs: Array<any>) {
 }
 
 interface HasEnv {
-  env: Record<string, string> | undefined;
+  env?: Record<string, string>
 }
 
 export function setEnvs(...objs: Array<HasEnv | undefined>) {

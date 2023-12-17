@@ -1,5 +1,5 @@
-name: Create a pull request to scaffold a working directory
-description: Create a pull request to scaffold a working directory
+name: Create a pull request to scaffold a Terraform Module
+description: Create a pull request to scaffold a Terraform Module
 inputs:
   github_token:
     description: |
@@ -8,30 +8,41 @@ inputs:
       If skip_create_pr is false
       pull-requests:write - Create pull requests
     required: true
+
 runs:
   using: composite
   steps:
+    - run: |
+        echo "::error ::github_token is required"
+        exit 1
+      shell: bash
+      if: inputs.github_token == ''
+    - run: |
+        echo "::error ::env.TFACTION_MODULE_PATH is required"
+        exit 1
+      shell: bash
+      if: env.TFACTION_MODULE_PATH == ''
+
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
-      id: target-config
-      env:
-        TFACTION_IS_APPLY: "false"
-        TFACTION_JOB_TYPE: scaffold_working_dir
 
-    - run: git add .
+    - run: aqua i -l -a
       shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
+      working-directory: ${{env.TFACTION_MODULE_PATH}}
+
     - run: |
-        echo "branch=scaffold-working-directory-${TFACTION_TARGET}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
+        echo "branch=scaffold-module-${TFACTION_MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
       id: branch
       shell: bash
 
+    - run: git add "$TFACTION_MODULE_PATH"
+      shell: bash
+
     - run: |
-        git diff --cached --name-only "${{steps.target-config.outputs.working_directory}}" |
+        git diff --cached --name-only |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "${{steps.branch.outputs.branch}}" \
-            -m "scaffold a working directory (${TFACTION_TARGET})"
+            -m "chore($TFACTION_MODULE_PATH): scaffold a Terraform Module"
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -43,14 +54,14 @@ runs:
         fi
         cat << EOS >> "$GITHUB_STEP_SUMMARY"
 
-        ## Create a scaffold pull request
+        ## Create a pull request
         
         Please run the following command in your terminal.
 
         $CODE_BLOCK
         gh pr create -R "$GITHUB_REPOSITORY" $draft_pr\\
           -H "${{steps.branch.outputs.branch}}" \\
-          -t "Scaffold a working directory (${TFACTION_TARGET})" \\
+          -t "Scaffold a Terraform Module (${TFACTION_MODULE_PATH})" \\
           -b "This pull request was created by [GitHub Actions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"
         $CODE_BLOCK
 
@@ -62,7 +73,7 @@ runs:
         CODE_BLOCK: "```"
 
     - run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a working directory (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by GitHub Actions workflow_dispatch event $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
+        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${TFACTION_MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
