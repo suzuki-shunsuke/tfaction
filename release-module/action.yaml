@@ -36,7 +36,7 @@ runs:
         MODULE_PATH: ${{inputs.module_path}}
 
     - run: |
-        module_name=${MODULE_PATH/\//_}
+        module_name=${MODULE_PATH//\//_}
         echo "tag=module_${module_name}_${{inputs.version}}" >> "$GITHUB_OUTPUT"
       id: get-tag
       shell: bash
