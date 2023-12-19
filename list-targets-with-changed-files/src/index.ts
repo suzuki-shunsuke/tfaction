@@ -113,20 +113,20 @@ try {
 
   const targetPrefix =
     config.label_prefixes != undefined &&
-    config.label_prefixes.target != undefined &&
-    config.label_prefixes.target != ""
+      config.label_prefixes.target != undefined &&
+      config.label_prefixes.target != ""
       ? config.label_prefixes.target
       : "target:";
   const skipPrefix =
     config.label_prefixes != undefined &&
-    config.label_prefixes.skip != undefined &&
-    config.label_prefixes.skip != ""
+      config.label_prefixes.skip != undefined &&
+      config.label_prefixes.skip != ""
       ? config.label_prefixes.skip
       : "skip:";
   const tfmigratePrefix =
     config.label_prefixes != undefined &&
-    config.label_prefixes.tfmigrate != undefined &&
-    config.label_prefixes.tfmigrate != ""
+      config.label_prefixes.tfmigrate != undefined &&
+      config.label_prefixes.tfmigrate != ""
       ? config.label_prefixes.tfmigrate
       : "tfmigrate:";
 
