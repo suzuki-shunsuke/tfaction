@@ -8,18 +8,36 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
+  secrets:
+    required: false
+    default: "{}"
 runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
-    - run: bash ${{ github.action_path }}/main.sh
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
-      shell: bash
+
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      id: env
+      with:
+        script: |
+          return Object.assign(JSON.parse(process.env.SECRETS,), {
+            GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+            WORKING_DIR: process.env.WORKING_DIR,
+            ROOT_DIR: process.env.ROOT_DIR,
+            PR_NUMBER: process.env.PR_NUMBER,
+            S3_BUCKET_NAME_TFMIGRATE_HISTORY: process.env.S3_BUCKET_NAME_TFMIGRATE_HISTORY,
+            GCS_BUCKET_NAME_TFMIGRATE_HISTORY: process.env.GCS_BUCKET_NAME_TFMIGRATE_HISTORY,
+          })
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
-        ROOT_DIR: ${{ github.workspace }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        S3_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}
-        GCS_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
+        ROOT_DIR: ${{github.workspace}}
+        PR_NUMBER: ${{github.event.pull_request.number}}
+        S3_BUCKET_NAME_TFMIGRATE_HISTORY: ${{steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}
+        GCS_BUCKET_NAME_TFMIGRATE_HISTORY: ${{steps.target-config.outputs.gcs_bucket_name_tfmigrate_history}}
+
+    - run: bash ${{github.action_path}}/main.sh
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+      shell: bash
+      env: ${{fromJSON(steps.env.outputs.result)}}

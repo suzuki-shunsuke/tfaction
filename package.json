@@ -1,0 +1,18 @@
+{
+  "name": "tfaction",
+  "version": "1.0.0",
+  "description": "Framework for Monorepo to build high level Terraform Workflows by GitHub Actions",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "fmt": "prettier -w ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.1.1"
+  }
+}

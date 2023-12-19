@@ -2,22 +2,41 @@
 # cmdx - task runner
 # https://github.com/suzuki-shunsuke/cmdx
 tasks:
-- name: release
-  short: r
-  description: release the new version
-  usage: release the new version
-  script: gh workflow run release.yaml -f tag={{.version}}
-  args:
-  - name: version
-    required: true
-    validate:
-    - regexp: "^v\\d+\\.\\d+.\\d+(-\\d+)?$"
-- name: schema
-  description: build JSON Schema
-  usage: build JSON Schema
-  require:
-    exec:
-    - generate-schema-doc
-  script: |
-    mkdir -p build
-    generate-schema-doc --expand-buttons --link-to-reused-ref schema build
+  - name: release
+    short: r
+    description: release the new version
+    usage: release the new version
+    script: gh workflow run release.yaml -f tag={{.version}}
+    args:
+      - name: version
+        required: true
+        validate:
+          - regexp: "^v\\d+\\.\\d+.\\d+(-\\d+)?$"
+  - name: schema
+    description: build JSON Schema
+    usage: build JSON Schema
+    require:
+      exec:
+        - generate-schema-doc
+    script: |
+      mkdir -p build
+      generate-schema-doc --expand-buttons --link-to-reused-ref schema build
+  - name: build
+    description: build TypeScript
+    usage: build TypeScript
+    script: |
+      set -euo pipefail
+      pushd lib
+      npm run build
+      popd
+      for dir in $(git ls-files | grep package.json | grep -v -E '^package\.json' | grep -v lib/package.json | xargs -n 1 dirname); do
+        pushd "$dir"
+        npm run build
+        popd
+      done
+
+  - name: fmt
+    description: Format with prettier
+    usage: Format with prettier
+    script: |
+      npm run fmt

@@ -8,6 +8,9 @@ inputs:
       issues:write - Create labels
     required: false
     default: ${{ github.token }}
+  secrets:
+    required: false
+    default: "{}"
 runs:
   using: composite
   steps:
@@ -23,18 +26,34 @@ runs:
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
+
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      id: env
+      with:
+        script: |
+          return Object.assign(JSON.parse(process.env.SECRETS,), {
+            GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+            ROOT_DIR: process.env.ROOT_DIR,
+            PR_NUMBER: process.env.PR_NUMBER,
+            RENOVATE_LOGIN: process.env.RENOVATE_LOGIN,
+            HEAD_SHA: process.env.HEAD_SHA,
+            DESTROY: process.env.DESTROY,
+          })
+      env:
+        SECRETS: ${{inputs.secrets}}
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        ROOT_DIR: ${{github.workspace}}
+        PR_NUMBER: ${{github.event.pull_request.number}}
+        RENOVATE_LOGIN: ${{steps.global-config.outputs.renovate_login}}
+        HEAD_SHA: ${{github.event.pull_request.head.sha}}
+        DESTROY: ${{steps.target-config.outputs.destroy}}
+
     - run: bash ${{ github.action_path }}/main.sh
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       if: |
         env.TFACTION_DRIFT_ISSUE_NUMBER || !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        ROOT_DIR: ${{ github.workspace }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
-        HEAD_SHA: ${{github.event.pull_request.head.sha}}
-        DESTROY: ${{ steps.target-config.outputs.destroy }}
+      env: ${{fromJSON(steps.env.outputs.result)}}
 
     - run: echo "value=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
       id: artifact_name

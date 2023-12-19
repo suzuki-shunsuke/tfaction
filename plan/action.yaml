@@ -2,9 +2,12 @@ name: plan
 description: plan
 inputs:
   github_token:
-    description: 'GitHub Access Token'
+    description: "GitHub Access Token"
     required: false
     default: ${{ github.token }}
+  secrets:
+    required: false
+    default: "{}"
 runs:
   using: composite
   steps:
@@ -12,8 +15,10 @@ runs:
       if: env.TFACTION_JOB_TYPE == 'terraform'
       with:
         github_token: ${{inputs.github_token}}
+        secrets: ${{inputs.secrets}}
 
     - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@main
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
       with:
         github_token: ${{inputs.github_token}}
+        secrets: ${{inputs.secrets}}

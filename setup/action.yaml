@@ -11,7 +11,7 @@ inputs:
     required: false
     default: ${{ github.token }}
   ssh_key:
-    description: 'SSH Key for Terraform Private Module'
+    description: "SSH Key for Terraform Private Module"
     required: false
 outputs:
   working_directory:
@@ -23,6 +23,9 @@ outputs:
   s3_bucket_name_tfmigrate_history:
     description: S3 Bucket name for tfmigrate history files
     value: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}
+  secrets:
+    description: Secrets from AWS Secrets Manager
+    value: ${{toJSON(steps.secrets.outputs)}}
 runs:
   using: composite
   steps:
@@ -96,8 +99,6 @@ runs:
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
-
     - uses: google-github-actions/auth@67e9c72af6e0492df856527b474995862b7b6591 # v2.0.0
       if: steps.target-config.outputs.gcp_service_account != ''
       with:
@@ -110,7 +111,10 @@ runs:
     - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
       if: inputs.ssh_key != ''
       with:
-       ssh_key: ${{ inputs.ssh_key }}
+        ssh_key: ${{ inputs.ssh_key }}
+
+    - uses: suzuki-shunsuke/tfaction/get-secrets@main
+      id: secrets
 
     - uses: suzuki-shunsuke/github-action-terraform-init@f30204183f50ed18edb01b9f18e896a64eb73b79 # v1.0.0
       with:
@@ -119,3 +123,4 @@ runs:
         github_app_token: ${{ inputs.github_token }}
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
+      env: ${{steps.secrets.outputs}}
