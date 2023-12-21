@@ -21,7 +21,6 @@ jobs:
       - run: echo "${{ steps.target-config.outputs.working_directory }}"
       - run: echo "${{ steps.target-config.outputs.aws_assume_role_arn }}"
       - run: echo "${{ steps.target-config.outputs.aws_region }}"
-      - run: echo "${{ steps.target-config.outputs.s3_bucket_name_plan_file }}"
       - run: echo "${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}"
       - run: echo "${{ steps.target-config.outputs.template_dir }}"
 
@@ -41,6 +40,5 @@ jobs:
           TFACTION_IA_APPLY: 'false'
           TFACTION_JOB_TYPE: 'terraform'
       - run: echo "${{ steps.target-config.outputs.working_directory }}"
-      - run: echo "${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}"
       - run: echo "${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}"
       - run: echo "${{ steps.target-config.outputs.template_dir }}"
