@@ -27,10 +27,12 @@ tasks:
     script: |
       set -euo pipefail
       pushd lib
+      npm i
       npm run build
       popd
       for dir in $(git ls-files | grep package.json | grep -v -E '^package\.json' | grep -v lib/package.json | xargs -n 1 dirname); do
         pushd "$dir"
+        npm i
         npm run build
         popd
       done
