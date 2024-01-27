@@ -49,7 +49,7 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: 'true'
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@chore-update-action-format
+    - uses: suzuki-shunsuke/github-action-terraform-fmt@main
       if: steps.target-config.outputs.destroy != 'true'
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
