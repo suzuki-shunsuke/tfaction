@@ -69,9 +69,6 @@
             "$ref": "#/$defs/TerraformProvidersLockOptions"
           },
 
-          "s3_bucket_name_plan_file": {
-            "$ref": "#/$defs/S3BucketNamePlanFile"
-          },
           "s3_bucket_name_tfmigrate_history": {
             "$ref": "#/$defs/S3BucketNameTfmigrateHistory"
           },
