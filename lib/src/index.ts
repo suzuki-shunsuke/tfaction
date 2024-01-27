@@ -197,7 +197,7 @@ export const setValue = (
 ): void => {
   core.setOutput(
     name,
-    value == "" || value == undefined ? defaultValue : value,
+    value || defaultValue,
   );
 };
 

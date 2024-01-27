@@ -24878,7 +24878,7 @@ const getIsApply = () => {
 };
 exports.getIsApply = getIsApply;
 const setValue = (name, value, defaultValue) => {
-    core.setOutput(name, value == "" || value == undefined ? defaultValue : value);
+    core.setOutput(name, value || defaultValue);
 };
 exports.setValue = setValue;
 const getTargetFromTargetGroups = (targetGroups, target) => {
@@ -57965,7 +57965,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const lib = __importStar(__nccwpck_require__(8022));
@@ -57978,36 +57978,34 @@ try {
     const config = lib.getConfig();
     const isApply = lib.getIsApply();
     const jobType = lib.getJobType();
-    const workingDirectoryFile = config.working_directory_file
-        ? config.working_directory_file
-        : "tfaction.yaml";
+    const workingDirectoryFile = (_a = config.working_directory_file) !== null && _a !== void 0 ? _a : "tfaction.yaml";
     let target = inputs.target;
     let workingDir = inputs.workingDir;
     let targetConfig = null;
     if (target) {
         targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
         if (!targetConfig) {
-            throw "target config is not found in target_groups";
+            throw new Error("target config is not found in target_groups");
         }
         workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
     }
     else if (workingDir) {
         targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, workingDir);
         if (!targetConfig) {
-            throw "target config is not found in target_groups";
+            throw new Error("target config is not found in target_groups");
         }
         target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
         core.exportVariable("TFACTION_TARGET", target);
     }
     else {
-        throw "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required";
+        throw new Error("Either TFACTION_TARGET or TFACTION_WORKING_DIR is required");
     }
     core.setOutput("working_directory", workingDir);
     core.setOutput("providers_lock_opts", "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64");
     lib.setOutputs(["template_dir"], [targetConfig]);
-    core.setOutput("enable_tfsec", (_b = (_a = config === null || config === void 0 ? void 0 : config.tfsec) === null || _a === void 0 ? void 0 : _a.enabled) !== null && _b !== void 0 ? _b : false);
-    core.setOutput("enable_tflint", (_d = (_c = config === null || config === void 0 ? void 0 : config.tflint) === null || _c === void 0 ? void 0 : _c.enabled) !== null && _d !== void 0 ? _d : true);
-    core.setOutput("enable_trivy", (_f = (_e = config === null || config === void 0 ? void 0 : config.trivy) === null || _e === void 0 ? void 0 : _e.enabled) !== null && _f !== void 0 ? _f : true);
+    core.setOutput("enable_tfsec", (_c = (_b = config === null || config === void 0 ? void 0 : config.tfsec) === null || _b === void 0 ? void 0 : _b.enabled) !== null && _c !== void 0 ? _c : false);
+    core.setOutput("enable_tflint", (_e = (_d = config === null || config === void 0 ? void 0 : config.tflint) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : true);
+    core.setOutput("enable_trivy", (_g = (_f = config === null || config === void 0 ? void 0 : config.trivy) === null || _f === void 0 ? void 0 : _f.enabled) !== null && _g !== void 0 ? _g : true);
     if (jobType === "scaffold_working_dir") {
         lib.setOutputs([
             "s3_bucket_name_tfmigrate_history",

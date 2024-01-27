@@ -15,9 +15,7 @@ try {
   const config = lib.getConfig();
   const isApply = lib.getIsApply();
   const jobType = lib.getJobType();
-  const workingDirectoryFile = config.working_directory_file
-    ? config.working_directory_file
-    : "tfaction.yaml";
+  const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
   let target = inputs.target;
   let workingDir = inputs.workingDir;
@@ -26,7 +24,7 @@ try {
   if (target) {
     targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
     if (!targetConfig) {
-      throw "target config is not found in target_groups";
+      throw new Error("target config is not found in target_groups");
     }
     workingDir = target.replace(
       targetConfig.target,
@@ -38,7 +36,7 @@ try {
       workingDir,
     );
     if (!targetConfig) {
-      throw "target config is not found in target_groups";
+      throw new Error("target config is not found in target_groups");
     }
     target = workingDir.replace(
       targetConfig.working_directory,
@@ -46,7 +44,7 @@ try {
     );
     core.exportVariable("TFACTION_TARGET", target);
   } else {
-    throw "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required";
+    throw new Error("Either TFACTION_TARGET or TFACTION_WORKING_DIR is required");
   }
 
   core.setOutput("working_directory", workingDir);

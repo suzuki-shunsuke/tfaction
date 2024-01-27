@@ -24878,7 +24878,7 @@ const getIsApply = () => {
 };
 exports.getIsApply = getIsApply;
 const setValue = (name, value, defaultValue) => {
-    core.setOutput(name, value == "" || value == undefined ? defaultValue : value);
+    core.setOutput(name, value || defaultValue);
 };
 exports.setValue = setValue;
 const getTargetFromTargetGroups = (targetGroups, target) => {
@@ -57965,29 +57965,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const lib = __importStar(__nccwpck_require__(8022));
 try {
     const config = lib.getConfig();
-    lib.setValue("base_working_directory", config.base_working_directory, ".");
-    lib.setValue("working_directory_file", config.working_directory_file, "tfaction.yaml");
-    lib.setValue("module_base_directory", config.module_base_directory, ".");
-    lib.setValue("module_file", config.module_file, "tfaction_module.yaml");
-    lib.setValue("renovate_login", config.renovate_login, "renovate[bot]");
-    core.setOutput("draft_pr", config.draft_pr ? true : false);
-    core.setOutput("skip_create_pr", config.skip_create_pr ? true : false);
-    if (config.label_prefixes != undefined) {
-        lib.setValue("label_prefix_target", config.label_prefixes.target, "target:");
-        lib.setValue("label_prefix_tfmigrate", config.label_prefixes.tfmigrate, "tfmigrate:");
-        lib.setValue("label_prefix_skip", config.label_prefixes.skip, "skip:");
-    }
-    else {
-        core.setOutput("label_prefix_target", "target:");
-        core.setOutput("label_prefix_tfmigrate", "tfmigrate:");
-        core.setOutput("label_prefix_skip", "skip:");
-    }
+    core.setOutput("base_working_directory", config.base_working_directory || ".");
+    core.setOutput("working_directory_file", config.working_directory_file || "tfaction.yaml");
+    core.setOutput("module_base_directory", config.module_base_directory || ".");
+    core.setOutput("module_file", config.module_file || "tfaction_module.yaml");
+    core.setOutput("renovate_login", config.renovate_login || "renovate[bot]");
+    core.setOutput("draft_pr", !!config.draft_pr);
+    core.setOutput("skip_create_pr", !!config.skip_create_pr);
+    core.setOutput("label_prefix_target", ((_a = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _a === void 0 ? void 0 : _a.target) || "target:");
+    core.setOutput("label_prefix_tfmigrate", ((_b = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _b === void 0 ? void 0 : _b.tfmigrate) || "tfmigrate:");
+    core.setOutput("label_prefix_skip", ((_c = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _c === void 0 ? void 0 : _c.skip) || "skip:");
     if (config.drift_detection && config.drift_detection.issue_repo_owner) {
         core.setOutput("drift_issue_repo_owner", config.drift_detection.issue_repo_owner);
     }
@@ -58007,21 +58000,21 @@ try {
             }
         }
     }
-    core.setOutput("disable_update_related_pull_requests", ((_a = config === null || config === void 0 ? void 0 : config.update_related_pull_requests) === null || _a === void 0 ? void 0 : _a.enabled) ? "false" : "true");
-    core.exportVariable("TFACTION_SKIP_ADDING_AQUA_PACKAGES", (_c = (_b = config === null || config === void 0 ? void 0 : config.scaffold_working_directory) === null || _b === void 0 ? void 0 : _b.skip_adding_aqua_packages) !== null && _c !== void 0 ? _c : "true");
-    core.setOutput("aqua_update_checksum_enabled", (_f = (_e = (_d = config === null || config === void 0 ? void 0 : config.aqua) === null || _d === void 0 ? void 0 : _d.update_checksum) === null || _e === void 0 ? void 0 : _e.enabled) !== null && _f !== void 0 ? _f : "false");
+    core.setOutput("disable_update_related_pull_requests", !((_e = (_d = config === null || config === void 0 ? void 0 : config.update_related_pull_requests) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : true));
+    core.exportVariable("TFACTION_SKIP_ADDING_AQUA_PACKAGES", (_g = (_f = config === null || config === void 0 ? void 0 : config.scaffold_working_directory) === null || _f === void 0 ? void 0 : _f.skip_adding_aqua_packages) !== null && _g !== void 0 ? _g : "true");
+    core.setOutput("aqua_update_checksum_enabled", (_k = (_j = (_h = config === null || config === void 0 ? void 0 : config.aqua) === null || _h === void 0 ? void 0 : _h.update_checksum) === null || _j === void 0 ? void 0 : _j.enabled) !== null && _k !== void 0 ? _k : "false");
     if (process.env.TFACTION_DRIFT_ISSUE_NUMBER) {
         core.setOutput("aqua_update_checksum_skip_push", "true");
     }
     else {
-        core.setOutput("aqua_update_checksum_skip_push", (_j = (_h = (_g = config === null || config === void 0 ? void 0 : config.aqua) === null || _g === void 0 ? void 0 : _g.update_checksum) === null || _h === void 0 ? void 0 : _h.skip_push) !== null && _j !== void 0 ? _j : "false");
+        core.setOutput("aqua_update_checksum_skip_push", (_o = (_m = (_l = config === null || config === void 0 ? void 0 : config.aqua) === null || _l === void 0 ? void 0 : _l.update_checksum) === null || _m === void 0 ? void 0 : _m.skip_push) !== null && _o !== void 0 ? _o : "false");
     }
-    core.setOutput("aqua_update_checksum_prune", (_m = (_l = (_k = config === null || config === void 0 ? void 0 : config.aqua) === null || _k === void 0 ? void 0 : _k.update_checksum) === null || _l === void 0 ? void 0 : _l.prune) !== null && _m !== void 0 ? _m : "false");
-    core.setOutput("enable_tfsec", (_p = (_o = config === null || config === void 0 ? void 0 : config.tfsec) === null || _o === void 0 ? void 0 : _o.enabled) !== null && _p !== void 0 ? _p : "false");
-    core.setOutput("enable_tflint", (_r = (_q = config === null || config === void 0 ? void 0 : config.tflint) === null || _q === void 0 ? void 0 : _q.enabled) !== null && _r !== void 0 ? _r : "true");
-    core.setOutput("enable_trivy", (_t = (_s = config === null || config === void 0 ? void 0 : config.trivy) === null || _s === void 0 ? void 0 : _s.enabled) !== null && _t !== void 0 ? _t : "true");
+    core.setOutput("aqua_update_checksum_prune", (_r = (_q = (_p = config === null || config === void 0 ? void 0 : config.aqua) === null || _p === void 0 ? void 0 : _p.update_checksum) === null || _q === void 0 ? void 0 : _q.prune) !== null && _r !== void 0 ? _r : "false");
+    core.setOutput("enable_tfsec", (_t = (_s = config === null || config === void 0 ? void 0 : config.tfsec) === null || _s === void 0 ? void 0 : _s.enabled) !== null && _t !== void 0 ? _t : "false");
+    core.setOutput("enable_tflint", (_v = (_u = config === null || config === void 0 ? void 0 : config.tflint) === null || _u === void 0 ? void 0 : _u.enabled) !== null && _v !== void 0 ? _v : "true");
+    core.setOutput("enable_trivy", (_x = (_w = config === null || config === void 0 ? void 0 : config.trivy) === null || _w === void 0 ? void 0 : _w.enabled) !== null && _x !== void 0 ? _x : "true");
     if (!config.plan_workflow_name) {
-        throw 'The setting "plan_workflow_name" is required in tfaction-root.yaml';
+        throw new Error('The setting "plan_workflow_name" is required in tfaction-root.yaml');
     }
     core.setOutput("plan_workflow_name", config.plan_workflow_name);
 }

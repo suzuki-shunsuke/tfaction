@@ -3,37 +3,19 @@ import * as lib from "lib";
 
 try {
   const config = lib.getConfig();
-  lib.setValue("base_working_directory", config.base_working_directory, ".");
-  lib.setValue(
-    "working_directory_file",
-    config.working_directory_file,
-    "tfaction.yaml",
-  );
+  core.setOutput("base_working_directory", config.base_working_directory || ".",);
+  core.setOutput("working_directory_file", config.working_directory_file || "tfaction.yaml",);
 
-  lib.setValue("module_base_directory", config.module_base_directory, ".");
-  lib.setValue("module_file", config.module_file, "tfaction_module.yaml");
+  core.setOutput("module_base_directory", config.module_base_directory || ".");
+  core.setOutput("module_file", config.module_file || "tfaction_module.yaml");
 
-  lib.setValue("renovate_login", config.renovate_login, "renovate[bot]");
-  core.setOutput("draft_pr", config.draft_pr ? true : false);
-  core.setOutput("skip_create_pr", config.skip_create_pr ? true : false);
+  core.setOutput("renovate_login", config.renovate_login || "renovate[bot]");
+  core.setOutput("draft_pr", !!config.draft_pr);
+  core.setOutput("skip_create_pr", !!config.skip_create_pr);
 
-  if (config.label_prefixes != undefined) {
-    lib.setValue(
-      "label_prefix_target",
-      config.label_prefixes.target,
-      "target:",
-    );
-    lib.setValue(
-      "label_prefix_tfmigrate",
-      config.label_prefixes.tfmigrate,
-      "tfmigrate:",
-    );
-    lib.setValue("label_prefix_skip", config.label_prefixes.skip, "skip:");
-  } else {
-    core.setOutput("label_prefix_target", "target:");
-    core.setOutput("label_prefix_tfmigrate", "tfmigrate:");
-    core.setOutput("label_prefix_skip", "skip:");
-  }
+  core.setOutput("label_prefix_target", config?.label_prefixes?.target || "target:");
+  core.setOutput("label_prefix_tfmigrate", config?.label_prefixes?.tfmigrate || "tfmigrate:");
+  core.setOutput("label_prefix_skip", config?.label_prefixes?.skip || "skip:");
 
   if (config.drift_detection && config.drift_detection.issue_repo_owner) {
     core.setOutput(
@@ -65,7 +47,7 @@ try {
 
   core.setOutput(
     "disable_update_related_pull_requests",
-    config?.update_related_pull_requests?.enabled ? "false" : "true",
+    !(config?.update_related_pull_requests?.enabled ?? true),
   );
   core.exportVariable(
     "TFACTION_SKIP_ADDING_AQUA_PACKAGES",
@@ -96,7 +78,7 @@ try {
   core.setOutput("enable_trivy", config?.trivy?.enabled ?? "true");
 
   if (!config.plan_workflow_name) {
-    throw 'The setting "plan_workflow_name" is required in tfaction-root.yaml';
+    throw new Error('The setting "plan_workflow_name" is required in tfaction-root.yaml');
   }
   core.setOutput("plan_workflow_name", config.plan_workflow_name);
 } catch (error) {

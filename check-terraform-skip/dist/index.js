@@ -24878,7 +24878,7 @@ const getIsApply = () => {
 };
 exports.getIsApply = getIsApply;
 const setValue = (name, value, defaultValue) => {
-    core.setOutput(name, value == "" || value == undefined ? defaultValue : value);
+    core.setOutput(name, value || defaultValue);
 };
 exports.setValue = setValue;
 const getTargetFromTargetGroups = (targetGroups, target) => {
@@ -57970,18 +57970,20 @@ const core = __importStar(__nccwpck_require__(2186));
 const fs = __importStar(__nccwpck_require__(7147));
 const lib = __importStar(__nccwpck_require__(8022));
 const getSkipTerraform = (inputs) => {
+    var _a, _b;
+    // https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr
     const config = lib.getConfig();
-    const renovateLogin = config.renovate_login
-        ? config.renovate_login
-        : "renovate[bot]";
+    const renovateLogin = (_a = config.renovate_login) !== null && _a !== void 0 ? _a : "renovate[bot]";
+    // labels is pull request's labels.
     const labels = fs.readFileSync(inputs.labels, "utf8").split("\n");
-    const target = inputs.target;
-    if (!target) {
+    if (!inputs.target) {
         throw "TFACTION_TARGET is required";
     }
-    if (renovateLogin != inputs.prAuthor) {
+    if (renovateLogin !== inputs.prAuthor) {
+        // If pull request author isn't Renovate bot
+        // If the pull request has the skip label of the target, terraform is skipped.
         for (let i = 0; i < labels.length; i++) {
-            if (labels[i] == `${inputs.skipLabelPrefix}${target}`) {
+            if (labels[i] == `${inputs.skipLabelPrefix}${inputs.target}`) {
                 return true;
             }
         }
@@ -57990,9 +57992,8 @@ const getSkipTerraform = (inputs) => {
     if (!config.skip_terraform_by_renovate) {
         return false;
     }
-    const renovateTerraformLabels = new Set(config.renovate_terraform_labels
-        ? config.renovate_terraform_labels
-        : ["terraform"]);
+    // If the pull request has labels of renovate_terraform_labels, terraform is run.
+    const renovateTerraformLabels = new Set((_b = config.renovate_terraform_labels) !== null && _b !== void 0 ? _b : ["terraform"]);
     for (let i = 0; i < labels.length; i++) {
         const label = labels[i];
         if (renovateTerraformLabels.has(label)) {
