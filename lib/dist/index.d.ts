@@ -1702,7 +1702,6 @@ export type Config = z.infer<typeof Config>;
 export declare const getConfig: () => Config;
 export declare const getTarget: () => string;
 export declare const getIsApply: () => boolean;
-export declare const setValue: (name: string, value: string | undefined, defaultValue: string) => void;
 export declare const getTargetFromTargetGroups: (targetGroups: Array<TargetGroup>, target: string) => TargetGroup | undefined;
 export declare const getTargetFromTargetGroupsByWorkingDir: (targetGroups: Array<TargetGroup>, wd: string) => TargetGroup | undefined;
 export declare const readTargetConfig: (p: string) => TargetConfig;

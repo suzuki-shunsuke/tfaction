@@ -190,14 +190,6 @@ export const getIsApply = (): boolean => {
   return process.env.TFACTION_IS_APPLY === "true";
 };
 
-export const setValue = (
-  name: string,
-  value: string | undefined,
-  defaultValue: string,
-): void => {
-  core.setOutput(name, value || defaultValue);
-};
-
 export const getTargetFromTargetGroups = (
   targetGroups: Array<TargetGroup>,
   target: string,

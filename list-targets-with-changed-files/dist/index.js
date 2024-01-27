@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.setValue = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
+exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
 const core = __importStar(__nccwpck_require__(5329));
 const js_yaml_1 = __nccwpck_require__(1168);
@@ -176,10 +176,6 @@ const getIsApply = () => {
     return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
-const setValue = (name, value, defaultValue) => {
-    core.setOutput(name, value || defaultValue);
-};
-exports.setValue = setValue;
 const getTargetFromTargetGroups = (targetGroups, target) => {
     for (let i = 0; i < targetGroups.length; i++) {
         const targetConfig = targetGroups[i];
