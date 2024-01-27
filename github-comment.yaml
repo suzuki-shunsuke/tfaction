@@ -3,9 +3,9 @@ post:
   create-pr-branch:
     template: |
       # :rocket: Pull Request Branch was created or updated
-      
+
       {{template "link" .}}
-      
+
       The pull request branch [pr/{{.PRNumber}}](https://github.com/suzuki-shunsuke/tfaction/tree/pr/{{.PRNumber}}) was created or updated.
 
       You can try this pull request in your workflows by changing tfaction version to `pr/{{.PRNumber}}`.

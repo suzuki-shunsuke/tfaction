@@ -2,24 +2,24 @@ name: List targets with changed files
 description: List targets with changed files
 inputs:
   changed_files:
-    description: 'Changed Files'
+    description: "Changed Files"
     required: true
   labels:
-    description: 'Labels File'
+    description: "Labels File"
     required: true
   config_files:
-    description: 'config file paths'
+    description: "config file paths"
     required: true
   pull_request:
-    description: 'pull request file'
+    description: "pull request file"
     required: false
 
   config:
-    description: 'config file path'
+    description: "config file path"
     required: false
 outputs:
   targets:
     description: list of targets
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

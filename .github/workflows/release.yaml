@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'tag'
+        description: "tag"
         required: true
       ref:
-        description: 'released ref (branch, tag or SHA). By default, the default branch is used'
+        description: "released ref (branch, tag or SHA). By default, the default branch is used"
         required: false
-        default: ''
+        default: ""
 permissions:
   contents: write
 jobs:

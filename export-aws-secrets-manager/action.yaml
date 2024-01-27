@@ -1,5 +1,5 @@
 name: Exports AWS Secrets Manager's secrets as environment variables
 description: Exports AWS Secrets Manager's secrets as environment variables
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"
