@@ -13,7 +13,6 @@ export interface TargetConfig {
   aws_region: string;
   s3_bucket_name_tfmigrate_history: string;
   template_dir: string;
-  gcs_bucket_name_plan_file: string;
 
   aws_assume_role_arn: string | undefined;
   gcp_service_account: string | undefined;
