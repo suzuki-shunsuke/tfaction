@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'tag'
+        description: "tag"
         required: true
       pr:
-        description: 'pr number'
+        description: "pr number"
         required: true
 permissions:
   contents: write

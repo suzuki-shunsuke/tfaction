@@ -1,69 +1,74 @@
-import * as fs from 'fs';
-import * as core from '@actions/core';
+import * as fs from "fs";
+import * as core from "@actions/core";
 
-const yaml = require('js-yaml');
+const yaml = require("js-yaml");
 
 interface Config {
-  working_directory_file?: string
-  target_groups: Array<TargetConfig>
-  env?: Record<string, string>
-  tfsec?: TfsecConfig
-  trivy?: TrivyConfig
-  tflint?: TflintConfig
+  working_directory_file?: string;
+  target_groups: Array<TargetConfig>;
+  env?: Record<string, string>;
+  tfsec?: TfsecConfig;
+  trivy?: TrivyConfig;
+  tflint?: TflintConfig;
 }
 
 interface TargetConfig {
-  target: string
-  working_directory: string
-  aws_region: string
-  s3_bucket_name_tfmigrate_history: string
-  template_dir: string
-  gcs_bucket_name_tfmigrate_history: string
+  target: string;
+  working_directory: string;
+  aws_region: string;
+  s3_bucket_name_tfmigrate_history: string;
+  template_dir: string;
+  gcs_bucket_name_tfmigrate_history: string;
 
-  aws_assume_role_arn?: string
-  gcp_service_account?: string
-  gcp_workload_identity_provider?: string
-  environment?: object | string
-  secrets?: object
-  runs_on?: string
+  aws_assume_role_arn?: string;
+  gcp_service_account?: string;
+  gcp_workload_identity_provider?: string;
+  environment?: object | string;
+  secrets?: object;
+  runs_on?: string;
 
-  terraform_plan_config?: JobConfig
-  tfmigrate_plan_config?: JobConfig
-  terraform_apply_config?: JobConfig
-  tfmigrate_apply_config?: JobConfig
-  env?: Record<string, string>
-  tfsec?: TfsecConfig
-  destroy?: boolean
+  terraform_plan_config?: JobConfig;
+  tfmigrate_plan_config?: JobConfig;
+  terraform_apply_config?: JobConfig;
+  tfmigrate_apply_config?: JobConfig;
+  env?: Record<string, string>;
+  tfsec?: TfsecConfig;
+  destroy?: boolean;
 }
 
 export interface TfsecConfig {
-  enabled: boolean
+  enabled: boolean;
 }
 
 export interface TflintConfig {
-  enabled: boolean
+  enabled: boolean;
 }
 
 export interface TrivyConfig {
-  enabled: boolean
+  enabled: boolean;
 }
 
 export interface JobConfig {
-  aws_assume_role_arn?: string
-  gcp_service_account?: string
-  gcp_workload_identity_provider?: string
-  environment?: object | string
-  secrets?: object
-  runs_on?: string
-  env?: Record<string, string>
+  aws_assume_role_arn?: string;
+  gcp_service_account?: string;
+  gcp_workload_identity_provider?: string;
+  environment?: object | string;
+  secrets?: object;
+  runs_on?: string;
+  env?: Record<string, string>;
 }
 
 export function getConfig(): Config {
-  const configFilePath = process.env.TFACTION_CONFIG ? process.env.TFACTION_CONFIG : 'tfaction-root.yaml';
-  return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+  const configFilePath = process.env.TFACTION_CONFIG
+    ? process.env.TFACTION_CONFIG
+    : "tfaction-root.yaml";
+  return yaml.load(fs.readFileSync(configFilePath, "utf8"));
 }
 
-export function getTargetFromTargetGroups(targetGroups: Array<TargetConfig>, target: string) {
+export function getTargetFromTargetGroups(
+  targetGroups: Array<TargetConfig>,
+  target: string,
+) {
   for (let i = 0; i < targetGroups.length; i++) {
     const targetConfig = targetGroups[i];
     if (target.startsWith(targetConfig.target)) {
@@ -73,7 +78,10 @@ export function getTargetFromTargetGroups(targetGroups: Array<TargetConfig>, tar
   return null;
 }
 
-export function getTargetFromTargetGroupsByWorkingDir(targetGroups: Array<TargetConfig>, wd: string) {
+export function getTargetFromTargetGroupsByWorkingDir(
+  targetGroups: Array<TargetConfig>,
+  wd: string,
+) {
   for (let i = 0; i < targetGroups.length; i++) {
     const targetConfig = targetGroups[i];
     if (wd.startsWith(targetConfig.working_directory)) {
@@ -84,38 +92,42 @@ export function getTargetFromTargetGroupsByWorkingDir(targetGroups: Array<Target
 }
 
 export function readTargetConfig(p: string): TargetConfig {
-  return yaml.load(fs.readFileSync(p, 'utf8'));
+  return yaml.load(fs.readFileSync(p, "utf8"));
 }
 
 export function getIsApply(): boolean {
-  return process.env.TFACTION_IS_APPLY == 'true'
+  return process.env.TFACTION_IS_APPLY == "true";
 }
 
 export function getJobType(): string {
   if (process.env.TFACTION_JOB_TYPE == undefined) {
-    throw 'environment variable TFACTION_JOB_TYPE is required';
+    throw "environment variable TFACTION_JOB_TYPE is required";
   }
   return process.env.TFACTION_JOB_TYPE;
 }
 
-export function getJobConfig(config: TargetConfig | undefined, isApply: boolean, jobType: string): JobConfig | undefined {
+export function getJobConfig(
+  config: TargetConfig | undefined,
+  isApply: boolean,
+  jobType: string,
+): JobConfig | undefined {
   if (config == undefined) {
     return undefined;
   }
   if (isApply) {
     switch (jobType) {
-      case 'terraform':
+      case "terraform":
         return config.terraform_apply_config;
-      case 'tfmigrate':
+      case "tfmigrate":
         return config.tfmigrate_apply_config;
       default:
         throw `unknown type: ${jobType}`;
     }
   }
   switch (jobType) {
-    case 'terraform':
+    case "terraform":
       return config.terraform_plan_config;
-    case 'tfmigrate':
+    case "tfmigrate":
       return config.tfmigrate_plan_config;
     default:
       throw `unknown type: ${jobType}`;
@@ -146,14 +158,14 @@ export function setOutputs(keys: Array<string>, objs: Array<any>) {
 }
 
 interface HasEnv {
-  env?: Record<string, string>
+  env?: Record<string, string>;
 }
 
 export function setEnvs(...objs: Array<HasEnv | undefined>) {
   const env = new Map<string, string>();
   for (let j = 0; j < objs.length; j++) {
     const obj = objs[j];
-    if (obj != undefined && obj != null && obj['env'] != undefined) {
+    if (obj != undefined && obj != null && obj["env"] != undefined) {
       for (const [key, value] of Object.entries(obj.env)) {
         env.set(key, value);
       }
