@@ -1,8 +1,17 @@
 import * as core from "@actions/core";
-import * as lib from "./lib";
+import * as lib from "lib";
 import * as path from "path";
 
+type Inputs = {
+  target?: string;
+  workingDir?: string;
+};
+
 try {
+  const inputs: Inputs = {
+    target: process.env.TFACTION_TARGET,
+    workingDir: process.env.TFACTION_WORKING_DIR,
+  };
   const config = lib.getConfig();
   const isApply = lib.getIsApply();
   const jobType = lib.getJobType();
@@ -10,13 +19,13 @@ try {
     ? config.working_directory_file
     : "tfaction.yaml";
 
-  let target = process.env.TFACTION_TARGET;
-  let workingDir = process.env.TFACTION_WORKING_DIR;
+  let target = inputs.target;
+  let workingDir = inputs.workingDir;
   let targetConfig = null;
 
   if (target) {
     targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
-    if (targetConfig === null) {
+    if (!targetConfig) {
       throw "target config is not found in target_groups";
     }
     workingDir = target.replace(
@@ -28,7 +37,7 @@ try {
       config.target_groups,
       workingDir,
     );
-    if (targetConfig === null) {
+    if (!targetConfig) {
       throw "target config is not found in target_groups";
     }
     target = workingDir.replace(
@@ -47,11 +56,11 @@ try {
   );
   lib.setOutputs(["template_dir"], [targetConfig]);
 
-  core.setOutput("enable_tfsec", getBool(config, false, "tfsec", "enabled"));
-  core.setOutput("enable_tflint", getBool(config, true, "tflint", "enabled"));
-  core.setOutput("enable_trivy", getBool(config, true, "trivy", "enabled"));
+  core.setOutput("enable_tfsec", config?.tfsec?.enabled ?? false);
+  core.setOutput("enable_tflint", config?.tflint?.enabled ?? true);
+  core.setOutput("enable_trivy", config?.trivy?.enabled ?? true);
 
-  if (jobType == "scaffold_working_dir") {
+  if (jobType === "scaffold_working_dir") {
     lib.setOutputs(
       [
         "s3_bucket_name_tfmigrate_history",
@@ -94,19 +103,4 @@ try {
   core.setFailed(
     error instanceof Error ? error.message : JSON.stringify(error),
   );
-}
-
-function getBool(a: any, defaultValue: boolean, ...keys: string[]): boolean {
-  try {
-    let value = a;
-    for (let i = 0; i < keys.length; i++) {
-      value = value[keys[i]];
-    }
-    if (value === undefined) {
-      return defaultValue;
-    }
-    return value === true;
-  } catch (_error) {
-    return defaultValue;
-  }
 }

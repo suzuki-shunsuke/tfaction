@@ -6829,7 +6829,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const lib = __importStar(__nccwpck_require__(9730));
 try {
     const config = lib.getConfig();
-    const secrets = new Map(Object.entries(JSON.parse(core.getInput('secrets'))));
+    const secrets = new Map(Object.entries(JSON.parse(core.getInput("secrets"))));
     const targetS = lib.getTarget();
     const jobType = lib.getJobType();
     const isApply = lib.getIsApply();
@@ -6886,27 +6886,27 @@ const core = __importStar(__nccwpck_require__(2186));
 const yaml = __nccwpck_require__(1917);
 function getConfig() {
     let configFilePath = process.env.TFACTION_CONFIG;
-    if (configFilePath == '' || configFilePath == undefined) {
-        configFilePath = 'tfaction-root.yaml';
+    if (configFilePath == "" || configFilePath == undefined) {
+        configFilePath = "tfaction-root.yaml";
     }
-    return yaml.load(fs.readFileSync(configFilePath, 'utf8'));
+    return yaml.load(fs.readFileSync(configFilePath, "utf8"));
 }
 exports.getConfig = getConfig;
 function getTarget() {
     const target = process.env.TFACTION_TARGET;
-    if (target == '' || target == undefined) {
-        throw 'the environment variable TFACTION_TARGET is required';
+    if (target == "" || target == undefined) {
+        throw "the environment variable TFACTION_TARGET is required";
     }
     return target;
 }
 exports.getTarget = getTarget;
 function getIsApply() {
-    return process.env.TFACTION_IS_APPLY == 'true';
+    return process.env.TFACTION_IS_APPLY == "true";
 }
 exports.getIsApply = getIsApply;
 function getJobType() {
     if (process.env.TFACTION_JOB_TYPE == undefined) {
-        throw 'environment variable TFACTION_JOB_TYPE is required';
+        throw "environment variable TFACTION_JOB_TYPE is required";
     }
     return process.env.TFACTION_JOB_TYPE;
 }
@@ -6914,18 +6914,18 @@ exports.getJobType = getJobType;
 function getJobConfig(config, isApply, jobType) {
     if (isApply) {
         switch (jobType) {
-            case 'terraform':
+            case "terraform":
                 return config.terraform_apply_config;
-            case 'tfmigrate':
+            case "tfmigrate":
                 return config.tfmigrate_apply_config;
             default:
                 throw `unknown type: ${jobType}`;
         }
     }
     switch (jobType) {
-        case 'terraform':
+        case "terraform":
             return config.terraform_plan_config;
-        case 'tfmigrate':
+        case "tfmigrate":
             return config.tfmigrate_plan_config;
         default:
             throw `unknown type: ${jobType}`;
@@ -6949,7 +6949,7 @@ function getTargetConfig(targets, target) {
             return t;
         }
     }
-    throw 'target is invalid';
+    throw "target is invalid";
 }
 exports.getTargetConfig = getTargetConfig;
 function setSecretToMap(secrets, m) {
@@ -6968,7 +6968,7 @@ function setSecretToMap(secrets, m) {
                 m.set(secret.secret_name, secret.secret_name);
             }
             else {
-                throw 'either secret_name or env_name is required';
+                throw "either secret_name or env_name is required";
             }
         }
     }
