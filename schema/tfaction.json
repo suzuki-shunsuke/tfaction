@@ -32,9 +32,6 @@
       "$ref": "#/$defs/Envs"
     },
 
-    "gcs_bucket_name_plan_file": {
-      "$ref": "#/$defs/GCSBucketNamePlanFile"
-    },
     "gcp_workload_identity_provider": {
       "$ref": "#/$defs/GCPWorkloadIdentityProvider"
     },
