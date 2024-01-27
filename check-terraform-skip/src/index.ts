@@ -10,30 +10,34 @@ type Inputs = {
 };
 
 const getSkipTerraform = (inputs: Inputs): boolean => {
+  // https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr
   const config = lib.getConfig();
-  const renovateLogin = config.renovate_login
-    ? config.renovate_login
-    : "renovate[bot]";
+  const renovateLogin = config.renovate_login ?? "renovate[bot]";
+  // labels is pull request's labels.
   const labels = fs.readFileSync(inputs.labels, "utf8").split("\n");
-  const target = inputs.target;
-  if (!target) {
+
+  if (!inputs.target) {
     throw "TFACTION_TARGET is required";
   }
-  if (renovateLogin != inputs.prAuthor) {
+
+  if (renovateLogin !== inputs.prAuthor) {
+    // If pull request author isn't Renovate bot
+    // If the pull request has the skip label of the target, terraform is skipped.
     for (let i = 0; i < labels.length; i++) {
-      if (labels[i] == `${inputs.skipLabelPrefix}${target}`) {
+      if (labels[i] == `${inputs.skipLabelPrefix}${inputs.target}`) {
         return true;
       }
     }
     return false;
   }
+
   if (!config.skip_terraform_by_renovate) {
     return false;
   }
+
+  // If the pull request has labels of renovate_terraform_labels, terraform is run.
   const renovateTerraformLabels = new Set(
-    config.renovate_terraform_labels
-      ? config.renovate_terraform_labels
-      : ["terraform"],
+    config.renovate_terraform_labels ?? ["terraform"],
   );
   for (let i = 0; i < labels.length; i++) {
     const label = labels[i];
