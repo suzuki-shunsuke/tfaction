@@ -44,7 +44,9 @@ try {
     );
     core.exportVariable("TFACTION_TARGET", target);
   } else {
-    throw new Error("Either TFACTION_TARGET or TFACTION_WORKING_DIR is required");
+    throw new Error(
+      "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",
+    );
   }
 
   core.setOutput("working_directory", workingDir);

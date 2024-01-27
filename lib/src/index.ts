@@ -195,10 +195,7 @@ export const setValue = (
   value: string | undefined,
   defaultValue: string,
 ): void => {
-  core.setOutput(
-    name,
-    value || defaultValue,
-  );
+  core.setOutput(name, value || defaultValue);
 };
 
 export const getTargetFromTargetGroups = (
