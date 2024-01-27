@@ -65,7 +65,7 @@ runs:
           exit 1
         fi
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@08fddcbf90a48b11e54962c287efa4449bb8da8c # tag=v0.1.1
+    - uses: suzuki-shunsuke/github-action-terraform-fmt@1012a0fc615ada0821b6d07f4b41d1541d7241a5 # v0.2.0
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_token: ${{ inputs.github_token }}
