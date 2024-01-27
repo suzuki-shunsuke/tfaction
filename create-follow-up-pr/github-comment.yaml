@@ -19,7 +19,7 @@ post:
       ## {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Please create a follow up pull request
 
       {{template "link" .}}
-      
+
       {{.Vars.mentions}}
 
       Apply failed. Please handle the problem. **:warning: Don't rerun GitHub Actions Workflow**

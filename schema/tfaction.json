@@ -142,10 +142,7 @@
       "items": {
         "type": "object",
         "description": "target group configuration",
-        "required": [
-          "secret_id",
-          "envs"
-        ],
+        "required": ["secret_id", "envs"],
         "properties": {
           "secret_id": {
             "type": "string",
@@ -157,9 +154,7 @@
             "items": {
               "type": "object",
               "description": "exported environment variable",
-              "required": [
-                "env_name"
-              ],
+              "required": ["env_name"],
               "properties": {
                 "env_name": {
                   "type": "string",

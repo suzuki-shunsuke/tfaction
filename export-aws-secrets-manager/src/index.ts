@@ -1,8 +1,10 @@
-import * as core from '@actions/core';
-import { run } from './run'
+import * as core from "@actions/core";
+import { run } from "./run";
 
 const main = async (): Promise<void> => {
-  await run()
-}
+  await run();
+};
 
-main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)))
+main().catch((e) =>
+  core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)),
+);

@@ -44,7 +44,7 @@ runs:
         cat << EOS >> "$GITHUB_STEP_SUMMARY"
 
         ## Create a scaffold pull request
-        
+
         Please run the following command in your terminal.
 
         $CODE_BLOCK

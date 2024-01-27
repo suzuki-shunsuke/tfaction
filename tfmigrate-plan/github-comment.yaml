@@ -6,28 +6,28 @@ post:
       ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}.tfmigrate.hcl isn't found
 
       {{template "link" .}}
-      
+
       To run `tfmigrate plan`, `.tfmigrate.hcl` is required.
 
 exec:
   tfmigrate-plan:
-  - when: true
-    template: |
-      ## {{template "status" .}} {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}} tfmigrate plan
+    - when: true
+      template: |
+        ## {{template "status" .}} {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}} tfmigrate plan
 
-      {{template "link" .}}
+        {{template "link" .}}
 
-      {{template "join_command" .}}
+        {{template "join_command" .}}
 
-      {{template "hidden_combined_output" .}}
+        {{template "hidden_combined_output" .}}
 
   conftest:
-  - when: ExitCode != 0
-    template: |
-      ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Violate Conftest Policy
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Violate Conftest Policy
 
-      {{template "link" .}} 
+        {{template "link" .}} 
 
-      {{template "join_command" .}}
+        {{template "join_command" .}}
 
-      {{.CombinedOutput | AvoidHTMLEscape}}
+        {{.CombinedOutput | AvoidHTMLEscape}}

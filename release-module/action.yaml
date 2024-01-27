@@ -2,10 +2,10 @@ name: Release Terraform Module
 description: Release Terraform Module
 inputs:
   module_path:
-    description: 'Module path'
+    description: "Module path"
     required: true
   version:
-    description: 'module version'
+    description: "module version"
     required: true
   github_token:
     description: |

@@ -2,8 +2,8 @@ name: Exports secrets as environment variables
 description: Exports secrets as environment variables
 inputs:
   secrets:
-    description: 'secrets context'
+    description: "secrets context"
     required: true
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

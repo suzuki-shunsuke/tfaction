@@ -16,8 +16,8 @@ jobs:
         env:
           TFACTION_CONFIG: get-target-config/tests/config-1.yaml
           TFACTION_TARGET: aws/foo
-          TFACTION_IA_APPLY: 'false'
-          TFACTION_JOB_TYPE: 'terraform'
+          TFACTION_IA_APPLY: "false"
+          TFACTION_JOB_TYPE: "terraform"
       - run: echo "${{ steps.target-config.outputs.working_directory }}"
       - run: echo "${{ steps.target-config.outputs.aws_assume_role_arn }}"
       - run: echo "${{ steps.target-config.outputs.aws_region }}"
@@ -38,8 +38,8 @@ jobs:
         env:
           TFACTION_CONFIG: get-target-config/tests/config-1.yaml
           TFACTION_TARGET: gcp/foo
-          TFACTION_IA_APPLY: 'false'
-          TFACTION_JOB_TYPE: 'terraform'
+          TFACTION_IA_APPLY: "false"
+          TFACTION_JOB_TYPE: "terraform"
       - run: echo "${{ steps.target-config.outputs.working_directory }}"
       - run: echo "${{ steps.target-config.outputs.gcs_bucket_name_plan_file }}"
       - run: echo "${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}"

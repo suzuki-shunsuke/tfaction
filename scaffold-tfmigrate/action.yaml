@@ -14,7 +14,7 @@ inputs:
     required: true
 
   migration_name:
-    description: 'Migration name'
+    description: "Migration name"
     required: false
     default: main
 
@@ -119,7 +119,7 @@ runs:
         cat << EOS >> "$GITHUB_STEP_SUMMARY"
 
         ## Create a pull request
-        
+
         Please run the following command in your terminal.
 
         $CODE_BLOCK
