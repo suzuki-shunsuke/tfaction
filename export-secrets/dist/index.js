@@ -28909,7 +28909,7 @@ exports.getConfig = getConfig;
 function getTarget() {
     const target = process.env.TFACTION_TARGET;
     if (target == "" || target == undefined) {
-        throw "the environment variable TFACTION_TARGET is required";
+        throw new Error("the environment variable TFACTION_TARGET is required");
     }
     return target;
 }
@@ -28920,7 +28920,7 @@ function getIsApply() {
 exports.getIsApply = getIsApply;
 function getJobType() {
     if (process.env.TFACTION_JOB_TYPE == undefined) {
-        throw "environment variable TFACTION_JOB_TYPE is required";
+        throw new Error("environment variable TFACTION_JOB_TYPE is required");
     }
     return process.env.TFACTION_JOB_TYPE;
 }
@@ -28963,7 +28963,7 @@ function getTargetConfig(targets, target) {
             return t;
         }
     }
-    throw "target is invalid";
+    throw new Error("target is invalid");
 }
 exports.getTargetConfig = getTargetConfig;
 function setSecretToMap(secrets, m) {
@@ -28982,7 +28982,7 @@ function setSecretToMap(secrets, m) {
                 m.set(secret.secret_name, secret.secret_name);
             }
             else {
-                throw "either secret_name or env_name is required";
+                throw new Error("either secret_name or env_name is required");
             }
         }
     }

@@ -46,7 +46,7 @@ const getTargetConfigByTarget = (
       job_type: jobType,
     };
   }
-  throw "target is invalid";
+  throw new Error("target is invalid");
 };
 
 const getPRBody = (): string => {

@@ -24870,7 +24870,7 @@ const getTarget = () => {
     if (target) {
         return target;
     }
-    throw "the environment variable TFACTION_TARGET is required";
+    throw new Error("the environment variable TFACTION_TARGET is required");
 };
 exports.getTarget = getTarget;
 const getIsApply = () => {

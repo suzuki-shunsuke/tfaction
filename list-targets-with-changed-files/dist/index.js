@@ -169,7 +169,7 @@ const getTarget = () => {
     if (target) {
         return target;
     }
-    throw "the environment variable TFACTION_TARGET is required";
+    throw new Error("the environment variable TFACTION_TARGET is required");
 };
 exports.getTarget = getTarget;
 const getIsApply = () => {
@@ -62200,7 +62200,7 @@ const getTargetConfigByTarget = (targets, target, isApply, jobType) => {
             job_type: jobType,
         };
     }
-    throw "target is invalid";
+    throw new Error("target is invalid");
 };
 const getPRBody = () => {
     if (github.context.payload.pull_request) {

@@ -32,7 +32,7 @@ async function exportSecrets(
   for (let i = 0; i < secrets.length; i++) {
     const secret = secrets[i];
     if (!secret.secret_id) {
-      throw "secret_id is required";
+      throw new Error("secret_id is required");
     }
     const command = new GetSecretValueCommand({
       SecretId: secret.secret_id,

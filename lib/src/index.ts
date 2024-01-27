@@ -183,7 +183,7 @@ export const getTarget = (): string => {
   if (target) {
     return target;
   }
-  throw "the environment variable TFACTION_TARGET is required";
+  throw new Error("the environment variable TFACTION_TARGET is required");
 };
 
 export const getIsApply = (): boolean => {

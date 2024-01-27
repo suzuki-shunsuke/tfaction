@@ -48966,7 +48966,7 @@ exports.getConfig = getConfig;
 function getTarget() {
     const target = process.env.TFACTION_TARGET;
     if (target == "" || target == undefined) {
-        throw "the environment variable TFACTION_TARGET is required";
+        throw new Error("the environment variable TFACTION_TARGET is required");
     }
     return target;
 }
@@ -48977,7 +48977,7 @@ function getIsApply() {
 exports.getIsApply = getIsApply;
 function getJobType() {
     if (process.env.TFACTION_JOB_TYPE == undefined) {
-        throw "environment variable TFACTION_JOB_TYPE is required";
+        throw new Error("environment variable TFACTION_JOB_TYPE is required");
     }
     return process.env.TFACTION_JOB_TYPE;
 }
@@ -49020,7 +49020,7 @@ function getTargetConfig(targets, target) {
             return t;
         }
     }
-    throw "target is invalid";
+    throw new Error("target is invalid");
 }
 exports.getTargetConfig = getTargetConfig;
 function getSecrets(targetConfig, jobConfig) {
@@ -49100,7 +49100,7 @@ function exportSecrets(client, secrets) {
         for (let i = 0; i < secrets.length; i++) {
             const secret = secrets[i];
             if (!secret.secret_id) {
-                throw "secret_id is required";
+                throw new Error("secret_id is required");
             }
             const command = new client_secrets_manager_1.GetSecretValueCommand({
                 SecretId: secret.secret_id,

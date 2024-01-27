@@ -17,7 +17,7 @@ const getSkipTerraform = (inputs: Inputs): boolean => {
   const labels = fs.readFileSync(inputs.labels, "utf8").split("\n");
 
   if (!inputs.target) {
-    throw "TFACTION_TARGET is required";
+    throw new Error("TFACTION_TARGET is required");
   }
 
   if (renovateLogin !== inputs.prAuthor) {
