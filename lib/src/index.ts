@@ -60,7 +60,9 @@ const AWSSecretsManagerSecretEnv = z.object({
   secret_key: z.optional(z.string()),
 });
 
-export type AWSSecretsManagerSecretEnv = z.infer<typeof AWSSecretsManagerSecretEnv>;
+export type AWSSecretsManagerSecretEnv = z.infer<
+  typeof AWSSecretsManagerSecretEnv
+>;
 
 const AWSSecretsManagerSecret = z.object({
   envs: z.array(AWSSecretsManagerSecretEnv),
@@ -298,7 +300,6 @@ export const setEnvs = (...objs: Array<HasEnv | undefined>): void => {
     }
   }
 };
-
 
 export function getTargetGroup(
   targets: Array<TargetGroup>,

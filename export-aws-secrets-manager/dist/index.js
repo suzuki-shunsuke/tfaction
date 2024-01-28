@@ -78132,13 +78132,13 @@ function exportSecrets(client, secrets) {
             });
             const response = yield client.send(command);
             if (!response.SecretString) {
-                throw `SecretString is empty: secret_id=${secret.secret_id}`;
+                throw new Error(`SecretString is empty: secret_id=${secret.secret_id}`);
             }
             let secretJSON = null;
             for (let j = 0; j < secret.envs.length; j++) {
                 const e = secret.envs[j];
                 if (!e.env_name) {
-                    throw `env_name is required: secret_id=${secret.secret_id}`;
+                    throw new Error(`env_name is required: secret_id=${secret.secret_id}`);
                 }
                 if (!e.secret_key) {
                     exportSecret(e.env_name, secret.secret_id, response.SecretString, "");
@@ -78148,7 +78148,7 @@ function exportSecrets(client, secrets) {
                     secretJSON = JSON.parse(response.SecretString);
                 }
                 if (!secretJSON[e.secret_key]) {
-                    throw `secret key isn't found: secret_key=${e.secret_key} secret_id=${secret.secret_id}`;
+                    throw new Error(`secret key isn't found: secret_key=${e.secret_key} secret_id=${secret.secret_id}`);
                 }
                 exportSecret(e.env_name, secret.secret_id, secretJSON[e.secret_key], e.secret_key);
             }
