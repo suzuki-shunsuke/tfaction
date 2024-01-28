@@ -55,6 +55,23 @@ const GitHubSecrets = z.array(
 
 export type GitHubSecrets = z.infer<typeof GitHubSecrets>;
 
+const AWSSecretsManagerSecretEnv = z.object({
+  env_name: z.string(),
+  secret_key: z.optional(z.string()),
+});
+
+export type AWSSecretsManagerSecretEnv = z.infer<typeof AWSSecretsManagerSecretEnv>;
+
+const AWSSecretsManagerSecret = z.object({
+  envs: z.array(AWSSecretsManagerSecretEnv),
+  secret_id: z.string(),
+  version_id: z.optional(z.string()),
+  version_stage: z.optional(z.string()),
+  aws_region: z.optional(z.string()),
+});
+
+export type AWSSecretsManagerSecret = z.infer<typeof AWSSecretsManagerSecret>;
+
 const JobConfig = z.object({
   aws_assume_role_arn: z.optional(z.string()),
   gcp_service_account: z.optional(z.string()),
@@ -63,6 +80,7 @@ const JobConfig = z.object({
   secrets: z.optional(GitHubSecrets),
   runs_on: z.optional(z.string()),
   env: z.optional(z.record(z.string())),
+  aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
 });
 
 export type JobConfig = z.infer<typeof JobConfig>;
@@ -86,6 +104,7 @@ const TargetGroup = z.object({
   tfmigrate_apply_config: z.optional(JobConfig),
   tfmigrate_plan_config: z.optional(JobConfig),
   working_directory: z.string(),
+  aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
 });
 
 export type TargetGroup = z.infer<typeof TargetGroup>;
@@ -279,3 +298,17 @@ export const setEnvs = (...objs: Array<HasEnv | undefined>): void => {
     }
   }
 };
+
+
+export function getTargetGroup(
+  targets: Array<TargetGroup>,
+  target: string,
+): TargetGroup {
+  for (let i = 0; i < targets.length; i++) {
+    const t = targets[i];
+    if (target.startsWith(t.target)) {
+      return t;
+    }
+  }
+  throw new Error("target is invalid");
+}
