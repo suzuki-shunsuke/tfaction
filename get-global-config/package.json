@@ -8,7 +8,7 @@
     "lib": "file:../lib/dist"
   },
   "devDependencies": {
-    "@types/node": "20.11.7",
+    "@types/node": "20.11.8",
     "@vercel/ncc": "0.38.1",
     "typescript": "5.3.3"
   }
