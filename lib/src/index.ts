@@ -275,7 +275,10 @@ export const setValues = (name: string, values: Array<any>): void => {
   }
 };
 
-export const setOutputs = (keys: Array<string>, objs: Array<any>): Map<string, any> => {
+export const setOutputs = (
+  keys: Array<string>,
+  objs: Array<any>,
+): Map<string, any> => {
   const outputs = new Map<string, any>();
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -293,7 +296,9 @@ type HasEnv = {
   env?: Record<string, string>;
 };
 
-export const setEnvs = (...objs: Array<HasEnv | undefined>): Map<string, any> => {
+export const setEnvs = (
+  ...objs: Array<HasEnv | undefined>
+): Map<string, any> => {
   const envs = new Map<string, any>();
   for (const obj of objs) {
     if (obj?.env) {
