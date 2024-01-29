@@ -2903,10 +2903,10 @@ export declare const getTargetFromTargetGroupsByWorkingDir: (targetGroups: Array
 export declare const readTargetConfig: (p: string) => TargetConfig;
 export declare const getJobConfig: (config: TargetConfig | undefined, isApply: boolean, jobType: JobType) => JobConfig | undefined;
 export declare const setValues: (name: string, values: Array<any>) => void;
-export declare const setOutputs: (keys: Array<string>, objs: Array<any>) => void;
+export declare const setOutputs: (keys: Array<string>, objs: Array<any>) => Map<string, any>;
 type HasEnv = {
     env?: Record<string, string>;
 };
-export declare const setEnvs: (...objs: Array<HasEnv | undefined>) => void;
+export declare const setEnvs: (...objs: Array<HasEnv | undefined>) => Map<string, any>;
 export declare function getTargetGroup(targets: Array<TargetGroup>, target: string): TargetGroup;
 export {};

@@ -24731,7 +24731,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
+exports.getTargetGroup = exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
 const core = __importStar(__nccwpck_require__(5329));
 const js_yaml_1 = __nccwpck_require__(1168);
@@ -24768,6 +24768,17 @@ const GitHubSecrets = zod_1.z.array(zod_1.z.object({
     env_name: zod_1.z.string(),
     secret_name: zod_1.z.string(),
 }));
+const AWSSecretsManagerSecretEnv = zod_1.z.object({
+    env_name: zod_1.z.string(),
+    secret_key: zod_1.z.optional(zod_1.z.string()),
+});
+const AWSSecretsManagerSecret = zod_1.z.object({
+    envs: zod_1.z.array(AWSSecretsManagerSecretEnv),
+    secret_id: zod_1.z.string(),
+    version_id: zod_1.z.optional(zod_1.z.string()),
+    version_stage: zod_1.z.optional(zod_1.z.string()),
+    aws_region: zod_1.z.optional(zod_1.z.string()),
+});
 const JobConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
@@ -24776,6 +24787,7 @@ const JobConfig = zod_1.z.object({
     secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
     env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
+    aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
 const TargetGroup = zod_1.z.object({
     aws_region: zod_1.z.optional(zod_1.z.string()),
@@ -24796,6 +24808,7 @@ const TargetGroup = zod_1.z.object({
     tfmigrate_apply_config: zod_1.z.optional(JobConfig),
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
     working_directory: zod_1.z.string(),
+    aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
 const TargetConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
@@ -24932,27 +24945,41 @@ const setValues = (name, values) => {
 };
 exports.setValues = setValues;
 const setOutputs = (keys, objs) => {
+    const outputs = new Map();
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         for (const obj of objs) {
             if (obj != undefined && obj != null && obj[key] != undefined) {
-                core.setOutput(key, obj[key]);
+                outputs.set(key, obj[key]);
                 break;
             }
         }
     }
+    return outputs;
 };
 exports.setOutputs = setOutputs;
 const setEnvs = (...objs) => {
+    const envs = new Map();
     for (const obj of objs) {
         if (obj === null || obj === void 0 ? void 0 : obj.env) {
             for (const [key, value] of Object.entries(obj.env)) {
-                core.exportVariable(key, value);
+                envs.set(key, value);
             }
         }
     }
+    return envs;
 };
 exports.setEnvs = setEnvs;
+function getTargetGroup(targets, target) {
+    for (let i = 0; i < targets.length; i++) {
+        const t = targets[i];
+        if (target.startsWith(t.target)) {
+            return t;
+        }
+    }
+    throw new Error("target is invalid");
+}
+exports.getTargetGroup = getTargetGroup;
 
 
 /***/ }),
@@ -57961,20 +57988,72 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(2186));
+const run_1 = __nccwpck_require__(7764);
+try {
+    (0, run_1.main)();
+}
+catch (error) {
+    core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
+}
+
+
+/***/ }),
+
+/***/ 7764:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.run = exports.main = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const lib = __importStar(__nccwpck_require__(8022));
 const path = __importStar(__nccwpck_require__(1017));
-try {
-    const inputs = {
+const main = () => {
+    const result = (0, exports.run)({
         target: process.env.TFACTION_TARGET,
         workingDir: process.env.TFACTION_WORKING_DIR,
-    };
-    const config = lib.getConfig();
-    const isApply = lib.getIsApply();
-    const jobType = lib.getJobType();
+        isApply: lib.getIsApply(),
+        jobType: lib.getJobType(),
+    }, lib.getConfig());
+    for (const [key, value] of result.envs) {
+        core.exportVariable(key, value);
+    }
+    for (const [key, value] of result.outputs) {
+        core.setOutput(key, value);
+    }
+};
+exports.main = main;
+const run = (inputs, config) => {
+    var _a, _b, _c, _d, _e, _f, _g;
     const workingDirectoryFile = (_a = config.working_directory_file) !== null && _a !== void 0 ? _a : "tfaction.yaml";
+    const envs = new Map();
+    const outputs = new Map();
     let target = inputs.target;
     let workingDir = inputs.workingDir;
     let targetConfig = null;
@@ -57991,19 +58070,21 @@ try {
             throw new Error("target config is not found in target_groups");
         }
         target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
-        core.exportVariable("TFACTION_TARGET", target);
+        envs.set("TFACTION_TARGET", target);
     }
     else {
         throw new Error("Either TFACTION_TARGET or TFACTION_WORKING_DIR is required");
     }
-    core.setOutput("working_directory", workingDir);
-    core.setOutput("providers_lock_opts", "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64");
-    lib.setOutputs(["template_dir"], [targetConfig]);
-    core.setOutput("enable_tfsec", (_c = (_b = config === null || config === void 0 ? void 0 : config.tfsec) === null || _b === void 0 ? void 0 : _b.enabled) !== null && _c !== void 0 ? _c : false);
-    core.setOutput("enable_tflint", (_e = (_d = config === null || config === void 0 ? void 0 : config.tflint) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : true);
-    core.setOutput("enable_trivy", (_g = (_f = config === null || config === void 0 ? void 0 : config.trivy) === null || _f === void 0 ? void 0 : _f.enabled) !== null && _g !== void 0 ? _g : true);
-    if (jobType === "scaffold_working_dir") {
-        lib.setOutputs([
+    outputs.set("working_directory", workingDir);
+    outputs.set("providers_lock_opts", "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64");
+    for (const [key, value] of lib.setOutputs(["template_dir"], [targetConfig])) {
+        outputs.set(key, value);
+    }
+    outputs.set("enable_tfsec", (_c = (_b = config === null || config === void 0 ? void 0 : config.tfsec) === null || _b === void 0 ? void 0 : _b.enabled) !== null && _c !== void 0 ? _c : false);
+    outputs.set("enable_tflint", (_e = (_d = config === null || config === void 0 ? void 0 : config.tflint) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : true);
+    outputs.set("enable_trivy", (_g = (_f = config === null || config === void 0 ? void 0 : config.trivy) === null || _f === void 0 ? void 0 : _f.enabled) !== null && _g !== void 0 ? _g : true);
+    if (inputs.jobType === "scaffold_working_dir") {
+        const m = lib.setOutputs([
             "s3_bucket_name_tfmigrate_history",
             "gcs_bucket_name_tfmigrate_history",
             "aws_region",
@@ -58011,29 +58092,43 @@ try {
             "gcp_service_account",
             "gcp_workload_identity_provider",
         ], [targetConfig]);
+        for (const [key, value] of m) {
+            outputs.set(key, value);
+        }
     }
     else {
-        const rootJobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
+        const rootJobConfig = lib.getJobConfig(targetConfig, inputs.isApply, inputs.jobType);
         const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
-        const jobConfig = lib.getJobConfig(wdConfig, isApply, jobType);
-        lib.setOutputs([
+        const jobConfig = lib.getJobConfig(wdConfig, inputs.isApply, inputs.jobType);
+        const m1 = lib.setOutputs([
             "s3_bucket_name_tfmigrate_history",
             "gcs_bucket_name_tfmigrate_history",
             "providers_lock_opts",
         ], [wdConfig, targetConfig, config]);
-        lib.setOutputs([
+        for (const [key, value] of m1) {
+            outputs.set(key, value);
+        }
+        const m2 = lib.setOutputs([
             "aws_region",
             "aws_assume_role_arn",
             "gcp_service_account",
             "gcp_workload_identity_provider",
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
-        core.setOutput("destroy", wdConfig.destroy ? true : false);
-        lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
+        for (const [key, value] of m2) {
+            outputs.set(key, value);
+        }
+        outputs.set("destroy", wdConfig.destroy ? true : false);
+        const m3 = lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
+        for (const [key, value] of m3) {
+            envs.set(key, value);
+        }
     }
-}
-catch (error) {
-    core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
-}
+    return {
+        outputs: outputs,
+        envs: envs,
+    };
+};
+exports.run = run;
 
 
 /***/ }),
