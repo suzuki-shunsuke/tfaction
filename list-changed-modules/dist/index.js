@@ -24732,15 +24732,59 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
+const run_1 = __nccwpck_require__(7764);
+try {
+    (0, run_1.main)();
+}
+catch (error) {
+    core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
+}
+
+
+/***/ }),
+
+/***/ 7764:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.run = exports.main = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const fs = __importStar(__nccwpck_require__(7147));
 const path = __importStar(__nccwpck_require__(1017));
-try {
-    const inputs = {
-        changedFiles: core.getInput("changed_files", { required: true }),
-        configFiles: core.getInput("config_files", { required: true }),
-    };
-    const changedFiles = fs.readFileSync(inputs.changedFiles, "utf8").split("\n");
-    const configFiles = fs.readFileSync(inputs.configFiles, "utf8").split("\n");
+const main = () => {
+    const changedFiles = fs.readFileSync(core.getInput("changed_files", { required: true }), "utf8").split("\n");
+    const configFiles = fs.readFileSync(core.getInput("config_files", { required: true }), "utf8").split("\n");
+    const modules = (0, exports.run)(configFiles, changedFiles);
+    core.info(`modules: ${Array.from(modules)}`);
+    core.setOutput("modules", Array.from(modules));
+};
+exports.main = main;
+const run = (configFiles, changedFiles) => {
     const workingDirs = new Set();
     for (const configFile of configFiles) {
         if (configFile === "") {
@@ -24753,18 +24797,15 @@ try {
         if (changedFile === "") {
             continue;
         }
-        for (let workingDir of workingDirs) {
+        for (const workingDir of workingDirs) {
             if (changedFile.startsWith(workingDir + "/")) {
                 modules.add(workingDir);
             }
         }
     }
-    core.info(`modules: ${Array.from(modules)}`);
-    core.setOutput("modules", Array.from(modules));
-}
-catch (error) {
-    core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
-}
+    return Array.from(modules);
+};
+exports.run = run;
 
 
 /***/ }),
