@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
+exports.getTargetGroup = exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
 const core = __importStar(__nccwpck_require__(5329));
 const js_yaml_1 = __nccwpck_require__(1168);
@@ -67,6 +67,17 @@ const GitHubSecrets = zod_1.z.array(zod_1.z.object({
     env_name: zod_1.z.string(),
     secret_name: zod_1.z.string(),
 }));
+const AWSSecretsManagerSecretEnv = zod_1.z.object({
+    env_name: zod_1.z.string(),
+    secret_key: zod_1.z.optional(zod_1.z.string()),
+});
+const AWSSecretsManagerSecret = zod_1.z.object({
+    envs: zod_1.z.array(AWSSecretsManagerSecretEnv),
+    secret_id: zod_1.z.string(),
+    version_id: zod_1.z.optional(zod_1.z.string()),
+    version_stage: zod_1.z.optional(zod_1.z.string()),
+    aws_region: zod_1.z.optional(zod_1.z.string()),
+});
 const JobConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
@@ -75,6 +86,7 @@ const JobConfig = zod_1.z.object({
     secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
     env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
+    aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
 const TargetGroup = zod_1.z.object({
     aws_region: zod_1.z.optional(zod_1.z.string()),
@@ -95,6 +107,7 @@ const TargetGroup = zod_1.z.object({
     tfmigrate_apply_config: zod_1.z.optional(JobConfig),
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
     working_directory: zod_1.z.string(),
+    aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
 const TargetConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
@@ -231,27 +244,41 @@ const setValues = (name, values) => {
 };
 exports.setValues = setValues;
 const setOutputs = (keys, objs) => {
+    const outputs = new Map();
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         for (const obj of objs) {
             if (obj != undefined && obj != null && obj[key] != undefined) {
-                core.setOutput(key, obj[key]);
+                outputs.set(key, obj[key]);
                 break;
             }
         }
     }
+    return outputs;
 };
 exports.setOutputs = setOutputs;
 const setEnvs = (...objs) => {
+    const envs = new Map();
     for (const obj of objs) {
         if (obj === null || obj === void 0 ? void 0 : obj.env) {
             for (const [key, value] of Object.entries(obj.env)) {
-                core.exportVariable(key, value);
+                envs.set(key, value);
             }
         }
     }
+    return envs;
 };
 exports.setEnvs = setEnvs;
+function getTargetGroup(targets, target) {
+    for (let i = 0; i < targets.length; i++) {
+        const t = targets[i];
+        if (target.startsWith(t.target)) {
+            return t;
+        }
+    }
+    throw new Error("target is invalid");
+}
+exports.getTargetGroup = getTargetGroup;
 
 
 /***/ }),
@@ -62167,6 +62194,48 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
+const run_1 = __nccwpck_require__(7764);
+try {
+    (0, run_1.main)();
+}
+catch (error) {
+    core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
+}
+
+
+/***/ }),
+
+/***/ 7764:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.main = exports.run = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const fs = __importStar(__nccwpck_require__(7147));
 const path = __importStar(__nccwpck_require__(1017));
@@ -62202,25 +62271,20 @@ const getTargetConfigByTarget = (targets, target, isApply, jobType) => {
     }
     throw new Error("target is invalid");
 };
-const getPRBody = () => {
-    if (github.context.payload.pull_request) {
-        return github.context.payload.pull_request.body
-            ? github.context.payload.pull_request.body
-            : "";
+const getPRBody = (prStr, payload) => {
+    if (payload.pull_request) {
+        return payload.pull_request.body || "";
     }
-    const prPath = core.getInput("pull_request");
-    if (!prPath) {
+    if (!prStr) {
         return "";
     }
-    const pr = JSON.parse(fs.readFileSync(prPath, "utf8"));
-    if (!pr || !pr.body) {
-        return "";
-    }
-    return pr.body;
+    const pr = JSON.parse(prStr);
+    return (pr === null || pr === void 0 ? void 0 : pr.body) || "";
 };
-try {
-    const config = lib.getConfig();
-    const isApply = lib.getIsApply();
+const run = (input) => {
+    var _a, _b, _c;
+    const config = input.config;
+    const isApply = input.isApply;
     const configWorkingDirMap = new Map();
     const configTargetMap = new Map();
     for (let i = 0; i < config.target_groups.length; i++) {
@@ -62228,13 +62292,9 @@ try {
         configWorkingDirMap.set(target.working_directory, target);
         configTargetMap.set(target.target, target);
     }
-    const labels = fs.readFileSync(core.getInput("labels"), "utf8").split("\n");
-    const changedFiles = fs
-        .readFileSync(core.getInput("changed_files"), "utf8")
-        .split("\n");
-    const configFiles = fs
-        .readFileSync(core.getInput("config_files"), "utf8")
-        .split("\n");
+    const labels = input.labels;
+    const changedFiles = input.changedFiles;
+    const configFiles = input.configFiles;
     const workingDirs = new Set();
     for (let i = 0; i < configFiles.length; i++) {
         const configFile = configFiles[i];
@@ -62246,7 +62306,7 @@ try {
     // <!-- tfaction follow up pr target=foo -->
     let followupTarget = "";
     const followupPRBodyPrefix = "<!-- tfaction follow up pr target=";
-    const prBody = getPRBody();
+    const prBody = getPRBody(input.pr, input.payload);
     if (prBody.startsWith(followupPRBodyPrefix)) {
         followupTarget = prBody
             .split("\n")[0]
@@ -62257,21 +62317,9 @@ try {
     const skips = new Set();
     const terraformTargetObjs = new Array();
     const tfmigrateObjs = new Array();
-    const targetPrefix = config.label_prefixes != undefined &&
-        config.label_prefixes.target != undefined &&
-        config.label_prefixes.target != ""
-        ? config.label_prefixes.target
-        : "target:";
-    const skipPrefix = config.label_prefixes != undefined &&
-        config.label_prefixes.skip != undefined &&
-        config.label_prefixes.skip != ""
-        ? config.label_prefixes.skip
-        : "skip:";
-    const tfmigratePrefix = config.label_prefixes != undefined &&
-        config.label_prefixes.tfmigrate != undefined &&
-        config.label_prefixes.tfmigrate != ""
-        ? config.label_prefixes.tfmigrate
-        : "tfmigrate:";
+    const targetPrefix = ((_a = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _a === void 0 ? void 0 : _a.target) || "target:";
+    const skipPrefix = ((_b = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _b === void 0 ? void 0 : _b.skip) || "skip:";
+    const tfmigratePrefix = ((_c = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _c === void 0 ? void 0 : _c.tfmigrate) || "tfmigrate:";
     for (let i = 0; i < labels.length; i++) {
         const label = labels[i];
         if (label == "") {
@@ -62304,13 +62352,13 @@ try {
         if (changedFile == "") {
             continue;
         }
-        for (let workingDir of workingDirs) {
+        for (const workingDir of workingDirs) {
             if (changedFile.startsWith(workingDir + "/")) {
                 changedWorkingDirs.add(workingDir);
             }
         }
     }
-    for (let changedWorkingDir of changedWorkingDirs) {
+    for (const changedWorkingDir of changedWorkingDirs) {
         for (let i = 0; i < config.target_groups.length; i++) {
             const target = config.target_groups[i];
             if (changedWorkingDir.startsWith(target.working_directory)) {
@@ -62330,11 +62378,28 @@ try {
         terraformTargets.add(followupTarget);
         terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, followupTarget, isApply, "terraform"));
     }
-    core.setOutput("targets", terraformTargetObjs.concat(tfmigrateObjs));
-}
-catch (error) {
-    core.setFailed(error instanceof Error ? error.message : JSON.stringify(error));
-}
+    return terraformTargetObjs.concat(tfmigrateObjs);
+};
+exports.run = run;
+const main = () => {
+    const prPath = core.getInput("pull_request");
+    const pr = prPath ? JSON.parse(fs.readFileSync(prPath, "utf8")) : "";
+    const targetConfigs = (0, exports.run)({
+        labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
+        config: lib.getConfig(),
+        isApply: lib.getIsApply(),
+        changedFiles: fs
+            .readFileSync(core.getInput("changed_files"), "utf8")
+            .split("\n"),
+        configFiles: fs
+            .readFileSync(core.getInput("config_files"), "utf8")
+            .split("\n"),
+        pr,
+        payload: github.context.payload,
+    });
+    core.setOutput("targets", targetConfigs);
+};
+exports.main = main;
 
 
 /***/ }),
