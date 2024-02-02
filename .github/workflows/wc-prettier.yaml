@@ -1,0 +1,14 @@
+---
+name: Prettier
+on: workflow_call
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        with:
+          node-version-file: .node-version
+      - run: prettier -c .
