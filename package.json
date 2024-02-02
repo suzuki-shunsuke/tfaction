@@ -11,7 +11,8 @@
     "prettier": "^3.2.4"
   },
   "scripts": {
-    "fmt": "prettier -w ."
+    "fmt": "prettier -w .",
+    "test": "prettier -c ."
   },
   "author": "",
   "license": "MIT"
