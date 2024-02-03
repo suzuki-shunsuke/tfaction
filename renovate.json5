@@ -9,7 +9,7 @@
     "helpers:pinGitHubActionDigests",
     "github>suzuki-shunsuke/renovate-config",
     "github>aquaproj/aqua-renovate-config#2.0.0",
-    "github>aquaproj/aqua-renovate-config:file#2.0.0(aqua/.*\\.yaml)"
+    "github>aquaproj/aqua-renovate-config:file#2.0.0(aqua/.*\\.yaml)",
   ],
   prHourlyLimit: 0,
   prConcurrentLimit: 0,
@@ -17,10 +17,8 @@
   packageRules: [
     {
       // Until https://github.com/suzuki-shunsuke/tfaction/pull/1479 is merged
-      matchManagers: [
-        "npm"
-      ],
-      enabled: false
-    }
-  ]
+      matchManagers: ["npm"],
+      enabled: false,
+    },
+  ],
 }

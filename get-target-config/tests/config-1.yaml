@@ -1,4 +1,5 @@
 ---
+plan_workflow_name: test
 target_groups:
   - working_directory: get-target-config/tests/aws/
     target: aws/
