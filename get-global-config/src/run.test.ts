@@ -33,11 +33,11 @@ test("default", () => {
   expect(
     main(
       {
-        skipLabelPrefix: "skip:",
-        labels: "",
-        prAuthor: "octocat",
-        target: "foo",
+        label_prefixes: {
+          skip: "skip:",
+        },
         plan_workflow_name: "plan",
+        target_groups: [],
       },
       {
         repository: "",
@@ -51,10 +51,11 @@ test("plan_workflow_name is required", () => {
   expect(() => {
     main(
       {
-        skipLabelPrefix: "skip:",
-        labels: "",
-        prAuthor: "octocat",
-        target: "foo",
+        plan_workflow_name: "",
+        label_prefixes: {
+          skip: "skip:",
+        },
+        target_groups: [],
       },
       {
         repository: "",
@@ -98,11 +99,10 @@ test("customize", () => {
   expect(
     main(
       {
-        skipLabelPrefix: "skip:",
-        labels: "",
-        prAuthor: "octocat",
-        target: "foo",
-
+        label_prefixes: {
+          skip: "skip:",
+        },
+        target_groups: [],
         plan_workflow_name: "plan",
         base_working_directory: "terraform",
         working_directory_file: "tfaction-config.yaml",
