@@ -24731,7 +24731,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
+exports.getTargetGroup = exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
 const core = __importStar(__nccwpck_require__(5329));
 const js_yaml_1 = __nccwpck_require__(1168);
@@ -24768,6 +24768,17 @@ const GitHubSecrets = zod_1.z.array(zod_1.z.object({
     env_name: zod_1.z.string(),
     secret_name: zod_1.z.string(),
 }));
+const AWSSecretsManagerSecretEnv = zod_1.z.object({
+    env_name: zod_1.z.string(),
+    secret_key: zod_1.z.optional(zod_1.z.string()),
+});
+const AWSSecretsManagerSecret = zod_1.z.object({
+    envs: zod_1.z.array(AWSSecretsManagerSecretEnv),
+    secret_id: zod_1.z.string(),
+    version_id: zod_1.z.optional(zod_1.z.string()),
+    version_stage: zod_1.z.optional(zod_1.z.string()),
+    aws_region: zod_1.z.optional(zod_1.z.string()),
+});
 const JobConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
@@ -24776,6 +24787,7 @@ const JobConfig = zod_1.z.object({
     secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
     env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
+    aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
 const TargetGroup = zod_1.z.object({
     aws_region: zod_1.z.optional(zod_1.z.string()),
@@ -24796,6 +24808,7 @@ const TargetGroup = zod_1.z.object({
     tfmigrate_apply_config: zod_1.z.optional(JobConfig),
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
     working_directory: zod_1.z.string(),
+    aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
 const TargetConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
@@ -24932,27 +24945,41 @@ const setValues = (name, values) => {
 };
 exports.setValues = setValues;
 const setOutputs = (keys, objs) => {
+    const outputs = new Map();
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         for (const obj of objs) {
             if (obj != undefined && obj != null && obj[key] != undefined) {
-                core.setOutput(key, obj[key]);
+                outputs.set(key, obj[key]);
                 break;
             }
         }
     }
+    return outputs;
 };
 exports.setOutputs = setOutputs;
 const setEnvs = (...objs) => {
+    const envs = new Map();
     for (const obj of objs) {
         if (obj === null || obj === void 0 ? void 0 : obj.env) {
             for (const [key, value] of Object.entries(obj.env)) {
-                core.exportVariable(key, value);
+                envs.set(key, value);
             }
         }
     }
+    return envs;
 };
 exports.setEnvs = setEnvs;
+function getTargetGroup(targets, target) {
+    for (let i = 0; i < targets.length; i++) {
+        const t = targets[i];
+        if (target.startsWith(t.target)) {
+            return t;
+        }
+    }
+    throw new Error("target is invalid");
+}
+exports.getTargetGroup = getTargetGroup;
 
 
 /***/ }),

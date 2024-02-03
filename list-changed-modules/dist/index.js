@@ -24777,8 +24777,12 @@ const core = __importStar(__nccwpck_require__(2186));
 const fs = __importStar(__nccwpck_require__(7147));
 const path = __importStar(__nccwpck_require__(1017));
 const main = () => {
-    const changedFiles = fs.readFileSync(core.getInput("changed_files", { required: true }), "utf8").split("\n");
-    const configFiles = fs.readFileSync(core.getInput("config_files", { required: true }), "utf8").split("\n");
+    const changedFiles = fs
+        .readFileSync(core.getInput("changed_files", { required: true }), "utf8")
+        .split("\n");
+    const configFiles = fs
+        .readFileSync(core.getInput("config_files", { required: true }), "utf8")
+        .split("\n");
     const modules = (0, exports.run)(configFiles, changedFiles);
     core.info(`modules: ${Array.from(modules)}`);
     core.setOutput("modules", Array.from(modules));

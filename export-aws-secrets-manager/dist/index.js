@@ -45009,25 +45009,29 @@ const setValues = (name, values) => {
 };
 exports.setValues = setValues;
 const setOutputs = (keys, objs) => {
+    const outputs = new Map();
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         for (const obj of objs) {
             if (obj != undefined && obj != null && obj[key] != undefined) {
-                core.setOutput(key, obj[key]);
+                outputs.set(key, obj[key]);
                 break;
             }
         }
     }
+    return outputs;
 };
 exports.setOutputs = setOutputs;
 const setEnvs = (...objs) => {
+    const envs = new Map();
     for (const obj of objs) {
         if (obj === null || obj === void 0 ? void 0 : obj.env) {
             for (const [key, value] of Object.entries(obj.env)) {
-                core.exportVariable(key, value);
+                envs.set(key, value);
             }
         }
     }
+    return envs;
 };
 exports.setEnvs = setEnvs;
 function getTargetGroup(targets, target) {
