@@ -75,7 +75,7 @@ export const run = async (): Promise<void> => {
     targetS,
   );
   if (!targetConfig) {
-    throw "target is invalid";
+    throw new Error("target is invalid");
   }
   const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
   let awsClient = null;

@@ -81632,7 +81632,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const isApply = lib.getIsApply();
     const targetConfig = lib.getTargetFromTargetGroups(config.target_groups, targetS);
     if (!targetConfig) {
-        throw "target is invalid";
+        throw new Error("target is invalid");
     }
     const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
     let awsClient = null;
