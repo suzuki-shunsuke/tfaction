@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import * as lib from "./lib";
+import * as lib from "lib";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
@@ -72,7 +72,13 @@ export const run = async (): Promise<void> => {
   const targetS = lib.getTarget();
   const jobType = lib.getJobType();
   const isApply = lib.getIsApply();
-  const targetConfig = lib.getTargetConfig(config.target_groups, targetS);
+  const targetConfig = lib.getTargetFromTargetGroups(
+    config.target_groups,
+    targetS,
+  );
+  if (!targetConfig) {
+    throw "target is invalid";
+  }
   const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
   let awsClient = null;
   if (targetConfig.aws_secrets_manager) {
