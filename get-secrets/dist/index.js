@@ -81589,20 +81589,20 @@ function exportSecrets(client, secrets) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const secret of secrets) {
             if (!secret.secret_id) {
-                throw "secret_id is required";
+                throw new Error("secret_id is required");
             }
             const command = new client_secrets_manager_1.GetSecretValueCommand({
                 SecretId: secret.secret_id,
             });
             const response = yield client.send(command);
             if (!response.SecretString) {
-                throw `SecretString is empty: secret_id=${secret.secret_id}`;
+                throw new Error(`SecretString is empty: secret_id=${secret.secret_id}`);
             }
             let secretJSON = null;
             const secretMap = new Map();
             for (const e of secret.envs) {
                 if (!e.env_name) {
-                    throw `env_name is required: secret_id=${secret.secret_id}`;
+                    throw new Error(`env_name is required: secret_id=${secret.secret_id}`);
                 }
                 if (!e.secret_key) {
                     secretMap.set(e.env_name, response.SecretString);
@@ -81613,7 +81613,7 @@ function exportSecrets(client, secrets) {
                     secretJSON = JSON.parse(response.SecretString);
                 }
                 if (!secretJSON[e.secret_key]) {
-                    throw `secret key isn't found: secret_key=${e.secret_key} secret_id=${secret.secret_id}`;
+                    throw new Error(`secret key isn't found: secret_key=${e.secret_key} secret_id=${secret.secret_id}`);
                 }
                 const secretValue = secretJSON[e.secret_key];
                 secretMap.set(e.env_name, secretValue);
