@@ -81587,8 +81587,7 @@ function exportSecret(envName, secretID, secretValue, secretKey) {
 }
 function exportSecrets(client, secrets) {
     return __awaiter(this, void 0, void 0, function* () {
-        for (let i = 0; i < secrets.length; i++) {
-            const secret = secrets[i];
+        for (const secret of secrets) {
             if (!secret.secret_id) {
                 throw "secret_id is required";
             }
@@ -81601,8 +81600,7 @@ function exportSecrets(client, secrets) {
             }
             let secretJSON = null;
             const secretMap = new Map();
-            for (let j = 0; j < secret.envs.length; j++) {
-                const e = secret.envs[j];
+            for (const e of secret.envs) {
                 if (!e.env_name) {
                     throw `env_name is required: secret_id=${secret.secret_id}`;
                 }

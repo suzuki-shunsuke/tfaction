@@ -27,8 +27,7 @@ async function exportSecrets(
   client: SecretsManagerClient,
   secrets: Array<lib.AWSSecretsManagerSecret>,
 ) {
-  for (let i = 0; i < secrets.length; i++) {
-    const secret = secrets[i];
+  for (const secret of secrets) {
     if (!secret.secret_id) {
       throw "secret_id is required";
     }
@@ -41,8 +40,7 @@ async function exportSecrets(
     }
     let secretJSON = null;
     const secretMap = new Map<string, string>();
-    for (let j = 0; j < secret.envs.length; j++) {
-      const e = secret.envs[j];
+    for (const e of secret.envs) {
       if (!e.env_name) {
         throw `env_name is required: secret_id=${secret.secret_id}`;
       }
