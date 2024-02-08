@@ -223,8 +223,9 @@ type Input = {
 };
 
 export const main = () => {
+  // The path to ci-info's pr.json.
   const prPath = core.getInput("pull_request");
-  const pr = prPath ? JSON.parse(fs.readFileSync(prPath, "utf8")) : "";
+  const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
 
   const targetConfigs = run({
     labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
