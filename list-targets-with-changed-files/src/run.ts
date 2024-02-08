@@ -225,9 +225,10 @@ type Input = {
 };
 
 export const main = () => {
+  // The path to ci-info's pr.json.
   const prPath = core.getInput("pull_request");
   core.info('try to read a pull request file');
-  const pr = prPath ? JSON.parse(fs.readFileSync(prPath, "utf8")) : "";
+  const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
   core.info('read a pull request file');
 
   const targetConfigs = run({
