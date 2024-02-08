@@ -34,7 +34,7 @@ runs:
         RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
         DESTROY: ${{ steps.target-config.outputs.destroy }}
-        CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.contest_policy_directory }}
+        CONFTEST_POLICY_DIRECTORY: ${{ github.workspace }}/${{ steps.global-config.outputs.contest_policy_directory }}
 
     - run: echo "value=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
       id: artifact_name

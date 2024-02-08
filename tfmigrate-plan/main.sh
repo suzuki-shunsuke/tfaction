@@ -32,7 +32,7 @@ github-comment exec \
 	-var "tfaction_target:$TFACTION_TARGET" \
 	-- tfmigrate plan --out tfplan.binary
 
-if [ -d "$ROOT_DIR/policy" ]; then
+if [ -d "$CONFTEST_POLICY_DIRECTORY" ]; then
 	github-comment exec -- terraform show -json tfplan.binary >tfplan.json
 	conftest -v # Install conftest in advance to exclude aqua lazy install log from github-comment's comment
 	github-comment exec \

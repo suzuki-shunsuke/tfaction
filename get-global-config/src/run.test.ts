@@ -14,7 +14,7 @@ test("default", () => {
       draft_pr: false,
       skip_create_pr: false,
       plan_workflow_name: "plan",
-      conftest_policy_directory: "/home/runner/work/policy",
+      conftest_policy_directory: "policy",
 
       label_prefix_target: "target:",
       label_prefix_tfmigrate: "tfmigrate:",
@@ -80,7 +80,7 @@ test("customize", () => {
       renovate_login: "renovate-custom[bot]",
       draft_pr: true,
       skip_create_pr: true,
-      conftest_policy_directory: "/path/to/conftest/policy",
+      conftest_policy_directory: "terraform/policy",
 
       label_prefix_target: "target:",
       label_prefix_tfmigrate: "tfmigrate:",
@@ -113,7 +113,7 @@ test("customize", () => {
         renovate_login: "renovate-custom[bot]",
         draft_pr: true,
         skip_create_pr: true,
-        conftest_policy_directory: "/path/to/conftest/policy",
+        conftest_policy_directory: "terraform/policy",
       },
       {
         repository: "",

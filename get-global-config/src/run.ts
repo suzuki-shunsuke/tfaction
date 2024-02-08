@@ -56,9 +56,7 @@ export const main = (config: lib.Config, input: Input): Result => {
     draft_pr: !!config.draft_pr,
     skip_create_pr: !!config.skip_create_pr,
     plan_workflow_name: config.plan_workflow_name,
-    conftest_policy_directory:
-      config.conftest_policy_directory ||
-      `${process.env.GITHUB_WORKSPACE}/policy`,
+    conftest_policy_directory: config.conftest_policy_directory ?? "policy",
 
     label_prefix_target: config?.label_prefixes?.target || "target:",
     label_prefix_tfmigrate: config?.label_prefixes?.tfmigrate || "tfmigrate:",
