@@ -64,9 +64,7 @@ const getPRBody = (prStr: string, payload: Payload): string => {
   if (!prStr) {
     return "";
   }
-  core.info('try to read a pull request body');
   const pr = JSON.parse(prStr);
-  core.info('read a pull request body');
   return pr?.body || "";
 };
 
@@ -227,9 +225,7 @@ type Input = {
 export const main = () => {
   // The path to ci-info's pr.json.
   const prPath = core.getInput("pull_request");
-  core.info('try to read a pull request file');
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
-  core.info('read a pull request file');
 
   const targetConfigs = run({
     labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
