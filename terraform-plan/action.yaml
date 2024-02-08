@@ -30,11 +30,11 @@ runs:
         env.TFACTION_DRIFT_ISSUE_NUMBER || !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        ROOT_DIR: ${{ github.workspace }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
         DESTROY: ${{ steps.target-config.outputs.destroy }}
+        CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.contest_policy_directory }}
 
     - run: echo "value=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
       id: artifact_name

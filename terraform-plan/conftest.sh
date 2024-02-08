@@ -8,4 +8,4 @@ github-comment exec \
 	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-var "tfaction_target:$TFACTION_TARGET" \
 	-k conftest -- \
-		conftest test --no-color -p "$ROOT_DIR/policy" tfplan.json
+		conftest test --no-color -p "$CONFTEST_POLICY_DIRECTORY" tfplan.json
