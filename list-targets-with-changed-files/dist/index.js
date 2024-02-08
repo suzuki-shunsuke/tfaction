@@ -62278,7 +62278,9 @@ const getPRBody = (prStr, payload) => {
     if (!prStr) {
         return "";
     }
+    core.info('try to read a pull request body');
     const pr = JSON.parse(prStr);
+    core.info('read a pull request body');
     return (pr === null || pr === void 0 ? void 0 : pr.body) || "";
 };
 const run = (input) => {
@@ -62383,7 +62385,9 @@ const run = (input) => {
 exports.run = run;
 const main = () => {
     const prPath = core.getInput("pull_request");
+    core.info('try to read a pull request file');
     const pr = prPath ? JSON.parse(fs.readFileSync(prPath, "utf8")) : "";
+    core.info('read a pull request file');
     const targetConfigs = (0, exports.run)({
         labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
         config: lib.getConfig(),
