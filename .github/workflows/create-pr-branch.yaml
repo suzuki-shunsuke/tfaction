@@ -1,10 +1,15 @@
 ---
 name: Create Pull Request Branch
+run-name: Create Pull Request Branch (${{inputs.pr}})
 on:
   workflow_dispatch:
     inputs:
       pr:
         description: "Pull Request Number"
+        required: true
+      is_comment:
+        description: Whether a comment is posted
+        type: boolean
         required: true
 jobs:
   create-pr-branch:
@@ -14,6 +19,7 @@ jobs:
       pull-requests: write
     with:
       pr: ${{fromJSON(inputs.pr)}}
+      is_comment: ${{inputs.is_comment}}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
       gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
