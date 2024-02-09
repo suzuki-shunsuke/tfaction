@@ -4,9 +4,7 @@
   "title": "tfaction-root.yaml",
   "type": "object",
   "description": "tfaction-root.yaml",
-  "required": [
-    "target_groups"
-  ],
+  "required": ["target_groups"],
   "properties": {
     "target_groups": {
       "type": "array",
@@ -15,10 +13,7 @@
       "items": {
         "type": "object",
         "description": "target group configuration",
-        "required": [
-          "working_directory",
-          "target"
-        ],
+        "required": ["working_directory", "target"],
         "properties": {
           "working_directory": {
             "type": "string",
@@ -340,10 +335,7 @@
       "items": {
         "type": "object",
         "description": "target group configuration",
-        "required": [
-          "secret_id",
-          "envs"
-        ],
+        "required": ["secret_id", "envs"],
         "properties": {
           "secret_id": {
             "type": "string",
@@ -355,9 +347,7 @@
             "items": {
               "type": "object",
               "description": "exported environment variable",
-              "required": [
-                "env_name"
-              ],
+              "required": ["env_name"],
               "properties": {
                 "env_name": {
                   "type": "string",
