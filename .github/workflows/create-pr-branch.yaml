@@ -1,5 +1,6 @@
 ---
 name: Create Pull Request Branch
+run-name: Create Pull Request Branch (${{inputs.pr}})
 on:
   workflow_dispatch:
     inputs:
