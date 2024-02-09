@@ -1,5 +1,6 @@
 ---
 name: wc-create-pr-branch
+run-name: wc-create-pr-branch (${{inputs.pr}})
 on:
   workflow_call:
     inputs:
