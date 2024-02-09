@@ -148,6 +148,7 @@ const Config = z.object({
     }),
   ),
   base_working_directory: z.optional(z.string()),
+  conftest_policy_directory: z.optional(z.string()),
   draft_pr: z.optional(z.boolean()),
   drift_detection: z.optional(
     z.object({

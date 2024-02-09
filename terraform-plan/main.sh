@@ -21,9 +21,7 @@ if [ "$code" -eq 1 ]; then
 	exit 1
 fi
 
-if [ -d "$ROOT_DIR/policy" ]; then
-	bash "$GITHUB_ACTION_PATH/conftest.sh"
-fi
+bash "$GITHUB_ACTION_PATH/conftest.sh"
 
 if [ "$code" = "0" ]; then
 	exit 0
