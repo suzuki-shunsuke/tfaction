@@ -14,7 +14,7 @@ test("default", () => {
       draft_pr: false,
       skip_create_pr: false,
       plan_workflow_name: "plan",
-      conftest_policy_directory: "policy",
+      conftest_policy_directory: "",
 
       label_prefix_target: "target:",
       label_prefix_tfmigrate: "tfmigrate:",

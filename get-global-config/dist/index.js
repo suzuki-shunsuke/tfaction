@@ -58034,7 +58034,7 @@ const main = (config, input) => {
         draft_pr: !!config.draft_pr,
         skip_create_pr: !!config.skip_create_pr,
         plan_workflow_name: config.plan_workflow_name,
-        conftest_policy_directory: (_a = config.conftest_policy_directory) !== null && _a !== void 0 ? _a : "policy",
+        conftest_policy_directory: (_a = config.conftest_policy_directory) !== null && _a !== void 0 ? _a : "",
         label_prefix_target: ((_b = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _b === void 0 ? void 0 : _b.target) || "target:",
         label_prefix_tfmigrate: ((_c = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _c === void 0 ? void 0 : _c.tfmigrate) || "tfmigrate:",
         label_prefix_skip: ((_d = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _d === void 0 ? void 0 : _d.skip) || "skip:",
