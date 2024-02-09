@@ -1699,6 +1699,7 @@ declare const Config: z.ZodObject<{
         } | undefined;
     }>>;
     base_working_directory: z.ZodOptional<z.ZodString>;
+    conftest_policy_directory: z.ZodOptional<z.ZodString>;
     draft_pr: z.ZodOptional<z.ZodBoolean>;
     drift_detection: z.ZodOptional<z.ZodObject<{
         issue_repo_owner: z.ZodOptional<z.ZodString>;
@@ -2681,6 +2682,7 @@ declare const Config: z.ZodObject<{
         } | undefined;
     } | undefined;
     base_working_directory?: string | undefined;
+    conftest_policy_directory?: string | undefined;
     draft_pr?: boolean | undefined;
     drift_detection?: {
         issue_repo_owner?: string | undefined;
@@ -2858,6 +2860,7 @@ declare const Config: z.ZodObject<{
         } | undefined;
     } | undefined;
     base_working_directory?: string | undefined;
+    conftest_policy_directory?: string | undefined;
     draft_pr?: boolean | undefined;
     drift_detection?: {
         issue_repo_owner?: string | undefined;
