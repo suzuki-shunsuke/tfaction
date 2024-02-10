@@ -62347,15 +62347,21 @@ const run = (input) => {
             continue;
         }
     }
+    const moduleCallerMap = JSON.parse(core.getInput("module_callers"));
     const changedWorkingDirs = new Set();
     for (let i = 0; i < changedFiles.length; i++) {
         const changedFile = changedFiles[i];
         if (changedFile == "") {
             continue;
         }
-        for (const workingDir of workingDirs) {
+        const dir = path.dirname(changedFile);
+        for (let workingDir of workingDirs) {
             if (changedFile.startsWith(workingDir + "/")) {
                 changedWorkingDirs.add(workingDir);
+            }
+            const moduleCallers = moduleCallerMap[dir] || [];
+            for (const caller of moduleCallers) {
+                changedWorkingDirs.add(caller);
             }
         }
     }
@@ -62399,6 +62405,7 @@ const main = () => {
         pr,
         payload: github.context.payload,
     });
+    core.info(`targets: ${JSON.stringify(targetConfigs)}`);
     core.setOutput("targets", targetConfigs);
 };
 exports.main = main;

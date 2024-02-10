@@ -39,8 +39,15 @@ runs:
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
+    - run: go install github.com/hashicorp/terraform-config-inspect@latest
+      shell: bash
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
+    - uses: suzuki-shunsuke/list-module-callers@main
+      id: list-module-callers
+      with:
+        config_files: ${{ steps.list-working-directory-configs.outputs.file }}
+        module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
     - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
       id: list-targets
       with:
@@ -48,6 +55,7 @@ runs:
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
+        module_callers: ${{ steps.list-module-callers.outputs.file }}
     - uses: suzuki-shunsuke/tfaction/list-changed-modules@main
       id: list-modules
       with:

@@ -1,0 +1,15 @@
+name: List module callers
+description: List module's callers
+inputs:
+  config_files:
+    description: "config file paths"
+    required: true
+  module_files:
+    description: "module file paths"
+    required: true
+outputs:
+  file:
+    description: A json to list module callers
+runs:
+  using: "node20"
+  main: "dist/index.js"
