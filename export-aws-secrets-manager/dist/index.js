@@ -44930,6 +44930,9 @@ const Config = zod_1.z.object({
     tflint: zod_1.z.optional(TflintConfig),
     tfsec: zod_1.z.optional(TfsecConfig),
     trivy: zod_1.z.optional(TrivyConfig),
+    update_local_path_module_caller: zod_1.z.optional(zod_1.z.object({
+        enabled: zod_1.z.optional(zod_1.z.boolean()),
+    })),
     update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),

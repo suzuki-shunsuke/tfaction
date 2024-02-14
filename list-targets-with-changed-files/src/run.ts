@@ -153,7 +153,7 @@ export const run = (input: Input): TargetConfig[] => {
     }
   }
 
-  const moduleCallerMap = JSON.parse(core.getInput("module_callers"));
+  const moduleCallerMap = JSON.parse(core.getInput("module_callers") || "{}");
   const changedWorkingDirs = new Set<string>();
   for (let i = 0; i < changedFiles.length; i++) {
     const changedFile = changedFiles[i];

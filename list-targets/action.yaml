@@ -43,8 +43,11 @@ runs:
       shell: bash
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
-    - uses: suzuki-shunsuke/list-module-callers@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
+    - uses: suzuki-shunsuke/tfaction/list-module-callers@main
       id: list-module-callers
+      if: steps.global-config.outputs.disable_update_local_path_module_caller == 'false'
       with:
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
         module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
