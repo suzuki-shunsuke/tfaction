@@ -9,7 +9,7 @@
     "helpers:pinGitHubActionDigests",
     "github>suzuki-shunsuke/renovate-config",
     "github>aquaproj/aqua-renovate-config#2.1.0",
-    "github>aquaproj/aqua-renovate-config:file#2.1.0(aqua/.*\\.yaml)",
+    "github>aquaproj/aqua-renovate-config:file#2.2.0(aqua/.*\\.yaml)",
   ],
   prHourlyLimit: 0,
   prConcurrentLimit: 0,
