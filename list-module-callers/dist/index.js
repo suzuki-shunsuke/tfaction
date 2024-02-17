@@ -24736,6 +24736,18 @@ const fs = __importStar(__nccwpck_require__(7147));
 const path = __importStar(__nccwpck_require__(1017));
 const child_process = __importStar(__nccwpck_require__(2081));
 const lib_1 = __nccwpck_require__(9730);
+function getGoBin() {
+    const gobin = child_process.execSync(`go env GOBIN`).toString("utf-8").trim();
+    if (gobin !== "") {
+        return gobin;
+    }
+    const gopath = child_process.execSync(`go env GOPATH`).toString("utf-8").trim();
+    if (gopath !== "") {
+        return `${gopath}/bin/`;
+    }
+    // Fallback to the default path if GOBIN or GOPATH are both unset.
+    return "/home/runner/go/bin/";
+}
 try {
     const configFiles = fs
         .readFileSync(core.getInput("config_files"), "utf8")
@@ -24750,7 +24762,7 @@ try {
             return;
         }
         const tfDir = path.dirname(tfFile);
-        const inspection = JSON.parse(child_process.execSync(`/home/runner/go/bin/terraform-config-inspect --json ${tfDir}`).toString("utf-8"));
+        const inspection = JSON.parse(child_process.execSync(`${getGoBin()}/terraform-config-inspect --json ${tfDir}`).toString("utf-8"));
         // List keys of Local Path modules (source starts with ./ or ../) in module_calls
         rawModuleCalls[tfDir] = Object.values(inspection["module_calls"]).flatMap((module) => {
             const source = module.source;
