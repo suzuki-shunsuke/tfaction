@@ -11,10 +11,10 @@ function getGoBin(): string {
     }
     const gopath = child_process.execSync(`go env GOPATH`).toString("utf-8").trim();
     if (gopath !== "") {
-        return `${gopath}/bin/`;
+        return `${gopath}/bin`;
     }
     // Fallback to the default path if GOBIN or GOPATH are both unset.
-    return "/home/runner/go/bin/";
+    return "/home/runner/go/bin";
 }
 
 try {
