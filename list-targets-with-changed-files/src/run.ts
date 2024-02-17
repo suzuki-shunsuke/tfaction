@@ -153,7 +153,7 @@ export const run = (input: Input): TargetConfig[] => {
     }
   }
 
-  const moduleCallerMap = JSON.parse(core.getInput("module_callers") || "{}");
+  const moduleCallerMap = input.module_callers;
   const changedWorkingDirs = new Set<string>();
   for (let i = 0; i < changedFiles.length; i++) {
     const changedFile = changedFiles[i];
@@ -226,6 +226,7 @@ type Input = {
   configFiles: string[];
   pr: string;
   payload: Payload;
+  module_callers: Record<string, string[]>;
 };
 
 export const main = () => {
@@ -245,6 +246,7 @@ export const main = () => {
       .split("\n"),
     pr,
     payload: github.context.payload,
+    module_callers: JSON.parse(core.getInput("module_callers") || "{}") as Record<string, string[]>,
   });
 
   core.info(`targets: ${JSON.stringify(targetConfigs)}`);

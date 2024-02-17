@@ -62350,7 +62350,7 @@ const run = (input) => {
             continue;
         }
     }
-    const moduleCallerMap = JSON.parse(core.getInput("module_callers") || "{}");
+    const moduleCallerMap = input.module_callers;
     const changedWorkingDirs = new Set();
     for (let i = 0; i < changedFiles.length; i++) {
         const changedFile = changedFiles[i];
@@ -62407,6 +62407,7 @@ const main = () => {
             .split("\n"),
         pr,
         payload: github.context.payload,
+        module_callers: JSON.parse(core.getInput("module_callers") || "{}"),
     });
     core.info(`targets: ${JSON.stringify(targetConfigs)}`);
     core.setOutput("targets", targetConfigs);

@@ -22,6 +22,7 @@ test("normal", () => {
           body: "hello",
         },
       },
+      module_callers: {},
     }),
   ).toStrictEqual([
     {
@@ -64,6 +65,7 @@ test("job config", () => {
           body: "hello",
         },
       },
+      module_callers: {},
     }),
   ).toStrictEqual([
     {
@@ -121,6 +123,7 @@ test("pr comment", () => {
           body: "<!-- tfaction follow up pr target=yoo/dev -->",
         },
       },
+      module_callers: {},
     }),
   ).toStrictEqual([
     {
@@ -143,4 +146,56 @@ test("pr comment", () => {
       target: "yoo/dev",
     },
   ]);
+});
+
+test("module callers", () => {
+    expect(
+        run({
+            config: {
+                plan_workflow_name: "plan",
+                target_groups: [
+                    {
+                        target: "foo/",
+                        working_directory: "foo/",
+                    },
+                ],
+            },
+            isApply: false,
+            labels: [],
+            changedFiles: ["foo/dev/main.tf"],
+            configFiles: ["foo/dev/tfaction.yaml"],
+            pr: "",
+            payload: {
+                pull_request: {
+                    body: "hello",
+                },
+            },
+            module_callers: {
+              // dev calls bar and baz
+              "foo/dev": ["foo/bar", "foo/baz"],
+            },
+        }),
+    ).toStrictEqual([
+        {
+            environment: undefined,
+            job_type: "terraform",
+            runs_on: "ubuntu-latest",
+            secrets: undefined,
+            target: "foo/dev",
+        },
+        {
+            environment: undefined,
+            job_type: "terraform",
+            runs_on: "ubuntu-latest",
+            secrets: undefined,
+            target: "foo/bar",
+        },
+        {
+            environment: undefined,
+            job_type: "terraform",
+            runs_on: "ubuntu-latest",
+            secrets: undefined,
+            target: "foo/baz",
+        },
+    ]);
 });
