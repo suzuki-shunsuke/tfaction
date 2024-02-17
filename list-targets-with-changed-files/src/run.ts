@@ -246,7 +246,9 @@ export const main = () => {
       .split("\n"),
     pr,
     payload: github.context.payload,
-    module_callers: JSON.parse(core.getInput("module_callers") || "{}") as Record<string, string[]>,
+    module_callers: JSON.parse(
+      core.getInput("module_callers") || "{}",
+    ) as Record<string, string[]>,
   });
 
   core.info(`targets: ${JSON.stringify(targetConfigs)}`);
