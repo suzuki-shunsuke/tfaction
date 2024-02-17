@@ -27,7 +27,7 @@ interface Outputs {
   drift_issue_repo_owner: string;
   drift_issue_repo_name: string;
   disable_update_related_pull_requests: boolean;
-  disable_update_local_path_module_caller: boolean;
+  update_local_path_module_caller: boolean;
   aqua_update_checksum_enabled: boolean;
   aqua_update_checksum_prune: boolean;
   aqua_update_checksum_skip_push: boolean;
@@ -65,9 +65,7 @@ export const main = (config: lib.Config, input: Input): Result => {
     disable_update_related_pull_requests: !(
       config?.update_related_pull_requests?.enabled ?? true
     ),
-    disable_update_local_path_module_caller: !(
-      config?.update_local_path_module_caller?.enabled ?? false
-    ),
+    update_local_path_module_caller: config?.update_local_path_module_caller?.enabled ?? false,
     aqua_update_checksum_enabled:
       config?.aqua?.update_checksum?.enabled ?? false,
     aqua_update_checksum_prune: config?.aqua?.update_checksum?.prune ?? false,

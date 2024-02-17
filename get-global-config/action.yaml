@@ -31,7 +31,7 @@ outputs:
   enable_trivy:
     description: If true, trivy is enabled in test action
 
-  disable_update_local_path_module_caller:
+  update_local_path_module_caller:
     description: If true, local-path module caller is updated when any of local-path modules is updated
 
   aqua_update_checksum_enabled:

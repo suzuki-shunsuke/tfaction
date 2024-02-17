@@ -58042,7 +58042,7 @@ const main = (config, input) => {
         label_prefix_tfmigrate: ((_c = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _c === void 0 ? void 0 : _c.tfmigrate) || "tfmigrate:",
         label_prefix_skip: ((_d = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _d === void 0 ? void 0 : _d.skip) || "skip:",
         disable_update_related_pull_requests: !((_f = (_e = config === null || config === void 0 ? void 0 : config.update_related_pull_requests) === null || _e === void 0 ? void 0 : _e.enabled) !== null && _f !== void 0 ? _f : true),
-        disable_update_local_path_module_caller: !((_h = (_g = config === null || config === void 0 ? void 0 : config.update_local_path_module_caller) === null || _g === void 0 ? void 0 : _g.enabled) !== null && _h !== void 0 ? _h : false),
+        update_local_path_module_caller: (_h = (_g = config === null || config === void 0 ? void 0 : config.update_local_path_module_caller) === null || _g === void 0 ? void 0 : _g.enabled) !== null && _h !== void 0 ? _h : false,
         aqua_update_checksum_enabled: (_l = (_k = (_j = config === null || config === void 0 ? void 0 : config.aqua) === null || _j === void 0 ? void 0 : _j.update_checksum) === null || _k === void 0 ? void 0 : _k.enabled) !== null && _l !== void 0 ? _l : false,
         aqua_update_checksum_prune: (_p = (_o = (_m = config === null || config === void 0 ? void 0 : config.aqua) === null || _m === void 0 ? void 0 : _m.update_checksum) === null || _o === void 0 ? void 0 : _o.prune) !== null && _p !== void 0 ? _p : false,
         aqua_update_checksum_skip_push: input.drift_issue_number
