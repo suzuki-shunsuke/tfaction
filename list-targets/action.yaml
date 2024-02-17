@@ -40,6 +40,7 @@ runs:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
     - run: go install github.com/hashicorp/terraform-config-inspect@latest
+      if: steps.global-config.outputs.disable_update_local_path_module_caller == 'false'
       shell: bash
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
