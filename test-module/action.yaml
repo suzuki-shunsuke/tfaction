@@ -14,7 +14,7 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
-    - uses: suzuki-shunsuke/trivy-config-action@9cb8a8558fb82684e7f66b0cdfaecef033b264ac # v0.2.1
+    - uses: suzuki-shunsuke/trivy-config-action@6c7c845cbf76e5745c4d772719de7a34453ae81d # v0.2.2
       if: fromJSON(steps.global-config.outputs.enable_trivy)
       with:
         github_token: ${{ inputs.github_token }}
