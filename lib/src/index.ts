@@ -182,6 +182,7 @@ const Config = z.object({
   tflint: z.optional(TflintConfig),
   tfsec: z.optional(TfsecConfig),
   trivy: z.optional(TrivyConfig),
+  terraform_command: z.optional(z.string()),
   update_related_pull_requests: z.optional(
     z.object({
       enabled: z.optional(z.boolean()),

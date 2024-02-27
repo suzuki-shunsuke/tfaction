@@ -29,6 +29,7 @@ test("default", () => {
       enable_tfsec: false,
       enable_tflint: true,
       enable_trivy: true,
+      terraform_command: "terraform",
     },
   };
   expect(
@@ -95,6 +96,7 @@ test("customize", () => {
       enable_tfsec: false,
       enable_tflint: true,
       enable_trivy: true,
+      terraform_command: "tofu",
     },
   };
 
@@ -114,6 +116,7 @@ test("customize", () => {
         draft_pr: true,
         skip_create_pr: true,
         conftest_policy_directory: "terraform/policy",
+        terraform_command: "tofu",
       },
       {
         repository: "",

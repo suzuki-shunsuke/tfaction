@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ -z "${TFMIGRATE_EXEC_PATH:-}" ] && [ "$TF_COMMAND" != terraform ] ; then
+	TFMIGRATE_EXEC_PATH=$TF_COMMAND
+fi
+
 apply_output=$(mktemp)
 
 set +e

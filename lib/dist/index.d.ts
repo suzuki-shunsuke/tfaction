@@ -2532,6 +2532,7 @@ declare const Config: z.ZodObject<{
     }, {
         enabled?: boolean | undefined;
     }>>;
+    terraform_command: z.ZodOptional<z.ZodString>;
     update_related_pull_requests: z.ZodOptional<z.ZodObject<{
         enabled: z.ZodOptional<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
@@ -2714,6 +2715,7 @@ declare const Config: z.ZodObject<{
     trivy?: {
         enabled?: boolean | undefined;
     } | undefined;
+    terraform_command?: string | undefined;
     update_related_pull_requests?: {
         enabled?: boolean | undefined;
     } | undefined;
@@ -2892,6 +2894,7 @@ declare const Config: z.ZodObject<{
     trivy?: {
         enabled?: boolean | undefined;
     } | undefined;
+    terraform_command?: string | undefined;
     update_related_pull_requests?: {
         enabled?: boolean | undefined;
     } | undefined;

@@ -109,10 +109,11 @@ runs:
       with:
         ssh_key: ${{ inputs.ssh_key }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@f30204183f50ed18edb01b9f18e896a64eb73b79 # v1.0.0
+    - uses: suzuki-shunsuke/github-action-terraform-init@feat-support-opentofu
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
         github_app_token: ${{ inputs.github_token }}
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
+        terraform_command: ${{ steps.global-config.outputs.terraform_command }}
