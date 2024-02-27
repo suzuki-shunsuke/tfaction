@@ -44930,6 +44930,7 @@ const Config = zod_1.z.object({
     tflint: zod_1.z.optional(TflintConfig),
     tfsec: zod_1.z.optional(TfsecConfig),
     trivy: zod_1.z.optional(TrivyConfig),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
     update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
