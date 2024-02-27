@@ -83,6 +83,8 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
   outputs.set("enable_tflint", config?.tflint?.enabled ?? true);
   outputs.set("enable_trivy", config?.trivy?.enabled ?? true);
 
+  outputs.set("terraform_command", "terraform");
+
   if (inputs.jobType === "scaffold_working_dir") {
     const m = lib.setOutputs(
       [
@@ -132,6 +134,7 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
         "aws_assume_role_arn",
         "gcp_service_account",
         "gcp_workload_identity_provider",
+        "terraform_command",
       ],
       [jobConfig, wdConfig, rootJobConfig, targetConfig, config],
     );

@@ -707,6 +707,7 @@ declare const TargetGroup: z.ZodObject<{
         version_stage?: string | undefined;
         aws_region?: string | undefined;
     }>, "many">>;
+    terraform_command: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     target: string;
     working_directory: string;
@@ -838,6 +839,7 @@ declare const TargetGroup: z.ZodObject<{
         version_stage?: string | undefined;
         aws_region?: string | undefined;
     }[] | undefined;
+    terraform_command?: string | undefined;
 }, {
     target: string;
     working_directory: string;
@@ -969,6 +971,7 @@ declare const TargetGroup: z.ZodObject<{
         version_stage?: string | undefined;
         aws_region?: string | undefined;
     }[] | undefined;
+    terraform_command?: string | undefined;
 }>;
 export type TargetGroup = z.infer<typeof TargetGroup>;
 declare const TargetConfig: z.ZodObject<{
@@ -1434,6 +1437,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }>>;
+    terraform_command: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     aws_assume_role_arn?: string | undefined;
     aws_region?: string | undefined;
@@ -1551,6 +1555,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     } | undefined;
+    terraform_command?: string | undefined;
 }, {
     aws_assume_role_arn?: string | undefined;
     aws_region?: string | undefined;
@@ -1668,6 +1673,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     } | undefined;
+    terraform_command?: string | undefined;
 }>;
 export type TargetConfig = z.infer<typeof TargetConfig>;
 declare const Config: z.ZodObject<{
@@ -2248,6 +2254,7 @@ declare const Config: z.ZodObject<{
             version_stage?: string | undefined;
             aws_region?: string | undefined;
         }>, "many">>;
+        terraform_command: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         target: string;
         working_directory: string;
@@ -2379,6 +2386,7 @@ declare const Config: z.ZodObject<{
             version_stage?: string | undefined;
             aws_region?: string | undefined;
         }[] | undefined;
+        terraform_command?: string | undefined;
     }, {
         target: string;
         working_directory: string;
@@ -2510,6 +2518,7 @@ declare const Config: z.ZodObject<{
             version_stage?: string | undefined;
             aws_region?: string | undefined;
         }[] | undefined;
+        terraform_command?: string | undefined;
     }>, "many">;
     tflint: z.ZodOptional<z.ZodObject<{
         enabled: z.ZodOptional<z.ZodBoolean>;
@@ -2674,6 +2683,7 @@ declare const Config: z.ZodObject<{
             version_stage?: string | undefined;
             aws_region?: string | undefined;
         }[] | undefined;
+        terraform_command?: string | undefined;
     }[];
     aqua?: {
         update_checksum?: {
@@ -2853,6 +2863,7 @@ declare const Config: z.ZodObject<{
             version_stage?: string | undefined;
             aws_region?: string | undefined;
         }[] | undefined;
+        terraform_command?: string | undefined;
     }[];
     aqua?: {
         update_checksum?: {
