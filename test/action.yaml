@@ -50,7 +50,7 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@support-other-tool
+    - uses: suzuki-shunsuke/github-action-terraform-fmt@388ce9deea65edd9a9a3a60bee140732c3dad7a2 # v0.2.1
       if: steps.target-config.outputs.destroy != 'true'
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
