@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ -z "${TFMIGRATE_EXEC_PATH:-}" ] && [ "$TF_COMMAND" != terraform ] ; then
+	TFMIGRATE_EXEC_PATH=$TF_COMMAND
+fi
+
 if [ ! -f .tfmigrate.hcl ]; then
 	if [ -n "${S3_BUCKET_NAME_TFMIGRATE_HISTORY:-}" ]; then
 		sed "s|%%TARGET%%|$TFACTION_TARGET|g" \

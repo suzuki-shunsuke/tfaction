@@ -24809,6 +24809,7 @@ const TargetGroup = zod_1.z.object({
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
     working_directory: zod_1.z.string(),
     aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
 });
 const TargetConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
@@ -24828,6 +24829,7 @@ const TargetConfig = zod_1.z.object({
     terraform_plan_config: zod_1.z.optional(JobConfig),
     tfmigrate_apply_config: zod_1.z.optional(JobConfig),
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
 });
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
@@ -24866,6 +24868,7 @@ const Config = zod_1.z.object({
     tflint: zod_1.z.optional(TflintConfig),
     tfsec: zod_1.z.optional(TfsecConfig),
     trivy: zod_1.z.optional(TrivyConfig),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
     update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
@@ -58047,6 +58050,7 @@ const main = (config, input) => {
         enable_tfsec: (_s = (_r = config === null || config === void 0 ? void 0 : config.tfsec) === null || _r === void 0 ? void 0 : _r.enabled) !== null && _s !== void 0 ? _s : false,
         enable_tflint: (_u = (_t = config === null || config === void 0 ? void 0 : config.tflint) === null || _t === void 0 ? void 0 : _t.enabled) !== null && _u !== void 0 ? _u : true,
         enable_trivy: (_w = (_v = config === null || config === void 0 ? void 0 : config.trivy) === null || _v === void 0 ? void 0 : _v.enabled) !== null && _w !== void 0 ? _w : true,
+        terraform_command: (config === null || config === void 0 ? void 0 : config.terraform_command) || "terraform",
         drift_issue_repo_owner: "",
         drift_issue_repo_name: "",
     };

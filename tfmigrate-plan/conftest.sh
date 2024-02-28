@@ -13,7 +13,7 @@ if [ ! -d "$CONFTEST_POLICY_DIRECTORY" ]; then
 	exit 0
 fi
 
-github-comment exec -- terraform show -json tfplan.binary >tfplan.json
+github-comment exec -- "$TF_COMMAND" show -json tfplan.binary >tfplan.json
 conftest -v # Install conftest in advance to exclude aqua lazy install log from github-comment's comment
 github-comment exec \
 	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \

@@ -15,6 +15,7 @@ test("default", () => {
       ["enable_trivy", true],
       ["destroy", false],
       ["aws_region", "us-east-1"],
+      ["terraform_command", "terraform"],
     ]),
   };
   expect(
@@ -52,6 +53,7 @@ test("config", () => {
       ["enable_tfsec", true],
       ["enable_tflint", false],
       ["enable_trivy", false],
+      ["terraform_command", "tofu"],
       ["destroy", false],
       ["aws_region", "us-east-1"],
     ]),
@@ -66,6 +68,7 @@ test("config", () => {
       },
       {
         plan_workflow_name: "plan",
+        terraform_command: "tofu",
         tfsec: {
           enabled: true,
         },
@@ -101,6 +104,7 @@ test("scaffold_working_dir", () => {
       ["enable_tfsec", false],
       ["enable_tflint", true],
       ["enable_trivy", true],
+      ["terraform_command", "terraform"],
     ]),
   };
   expect(
