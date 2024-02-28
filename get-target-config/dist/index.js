@@ -58109,6 +58109,7 @@ const run = (inputs, config) => {
             "s3_bucket_name_tfmigrate_history",
             "gcs_bucket_name_tfmigrate_history",
             "providers_lock_opts",
+            "terraform_command",
         ], [wdConfig, targetConfig, config]);
         for (const [key, value] of m1) {
             outputs.set(key, value);
@@ -58118,7 +58119,6 @@ const run = (inputs, config) => {
             "aws_assume_role_arn",
             "gcp_service_account",
             "gcp_workload_identity_provider",
-            "terraform_command",
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
         for (const [key, value] of m2) {
             outputs.set(key, value);

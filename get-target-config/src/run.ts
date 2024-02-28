@@ -121,6 +121,7 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
         "s3_bucket_name_tfmigrate_history",
         "gcs_bucket_name_tfmigrate_history",
         "providers_lock_opts",
+        "terraform_command",
       ],
       [wdConfig, targetConfig, config],
     );
@@ -134,7 +135,6 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
         "aws_assume_role_arn",
         "gcp_service_account",
         "gcp_workload_identity_provider",
-        "terraform_command",
       ],
       [jobConfig, wdConfig, rootJobConfig, targetConfig, config],
     );
