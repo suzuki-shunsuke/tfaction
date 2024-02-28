@@ -116,3 +116,4 @@ runs:
         github_app_token: ${{ inputs.github_token }}
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
+        terraform_command: ${{ steps.target-config.outputs.terraform_command }}

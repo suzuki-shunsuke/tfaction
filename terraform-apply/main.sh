@@ -7,7 +7,7 @@ bash "$GITHUB_ACTION_PATH/download_plan_file.sh"
 apply_output=$(mktemp)
 
 set +e
-tfcmt -var "target:$TFACTION_TARGET" apply -- terraform apply -auto-approve -no-color -input=false tfplan.binary 2>&1 | tee "$apply_output"
+tfcmt -var "target:$TFACTION_TARGET" apply -- "$TF_COMMAND" apply -auto-approve -no-color -input=false tfplan.binary 2>&1 | tee "$apply_output"
 code=$?
 set -e
 

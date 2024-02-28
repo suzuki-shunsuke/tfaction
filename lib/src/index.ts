@@ -107,6 +107,7 @@ const TargetGroup = z.object({
   tfmigrate_plan_config: z.optional(JobConfig),
   working_directory: z.string(),
   aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
+  terraform_command: z.optional(z.string()),
 });
 
 export type TargetGroup = z.infer<typeof TargetGroup>;
@@ -131,6 +132,7 @@ const TargetConfig = z.object({
   terraform_plan_config: z.optional(JobConfig),
   tfmigrate_apply_config: z.optional(JobConfig),
   tfmigrate_plan_config: z.optional(JobConfig),
+  terraform_command: z.optional(z.string()),
 });
 
 export type TargetConfig = z.infer<typeof TargetConfig>;
@@ -182,6 +184,7 @@ const Config = z.object({
   tflint: z.optional(TflintConfig),
   tfsec: z.optional(TfsecConfig),
   trivy: z.optional(TrivyConfig),
+  terraform_command: z.optional(z.string()),
   update_related_pull_requests: z.optional(
     z.object({
       enabled: z.optional(z.boolean()),

@@ -20,11 +20,12 @@ runs:
           -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
           -k terraform-validate \
           -var "tfaction_target:${TFACTION_TARGET}" \
-          -- terraform validate
+          -- "$TF_COMMAND" validate
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
     - uses: suzuki-shunsuke/trivy-config-action@6c7c845cbf76e5745c4d772719de7a34453ae81d # v0.2.2
       if: fromJSON(steps.target-config.outputs.enable_trivy) && steps.target-config.outputs.destroy != 'true'
@@ -49,9 +50,10 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@1012a0fc615ada0821b6d07f4b41d1541d7241a5 # v0.2.0
+    - uses: suzuki-shunsuke/github-action-terraform-fmt@388ce9deea65edd9a9a3a60bee140732c3dad7a2 # v0.2.1
       if: steps.target-config.outputs.destroy != 'true'
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
+        terraform_command: ${{ steps.target-config.outputs.terraform_command }}
