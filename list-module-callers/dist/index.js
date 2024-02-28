@@ -24741,7 +24741,10 @@ function getGoBin() {
     if (gobin !== "") {
         return gobin;
     }
-    const gopath = child_process.execSync(`go env GOPATH`).toString("utf-8").trim();
+    const gopath = child_process
+        .execSync(`go env GOPATH`)
+        .toString("utf-8")
+        .trim();
     if (gopath !== "") {
         return `${gopath}/bin`;
     }
@@ -24757,12 +24760,14 @@ try {
         .split("\n");
     const rawModuleCalls = {};
     const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
-    allTerraformFiles.forEach(tfFile => {
+    allTerraformFiles.forEach((tfFile) => {
         if (tfFile == "") {
             return;
         }
         const tfDir = path.dirname(tfFile);
-        const inspection = JSON.parse(child_process.execSync(`${getGoBin()}/terraform-config-inspect --json ${tfDir}`).toString("utf-8"));
+        const inspection = JSON.parse(child_process
+            .execSync(`${getGoBin()}/terraform-config-inspect --json ${tfDir}`)
+            .toString("utf-8"));
         // List keys of Local Path modules (source starts with ./ or ../) in module_calls
         rawModuleCalls[tfDir] = Object.values(inspection["module_calls"]).flatMap((module) => {
             const source = module.source;

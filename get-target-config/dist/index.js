@@ -24809,6 +24809,7 @@ const TargetGroup = zod_1.z.object({
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
     working_directory: zod_1.z.string(),
     aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
 });
 const TargetConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
@@ -24828,6 +24829,7 @@ const TargetConfig = zod_1.z.object({
     terraform_plan_config: zod_1.z.optional(JobConfig),
     tfmigrate_apply_config: zod_1.z.optional(JobConfig),
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
 });
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
@@ -24869,6 +24871,7 @@ const Config = zod_1.z.object({
     update_local_path_module_caller: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
     update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
@@ -58087,6 +58090,7 @@ const run = (inputs, config) => {
     outputs.set("enable_tfsec", (_c = (_b = config === null || config === void 0 ? void 0 : config.tfsec) === null || _b === void 0 ? void 0 : _b.enabled) !== null && _c !== void 0 ? _c : false);
     outputs.set("enable_tflint", (_e = (_d = config === null || config === void 0 ? void 0 : config.tflint) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : true);
     outputs.set("enable_trivy", (_g = (_f = config === null || config === void 0 ? void 0 : config.trivy) === null || _f === void 0 ? void 0 : _f.enabled) !== null && _g !== void 0 ? _g : true);
+    outputs.set("terraform_command", "terraform");
     if (inputs.jobType === "scaffold_working_dir") {
         const m = lib.setOutputs([
             "s3_bucket_name_tfmigrate_history",
@@ -58108,6 +58112,7 @@ const run = (inputs, config) => {
             "s3_bucket_name_tfmigrate_history",
             "gcs_bucket_name_tfmigrate_history",
             "providers_lock_opts",
+            "terraform_command",
         ], [wdConfig, targetConfig, config]);
         for (const [key, value] of m1) {
             outputs.set(key, value);

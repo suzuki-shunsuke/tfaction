@@ -25,10 +25,12 @@ test("default", () => {
       aqua_update_checksum_enabled: false,
       aqua_update_checksum_prune: false,
       aqua_update_checksum_skip_push: false,
+      update_local_path_module_caller: false,
 
       enable_tfsec: false,
       enable_tflint: true,
       enable_trivy: true,
+      terraform_command: "terraform",
     },
   };
   expect(
@@ -81,6 +83,7 @@ test("customize", () => {
       draft_pr: true,
       skip_create_pr: true,
       conftest_policy_directory: "terraform/policy",
+      update_local_path_module_caller: false,
 
       label_prefix_target: "target:",
       label_prefix_tfmigrate: "tfmigrate:",
@@ -95,6 +98,7 @@ test("customize", () => {
       enable_tfsec: false,
       enable_tflint: true,
       enable_trivy: true,
+      terraform_command: "tofu",
     },
   };
 
@@ -114,6 +118,7 @@ test("customize", () => {
         draft_pr: true,
         skip_create_pr: true,
         conftest_policy_directory: "terraform/policy",
+        terraform_command: "tofu",
       },
       {
         repository: "",

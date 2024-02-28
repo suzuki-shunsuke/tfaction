@@ -46,33 +46,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_darwin_amd64.tar.gz",
-      "checksum": "BFA890E77A8508603C785AF09A30BBAB3A3255D291D8D27EFC3F20AC8E303A8E",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_darwin_amd64.tar.gz",
+      "checksum": "1459F1EC2182162C85BEDDACFF9B05D1CB921BFB2656A6FD9151E9CD84CD63E9",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_darwin_arm64.tar.gz",
-      "checksum": "5E131AB7DE7AD051E1923B80D167AAA414734E97C720698C48778250E1DD2590",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_darwin_arm64.tar.gz",
+      "checksum": "4B8EFF986643B8D9918C4FD3ADA9C0EEE7E59230A53A46A9BD9686521DCAD170",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_linux_amd64.tar.gz",
-      "checksum": "F0294C342AF98FAD4FF917BC32032F28E1B55F76AEDF291886EC10BBED7C12E1",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_linux_amd64.tar.gz",
+      "checksum": "5C9B6E5418F688B7F7C7E3D40C13D9E41B1CA45FB6A2C35788B0580E34B7300F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_linux_arm64.tar.gz",
-      "checksum": "A1056D85D614AF4F6E5517ED2911DAB2621B8E97C368C8B265328F9C22801648",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_linux_arm64.tar.gz",
+      "checksum": "03FFE5891DA7800EC39533543667697B5C292D0FF8B906397B43C58374EC052A",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_windows_amd64.zip",
-      "checksum": "8E31F6D623CDC3C12D2236E1E444FAA191126434A2007F4D2BECC0D0D416469B",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_windows_amd64.zip",
+      "checksum": "2040AEB2530A80ABBB923493F6947443203B7E60E829CB7BAD1C8CDE1483C376",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_windows_arm64.zip",
-      "checksum": "2545EEA6E1F02A24619514F50DCCE7543B8C0028B50E3EFBCEC3DC79E16AE5EA",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_windows_arm64.zip",
+      "checksum": "BC082F32A036A86DAD364BC46E2D707C4DA5615598E2D50DA2CB840CFF97731D",
       "algorithm": "sha256"
     },
     {
@@ -166,8 +166,38 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.130.0/registry.yaml",
-      "checksum": "947D8F7F97452064862CDB7809D223B5E3D9A96C189D74D8E147A0CF30447D85",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_darwin_amd64.tar.gz",
+      "checksum": "8A6AF33EC934061F7FE286CA15391858ABEB1296D8CE18F41F02BD478691AEBE",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_darwin_arm64.tar.gz",
+      "checksum": "CB58838DBAB7B6F32134FB1793243F1C487845304A58DBDD21B6E488AA8B43E6",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_linux_amd64.tar.gz",
+      "checksum": "FF391582747B86581ABC4FEDCB6652AE9E1596EE7CBBD0E875EADF8098196D74",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_linux_arm64.tar.gz",
+      "checksum": "3042CD88D1EB16A76E56263D6C8F49CC6B2CC4B720ED17345AF1034F3CD8A721",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_windows_amd64.tar.gz",
+      "checksum": "259057212453FA35F4433780E77F4E6158E80991C0DB4A6C4CE930E01AB22C34",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_windows_arm64.tar.gz",
+      "checksum": "9921C1CEA365C6385F084777AD0FE4710C469376D016C96347E00D2F26A04DAA",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.142.0/registry.yaml",
+      "checksum": "5A7FE8FF6BC41FD5A4C47CCE13C567F1CBA18FB3855C7BEAC9AA4209803DEEF0",
       "algorithm": "sha256"
     }
   ]
