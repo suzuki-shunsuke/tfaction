@@ -10,7 +10,9 @@ workflow=$PLAN_WORKFLOW_NAME
 pr_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
 
 # https://github.com/suzuki-shunsuke/tfaction/pull/1570#issuecomment-1987382651
-# We don't use gh run list's -c option because this requires GitHub CLI v2.40.0 or newer.
+# We don't use gh run list's -c option because 
+# 1. this requires GitHub CLI v2.40.0 or newer
+# 2. we should check the latest workflow run
 body=$(gh run list -w "$workflow" -b "$branch" -L 1 --json headSha,databaseId --jq '.[0]')
 run_id=$(echo "$body" | jq -r ".databaseId")
 head_sha=$(echo "$body" | jq -r ".headSha")
