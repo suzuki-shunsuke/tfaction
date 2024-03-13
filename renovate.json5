@@ -1,23 +1,23 @@
 {
   extends: [
-    ":dependencyDashboard",
-    ":semanticPrefixFixDepsChoreOthers",
-    ":autodetectPinVersions",
-    "group:monorepos",
-    "group:recommended",
-    "workarounds:all",
-    "helpers:pinGitHubActionDigests",
-    "github>suzuki-shunsuke/renovate-config",
-    "github>aquaproj/aqua-renovate-config#2.2.0",
-    "github>aquaproj/aqua-renovate-config:file#2.2.0(aqua/.*\\.yaml)",
+    ':dependencyDashboard',
+    ':semanticPrefixFixDepsChoreOthers',
+    'group:monorepos',
+    'group:recommended',
+    'workarounds:all',
+    'helpers:pinGitHubActionDigests',
+    'github>suzuki-shunsuke/renovate-config',
+    'github>aquaproj/aqua-renovate-config#2.2.0',
+    'github>aquaproj/aqua-renovate-config:file#2.2.0(aqua/.*\\.yaml)',
   ],
   prHourlyLimit: 0,
   prConcurrentLimit: 0,
   branchConcurrentLimit: 0,
   packageRules: [
     {
-      // Until https://github.com/suzuki-shunsuke/tfaction/pull/1479 is merged
-      matchManagers: ["npm"],
+      matchManagers: [
+        'npm',
+      ],
       enabled: false,
     },
   ],
