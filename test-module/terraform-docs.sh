@@ -9,6 +9,8 @@ fi
 
 tempfile=$(mktemp)
 
+terraform-docs -v
+
 if ! github-comment exec \
 	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-var "tfaction_target:${TFACTION_TARGET}" \
@@ -31,7 +33,10 @@ if [ "$created" = "true" ] || ! git diff --quiet README.md; then
 		echo "::error ::Please generate Module's README.md with terraform-docs."
 		exit 1
 	fi
-	ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
+	github-comment exec \
+		-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+		-var "tfaction_target:${TFACTION_TARGET}" \
+		-- ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
 		-m "docs($TFACTION_TARGET): generate Terraform Module document by terraform-docs" \
 		-C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md"
 	exit 1
