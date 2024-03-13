@@ -62,7 +62,7 @@ runs:
           -var "tfaction_target:${TFACTION_TARGET}" \
           -- terraform-docs . > README.md
         if [ "$created" = "true" ] || ! git diff --quiet README.md; then
-          if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
+          if [ "$GITHUB_EVENT_NAME" != pull_request ] && [ "$GITHUB_EVENT_NAME" != pull_request_target ]; then
             echo "::error ::Please generate Module's README.md with terraform-docs."
             exit 1
           fi
