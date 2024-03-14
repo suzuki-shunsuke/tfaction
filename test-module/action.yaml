@@ -51,26 +51,7 @@ runs:
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-      run: |
-        set -euo pipefail
-        created=false
-        if ! [ -f README.md ]; then
-          created=true
-        fi
-        github-comment exec \
-          -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-          -var "tfaction_target:${TFACTION_TARGET}" \
-          -- terraform-docs . > README.md
-        if [ "$created" = "true" ] || ! git diff --quiet README.md; then
-          if [ "$GITHUB_EVENT_NAME" != pull_request ] && [ "$GITHUB_EVENT_NAME" != pull_request_target ]; then
-            echo "::error ::Please generate Module's README.md with terraform-docs."
-            exit 1
-          fi
-          ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
-            -m "docs($TFACTION_TARGET): generate Terraform Module document by terraform-docs" \
-            -C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md"
-          exit 1
-        fi
+      run: bash "${GITHUB_ACTION_PATH}/terraform-docs.sh"
 
     - uses: suzuki-shunsuke/github-action-terraform-fmt@388ce9deea65edd9a9a3a60bee140732c3dad7a2 # v0.2.1
       with:
