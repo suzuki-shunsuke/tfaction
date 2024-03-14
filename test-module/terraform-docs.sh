@@ -21,7 +21,7 @@ if ! github-comment exec \
 	exit 1
 fi
 
-if ! grep '<!-- BEGIN_TF_DOCS -->' README.md; then
+if ! grep -q '<!-- BEGIN_TF_DOCS -->' README.md; then
 	# output.file is disabled
 	cat "$tempfile" > README.md
 fi
