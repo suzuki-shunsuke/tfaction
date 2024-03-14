@@ -14,6 +14,13 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
+    - run: github-comment exec -- terraform init
+      # https://github.com/suzuki-shunsuke/tfaction/issues/1576
+      shell: bash
+      working-directory: ${{ env.TFACTION_TARGET }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+
     - uses: suzuki-shunsuke/trivy-config-action@6c7c845cbf76e5745c4d772719de7a34453ae81d # v0.2.2
       if: fromJSON(steps.global-config.outputs.enable_trivy)
       with:
@@ -28,7 +35,7 @@ runs:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: "true"
 
-    - uses: suzuki-shunsuke/github-action-tflint@b12ad80ebcd02fc75188a4fdcf5f0623d59ac521 # v1.0.0
+    - uses: suzuki-shunsuke/github-action-tflint@0b7fbc35b0d512749f35c3036df57c3a95d3e9e1 # v1.1.0
       if: fromJSON(steps.global-config.outputs.enable_tflint)
       with:
         github_token: ${{ inputs.github_token }}
@@ -44,26 +51,7 @@ runs:
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-      run: |
-        set -euo pipefail
-        created=false
-        if ! [ -f README.md ]; then
-          created=true
-        fi
-        github-comment exec \
-          -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-          -var "tfaction_target:${TFACTION_TARGET}" \
-          -- terraform-docs . > README.md
-        if [ "$created" = "true" ] || ! git diff --quiet README.md; then
-          if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
-            echo "::error ::Please generate Module's README.md with terraform-docs."
-            exit 1
-          fi
-          ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
-            -m "docs($TFACTION_TARGET): generate Terraform Module document by terraform-docs" \
-            -C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md"
-          exit 1
-        fi
+      run: bash "${GITHUB_ACTION_PATH}/terraform-docs.sh"
 
     - uses: suzuki-shunsuke/github-action-terraform-fmt@388ce9deea65edd9a9a3a60bee140732c3dad7a2 # v0.2.1
       with:
