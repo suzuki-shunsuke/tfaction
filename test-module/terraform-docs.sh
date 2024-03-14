@@ -21,8 +21,8 @@ if ! github-comment exec \
 	exit 1
 fi
 
-if [ -s "$tempfile" ]; then
-	# Not inject mode
+if ! grep '<!-- BEGIN_TF_DOCS -->' README.md; then
+	# output.file is disabled
 	cat "$tempfile" > README.md
 fi
 
