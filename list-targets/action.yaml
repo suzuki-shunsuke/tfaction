@@ -43,7 +43,7 @@ runs:
       id: list-working-directory-configs
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
-    - run: bash "$GITHUB_ACTION_PATH/install_terraform-config-inspect.sh"
+    - run: bash "$GITHUB_ACTION_PATH/install_terraform_config_inspect.sh"
       id: install-terraform-config-inspect
       if: steps.global-config.outputs.update_local_path_module_caller == 'true'
       shell: bash
