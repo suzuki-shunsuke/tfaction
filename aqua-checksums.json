@@ -16,63 +16,63 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.1/reviewdog_0.17.1_Darwin_arm64.tar.gz",
-      "checksum": "63A93090391DEB185B64C1F27746AB420E247F8A4BE8E00EBB85FFC973FE92F1",
+      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.2/reviewdog_0.17.2_Darwin_arm64.tar.gz",
+      "checksum": "0B16689B5CB5C4210A4478436E99A4CCD0DAAF86700E310D2E5E26717E770B4E",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.1/reviewdog_0.17.1_Darwin_x86_64.tar.gz",
-      "checksum": "75A4D5F59E0CA948AFDC4B1933E662E43DB1C667FECB62453B889F8F52E92DD0",
+      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.2/reviewdog_0.17.2_Darwin_x86_64.tar.gz",
+      "checksum": "8FAEDDFA755048DC2FB3AD73AE7FEA805CFCDCFEC5997AFEFAC66370899BBF8C",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.1/reviewdog_0.17.1_Linux_arm64.tar.gz",
-      "checksum": "82BE55F266E14FAD5C5BDA4BF3202B54F1A68B47D7ECCCA3F60FB5789EBA77EB",
+      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.2/reviewdog_0.17.2_Linux_arm64.tar.gz",
+      "checksum": "873B075EAE781EB28E710BF42A6C08EDB4423A6ABE389CB94E2B08AF06FD4CDA",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.1/reviewdog_0.17.1_Linux_x86_64.tar.gz",
-      "checksum": "F5A198AB05B0B170BE3D17B05B41813EABF3830C9613894B54341D4078662599",
+      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.2/reviewdog_0.17.2_Linux_x86_64.tar.gz",
+      "checksum": "1CB3FC67BD15225423F50FF06E543F7A4BB9BE5C3952996848EC412A6CB4C390",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.1/reviewdog_0.17.1_Windows_arm64.tar.gz",
-      "checksum": "453997764B3F667CD09E23A606E93249FE7DFD02C97F068D068DA56CA31A2234",
+      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.2/reviewdog_0.17.2_Windows_arm64.tar.gz",
+      "checksum": "70D5F41B27355595B9E070E232DADCCB827B26037B0FEBF9F6CBCC5E8B759392",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.1/reviewdog_0.17.1_Windows_x86_64.tar.gz",
-      "checksum": "45358E2A3E4BC041DBA95606E4EA2500D3292B954912AD9CD8E4C461F59F0711",
+      "id": "github_release/github.com/reviewdog/reviewdog/v0.17.2/reviewdog_0.17.2_Windows_x86_64.tar.gz",
+      "checksum": "5ADE60862B036D79212475B926D6EA41AE1F36A443F328F31704383D6FF4035C",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_darwin_amd64.tar.gz",
-      "checksum": "BFA890E77A8508603C785AF09A30BBAB3A3255D291D8D27EFC3F20AC8E303A8E",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_darwin_amd64.tar.gz",
+      "checksum": "1459F1EC2182162C85BEDDACFF9B05D1CB921BFB2656A6FD9151E9CD84CD63E9",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_darwin_arm64.tar.gz",
-      "checksum": "5E131AB7DE7AD051E1923B80D167AAA414734E97C720698C48778250E1DD2590",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_darwin_arm64.tar.gz",
+      "checksum": "4B8EFF986643B8D9918C4FD3ADA9C0EEE7E59230A53A46A9BD9686521DCAD170",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_linux_amd64.tar.gz",
-      "checksum": "F0294C342AF98FAD4FF917BC32032F28E1B55F76AEDF291886EC10BBED7C12E1",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_linux_amd64.tar.gz",
+      "checksum": "5C9B6E5418F688B7F7C7E3D40C13D9E41B1CA45FB6A2C35788B0580E34B7300F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_linux_arm64.tar.gz",
-      "checksum": "A1056D85D614AF4F6E5517ED2911DAB2621B8E97C368C8B265328F9C22801648",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_linux_arm64.tar.gz",
+      "checksum": "03FFE5891DA7800EC39533543667697B5C292D0FF8B906397B43C58374EC052A",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_windows_amd64.zip",
-      "checksum": "8E31F6D623CDC3C12D2236E1E444FAA191126434A2007F4D2BECC0D0D416469B",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_windows_amd64.zip",
+      "checksum": "2040AEB2530A80ABBB923493F6947443203B7E60E829CB7BAD1C8CDE1483C376",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/rhysd/actionlint/v1.6.26/actionlint_1.6.26_windows_arm64.zip",
-      "checksum": "2545EEA6E1F02A24619514F50DCCE7543B8C0028B50E3EFBCEC3DC79E16AE5EA",
+      "id": "github_release/github.com/rhysd/actionlint/v1.6.27/actionlint_1.6.27_windows_arm64.zip",
+      "checksum": "BC082F32A036A86DAD364BC46E2D707C4DA5615598E2D50DA2CB840CFF97731D",
       "algorithm": "sha256"
     },
     {
@@ -136,38 +136,68 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.3/github-comment_6.0.3_darwin_amd64.tar.gz",
-      "checksum": "53E80067BB0CFFEF32D8F8982EFD148307623644727B12084EDDF11273CBE083",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.4/github-comment_6.0.4_darwin_amd64.tar.gz",
+      "checksum": "0E661C36C7791657DF898A0E91C571B85106245A496BC9116E6105F3C3AB65C6",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.3/github-comment_6.0.3_darwin_arm64.tar.gz",
-      "checksum": "B0F4D25DBBE2CE3BA3E149282ED2D3B3E87D59B80FE37C6A16655D8F2C670B49",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.4/github-comment_6.0.4_darwin_arm64.tar.gz",
+      "checksum": "9F5EA3BA42C9B8E6620AEBB3A0CE1267221433C369BD36153CF7B5E901B93CFF",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.3/github-comment_6.0.3_linux_amd64.tar.gz",
-      "checksum": "0815A76F491FECE4D89984EA091E1605D21EB64DE5B498BFC6463442B73FE6D7",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.4/github-comment_6.0.4_linux_amd64.tar.gz",
+      "checksum": "278A38B3A15B07B4A555FE4C61552A668783C174FBEBE8E3CC435D1E75784004",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.3/github-comment_6.0.3_linux_arm64.tar.gz",
-      "checksum": "DC56B021F6771F4FCED673530F7973DB3A05EAF8686FE1ED71E172F895CC5F39",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.4/github-comment_6.0.4_linux_arm64.tar.gz",
+      "checksum": "7955777627C690E8377857F5F8B2631A274B20CFE89D968E7F9BEDB9CE5833C6",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.3/github-comment_6.0.3_windows_amd64.tar.gz",
-      "checksum": "07BE230FF236FFD1E4CFB8A3E988637138F2BA58C7390C6500B8335B9443D226",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.4/github-comment_6.0.4_windows_amd64.tar.gz",
+      "checksum": "23BA8AE46FC3DF4DF79AFEDFE6B22C012FF740C937E22E9310BF5376482EE088",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.3/github-comment_6.0.3_windows_arm64.tar.gz",
-      "checksum": "4EA56534B35FE7E44B2C624E515EFBEBEA5D2AD46734609FA3B021A32B3B2D17",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.0.4/github-comment_6.0.4_windows_arm64.tar.gz",
+      "checksum": "278E69EC7BEBA5CF30242761736E254569F5DF5A842B99E491CE643EB30FFE44",
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.130.0/registry.yaml",
-      "checksum": "947D8F7F97452064862CDB7809D223B5E3D9A96C189D74D8E147A0CF30447D85",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_darwin_amd64.tar.gz",
+      "checksum": "8A6AF33EC934061F7FE286CA15391858ABEB1296D8CE18F41F02BD478691AEBE",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_darwin_arm64.tar.gz",
+      "checksum": "CB58838DBAB7B6F32134FB1793243F1C487845304A58DBDD21B6E488AA8B43E6",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_linux_amd64.tar.gz",
+      "checksum": "FF391582747B86581ABC4FEDCB6652AE9E1596EE7CBBD0E875EADF8098196D74",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_linux_arm64.tar.gz",
+      "checksum": "3042CD88D1EB16A76E56263D6C8F49CC6B2CC4B720ED17345AF1034F3CD8A721",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_windows_amd64.tar.gz",
+      "checksum": "259057212453FA35F4433780E77F4E6158E80991C0DB4A6C4CE930E01AB22C34",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.1.2/pinact_windows_arm64.tar.gz",
+      "checksum": "9921C1CEA365C6385F084777AD0FE4710C469376D016C96347E00D2F26A04DAA",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.151.0/registry.yaml",
+      "checksum": "F335C236B20566F858891615B981F9FBE82C0A304002242910938904E61D7F5B",
       "algorithm": "sha256"
     }
   ]

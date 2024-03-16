@@ -1,10 +1,12 @@
 import path from "node:path";
 
-type ModuleCalls = Record<string, string[]>
+type ModuleCalls = Record<string, string[]>;
 
-type ModuleToCallers = Record<string, string[]>
+type ModuleToCallers = Record<string, string[]>;
 
-export function resolveRelativeCallTree(rawModuleCalls: ModuleCalls): ModuleCalls {
+export function resolveRelativeCallTree(
+  rawModuleCalls: ModuleCalls,
+): ModuleCalls {
   const moduleCalls: ModuleCalls = {};
   for (const [module, thisChildren] of Object.entries(rawModuleCalls)) {
     const absModulePath = path.resolve("/", module);
@@ -19,7 +21,9 @@ export function resolveRelativeCallTree(rawModuleCalls: ModuleCalls): ModuleCall
   return moduleCalls;
 }
 
-export function buildModuleToCallers(modulesCalls: ModuleCalls): ModuleToCallers {
+export function buildModuleToCallers(
+  modulesCalls: ModuleCalls,
+): ModuleToCallers {
   function findCallers(module: string): string[] {
     const callers = [];
     for (const [directCaller, modules] of Object.entries(modulesCalls)) {

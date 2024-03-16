@@ -43,9 +43,6 @@ runs:
       id: list-working-directory-configs
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
-    - run: go install github.com/hashicorp/terraform-config-inspect@a34142ec2a72dd916592afd3247dd354f1cc7e5c
-      if: steps.global-config.outputs.update_local_path_module_caller == 'true'
-      shell: bash
     - uses: suzuki-shunsuke/tfaction/list-module-callers@main
       id: list-module-callers
       if: steps.global-config.outputs.update_local_path_module_caller == 'true'

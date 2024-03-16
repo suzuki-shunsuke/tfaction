@@ -58,3 +58,10 @@ tasks:
     usage: Format with prettier
     script: |
       npm run fmt
+
+  - name: pinact
+    description: Run pinact
+    usage: Run pinact
+    script: |
+      pinact run
+      find . -name action.yaml | xargs pinact run

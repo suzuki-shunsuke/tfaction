@@ -24809,6 +24809,7 @@ const TargetGroup = zod_1.z.object({
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
     working_directory: zod_1.z.string(),
     aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
 });
 const TargetConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
@@ -24828,6 +24829,7 @@ const TargetConfig = zod_1.z.object({
     terraform_plan_config: zod_1.z.optional(JobConfig),
     tfmigrate_apply_config: zod_1.z.optional(JobConfig),
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
 });
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
@@ -24869,6 +24871,7 @@ const Config = zod_1.z.object({
     update_local_path_module_caller: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
+    terraform_command: zod_1.z.optional(zod_1.z.string()),
     update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),

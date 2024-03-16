@@ -35,6 +35,8 @@ interface Outputs {
   enable_tfsec: boolean;
   enable_tflint: boolean;
   enable_trivy: boolean;
+
+  terraform_command: string;
 }
 
 interface Envs {
@@ -65,7 +67,8 @@ export const main = (config: lib.Config, input: Input): Result => {
     disable_update_related_pull_requests: !(
       config?.update_related_pull_requests?.enabled ?? true
     ),
-    update_local_path_module_caller: config?.update_local_path_module_caller?.enabled ?? false,
+    update_local_path_module_caller:
+      config?.update_local_path_module_caller?.enabled ?? false,
     aqua_update_checksum_enabled:
       config?.aqua?.update_checksum?.enabled ?? false,
     aqua_update_checksum_prune: config?.aqua?.update_checksum?.prune ?? false,
@@ -75,6 +78,7 @@ export const main = (config: lib.Config, input: Input): Result => {
     enable_tfsec: config?.tfsec?.enabled ?? false,
     enable_tflint: config?.tflint?.enabled ?? true,
     enable_trivy: config?.trivy?.enabled ?? true,
+    terraform_command: config?.terraform_command || "terraform",
 
     drift_issue_repo_owner: "",
     drift_issue_repo_name: "",

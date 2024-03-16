@@ -33,6 +33,9 @@ outputs:
 
   destroy:
     description: If true, terraform plan is run with the `-destroy` option
+
+  terraform_command:
+    description: Terraform command. By default, the value is "terraform". If you use OpenTofu, the value is "tofu"
 runs:
   using: "node20"
   main: "dist/index.js"
