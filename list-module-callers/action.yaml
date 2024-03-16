@@ -7,6 +7,9 @@ inputs:
   module_files:
     description: "module file paths"
     required: true
+  terraform_config_inspect_path:
+    description: The install path of terraform-config-inspect
+    required: false
 outputs:
   file:
     description: A json to list module callers

@@ -4,22 +4,6 @@ import * as path from "path";
 import * as child_process from "child_process";
 import { buildModuleToCallers, resolveRelativeCallTree } from "./lib";
 
-function getGoBin(): string {
-  const gobin = child_process.execSync(`go env GOBIN`).toString("utf-8").trim();
-  if (gobin !== "") {
-    return gobin;
-  }
-  const gopath = child_process
-    .execSync(`go env GOPATH`)
-    .toString("utf-8")
-    .trim();
-  if (gopath !== "") {
-    return `${gopath}/bin`;
-  }
-  // Fallback to the default path if GOBIN or GOPATH are both unset.
-  return "/home/runner/go/bin";
-}
-
 try {
   const configFiles = fs
     .readFileSync(core.getInput("config_files"), "utf8")
@@ -30,6 +14,10 @@ try {
 
   const rawModuleCalls: Record<string, Array<string>> = {};
 
+  const terraformConfigInspectPath =
+    core.getInput("terraform_config_inspect_path") ||
+    "terraform-config-inspect";
+
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
   allTerraformFiles.forEach((tfFile) => {
     if (tfFile == "") {
@@ -39,7 +27,7 @@ try {
     const tfDir = path.dirname(tfFile);
     const inspection = JSON.parse(
       child_process
-        .execSync(`${getGoBin()}/terraform-config-inspect --json ${tfDir}`)
+        .execSync(`${terraformConfigInspectPath} --json ${tfDir}`)
         .toString("utf-8"),
     );
 
