@@ -2541,6 +2541,13 @@ declare const Config: z.ZodObject<{
     }, {
         enabled?: boolean | undefined;
     }>>;
+    update_local_path_module_caller: z.ZodOptional<z.ZodObject<{
+        enabled: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        enabled?: boolean | undefined;
+    }, {
+        enabled?: boolean | undefined;
+    }>>;
     terraform_command: z.ZodOptional<z.ZodString>;
     update_related_pull_requests: z.ZodOptional<z.ZodObject<{
         enabled: z.ZodOptional<z.ZodBoolean>;
@@ -2725,6 +2732,9 @@ declare const Config: z.ZodObject<{
     trivy?: {
         enabled?: boolean | undefined;
     } | undefined;
+    update_local_path_module_caller?: {
+        enabled?: boolean | undefined;
+    } | undefined;
     terraform_command?: string | undefined;
     update_related_pull_requests?: {
         enabled?: boolean | undefined;
@@ -2903,6 +2913,9 @@ declare const Config: z.ZodObject<{
         enabled?: boolean | undefined;
     } | undefined;
     trivy?: {
+        enabled?: boolean | undefined;
+    } | undefined;
+    update_local_path_module_caller?: {
         enabled?: boolean | undefined;
     } | undefined;
     terraform_command?: string | undefined;

@@ -24868,6 +24868,9 @@ const Config = zod_1.z.object({
     tflint: zod_1.z.optional(TflintConfig),
     tfsec: zod_1.z.optional(TfsecConfig),
     trivy: zod_1.z.optional(TrivyConfig),
+    update_local_path_module_caller: zod_1.z.optional(zod_1.z.object({
+        enabled: zod_1.z.optional(zod_1.z.boolean()),
+    })),
     terraform_command: zod_1.z.optional(zod_1.z.string()),
     update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
@@ -58024,7 +58027,7 @@ catch (error) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = void 0;
 const main = (config, input) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0;
     if (!config.plan_workflow_name) {
         throw new Error('The setting "plan_workflow_name" is required in tfaction-root.yaml');
     }
@@ -58042,20 +58045,21 @@ const main = (config, input) => {
         label_prefix_tfmigrate: ((_c = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _c === void 0 ? void 0 : _c.tfmigrate) || "tfmigrate:",
         label_prefix_skip: ((_d = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _d === void 0 ? void 0 : _d.skip) || "skip:",
         disable_update_related_pull_requests: !((_f = (_e = config === null || config === void 0 ? void 0 : config.update_related_pull_requests) === null || _e === void 0 ? void 0 : _e.enabled) !== null && _f !== void 0 ? _f : true),
-        aqua_update_checksum_enabled: (_j = (_h = (_g = config === null || config === void 0 ? void 0 : config.aqua) === null || _g === void 0 ? void 0 : _g.update_checksum) === null || _h === void 0 ? void 0 : _h.enabled) !== null && _j !== void 0 ? _j : false,
-        aqua_update_checksum_prune: (_m = (_l = (_k = config === null || config === void 0 ? void 0 : config.aqua) === null || _k === void 0 ? void 0 : _k.update_checksum) === null || _l === void 0 ? void 0 : _l.prune) !== null && _m !== void 0 ? _m : false,
+        update_local_path_module_caller: (_h = (_g = config === null || config === void 0 ? void 0 : config.update_local_path_module_caller) === null || _g === void 0 ? void 0 : _g.enabled) !== null && _h !== void 0 ? _h : false,
+        aqua_update_checksum_enabled: (_l = (_k = (_j = config === null || config === void 0 ? void 0 : config.aqua) === null || _j === void 0 ? void 0 : _j.update_checksum) === null || _k === void 0 ? void 0 : _k.enabled) !== null && _l !== void 0 ? _l : false,
+        aqua_update_checksum_prune: (_p = (_o = (_m = config === null || config === void 0 ? void 0 : config.aqua) === null || _m === void 0 ? void 0 : _m.update_checksum) === null || _o === void 0 ? void 0 : _o.prune) !== null && _p !== void 0 ? _p : false,
         aqua_update_checksum_skip_push: input.drift_issue_number
             ? true
-            : (_q = (_p = (_o = config === null || config === void 0 ? void 0 : config.aqua) === null || _o === void 0 ? void 0 : _o.update_checksum) === null || _p === void 0 ? void 0 : _p.skip_push) !== null && _q !== void 0 ? _q : false,
-        enable_tfsec: (_s = (_r = config === null || config === void 0 ? void 0 : config.tfsec) === null || _r === void 0 ? void 0 : _r.enabled) !== null && _s !== void 0 ? _s : false,
-        enable_tflint: (_u = (_t = config === null || config === void 0 ? void 0 : config.tflint) === null || _t === void 0 ? void 0 : _t.enabled) !== null && _u !== void 0 ? _u : true,
-        enable_trivy: (_w = (_v = config === null || config === void 0 ? void 0 : config.trivy) === null || _v === void 0 ? void 0 : _v.enabled) !== null && _w !== void 0 ? _w : true,
+            : (_s = (_r = (_q = config === null || config === void 0 ? void 0 : config.aqua) === null || _q === void 0 ? void 0 : _q.update_checksum) === null || _r === void 0 ? void 0 : _r.skip_push) !== null && _s !== void 0 ? _s : false,
+        enable_tfsec: (_u = (_t = config === null || config === void 0 ? void 0 : config.tfsec) === null || _t === void 0 ? void 0 : _t.enabled) !== null && _u !== void 0 ? _u : false,
+        enable_tflint: (_w = (_v = config === null || config === void 0 ? void 0 : config.tflint) === null || _v === void 0 ? void 0 : _v.enabled) !== null && _w !== void 0 ? _w : true,
+        enable_trivy: (_y = (_x = config === null || config === void 0 ? void 0 : config.trivy) === null || _x === void 0 ? void 0 : _x.enabled) !== null && _y !== void 0 ? _y : true,
         terraform_command: (config === null || config === void 0 ? void 0 : config.terraform_command) || "terraform",
         drift_issue_repo_owner: "",
         drift_issue_repo_name: "",
     };
     const envs = {
-        TFACTION_SKIP_ADDING_AQUA_PACKAGES: (_y = (_x = config === null || config === void 0 ? void 0 : config.scaffold_working_directory) === null || _x === void 0 ? void 0 : _x.skip_adding_aqua_packages) !== null && _y !== void 0 ? _y : true,
+        TFACTION_SKIP_ADDING_AQUA_PACKAGES: (_0 = (_z = config === null || config === void 0 ? void 0 : config.scaffold_working_directory) === null || _z === void 0 ? void 0 : _z.skip_adding_aqua_packages) !== null && _0 !== void 0 ? _0 : true,
     };
     if (config.drift_detection && config.drift_detection.issue_repo_owner) {
         outputs.drift_issue_repo_owner = config.drift_detection.issue_repo_owner;

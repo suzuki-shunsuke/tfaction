@@ -153,15 +153,21 @@ export const run = (input: Input): TargetConfig[] => {
     }
   }
 
+  const moduleCallerMap = input.module_callers;
   const changedWorkingDirs = new Set<string>();
   for (let i = 0; i < changedFiles.length; i++) {
     const changedFile = changedFiles[i];
     if (changedFile == "") {
       continue;
     }
-    for (const workingDir of workingDirs) {
+    const dir = path.dirname(changedFile);
+    for (let workingDir of workingDirs) {
       if (changedFile.startsWith(workingDir + "/")) {
         changedWorkingDirs.add(workingDir);
+      }
+      const moduleCallers: string[] = moduleCallerMap[dir] || [];
+      for (const caller of moduleCallers) {
+        changedWorkingDirs.add(caller);
       }
     }
   }
@@ -220,6 +226,7 @@ type Input = {
   configFiles: string[];
   pr: string;
   payload: Payload;
+  module_callers: Record<string, string[]>;
 };
 
 export const main = () => {
@@ -239,7 +246,11 @@ export const main = () => {
       .split("\n"),
     pr,
     payload: github.context.payload,
+    module_callers: JSON.parse(
+      core.getInput("module_callers") || "{}",
+    ) as Record<string, string[]>,
   });
 
+  core.info(`targets: ${JSON.stringify(targetConfigs)}`);
   core.setOutput("targets", targetConfigs);
 };

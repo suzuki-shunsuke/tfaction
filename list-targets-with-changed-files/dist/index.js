@@ -167,6 +167,9 @@ const Config = zod_1.z.object({
     tflint: zod_1.z.optional(TflintConfig),
     tfsec: zod_1.z.optional(TfsecConfig),
     trivy: zod_1.z.optional(TrivyConfig),
+    update_local_path_module_caller: zod_1.z.optional(zod_1.z.object({
+        enabled: zod_1.z.optional(zod_1.z.boolean()),
+    })),
     terraform_command: zod_1.z.optional(zod_1.z.string()),
     update_related_pull_requests: zod_1.z.optional(zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
@@ -62350,15 +62353,21 @@ const run = (input) => {
             continue;
         }
     }
+    const moduleCallerMap = input.module_callers;
     const changedWorkingDirs = new Set();
     for (let i = 0; i < changedFiles.length; i++) {
         const changedFile = changedFiles[i];
         if (changedFile == "") {
             continue;
         }
-        for (const workingDir of workingDirs) {
+        const dir = path.dirname(changedFile);
+        for (let workingDir of workingDirs) {
             if (changedFile.startsWith(workingDir + "/")) {
                 changedWorkingDirs.add(workingDir);
+            }
+            const moduleCallers = moduleCallerMap[dir] || [];
+            for (const caller of moduleCallers) {
+                changedWorkingDirs.add(caller);
             }
         }
     }
@@ -62401,7 +62410,9 @@ const main = () => {
             .split("\n"),
         pr,
         payload: github.context.payload,
+        module_callers: JSON.parse(core.getInput("module_callers") || "{}"),
     });
+    core.info(`targets: ${JSON.stringify(targetConfigs)}`);
     core.setOutput("targets", targetConfigs);
 };
 exports.main = main;

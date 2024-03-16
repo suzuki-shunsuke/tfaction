@@ -41,6 +41,14 @@ runs:
 
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
+    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      id: global-config
+    - uses: suzuki-shunsuke/tfaction/list-module-callers@main
+      id: list-module-callers
+      if: steps.global-config.outputs.update_local_path_module_caller == 'true'
+      with:
+        config_files: ${{ steps.list-working-directory-configs.outputs.file }}
+        module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
     - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
       id: list-targets
       with:
@@ -48,6 +56,7 @@ runs:
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
+        module_callers: ${{ steps.list-module-callers.outputs.file }}
     - uses: suzuki-shunsuke/tfaction/list-changed-modules@main
       id: list-modules
       with:
