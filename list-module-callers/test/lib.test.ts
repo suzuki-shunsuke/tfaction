@@ -1,4 +1,3 @@
-import {expect, describe, it} from 'vitest'
 import {resolveRelativeCallTree, buildModuleToCallers} from '../src/lib'
 
 describe("resolveRelativeCallTree", () => {
