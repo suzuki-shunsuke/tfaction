@@ -24744,7 +24744,6 @@ try {
         .readFileSync(core.getInput("module_files"), "utf8")
         .split("\n");
     const rawModuleCalls = {};
-    const terraformConfigInspectPath = core.getInput("terraform_config_inspect_path") || "terraform-config-inspect";
     const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
     allTerraformFiles.forEach((tfFile) => {
         if (tfFile == "") {
@@ -24752,7 +24751,7 @@ try {
         }
         const tfDir = path.dirname(tfFile);
         const inspection = JSON.parse(child_process
-            .execSync(`${terraformConfigInspectPath} --json ${tfDir}`)
+            .execSync(`terraform-config-inspect --json ${tfDir}`)
             .toString("utf-8"));
         // List keys of Local Path modules (source starts with ./ or ../) in module_calls
         rawModuleCalls[tfDir] = Object.values(inspection["module_calls"]).flatMap((module) => {

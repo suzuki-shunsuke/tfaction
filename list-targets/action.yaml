@@ -43,17 +43,12 @@ runs:
       id: list-working-directory-configs
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
-    - run: bash "$GITHUB_ACTION_PATH/install_terraform_config_inspect.sh"
-      id: install-terraform-config-inspect
-      if: steps.global-config.outputs.update_local_path_module_caller == 'true'
-      shell: bash
     - uses: suzuki-shunsuke/tfaction/list-module-callers@main
       id: list-module-callers
       if: steps.global-config.outputs.update_local_path_module_caller == 'true'
       with:
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
         module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
-        terraform_config_inspect_path: ${{ steps.install-terraform-config-inspect.outputs.install_path }}
     - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
       id: list-targets
       with:
