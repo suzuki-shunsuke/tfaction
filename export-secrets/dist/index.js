@@ -28844,6 +28844,9 @@ const lib = __importStar(__nccwpck_require__(9730));
 try {
     const config = lib.getConfig();
     const secrets = new Map(Object.entries(JSON.parse(core.getInput("secrets"))));
+    // Log the list of secrets for troubleshooting
+    // https://github.com/suzuki-shunsuke/tfaction/issues/1564
+    core.info(`The list of secret names passed to the action: ${Array.from(secrets.keys()).join(", ")}`);
     const targetS = lib.getTarget();
     const jobType = lib.getJobType();
     const isApply = lib.getIsApply();
