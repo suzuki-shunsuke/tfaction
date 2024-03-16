@@ -13,6 +13,9 @@ inputs:
   pull_request:
     description: "pull request file"
     required: false
+  module_callers:
+    description: "A json that describes module's direct and transitive callers"
+    required: false
 
   config:
     description: "config file path"
