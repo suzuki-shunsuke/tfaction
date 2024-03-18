@@ -80,7 +80,7 @@ export function getJobConfig(
       case "tfmigrate":
         return config.tfmigrate_apply_config;
       default:
-        throw `unknown type: ${jobType}`;
+        throw new Error(`unknown type: ${jobType}`);
     }
   }
   switch (jobType) {
@@ -89,7 +89,7 @@ export function getJobConfig(
     case "tfmigrate":
       return config.tfmigrate_plan_config;
     default:
-      throw `unknown type: ${jobType}`;
+      throw new Error(`unknown type: ${jobType}`);
   }
 }
 
