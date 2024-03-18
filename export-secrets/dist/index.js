@@ -28854,7 +28854,7 @@ try {
     const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
     for (let [envName, secretName] of lib.getSecrets(targetConfig, jobConfig)) {
         if (!secrets.has(secretName)) {
-            throw `secret is not found: ${secretName}`;
+            throw new Error(`secret is not found: ${secretName}`);
         }
         const secretValue = secrets.get(secretName);
         core.info(`export the secret ${secretName} as the environment variable ${envName}`);
@@ -28936,7 +28936,7 @@ function getJobConfig(config, isApply, jobType) {
             case "tfmigrate":
                 return config.tfmigrate_apply_config;
             default:
-                throw `unknown type: ${jobType}`;
+                throw new Error(`unknown type: ${jobType}`);
         }
     }
     switch (jobType) {
@@ -28945,7 +28945,7 @@ function getJobConfig(config, isApply, jobType) {
         case "tfmigrate":
             return config.tfmigrate_plan_config;
         default:
-            throw `unknown type: ${jobType}`;
+            throw new Error(`unknown type: ${jobType}`);
     }
 }
 exports.getJobConfig = getJobConfig;

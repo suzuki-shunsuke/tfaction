@@ -20,7 +20,7 @@ try {
   const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
   for (let [envName, secretName] of lib.getSecrets(targetConfig, jobConfig)) {
     if (!secrets.has(secretName)) {
-      throw `secret is not found: ${secretName}`;
+      throw new Error(`secret is not found: ${secretName}`);
     }
     const secretValue = secrets.get(secretName);
     core.info(
