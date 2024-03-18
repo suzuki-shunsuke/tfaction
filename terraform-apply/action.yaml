@@ -5,7 +5,6 @@ inputs:
     description: |
       GitHub Access Token
       pull-requests:write - Create pull request comments and labels
-      issues:write - Create labels
       actions:read - Download artifacts
       contents:write - Update pull request branches
     required: false
