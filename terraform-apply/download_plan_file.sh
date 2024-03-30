@@ -5,7 +5,13 @@ set -euo pipefail
 filename=tfplan.binary
 artifact_name=terraform_plan_file_${TFACTION_TARGET//\//__}
 branch=$CI_INFO_HEAD_REF
-workflow=$PLAN_WORKFLOW_NAME
+
+export GH_COMMENT_CONFIG=${GITHUB_ACTION_PATH}/github-comment.yaml
+export GH_COMMENT_VAR_tfaction_target=$TFACTION_TARGET
+export GH_COMMENT_VAR_plan_workflow_name=$PLAN_WORKFLOW_NAME
+
+github-comment exec -- jq --version
+github-comment exec -- gh version
 
 pr_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
 
@@ -13,14 +19,24 @@ pr_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
 # We don't use gh run list's -c option because 
 # 1. this requires GitHub CLI v2.40.0 or newer
 # 2. we should check the latest workflow run
-body=$(gh run list -w "$workflow" -b "$branch" -L 1 --json headSha,databaseId --jq '.[0]')
+body=$(github-comment exec \
+	-k list-workflow-runs \
+	-- gh run list -w "$PLAN_WORKFLOW_NAME" -b "$branch" -L 1 --json headSha,databaseId --jq '.[0]')
+
+if [ -z "$body" ]; then
+	echo "::error::body is empty. No workflow run is found"
+	github-comment post \
+		-k no-workflow-run-found \
+		-var "branch:$branch"
+	exit 1
+fi
+
 run_id=$(echo "$body" | jq -r ".databaseId")
 head_sha=$(echo "$body" | jq -r ".headSha")
 
 if [ "$head_sha" != "$pr_head_sha" ]; then
 	echo "::error::workflow run's headSha ($head_sha) is different from the associated pull request's head sha ($pr_head_sha)"
 	github-comment post \
-		-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 		-k invalid-workflow-sha \
 		-var "wf_sha:$head_sha" \
 		-var "pr_sha:$pr_head_sha"
@@ -29,5 +45,7 @@ fi
 
 tempdir=$(mktemp -d)
 
-gh run download -D "$tempdir" -n "$artifact_name" "$run_id"
+github-comment exec \
+	-k download-plan-file \
+	-- gh run download -D "$tempdir" -n "$artifact_name" "$run_id"
 cp "$tempdir/$filename" tfplan.binary
