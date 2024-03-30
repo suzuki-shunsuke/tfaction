@@ -21,15 +21,47 @@ exec:
 
         {{template "hidden_combined_output" .}}
 
-  invalid-plan-workflow-name:
-    - when: ExitCode != 0
+  list-workflow-runs:
+    - when: ExitCode != 0 and Stderr contains "could not find any workflows named"
       template: |
-        ## :x: {{.Vars.tfaction_target}}: Failed to get the workflow `{{.Vars.plan_workflow_name}}`
+        ## :x: {{.Vars.tfaction_target}}: Failed to list workflow runs `{{.Vars.plan_workflow_name}}`
 
         {{template "link" .}}
 
-        It failed to view the workflow `{{.Vars.plan_workflow_name}}`.
+        It failed to list workflow runs `{{.Vars.plan_workflow_name}}`.
         Probably the setting `plan_workflow_name` in `tfaction-root.yaml` is wrong.
+        `plan_workflow_name` must the workflow name where terraform plan is run.
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{.Vars.tfaction_target}}: Failed to list workflow runs `{{.Vars.plan_workflow_name}}`
+
+        {{template "link" .}}
+
+        It failed to list workflow runs `{{.Vars.plan_workflow_name}}`.
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+    - when: Stdout == ""
+      template: |
+        ## :x: {{.Vars.tfaction_target}}: No workflow run is found `{{.Vars.plan_workflow_name}}`
+
+        {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+
+  download-plan-file:
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{.Vars.tfaction_target}}: Failed to download a plan file from GitHub Actions Artifact
+
+        {{template "link" .}}
 
         {{template "join_command" .}}
 
