@@ -20,3 +20,17 @@ exec:
         {{template "join_command" .}}
 
         {{template "hidden_combined_output" .}}
+
+  invalid-plan-workflow-name:
+    - when: ExitCode != 0
+      template: |
+        ## :x: Failed to get the workflow `{{.Vars.plan_workflow_name}}` ({{.Vars.tfaction_target}})
+
+        {{template "link" .}}
+
+        It failed to view the workflow `{{.Vars.plan_workflow_name}}`.
+        Probably the setting `plan_workflow_name` in `tfaction-root.yaml` is wrong.
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
