@@ -25,7 +25,10 @@ body=$(github-comment exec \
 
 if [ -z "$body" ]; then
 	echo "::error::body is empty. No workflow run is found"
-	github-comment post -k no-workflow-run-found
+	github-comment post \
+		-k no-workflow-run-found \
+		-var "branch:$branch" \
+		-var "command:gh run list -w \"$PLAN_WORKFLOW_NAME\" -b \"$branch\" -L 1 --json headSha,databaseId --jq '.[0]'"
 	exit 1
 fi
 
