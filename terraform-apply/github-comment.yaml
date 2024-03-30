@@ -21,10 +21,6 @@ post:
       Maybe the setting `plan_workflow_name` in `tfaction-root.yaml` is wrong.
       `plan_workflow_name` must be the workflow name where terraform plan is run in CI of pull requests.
 
-      ```sh
-      {{.Vars.command}}
-      ```
-
 exec:
   default:
     - when: ExitCode != 0
