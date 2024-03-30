@@ -6,11 +6,14 @@ filename=tfplan.binary
 artifact_name=terraform_plan_file_${TFACTION_TARGET//\//__}
 branch=$CI_INFO_HEAD_REF
 
-pr_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
-
 export GH_COMMENT_CONFIG=${GITHUB_ACTION_PATH}/github-comment.yaml
 export GH_COMMENT_VAR_tfaction_target=$TFACTION_TARGET
 export GH_COMMENT_VAR_plan_workflow_name=$PLAN_WORKFLOW_NAME
+
+github-comment exec -- jq --version
+github-comment exec -- gh version
+
+pr_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
 
 # https://github.com/suzuki-shunsuke/tfaction/pull/1570#issuecomment-1987382651
 # We don't use gh run list's -c option because 
