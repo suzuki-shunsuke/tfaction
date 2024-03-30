@@ -15,7 +15,6 @@
     "aws_secrets_manager": {
       "$ref": "#/$defs/AWSSecretsManager"
     },
-
     "drift_detection": {
       "type": "object",
       "required": [],
@@ -27,30 +26,27 @@
         }
       }
     },
-
     "envs": {
       "$ref": "#/$defs/Envs"
     },
-
     "gcp_workload_identity_provider": {
       "$ref": "#/$defs/GCPWorkloadIdentityProvider"
+    },
+    "gcp_access_token_scopes": {
+      "$ref": "#/$defs/GCPAccessTokenScopes"
     },
     "gcs_bucket_name_tfmigrate_history": {
       "$ref": "#/$defs/GCSBucketNameTfmigrateHistory"
     },
-
     "providers_lock_opts": {
       "$ref": "#/$defs/TerraformProvidersLockOptions"
     },
-
     "s3_bucket_name_tfmigrate_history": {
       "$ref": "#/$defs/S3BucketNameTfmigrateHistory"
     },
-
     "secrets": {
       "$ref": "#/$defs/Secrets"
     },
-
     "terraform_plan_config": {
       "$ref": "#/$defs/JobConfig",
       "description": "configuration which is used in the job for 'terraform plan'"
@@ -89,6 +85,10 @@
     "GCPWorkloadIdentityProvider": {
       "type": "string",
       "description": "GCP Workload Identity Provider"
+    },
+    "GCPAccessTokenScopes": {
+      "type": "string",
+      "description": "List of OAuth 2.0 access scopes to be included in the generated token for authenticating to Google Cloud"
     },
     "GCSBucketNamePlanFile": {
       "type": "string",
@@ -180,6 +180,9 @@
         },
         "gcp_workload_identity_provider": {
           "$ref": "#/$defs/GCPWorkloadIdentityProvider"
+        },
+        "gcp_access_token_scopes": {
+          "$ref": "#/$defs/GCPAccessTokenScopes"
         },
         "secrets": {
           "$ref": "#/$defs/Secrets"

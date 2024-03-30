@@ -24783,6 +24783,7 @@ const JobConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
+    gcp_access_token_scopes: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
     secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
@@ -58102,6 +58103,7 @@ const run = (inputs, config) => {
             "aws_assume_role_arn",
             "gcp_service_account",
             "gcp_workload_identity_provider",
+            "gcp_access_token_scopes",
         ], [targetConfig]);
         for (const [key, value] of m) {
             outputs.set(key, value);
@@ -58125,6 +58127,7 @@ const run = (inputs, config) => {
             "aws_assume_role_arn",
             "gcp_service_account",
             "gcp_workload_identity_provider",
+            "gcp_access_token_scopes",
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
         for (const [key, value] of m2) {
             outputs.set(key, value);

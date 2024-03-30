@@ -98,6 +98,7 @@ declare const JobConfig: z.ZodObject<{
     aws_assume_role_arn: z.ZodOptional<z.ZodString>;
     gcp_service_account: z.ZodOptional<z.ZodString>;
     gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+    gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
     environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
         name: z.ZodString;
         url: z.ZodString;
@@ -158,6 +159,7 @@ declare const JobConfig: z.ZodObject<{
     aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
+    gcp_access_token_scopes?: string | undefined;
     environment?: string | {
         url: string;
         name: string;
@@ -182,6 +184,7 @@ declare const JobConfig: z.ZodObject<{
     aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
+    gcp_access_token_scopes?: string | undefined;
     environment?: string | {
         url: string;
         name: string;
@@ -240,6 +243,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -300,6 +304,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -324,6 +329,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -349,6 +355,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -409,6 +416,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -433,6 +441,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -458,6 +467,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -518,6 +528,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -542,6 +553,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -567,6 +579,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -627,6 +640,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -651,6 +665,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -733,6 +748,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -758,6 +774,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -783,6 +800,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -808,6 +826,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -865,6 +884,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -890,6 +910,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -915,6 +936,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -940,6 +962,7 @@ declare const TargetGroup: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1005,6 +1028,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -1065,6 +1089,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1089,6 +1114,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1114,6 +1140,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -1174,6 +1201,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1198,6 +1226,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1223,6 +1252,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -1283,6 +1313,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1307,6 +1338,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1332,6 +1364,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -1392,6 +1425,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1416,6 +1450,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1459,6 +1494,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1484,6 +1520,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1509,6 +1546,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1534,6 +1572,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1577,6 +1616,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1602,6 +1642,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1627,6 +1668,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1652,6 +1694,7 @@ declare const TargetConfig: z.ZodObject<{
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1787,6 +1830,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn: z.ZodOptional<z.ZodString>;
             gcp_service_account: z.ZodOptional<z.ZodString>;
             gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+            gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
             environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
@@ -1847,6 +1891,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -1871,6 +1916,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -1896,6 +1942,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn: z.ZodOptional<z.ZodString>;
             gcp_service_account: z.ZodOptional<z.ZodString>;
             gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+            gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
             environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
@@ -1956,6 +2003,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -1980,6 +2028,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2005,6 +2054,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn: z.ZodOptional<z.ZodString>;
             gcp_service_account: z.ZodOptional<z.ZodString>;
             gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+            gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
             environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
@@ -2065,6 +2115,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2089,6 +2140,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2114,6 +2166,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn: z.ZodOptional<z.ZodString>;
             gcp_service_account: z.ZodOptional<z.ZodString>;
             gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+            gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
             environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
@@ -2174,6 +2227,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2198,6 +2252,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2280,6 +2335,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2305,6 +2361,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2330,6 +2387,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2355,6 +2413,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2412,6 +2471,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2437,6 +2497,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2462,6 +2523,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2487,6 +2549,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2584,6 +2647,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2609,6 +2673,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2634,6 +2699,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2659,6 +2725,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2767,6 +2834,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2792,6 +2860,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2817,6 +2886,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2842,6 +2912,7 @@ declare const Config: z.ZodObject<{
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
+            gcp_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;

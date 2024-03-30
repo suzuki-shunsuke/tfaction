@@ -13,6 +13,8 @@ outputs:
     description: Google Cloud Platform Service Account for GCP Workload Identity Federation
   gcp_workload_identity_provider:
     description: Google Cloud Platform Identity Provider for GCP Workload Identity Federation
+  gcp_access_token_scopes:
+    description: List of OAuth 2.0 access scopes to be included in the generated token for authenticating to Google Cloud
 
   s3_bucket_name_tfmigrate_history:
     description: S3 Bucket name for tfmigrate history files

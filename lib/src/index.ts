@@ -78,6 +78,7 @@ const JobConfig = z.object({
   aws_assume_role_arn: z.optional(z.string()),
   gcp_service_account: z.optional(z.string()),
   gcp_workload_identity_provider: z.optional(z.string()),
+  gcp_access_token_scopes: z.optional(z.string()),
   environment: z.optional(GitHubEnvironment),
   secrets: z.optional(GitHubSecrets),
   runs_on: z.optional(z.string()),
