@@ -25,6 +25,7 @@ body=$(github-comment exec \
 
 if [ -z "$body" ]; then
 	echo "::error::body is empty. No workflow run is found"
+	github-comment post -k no-workflow-run-found
 	exit 1
 fi
 

@@ -9,6 +9,15 @@ post:
       It failed to get a Terraform plan file from the pull request workflow run's artifacts.
       workflow run's headSha ({{.Vars.wf_sha}}) is different from the associated pull request's head sha ({{.Vars.pr_sha}}).
 
+  no-workflow-run-found:
+    template: |
+      ## :x: {{.Vars.tfaction_target}}: No workflow run is found `{{.Vars.plan_workflow_name}}`
+
+      {{template "link" .}}
+
+      Maybe the setting `plan_workflow_name` in `tfaction-root.yaml` is wrong.
+      `plan_workflow_name` must be the workflow name where terraform plan is run.
+
 exec:
   default:
     - when: ExitCode != 0
@@ -30,7 +39,7 @@ exec:
 
         It failed to list workflow runs `{{.Vars.plan_workflow_name}}`.
         Probably the setting `plan_workflow_name` in `tfaction-root.yaml` is wrong.
-        `plan_workflow_name` must the workflow name where terraform plan is run.
+        `plan_workflow_name` must be the workflow name where terraform plan is run.
 
         {{template "join_command" .}}
 
