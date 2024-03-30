@@ -24,7 +24,7 @@ exec:
   invalid-plan-workflow-name:
     - when: ExitCode != 0
       template: |
-        ## :x: Failed to get the workflow `{{.Vars.plan_workflow_name}}` ({{.Vars.tfaction_target}})
+        ## :x: {{.Vars.tfaction_target}}: Failed to get the workflow `{{.Vars.plan_workflow_name}}`
 
         {{template "link" .}}
 
