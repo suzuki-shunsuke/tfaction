@@ -94,6 +94,7 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
         "aws_assume_role_arn",
         "gcp_service_account",
         "gcp_workload_identity_provider",
+        "gcp_access_token_scopes",
       ],
       [targetConfig],
     );
@@ -135,6 +136,7 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
         "aws_assume_role_arn",
         "gcp_service_account",
         "gcp_workload_identity_provider",
+        "gcp_access_token_scopes",
       ],
       [jobConfig, wdConfig, rootJobConfig, targetConfig, config],
     );

@@ -44847,6 +44847,7 @@ const JobConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
+    gcp_access_token_scopes: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
     secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
