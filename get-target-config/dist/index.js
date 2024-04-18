@@ -24784,6 +24784,9 @@ const JobConfig = zod_1.z.object({
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     gcp_access_token_scopes: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_service_account: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_access_token_scopes: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
     secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
@@ -24798,6 +24801,8 @@ const TargetGroup = zod_1.z.object({
     environment: zod_1.z.optional(GitHubEnvironment),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_service_account: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     gcs_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
     runs_on: zod_1.z.optional(zod_1.z.string()),
     secrets: zod_1.z.optional(GitHubSecrets),
@@ -58104,6 +58109,9 @@ const run = (inputs, config) => {
             "gcp_service_account",
             "gcp_workload_identity_provider",
             "gcp_access_token_scopes",
+            "gcp_remote_backend_service_account",
+            "gcp_remote_backend_workload_identity_provider",
+            "gcp_remote_backend_access_token_scopes",
         ], [targetConfig]);
         for (const [key, value] of m) {
             outputs.set(key, value);
@@ -58128,6 +58136,9 @@ const run = (inputs, config) => {
             "gcp_service_account",
             "gcp_workload_identity_provider",
             "gcp_access_token_scopes",
+            "gcp_remote_backend_service_account",
+            "gcp_remote_backend_workload_identity_provider",
+            "gcp_remote_backend_access_token_scopes",
         ], [jobConfig, wdConfig, rootJobConfig, targetConfig, config]);
         for (const [key, value] of m2) {
             outputs.set(key, value);

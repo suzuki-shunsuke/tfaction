@@ -95,6 +95,9 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
         "gcp_service_account",
         "gcp_workload_identity_provider",
         "gcp_access_token_scopes",
+        "gcp_remote_backend_service_account",
+        "gcp_remote_backend_workload_identity_provider",
+        "gcp_remote_backend_access_token_scopes",
       ],
       [targetConfig],
     );
@@ -137,6 +140,9 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
         "gcp_service_account",
         "gcp_workload_identity_provider",
         "gcp_access_token_scopes",
+        "gcp_remote_backend_service_account",
+        "gcp_remote_backend_workload_identity_provider",
+        "gcp_remote_backend_access_token_scopes",
       ],
       [jobConfig, wdConfig, rootJobConfig, targetConfig, config],
     );

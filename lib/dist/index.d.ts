@@ -99,6 +99,9 @@ declare const JobConfig: z.ZodObject<{
     gcp_service_account: z.ZodOptional<z.ZodString>;
     gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
     gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+    gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+    gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+    gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
     environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
         name: z.ZodString;
         url: z.ZodString;
@@ -160,6 +163,9 @@ declare const JobConfig: z.ZodObject<{
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
     gcp_access_token_scopes?: string | undefined;
+    gcp_remote_backend_service_account?: string | undefined;
+    gcp_remote_backend_workload_identity_provider?: string | undefined;
+    gcp_remote_backend_access_token_scopes?: string | undefined;
     environment?: string | {
         url: string;
         name: string;
@@ -185,6 +191,9 @@ declare const JobConfig: z.ZodObject<{
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
     gcp_access_token_scopes?: string | undefined;
+    gcp_remote_backend_service_account?: string | undefined;
+    gcp_remote_backend_workload_identity_provider?: string | undefined;
+    gcp_remote_backend_access_token_scopes?: string | undefined;
     environment?: string | {
         url: string;
         name: string;
@@ -224,6 +233,8 @@ declare const TargetGroup: z.ZodObject<{
     }>]>>;
     gcp_service_account: z.ZodOptional<z.ZodString>;
     gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+    gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+    gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
     gcs_bucket_name_tfmigrate_history: z.ZodOptional<z.ZodString>;
     runs_on: z.ZodOptional<z.ZodString>;
     secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
@@ -244,6 +255,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -305,6 +319,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -330,6 +347,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -356,6 +376,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -417,6 +440,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -442,6 +468,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -468,6 +497,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -529,6 +561,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -554,6 +589,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -580,6 +618,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -641,6 +682,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -666,6 +710,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -736,6 +783,8 @@ declare const TargetGroup: z.ZodObject<{
     } | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
+    gcp_remote_backend_service_account?: string | undefined;
+    gcp_remote_backend_workload_identity_provider?: string | undefined;
     gcs_bucket_name_tfmigrate_history?: string | undefined;
     runs_on?: string | undefined;
     secrets?: {
@@ -749,6 +798,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -775,6 +827,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -801,6 +856,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -827,6 +885,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -872,6 +933,8 @@ declare const TargetGroup: z.ZodObject<{
     } | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
+    gcp_remote_backend_service_account?: string | undefined;
+    gcp_remote_backend_workload_identity_provider?: string | undefined;
     gcs_bucket_name_tfmigrate_history?: string | undefined;
     runs_on?: string | undefined;
     secrets?: {
@@ -885,6 +948,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -911,6 +977,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -937,6 +1006,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -963,6 +1035,9 @@ declare const TargetGroup: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1029,6 +1104,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -1090,6 +1168,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1115,6 +1196,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1141,6 +1225,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -1202,6 +1289,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1227,6 +1317,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1253,6 +1346,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -1314,6 +1410,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1339,6 +1438,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1365,6 +1467,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
         environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
@@ -1426,6 +1531,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1451,6 +1559,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1495,6 +1606,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1521,6 +1635,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1547,6 +1664,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1573,6 +1693,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1617,6 +1740,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1643,6 +1769,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1669,6 +1798,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1695,6 +1827,9 @@ declare const TargetConfig: z.ZodObject<{
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_access_token_scopes?: string | undefined;
         environment?: string | {
             url: string;
             name: string;
@@ -1811,6 +1946,8 @@ declare const Config: z.ZodObject<{
         }>]>>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+        gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
         gcs_bucket_name_tfmigrate_history: z.ZodOptional<z.ZodString>;
         runs_on: z.ZodOptional<z.ZodString>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
@@ -1831,6 +1968,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account: z.ZodOptional<z.ZodString>;
             gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
             gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
             environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
@@ -1892,6 +2032,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -1917,6 +2060,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -1943,6 +2089,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account: z.ZodOptional<z.ZodString>;
             gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
             gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
             environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
@@ -2004,6 +2153,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2029,6 +2181,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2055,6 +2210,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account: z.ZodOptional<z.ZodString>;
             gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
             gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
             environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
@@ -2116,6 +2274,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2141,6 +2302,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2167,6 +2331,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account: z.ZodOptional<z.ZodString>;
             gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
             gcp_access_token_scopes: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_service_account: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_workload_identity_provider: z.ZodOptional<z.ZodString>;
+            gcp_remote_backend_access_token_scopes: z.ZodOptional<z.ZodString>;
             environment: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
@@ -2228,6 +2395,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2253,6 +2423,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2323,6 +2496,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
         gcs_bucket_name_tfmigrate_history?: string | undefined;
         runs_on?: string | undefined;
         secrets?: {
@@ -2336,6 +2511,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2362,6 +2540,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2388,6 +2569,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2414,6 +2598,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2459,6 +2646,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
         gcs_bucket_name_tfmigrate_history?: string | undefined;
         runs_on?: string | undefined;
         secrets?: {
@@ -2472,6 +2661,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2498,6 +2690,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2524,6 +2719,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2550,6 +2748,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2635,6 +2836,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
         gcs_bucket_name_tfmigrate_history?: string | undefined;
         runs_on?: string | undefined;
         secrets?: {
@@ -2648,6 +2851,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2674,6 +2880,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2700,6 +2909,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2726,6 +2938,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2822,6 +3037,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
+        gcp_remote_backend_service_account?: string | undefined;
+        gcp_remote_backend_workload_identity_provider?: string | undefined;
         gcs_bucket_name_tfmigrate_history?: string | undefined;
         runs_on?: string | undefined;
         secrets?: {
@@ -2835,6 +3052,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2861,6 +3081,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2887,6 +3110,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
@@ -2913,6 +3139,9 @@ declare const Config: z.ZodObject<{
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
+            gcp_remote_backend_service_account?: string | undefined;
+            gcp_remote_backend_workload_identity_provider?: string | undefined;
+            gcp_remote_backend_access_token_scopes?: string | undefined;
             environment?: string | {
                 url: string;
                 name: string;
