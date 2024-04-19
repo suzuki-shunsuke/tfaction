@@ -96,6 +96,19 @@ runs:
     - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
 
     - uses: google-github-actions/auth@55bd3a7c6e2ae7cf1877fd1ccb9d54c0503c457c # v2.1.2
+      id: google-backend-credentials
+      if: steps.target-config.outputs.gcp_remote_backend_service_account != ''
+      with:
+        workload_identity_provider: ${{ steps.target-config.outputs.gcp_remote_backend_workload_identity_provider != '' && steps.target-config.outputs.gcp_remote_backend_workload_identity_provider || steps.target-config.outputs.gcp_workload_identity_provider }}
+        service_account: ${{ steps.target-config.outputs.gcp_remote_backend_service_account }}
+
+    - shell: bash
+      if: steps.target-config.outputs.gcp_remote_backend_service_account != ''
+      run: echo "GOOGLE_BACKEND_CREDENTIALS=$GOOGLE_BACKEND_CREDENTIALS" >> "$GITHUB_ENV"
+      env:
+        GOOGLE_BACKEND_CREDENTIALS: ${{ steps.google-backend-credentials.outputs.credentials_file_path }}
+
+    - uses: google-github-actions/auth@55bd3a7c6e2ae7cf1877fd1ccb9d54c0503c457c # v2.1.2
       if: steps.target-config.outputs.gcp_service_account != ''
       with:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
