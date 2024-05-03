@@ -99,6 +99,7 @@ export const run = (input: Input): TargetConfig[] => {
   if (prBody.startsWith(followupPRBodyPrefix)) {
     followupTarget = prBody
       .split("\n")[0]
+      .trim()
       .slice(followupPRBodyPrefix.length, -" -->".length);
   }
 

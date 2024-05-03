@@ -62814,6 +62814,7 @@ const run = (input) => {
     if (prBody.startsWith(followupPRBodyPrefix)) {
         followupTarget = prBody
             .split("\n")[0]
+            .trim()
             .slice(followupPRBodyPrefix.length, -" -->".length);
     }
     const terraformTargets = new Set();
