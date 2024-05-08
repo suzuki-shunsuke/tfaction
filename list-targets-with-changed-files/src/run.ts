@@ -92,16 +92,15 @@ export const run = (input: Input): TargetConfig[] => {
     workingDirs.add(path.dirname(configFile));
   }
 
+  // Expected followupPRBody include the line:
   // <!-- tfaction follow up pr target=foo -->
-  let followupTarget = "";
-  const followupPRBodyPrefix = "<!-- tfaction follow up pr target=";
+  const followupTargetCommentRegex = new RegExp(
+    /<!-- tfaction follow up pr target=([^\s]+).*-->/,
+    "s",
+  );
   const prBody = getPRBody(input.pr, input.payload);
-  if (prBody.startsWith(followupPRBodyPrefix)) {
-    followupTarget = prBody
-      .split("\n")[0]
-      .trim()
-      .slice(followupPRBodyPrefix.length, -" -->".length);
-  }
+  const matchResult = prBody.match(followupTargetCommentRegex);
+  const followupTarget = matchResult ? matchResult[1] : "";
 
   const terraformTargets = new Set<string>();
   const tfmigrates = new Set<string>();
