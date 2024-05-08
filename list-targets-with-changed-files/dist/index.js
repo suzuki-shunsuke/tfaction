@@ -83,6 +83,8 @@ const JobConfig = zod_1.z.object({
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     gcp_access_token_scopes: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_service_account: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
     secrets: zod_1.z.optional(GitHubSecrets),
     runs_on: zod_1.z.optional(zod_1.z.string()),
@@ -97,6 +99,8 @@ const TargetGroup = zod_1.z.object({
     environment: zod_1.z.optional(GitHubEnvironment),
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_service_account: zod_1.z.optional(zod_1.z.string()),
+    gcp_remote_backend_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     gcs_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
     runs_on: zod_1.z.optional(zod_1.z.string()),
     secrets: zod_1.z.optional(GitHubSecrets),
@@ -62807,16 +62811,12 @@ const run = (input) => {
         }
         workingDirs.add(path.dirname(configFile));
     }
+    // Expected followupPRBody include the line:
     // <!-- tfaction follow up pr target=foo -->
-    let followupTarget = "";
-    const followupPRBodyPrefix = "<!-- tfaction follow up pr target=";
+    const followupTargetCommentRegex = new RegExp(/<!-- tfaction follow up pr target=([^\s]+).*-->/, "s");
     const prBody = getPRBody(input.pr, input.payload);
-    if (prBody.startsWith(followupPRBodyPrefix)) {
-        followupTarget = prBody
-            .split("\n")[0]
-            .trim()
-            .slice(followupPRBodyPrefix.length, -" -->".length);
-    }
+    const matchResult = prBody.match(followupTargetCommentRegex);
+    const followupTarget = matchResult ? matchResult[1] : "";
     const terraformTargets = new Set();
     const tfmigrates = new Set();
     const skips = new Set();
