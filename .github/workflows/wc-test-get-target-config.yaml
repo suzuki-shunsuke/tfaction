@@ -4,6 +4,7 @@ on: workflow_call
 
 jobs:
   test-get-target-config:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions: {}
     steps:
@@ -25,6 +26,7 @@ jobs:
       - run: echo "${{ steps.target-config.outputs.template_dir }}"
 
   test-get-target-config-gcp:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions: {}
     steps:
