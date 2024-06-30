@@ -4,6 +4,7 @@ on: workflow_call
 
 jobs:
   prettier:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions: {}
     steps:
