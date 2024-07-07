@@ -25000,7 +25000,7 @@ const JobConfig = zod_1.z.object({
     gcp_access_token_scopes: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
     secrets: zod_1.z.optional(GitHubSecrets),
-    runs_on: zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())]),
+    runs_on: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
     env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
     aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
