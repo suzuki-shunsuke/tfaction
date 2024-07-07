@@ -19,7 +19,7 @@ export interface TargetConfig {
   gcp_workload_identity_provider: string | undefined;
   environment: object | string | undefined;
   secrets: Array<Secret> | undefined;
-  runs_on: string | undefined;
+  runs_on: string[] | string | undefined;
 
   terraform_plan_config: JobConfig | undefined;
   tfmigrate_plan_config: JobConfig | undefined;
@@ -38,7 +38,7 @@ export interface JobConfig {
   gcp_workload_identity_provider: string | undefined;
   environment: object | string | undefined;
   secrets: Array<Secret> | undefined;
-  runs_on: string | undefined;
+  runs_on: string[] | string | undefined;
 }
 
 export function getConfig(): Config {
