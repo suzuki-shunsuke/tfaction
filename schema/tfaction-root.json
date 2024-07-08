@@ -61,6 +61,9 @@
           "providers_lock_opts": {
             "$ref": "#/$defs/TerraformProvidersLockOptions"
           },
+          "runs_on": {
+            "$ref": "#/$defs/RunsOn"
+          },
           "s3_bucket_name_tfmigrate_history": {
             "$ref": "#/$defs/S3BucketNameTfmigrateHistory"
           },
@@ -398,12 +401,19 @@
         },
         "envs": {
           "$ref": "#/$defs/Envs"
+        },
+        "runs_on": {
+          "$ref": "#/$defs/RunsOn"
         }
       }
     },
     "Envs": {
       "type": "object",
       "description": "environment variables"
+    },
+    "RunsOn": {
+      "type": ["string", "array"],
+      "description": "The type of runner that the job will run on"
     }
   }
 }
