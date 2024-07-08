@@ -556,8 +556,8 @@ class OidcClient {
             const res = yield httpclient
                 .getJson(id_token_url)
                 .catch(error => {
-                throw new Error(`Failed to get ID Token. \n 
-        Error Code : ${error.statusCode}\n 
+                throw new Error(`Failed to get ID Token. \n
+        Error Code : ${error.statusCode}\n
         Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
@@ -25002,7 +25002,7 @@ const JobConfig = zod_1.z.object({
     gcp_remote_backend_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
     secrets: zod_1.z.optional(GitHubSecrets),
-    runs_on: zod_1.z.optional(zod_1.z.string()),
+    runs_on: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
     env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
     aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
@@ -25017,7 +25017,7 @@ const TargetGroup = zod_1.z.object({
     gcp_remote_backend_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_remote_backend_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     gcs_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
-    runs_on: zod_1.z.optional(zod_1.z.string()),
+    runs_on: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
     secrets: zod_1.z.optional(GitHubSecrets),
     s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
     target: zod_1.z.string(),
@@ -25765,8 +25765,8 @@ class OidcClient {
             const res = yield httpclient
                 .getJson(id_token_url)
                 .catch(error => {
-                throw new Error(`Failed to get ID Token. \n 
-        Error Code : ${error.statusCode}\n 
+                throw new Error(`Failed to get ID Token. \n
+        Error Code : ${error.statusCode}\n
         Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
@@ -58229,7 +58229,7 @@ ZodReadonly.create = (type, params) => {
         ...processCreateParams(params),
     });
 };
-const custom = (check, params = {}, 
+const custom = (check, params = {},
 /**
  * @deprecated
  *
@@ -62059,7 +62059,7 @@ module.exports = parseParams
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -62073,7 +62073,7 @@ module.exports = parseParams
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
@@ -62082,23 +62082,23 @@ module.exports = parseParams
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
-/******/ 	
+/******/
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __nccwpck_require__(6144);
 /******/ 	module.exports = __webpack_exports__;
-/******/ 	
+/******/
 /******/ })()
 ;
