@@ -83,7 +83,7 @@ const JobConfig = z.object({
   gcp_remote_backend_workload_identity_provider: z.optional(z.string()),
   environment: z.optional(GitHubEnvironment),
   secrets: z.optional(GitHubSecrets),
-  runs_on: z.union([z.string(), z.array(z.string())]),
+  runs_on: z.optional(z.union([z.string(), z.array(z.string())])),
   env: z.optional(z.record(z.string())),
   aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
 });

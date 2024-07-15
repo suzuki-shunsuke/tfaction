@@ -121,7 +121,7 @@ declare const JobConfig: z.ZodObject<{
         env_name: string;
         secret_name: string;
     }>, "many">>;
-    runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+    runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
     env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
     aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
         envs: z.ZodArray<z.ZodObject<{
@@ -158,7 +158,7 @@ declare const JobConfig: z.ZodObject<{
         aws_region?: string | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
-    runs_on: (string | string[]) & (string | string[] | undefined);
+    runs_on: string | string[] | undefined;
     aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
@@ -185,7 +185,7 @@ declare const JobConfig: z.ZodObject<{
         aws_region?: string | undefined;
     }[] | undefined;
 }, {
-    runs_on: (string | string[]) & (string | string[] | undefined);
+    runs_on: string | string[] | undefined;
     aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
@@ -274,7 +274,7 @@ declare const TargetGroup: z.ZodObject<{
             env_name: string;
             secret_name: string;
         }>, "many">>;
-        runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+        runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
         env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
             envs: z.ZodArray<z.ZodObject<{
@@ -311,7 +311,7 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -338,7 +338,7 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -392,7 +392,7 @@ declare const TargetGroup: z.ZodObject<{
             env_name: string;
             secret_name: string;
         }>, "many">>;
-        runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+        runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
         env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
             envs: z.ZodArray<z.ZodObject<{
@@ -429,7 +429,7 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -456,7 +456,7 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -510,7 +510,7 @@ declare const TargetGroup: z.ZodObject<{
             env_name: string;
             secret_name: string;
         }>, "many">>;
-        runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+        runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
         env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
             envs: z.ZodArray<z.ZodObject<{
@@ -547,7 +547,7 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -574,7 +574,7 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -628,7 +628,7 @@ declare const TargetGroup: z.ZodObject<{
             env_name: string;
             secret_name: string;
         }>, "many">>;
-        runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+        runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
         env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
             envs: z.ZodArray<z.ZodObject<{
@@ -665,7 +665,7 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -692,7 +692,7 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -779,7 +779,7 @@ declare const TargetGroup: z.ZodObject<{
     s3_bucket_name_tfmigrate_history?: string | undefined;
     template_dir?: string | undefined;
     terraform_apply_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -807,7 +807,7 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_plan_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -835,7 +835,7 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_apply_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -863,7 +863,7 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_plan_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -925,7 +925,7 @@ declare const TargetGroup: z.ZodObject<{
     s3_bucket_name_tfmigrate_history?: string | undefined;
     template_dir?: string | undefined;
     terraform_apply_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -953,7 +953,7 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_plan_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -981,7 +981,7 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_apply_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1009,7 +1009,7 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_plan_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1103,7 +1103,7 @@ declare const TargetConfig: z.ZodObject<{
             env_name: string;
             secret_name: string;
         }>, "many">>;
-        runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+        runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
         env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
             envs: z.ZodArray<z.ZodObject<{
@@ -1140,7 +1140,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1167,7 +1167,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1221,7 +1221,7 @@ declare const TargetConfig: z.ZodObject<{
             env_name: string;
             secret_name: string;
         }>, "many">>;
-        runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+        runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
         env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
             envs: z.ZodArray<z.ZodObject<{
@@ -1258,7 +1258,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1285,7 +1285,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1339,7 +1339,7 @@ declare const TargetConfig: z.ZodObject<{
             env_name: string;
             secret_name: string;
         }>, "many">>;
-        runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+        runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
         env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
             envs: z.ZodArray<z.ZodObject<{
@@ -1376,7 +1376,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1403,7 +1403,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1457,7 +1457,7 @@ declare const TargetConfig: z.ZodObject<{
             env_name: string;
             secret_name: string;
         }>, "many">>;
-        runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+        runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
         env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
             envs: z.ZodArray<z.ZodObject<{
@@ -1494,7 +1494,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1521,7 +1521,7 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1567,7 +1567,7 @@ declare const TargetConfig: z.ZodObject<{
         secret_name: string;
     }[] | undefined;
     terraform_apply_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1595,7 +1595,7 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_plan_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1623,7 +1623,7 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_apply_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1651,7 +1651,7 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_plan_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1697,7 +1697,7 @@ declare const TargetConfig: z.ZodObject<{
         secret_name: string;
     }[] | undefined;
     terraform_apply_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1725,7 +1725,7 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_plan_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1753,7 +1753,7 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_apply_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1781,7 +1781,7 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_plan_config?: {
-        runs_on: (string | string[]) & (string | string[] | undefined);
+        runs_on: string | string[] | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
@@ -1947,7 +1947,7 @@ declare const Config: z.ZodObject<{
                 env_name: string;
                 secret_name: string;
             }>, "many">>;
-            runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+            runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
             env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
             aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 envs: z.ZodArray<z.ZodObject<{
@@ -1984,7 +1984,7 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2011,7 +2011,7 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         }, {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2065,7 +2065,7 @@ declare const Config: z.ZodObject<{
                 env_name: string;
                 secret_name: string;
             }>, "many">>;
-            runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+            runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
             env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
             aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 envs: z.ZodArray<z.ZodObject<{
@@ -2102,7 +2102,7 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2129,7 +2129,7 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         }, {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2183,7 +2183,7 @@ declare const Config: z.ZodObject<{
                 env_name: string;
                 secret_name: string;
             }>, "many">>;
-            runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+            runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
             env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
             aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 envs: z.ZodArray<z.ZodObject<{
@@ -2220,7 +2220,7 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2247,7 +2247,7 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         }, {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2301,7 +2301,7 @@ declare const Config: z.ZodObject<{
                 env_name: string;
                 secret_name: string;
             }>, "many">>;
-            runs_on: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>;
+            runs_on: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, "many">]>>;
             env: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
             aws_secrets_manager: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 envs: z.ZodArray<z.ZodObject<{
@@ -2338,7 +2338,7 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2365,7 +2365,7 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         }, {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2452,7 +2452,7 @@ declare const Config: z.ZodObject<{
         s3_bucket_name_tfmigrate_history?: string | undefined;
         template_dir?: string | undefined;
         terraform_apply_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2480,7 +2480,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_plan_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2508,7 +2508,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_apply_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2536,7 +2536,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_plan_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2598,7 +2598,7 @@ declare const Config: z.ZodObject<{
         s3_bucket_name_tfmigrate_history?: string | undefined;
         template_dir?: string | undefined;
         terraform_apply_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2626,7 +2626,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_plan_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2654,7 +2654,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_apply_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2682,7 +2682,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_plan_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2784,7 +2784,7 @@ declare const Config: z.ZodObject<{
         s3_bucket_name_tfmigrate_history?: string | undefined;
         template_dir?: string | undefined;
         terraform_apply_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2812,7 +2812,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_plan_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2840,7 +2840,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_apply_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2868,7 +2868,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_plan_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -2981,7 +2981,7 @@ declare const Config: z.ZodObject<{
         s3_bucket_name_tfmigrate_history?: string | undefined;
         template_dir?: string | undefined;
         terraform_apply_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -3009,7 +3009,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_plan_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -3037,7 +3037,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_apply_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
@@ -3065,7 +3065,7 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_plan_config?: {
-            runs_on: (string | string[]) & (string | string[] | undefined);
+            runs_on: string | string[] | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
