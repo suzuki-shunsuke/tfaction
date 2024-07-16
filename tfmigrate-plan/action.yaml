@@ -15,7 +15,7 @@ runs:
       id: global-config
     - uses: suzuki-shunsuke/tfaction/get-target-config@main
       id: target-config
-    - run: bash ${{ github.action_path }}/main.sh
+    - run: bash "$GITHUB_ACTION_PATH/main.sh"
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:

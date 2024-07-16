@@ -53,7 +53,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: bash "${GITHUB_ACTION_PATH}/terraform-docs.sh"
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@388ce9deea65edd9a9a3a60bee140732c3dad7a2 # v0.2.1
+    - uses: suzuki-shunsuke/github-action-terraform-fmt@c7378a5b9d2311278db9a7ef825ee6ad6697078c # v0.2.2-1
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_token: ${{ inputs.github_token }}

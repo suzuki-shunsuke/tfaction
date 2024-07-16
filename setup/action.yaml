@@ -124,7 +124,7 @@ runs:
       with:
         ssh_key: ${{ inputs.ssh_key }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@71673ab29266f67c4470773675e087e9a4dda3c5 # v1.1.0
+    - uses: suzuki-shunsuke/github-action-terraform-init@29c2316e647f5785788b0a049d11a12c6d615fda # v1.1.1-1
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}

@@ -16,7 +16,7 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
-    - run: bash ${{ github.action_path }}/skip_create_pr.sh
+    - run: bash "$GITHUB_ACTION_PATH/skip_create_pr.sh"
       shell: bash
       if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:
@@ -24,7 +24,7 @@ runs:
         TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
         TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
 
-    - run: bash ${{ github.action_path }}/main.sh
+    - run: bash "$GITHUB_ACTION_PATH/main.sh"
       shell: bash
       if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:

@@ -48,7 +48,7 @@ runs:
     - name: Create .tfmigrate.hcl (S3)
       run: |
         if [ ! -f ".tfmigrate.hcl" ]; then
-          sed "s|%%TARGET%%|${TFACTION_TARGET}|g" ${{ github.action_path }}/tfmigrate.hcl |
+          sed "s|%%TARGET%%|${TFACTION_TARGET}|g" "$GITHUB_ACTION_PATH/tfmigrate.hcl" |
           sed 's|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}|g' > .tfmigrate.hcl
         fi
       if: steps.target-config.outputs.s3_bucket_name_tfmigrate_history != ''
@@ -58,7 +58,7 @@ runs:
     - name: Create .tfmigrate.hcl (GCS)
       run: |
         if [ ! -f ".tfmigrate.hcl" ]; then
-          sed "s|%%TARGET%%|${TFACTION_TARGET}|g" ${{ github.action_path }}/tfmigrate-gcs.hcl |
+          sed "s|%%TARGET%%|${TFACTION_TARGET}|g" "$GITHUB_ACTION_PATH/tfmigrate-gcs.hcl" |
           sed 's|%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.gcs_bucket_name_tfmigrate_history}}|g' > .tfmigrate.hcl
         fi
       if: steps.target-config.outputs.gcs_bucket_name_tfmigrate_history != ''
@@ -70,7 +70,7 @@ runs:
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
     - name: Create a migration file
-      run: sed "s|%%MIGRATION_NAME%%|${{inputs.migration_name}}|g"  ${{ github.action_path }}/migration.hcl > "tfmigrate/$(date +%Y%m%d%H%M%S)_${{inputs.migration_name}}.hcl"
+      run: sed "s|%%MIGRATION_NAME%%|${{inputs.migration_name}}|g" "$GITHUB_ACTION_PATH/migration.hcl" > "tfmigrate/$(date +%Y%m%d%H%M%S)_${{inputs.migration_name}}.hcl"
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
