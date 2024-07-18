@@ -412,7 +412,17 @@
       "description": "environment variables"
     },
     "RunsOn": {
-      "type": ["string", "array"],
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
       "description": "The type of runner that the job will run on"
     }
   }
