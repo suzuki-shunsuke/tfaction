@@ -24,6 +24,18 @@ After you update code, you have to run the following things.
 - Format code
 - Update [JSON Schema](schema) and [document](https://suzuki-shunsuke.github.io/tfaction/docs/)
 
+## Node.js version management
+
+This project depends on Node.js, and there are a lot of Node.js version managers.
+This project supports a lot of Node.js version managers.
+
+- [NVM](https://github.com/nvm-sh/nvm): [.nvmrc](.nvmrc)
+- [.node-version](.node-version): https://github.com/shadowspawn/node-version-usage
+  - asdf, mise, fnm, nodeenv, etc
+- [volta](https://volta.sh/): [package.json](package.json)
+
+These versions must be same.
+
 ## Build TypeScript
 
 ```sh
