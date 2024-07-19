@@ -15,5 +15,8 @@
     "test": "prettier -c ."
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "volta": {
+    "node": "20.15.1"
+  }
 }
