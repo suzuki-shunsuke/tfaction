@@ -44867,7 +44867,7 @@ const JobConfig = zod_1.z.object({
     gcp_access_token_scopes: zod_1.z.optional(zod_1.z.string()),
     environment: zod_1.z.optional(GitHubEnvironment),
     secrets: zod_1.z.optional(GitHubSecrets),
-    runs_on: zod_1.z.optional(zod_1.z.string()),
+    runs_on: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
     env: zod_1.z.optional(zod_1.z.record(zod_1.z.string())),
     aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
 });
@@ -44880,7 +44880,7 @@ const TargetGroup = zod_1.z.object({
     gcp_service_account: zod_1.z.optional(zod_1.z.string()),
     gcp_workload_identity_provider: zod_1.z.optional(zod_1.z.string()),
     gcs_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
-    runs_on: zod_1.z.optional(zod_1.z.string()),
+    runs_on: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
     secrets: zod_1.z.optional(GitHubSecrets),
     s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
     target: zod_1.z.string(),

@@ -6,7 +6,7 @@ import * as lib from "lib";
 
 type TargetConfig = {
   target: string;
-  runs_on: string;
+  runs_on: string | string[];
   job_type: string;
   environment?: lib.GitHubEnvironment;
   secrets?: lib.GitHubSecrets;

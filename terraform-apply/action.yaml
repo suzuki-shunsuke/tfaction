@@ -32,7 +32,7 @@ runs:
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
-    - run: bash ${{ github.action_path }}/main.sh
+    - run: bash "$GITHUB_ACTION_PATH/main.sh"
       id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash

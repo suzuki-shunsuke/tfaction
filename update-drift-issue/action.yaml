@@ -17,7 +17,7 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
     - name: Post a comment
-      run: bash ${{ github.action_path }}/post-comment.sh
+      run: bash "$GITHUB_ACTION_PATH/post-comment.sh"
       shell: bash
       if: |
         inputs.status != 'success' && env.TFACTION_DRIFT_ISSUE_NUMBER
