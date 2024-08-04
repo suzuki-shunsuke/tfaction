@@ -136,33 +136,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.1.0/github-comment_6.1.0_darwin_amd64.tar.gz",
-      "checksum": "EC43EFE9FBE0E8AC5BBB0E4A6798F9FE1FCC3DCDDE7BF6BA654741462FEA5640",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.2.0/github-comment_6.2.0_darwin_amd64.tar.gz",
+      "checksum": "D8BC9008361B06F6A8BE9B34D0F7829F33D7A3DF3DD74AB808198C6C1C5560F1",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.1.0/github-comment_6.1.0_darwin_arm64.tar.gz",
-      "checksum": "3D49878707E54189F759A0182AB760DBE487E5F5B4AC9D57360812EF9C179673",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.2.0/github-comment_6.2.0_darwin_arm64.tar.gz",
+      "checksum": "E494098485E742B58DE814168EF63D331EE31EFE17A8608B8CB3ED0C46E63A12",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.1.0/github-comment_6.1.0_linux_amd64.tar.gz",
-      "checksum": "1707E76835E649690AE2767AC667703D6682F41F6DC6C50744D6A661375549C1",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.2.0/github-comment_6.2.0_linux_amd64.tar.gz",
+      "checksum": "51C478D0B613FE1477E9E8477F51B47B8BAD04D4AB31CDAA596D7E0DAF8193B0",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.1.0/github-comment_6.1.0_linux_arm64.tar.gz",
-      "checksum": "B91680074D1FEE3C3D18C4030BB38F16C568016265F045898E0EEBB4E36F3C34",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.2.0/github-comment_6.2.0_linux_arm64.tar.gz",
+      "checksum": "24ADDFF0AEDC44A5B8BC8FED02233D17C0DE5D38FA1B66B99B76CCC95CA2BE57",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.1.0/github-comment_6.1.0_windows_amd64.tar.gz",
-      "checksum": "E58F53FBFABEAEF16CF0E64EB0AACBD1DB5E47A98175926BAE5856038E8123BC",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.2.0/github-comment_6.2.0_windows_amd64.tar.gz",
+      "checksum": "0B976FB7153128B12E484EAD5A0E420F0D062A4BF82BA44BDEEA0E891C847255",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.1.0/github-comment_6.1.0_windows_arm64.tar.gz",
-      "checksum": "154889C01E4D5D2DF9123CC095E90CD6061F24441D5994896F9893E8CCC6DD5B",
+      "id": "github_release/github.com/suzuki-shunsuke/github-comment/v6.2.0/github-comment_6.2.0_windows_arm64.tar.gz",
+      "checksum": "7DE8249B567FE41235F96756B0596F0D2DEACA975908D157150C0E55D67168CD",
       "algorithm": "sha256"
     },
     {
@@ -196,8 +196,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.203.0/registry.yaml",
-      "checksum": "58FD4AD62E1F63AF1AED6811DE57952704965341146678BE0123B3D62F539A2C",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.209.0/registry.yaml",
+      "checksum": "3BA331C029079880731E6507566B9626855447E8B5B44F3352EBF4A94C9D78D1",
       "algorithm": "sha256"
     }
   ]
