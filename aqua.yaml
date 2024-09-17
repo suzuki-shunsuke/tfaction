@@ -3,7 +3,7 @@
 # https://aquaproj.github.io/
 registries:
   - type: standard
-    ref: v4.220.1 # renovate: depName=aquaproj/aqua-registry
+    ref: v4.220.2 # renovate: depName=aquaproj/aqua-registry
 
 packages:
   - import: aqua/*.yaml
