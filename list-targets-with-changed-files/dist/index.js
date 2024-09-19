@@ -62757,6 +62757,7 @@ const getTargetConfigByTarget = (targets, target, isApply, jobType) => {
         if (jobConfig === undefined) {
             return {
                 target: target,
+                working_directory: target.replace(t.target, t.working_directory),
                 runs_on: t.runs_on ? t.runs_on : "ubuntu-latest",
                 environment: t === null || t === void 0 ? void 0 : t.environment,
                 secrets: t.secrets,
@@ -62765,6 +62766,7 @@ const getTargetConfigByTarget = (targets, target, isApply, jobType) => {
         }
         return {
             target: target,
+            working_directory: target.replace(t.target, t.working_directory),
             runs_on: jobConfig.runs_on
                 ? jobConfig.runs_on
                 : t.runs_on
