@@ -6,6 +6,7 @@ import * as lib from "lib";
 
 type TargetConfig = {
   target: string;
+  working_directory: string;
   runs_on: string | string[];
   job_type: string;
   environment?: lib.GitHubEnvironment;
@@ -26,6 +27,7 @@ const getTargetConfigByTarget = (
     if (jobConfig === undefined) {
       return {
         target: target,
+        working_directory: target.replace(t.target, t.working_directory),
         runs_on: t.runs_on ? t.runs_on : "ubuntu-latest",
         environment: t?.environment,
         secrets: t.secrets,
@@ -34,6 +36,7 @@ const getTargetConfigByTarget = (
     }
     return {
       target: target,
+      working_directory: target.replace(t.target, t.working_directory),
       runs_on: jobConfig.runs_on
         ? jobConfig.runs_on
         : t.runs_on
