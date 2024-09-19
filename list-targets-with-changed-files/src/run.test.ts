@@ -31,6 +31,7 @@ test("normal", () => {
       runs_on: "ubuntu-latest",
       secrets: undefined,
       target: "foo/dev",
+      working_directory: "foo/dev",
     },
   ]);
 });
@@ -79,6 +80,7 @@ test("job config", () => {
         },
       ],
       target: "foo/dev",
+      working_directory: "foo/dev",
     },
   ]);
 });
@@ -122,6 +124,7 @@ const prCommnetExpected = [
       },
     ],
     target: "foo/dev",
+    working_directory: "foo/dev",
   },
   {
     environment: "yoo",
@@ -129,6 +132,7 @@ const prCommnetExpected = [
     runs_on: "ubuntu-latest",
     secrets: undefined,
     target: "yoo/dev",
+    working_directory: "yoo/services/dev",
   },
 ];
 
@@ -206,6 +210,7 @@ test("module callers", () => {
       runs_on: "ubuntu-latest",
       secrets: undefined,
       target: "foo/dev",
+      working_directory: "foo/dev",
     },
     {
       environment: undefined,
@@ -213,6 +218,7 @@ test("module callers", () => {
       runs_on: "ubuntu-latest",
       secrets: undefined,
       target: "foo/bar",
+      working_directory: "foo/bar",
     },
     {
       environment: undefined,
@@ -220,6 +226,7 @@ test("module callers", () => {
       runs_on: "ubuntu-latest",
       secrets: undefined,
       target: "foo/baz",
+      working_directory: "foo/baz",
     },
   ]);
 });
