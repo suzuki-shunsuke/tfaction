@@ -29,6 +29,7 @@ After you update code, you have to run the following things.
 This project depends on Node.js, and there are a lot of Node.js version managers.
 This project supports a lot of Node.js version managers.
 
+- [aqua](https://aquaproj.github.io/): [aqua/node.yaml](aqua/node.yaml)
 - [NVM](https://github.com/nvm-sh/nvm): [.nvmrc](.nvmrc)
 - [.node-version](.node-version): https://github.com/shadowspawn/node-version-usage
   - asdf, mise, fnm, nodeenv, etc
