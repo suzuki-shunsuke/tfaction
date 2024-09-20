@@ -37,11 +37,6 @@ Follow up #$CI_INFO_PR_NUMBER ([failed workflow]($GITHUB_SERVER_URL/$GITHUB_REPO
 1. Add commits to this pull request and fix the problem if needed
 1. Review and merge this pull request"
 
-if [ "${CREATE_FOLLOW_UP_PR_FILE:-}" != "true" ]; then
-	pr_body="<!-- tfaction follow up pr target=$TFACTION_TARGET -->
-$pr_body"
-fi
-
 create_opts+=( -b "$pr_body" )
 
 follow_up_pr_url=$(gh pr create "${create_opts[@]}")

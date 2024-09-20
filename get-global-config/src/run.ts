@@ -37,8 +37,6 @@ interface Outputs {
   enable_trivy: boolean;
 
   terraform_command: string;
-
-  create_follow_up_pr_file: boolean;
 }
 
 interface Envs {
@@ -84,8 +82,6 @@ export const main = (config: lib.Config, input: Input): Result => {
 
     drift_issue_repo_owner: "",
     drift_issue_repo_name: "",
-
-    create_follow_up_pr_file: config?.create_follow_up_pr?.create_file ?? false,
   };
   const envs: Envs = {
     TFACTION_SKIP_ADDING_AQUA_PACKAGES:

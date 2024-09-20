@@ -25,7 +25,6 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
         TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
-        CREATE_FOLLOW_UP_PR_FILE: ${{ steps.global-config.outputs.create_follow_up_pr_file }}
         WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
 
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
@@ -34,5 +33,4 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
-        CREATE_FOLLOW_UP_PR_FILE: ${{ steps.global-config.outputs.create_follow_up_pr_file }}
         WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}

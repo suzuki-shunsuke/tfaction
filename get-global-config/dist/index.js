@@ -25095,9 +25095,6 @@ const Config = zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
     working_directory_file: zod_1.z.optional(zod_1.z.string()),
-    create_follow_up_pr: zod_1.z.optional(zod_1.z.object({
-        create_file: zod_1.z.optional(zod_1.z.boolean()),
-    })),
 });
 const getConfig = () => {
     let configFilePath = process.env.TFACTION_CONFIG;
@@ -58463,7 +58460,7 @@ catch (error) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = void 0;
 const main = (config, input) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0;
     if (!config.plan_workflow_name) {
         throw new Error('The setting "plan_workflow_name" is required in tfaction-root.yaml');
     }
@@ -58493,10 +58490,9 @@ const main = (config, input) => {
         terraform_command: (config === null || config === void 0 ? void 0 : config.terraform_command) || "terraform",
         drift_issue_repo_owner: "",
         drift_issue_repo_name: "",
-        create_follow_up_pr_file: (_0 = (_z = config === null || config === void 0 ? void 0 : config.create_follow_up_pr) === null || _z === void 0 ? void 0 : _z.create_file) !== null && _0 !== void 0 ? _0 : false,
     };
     const envs = {
-        TFACTION_SKIP_ADDING_AQUA_PACKAGES: (_2 = (_1 = config === null || config === void 0 ? void 0 : config.scaffold_working_directory) === null || _1 === void 0 ? void 0 : _1.skip_adding_aqua_packages) !== null && _2 !== void 0 ? _2 : true,
+        TFACTION_SKIP_ADDING_AQUA_PACKAGES: (_0 = (_z = config === null || config === void 0 ? void 0 : config.scaffold_working_directory) === null || _z === void 0 ? void 0 : _z.skip_adding_aqua_packages) !== null && _0 !== void 0 ? _0 : true,
     };
     if (config.drift_detection && config.drift_detection.issue_repo_owner) {
         outputs.drift_issue_repo_owner = config.drift_detection.issue_repo_owner;

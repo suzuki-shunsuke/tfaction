@@ -2758,13 +2758,6 @@ declare const Config: z.ZodObject<{
         enabled?: boolean | undefined;
     }>>;
     working_directory_file: z.ZodOptional<z.ZodString>;
-    create_follow_up_pr: z.ZodOptional<z.ZodObject<{
-        create_file: z.ZodOptional<z.ZodBoolean>;
-    }, "strip", z.ZodTypeAny, {
-        create_file?: boolean | undefined;
-    }, {
-        create_file?: boolean | undefined;
-    }>>;
 }, "strip", z.ZodTypeAny, {
     plan_workflow_name: string;
     target_groups: {
@@ -2962,9 +2955,6 @@ declare const Config: z.ZodObject<{
         enabled?: boolean | undefined;
     } | undefined;
     working_directory_file?: string | undefined;
-    create_follow_up_pr?: {
-        create_file?: boolean | undefined;
-    } | undefined;
 }, {
     plan_workflow_name: string;
     target_groups: {
@@ -3162,9 +3152,6 @@ declare const Config: z.ZodObject<{
         enabled?: boolean | undefined;
     } | undefined;
     working_directory_file?: string | undefined;
-    create_follow_up_pr?: {
-        create_file?: boolean | undefined;
-    } | undefined;
 }>;
 export type Config = z.infer<typeof Config>;
 export declare const getConfig: () => Config;
