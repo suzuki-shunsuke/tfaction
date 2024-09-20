@@ -229,8 +229,7 @@ export const getTargetFromTargetGroups = (
   targetGroups: Array<TargetGroup>,
   target: string,
 ): TargetGroup | undefined => {
-  for (let i = 0; i < targetGroups.length; i++) {
-    const targetConfig = targetGroups[i];
+  for (const targetConfig of targetGroups) {
     if (target.startsWith(targetConfig.target)) {
       return targetConfig;
     }
@@ -242,8 +241,7 @@ export const getTargetFromTargetGroupsByWorkingDir = (
   targetGroups: Array<TargetGroup>,
   wd: string,
 ): TargetGroup | undefined => {
-  for (let i = 0; i < targetGroups.length; i++) {
-    const targetConfig = targetGroups[i];
+  for (const targetConfig of targetGroups) {
     if (wd.startsWith(targetConfig.working_directory)) {
       return targetConfig;
     }
@@ -280,8 +278,7 @@ export const getJobConfig = (
 };
 
 export const setValues = (name: string, values: Array<any>): void => {
-  for (let i = 0; i < values.length; i++) {
-    const value = values[i];
+  for (const value of values) {
     if (value != undefined) {
       core.setOutput(name, value);
       return;
@@ -294,8 +291,7 @@ export const setOutputs = (
   objs: Array<any>,
 ): Map<string, any> => {
   const outputs = new Map<string, any>();
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
+  for (const key of keys) {
     for (const obj of objs) {
       if (obj != undefined && obj != null && obj[key] != undefined) {
         outputs.set(key, obj[key]);
@@ -328,8 +324,7 @@ export function getTargetGroup(
   targets: Array<TargetGroup>,
   target: string,
 ): TargetGroup {
-  for (let i = 0; i < targets.length; i++) {
-    const t = targets[i];
+  for (const t of targets) {
     if (target.startsWith(t.target)) {
       return t;
     }
