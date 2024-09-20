@@ -10,10 +10,6 @@ export FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%
 
 bash "$GITHUB_ACTION_PATH/create_commit.sh"
 
-git pull origin "$FOLLOW_UP_BRANCH"
-git fetch origin "$FOLLOW_UP_BRANCH"
-git branch "$FOLLOW_UP_BRANCH" "origin/$FOLLOW_UP_BRANCH"
-
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
 create_opts=( -H "$FOLLOW_UP_BRANCH" -t "$pr_title" )
