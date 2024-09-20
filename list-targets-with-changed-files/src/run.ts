@@ -77,8 +77,7 @@ export const run = (input: Input): TargetConfig[] => {
 
   const configWorkingDirMap = new Map();
   const configTargetMap = new Map();
-  for (let i = 0; i < config.target_groups.length; i++) {
-    const target = config.target_groups[i];
+  for (const target of config.target_groups) {
     configWorkingDirMap.set(target.working_directory, target);
     configTargetMap.set(target.target, target);
   }
@@ -87,8 +86,7 @@ export const run = (input: Input): TargetConfig[] => {
   const changedFiles = input.changedFiles;
   const configFiles = input.configFiles;
   const workingDirs = new Set<string>();
-  for (let i = 0; i < configFiles.length; i++) {
-    const configFile = configFiles[i];
+  for (const configFile of configFiles) {
     if (configFile == "") {
       continue;
     }
@@ -115,8 +113,7 @@ export const run = (input: Input): TargetConfig[] => {
   const skipPrefix = config?.label_prefixes?.skip || "skip:";
   const tfmigratePrefix = config?.label_prefixes?.tfmigrate || "tfmigrate:";
 
-  for (let i = 0; i < labels.length; i++) {
-    const label = labels[i];
+  for (const label of labels) {
     if (label == "") {
       continue;
     }
@@ -158,8 +155,7 @@ export const run = (input: Input): TargetConfig[] => {
 
   const moduleCallerMap = input.module_callers;
   const changedWorkingDirs = new Set<string>();
-  for (let i = 0; i < changedFiles.length; i++) {
-    const changedFile = changedFiles[i];
+  for (const changedFile of changedFiles) {
     if (changedFile == "") {
       continue;
     }
@@ -176,8 +172,7 @@ export const run = (input: Input): TargetConfig[] => {
   }
 
   for (const changedWorkingDir of changedWorkingDirs) {
-    for (let i = 0; i < config.target_groups.length; i++) {
-      const target = config.target_groups[i];
+    for (const target of config.target_groups) {
       if (changedWorkingDir.startsWith(target.working_directory)) {
         const changedTarget = changedWorkingDir.replace(
           target.working_directory,

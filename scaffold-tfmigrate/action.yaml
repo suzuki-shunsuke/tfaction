@@ -24,7 +24,7 @@ inputs:
 outputs:
   working_directory:
     description: Working Directory
-    value: ${{ steps.target-config.outputs.working_directory }}
+    value: ${{steps.target-config.outputs.working_directory}}
 
 runs:
   using: composite
@@ -36,20 +36,25 @@ runs:
       env:
         TFACTION_JOB_TYPE: scaffold_working_dir
 
-    - run: gh pr checkout "${{inputs.pr_number}}"
+    - run: gh pr checkout "$PR_NUMBER"
       shell: bash
       if: inputs.pr_number
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
+        PR_NUMBER: ${{inputs.pr_number}}
 
-    - run: mkdir -p "$(dirname "${{steps.target-config.outputs.working_directory}}")"
+    - run: mkdir -p "$(dirname "$WORKING_DIR")"
       shell: bash
+      env:
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
 
     - name: Create .tfmigrate.hcl (S3)
+      env:
+        BUCKET_NAME: ${{steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}
       run: |
         if [ ! -f ".tfmigrate.hcl" ]; then
           sed "s|%%TARGET%%|${TFACTION_TARGET}|g" "$GITHUB_ACTION_PATH/tfmigrate.hcl" |
-          sed 's|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}|g' > .tfmigrate.hcl
+          sed "s|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|${BUCKET_NAME}|g" > .tfmigrate.hcl
         fi
       if: steps.target-config.outputs.s3_bucket_name_tfmigrate_history != ''
       shell: bash
@@ -59,20 +64,24 @@ runs:
       run: |
         if [ ! -f ".tfmigrate.hcl" ]; then
           sed "s|%%TARGET%%|${TFACTION_TARGET}|g" "$GITHUB_ACTION_PATH/tfmigrate-gcs.hcl" |
-          sed 's|%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.gcs_bucket_name_tfmigrate_history}}|g' > .tfmigrate.hcl
+          sed "s|%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%|${BUCKET_NAME}|g" > .tfmigrate.hcl
         fi
       if: steps.target-config.outputs.gcs_bucket_name_tfmigrate_history != ''
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
+      env:
+        BUCKET_NAME: ${{steps.target-config.outputs.gcs_bucket_name_tfmigrate_history}}
 
     - run: mkdir -p tfmigrate
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
 
     - name: Create a migration file
-      run: sed "s|%%MIGRATION_NAME%%|${{inputs.migration_name}}|g" "$GITHUB_ACTION_PATH/migration.hcl" > "tfmigrate/$(date +%Y%m%d%H%M%S)_${{inputs.migration_name}}.hcl"
+      run: sed "s|%%MIGRATION_NAME%%|${MIGRATION_NAME}|g" "$GITHUB_ACTION_PATH/migration.hcl" > "tfmigrate/$(date +%Y%m%d%H%M%S)_${MIGRATION_NAME}.hcl"
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
+      env:
+        MIGRATION_NAME: ${{inputs.migration_name}}
 
     - run: git add .tfmigrate.hcl tfmigrate
       shell: bash
@@ -100,7 +109,7 @@ runs:
             -m "chore: scaffold a tfmigrate migration (${TFACTION_TARGET})"
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{inputs.github_token}}
 
     - name: Create a label to the repository and output the guide to GitHub Step Summary
       if: |
@@ -141,7 +150,7 @@ runs:
         !fromJSON(steps.global-config.outputs.skip_create_pr) && !inputs.pr_number
       id: create_pr
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{inputs.github_token}}
       run: |
         opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
         About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
@@ -159,23 +168,27 @@ runs:
       shell: bash
       if: inputs.pr_number
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        PR_NUMBER: ${{inputs.pr_number}}
+        LABEL_PREFIX: ${{steps.global-config.outputs.label_prefix_tfmigrate}}
       run: |
-        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ inputs.pr_number }}/labels" \
+        curl -X POST "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Accept: application/json" \
           -H "Content-type: application/json" \
-          -d "[{\"name\":\"${{steps.global-config.outputs.label_prefix_tfmigrate}}${TFACTION_TARGET}\"}]"
+          -d "[{\"name\":\"${LABEL_PREFIX}${TFACTION_TARGET}\"}]"
 
     - name: Add a label to the pull request
       shell: bash
       if: |
         !fromJSON(steps.global-config.outputs.skip_create_pr) && !inputs.pr_number
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        PR_NUMBER: ${{steps.create_pr.outputs.pr_number}}
+        LABEL_PREFIX: ${{steps.global-config.outputs.label_prefix_tfmigrate}}
       run: |
-        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ steps.create_pr.outputs.pr_number }}/labels" \
+        curl -X POST "${GITHUB_API_URL}/repos/$GITHUB_REPOSITORY/issues/${PR_NUMBER}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Accept: application/json" \
           -H "Content-type: application/json" \
-          -d "[{\"name\":\"${{steps.global-config.outputs.label_prefix_tfmigrate}}${TFACTION_TARGET}\"}]"
+          -d "[{\"name\":\"${LABEL_PREFIX}${TFACTION_TARGET}\"}]"

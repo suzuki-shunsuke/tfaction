@@ -158,16 +158,16 @@ declare const JobConfig: z.ZodObject<{
         aws_region?: string | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
+    environment?: string | {
+        url: string;
+        name: string;
+    } | undefined;
     aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
     gcp_access_token_scopes?: string | undefined;
     gcp_remote_backend_service_account?: string | undefined;
     gcp_remote_backend_workload_identity_provider?: string | undefined;
-    environment?: string | {
-        url: string;
-        name: string;
-    } | undefined;
     secrets?: {
         env_name: string;
         secret_name: string;
@@ -185,16 +185,16 @@ declare const JobConfig: z.ZodObject<{
         aws_region?: string | undefined;
     }[] | undefined;
 }, {
+    environment?: string | {
+        url: string;
+        name: string;
+    } | undefined;
     aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
     gcp_access_token_scopes?: string | undefined;
     gcp_remote_backend_service_account?: string | undefined;
     gcp_remote_backend_workload_identity_provider?: string | undefined;
-    environment?: string | {
-        url: string;
-        name: string;
-    } | undefined;
     secrets?: {
         env_name: string;
         secret_name: string;
@@ -311,16 +311,16 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -338,16 +338,16 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -429,16 +429,16 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -456,16 +456,16 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -547,16 +547,16 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -574,16 +574,16 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -665,16 +665,16 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -692,16 +692,16 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -758,37 +758,47 @@ declare const TargetGroup: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     target: string;
     working_directory: string;
-    aws_region?: string | undefined;
-    aws_assume_role_arn?: string | undefined;
-    destroy?: boolean | undefined;
-    env?: Record<string, string> | undefined;
     environment?: string | {
         url: string;
         name: string;
     } | undefined;
+    aws_region?: string | undefined;
+    aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
     gcp_remote_backend_service_account?: string | undefined;
     gcp_remote_backend_workload_identity_provider?: string | undefined;
-    gcs_bucket_name_tfmigrate_history?: string | undefined;
-    runs_on?: string | string[] | undefined;
     secrets?: {
         env_name: string;
         secret_name: string;
     }[] | undefined;
+    runs_on?: string | string[] | undefined;
+    env?: Record<string, string> | undefined;
+    aws_secrets_manager?: {
+        envs: {
+            env_name: string;
+            secret_key?: string | undefined;
+        }[];
+        secret_id: string;
+        version_id?: string | undefined;
+        version_stage?: string | undefined;
+        aws_region?: string | undefined;
+    }[] | undefined;
+    destroy?: boolean | undefined;
+    gcs_bucket_name_tfmigrate_history?: string | undefined;
     s3_bucket_name_tfmigrate_history?: string | undefined;
     template_dir?: string | undefined;
     terraform_apply_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -807,16 +817,16 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_plan_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -835,16 +845,16 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_apply_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -863,16 +873,16 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_plan_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -890,51 +900,51 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     } | undefined;
-    aws_secrets_manager?: {
-        envs: {
-            env_name: string;
-            secret_key?: string | undefined;
-        }[];
-        secret_id: string;
-        version_id?: string | undefined;
-        version_stage?: string | undefined;
-        aws_region?: string | undefined;
-    }[] | undefined;
     terraform_command?: string | undefined;
 }, {
     target: string;
     working_directory: string;
-    aws_region?: string | undefined;
-    aws_assume_role_arn?: string | undefined;
-    destroy?: boolean | undefined;
-    env?: Record<string, string> | undefined;
     environment?: string | {
         url: string;
         name: string;
     } | undefined;
+    aws_region?: string | undefined;
+    aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
     gcp_remote_backend_service_account?: string | undefined;
     gcp_remote_backend_workload_identity_provider?: string | undefined;
-    gcs_bucket_name_tfmigrate_history?: string | undefined;
-    runs_on?: string | string[] | undefined;
     secrets?: {
         env_name: string;
         secret_name: string;
     }[] | undefined;
+    runs_on?: string | string[] | undefined;
+    env?: Record<string, string> | undefined;
+    aws_secrets_manager?: {
+        envs: {
+            env_name: string;
+            secret_key?: string | undefined;
+        }[];
+        secret_id: string;
+        version_id?: string | undefined;
+        version_stage?: string | undefined;
+        aws_region?: string | undefined;
+    }[] | undefined;
+    destroy?: boolean | undefined;
+    gcs_bucket_name_tfmigrate_history?: string | undefined;
     s3_bucket_name_tfmigrate_history?: string | undefined;
     template_dir?: string | undefined;
     terraform_apply_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -953,16 +963,16 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_plan_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -981,16 +991,16 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_apply_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1009,16 +1019,16 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_plan_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1036,16 +1046,6 @@ declare const TargetGroup: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     } | undefined;
-    aws_secrets_manager?: {
-        envs: {
-            env_name: string;
-            secret_key?: string | undefined;
-        }[];
-        secret_id: string;
-        version_id?: string | undefined;
-        version_stage?: string | undefined;
-        aws_region?: string | undefined;
-    }[] | undefined;
     terraform_command?: string | undefined;
 }>;
 export type TargetGroup = z.infer<typeof TargetGroup>;
@@ -1140,16 +1140,16 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1167,16 +1167,16 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1258,16 +1258,16 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1285,16 +1285,16 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1376,16 +1376,16 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1403,16 +1403,16 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1494,16 +1494,16 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1521,16 +1521,16 @@ declare const TargetConfig: z.ZodObject<{
             aws_region?: string | undefined;
         }[] | undefined;
     }, {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1550,33 +1550,29 @@ declare const TargetConfig: z.ZodObject<{
     }>>;
     terraform_command: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    aws_assume_role_arn?: string | undefined;
     aws_region?: string | undefined;
-    destroy?: boolean | undefined;
-    drift_detection?: {
-        enabled?: boolean | undefined;
-    } | undefined;
-    env?: Record<string, string> | undefined;
-    gcs_bucket_name_tfmigrate_history?: string | undefined;
+    aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
-    providers_lock_opts?: string | undefined;
-    s3_bucket_name_tfmigrate_history?: string | undefined;
     secrets?: {
         env_name: string;
         secret_name: string;
     }[] | undefined;
+    env?: Record<string, string> | undefined;
+    destroy?: boolean | undefined;
+    gcs_bucket_name_tfmigrate_history?: string | undefined;
+    s3_bucket_name_tfmigrate_history?: string | undefined;
     terraform_apply_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1595,16 +1591,16 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_plan_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1623,16 +1619,16 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_apply_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1651,16 +1647,16 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_plan_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1679,34 +1675,34 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_command?: string | undefined;
+    drift_detection?: {
+        enabled?: boolean | undefined;
+    } | undefined;
+    providers_lock_opts?: string | undefined;
 }, {
-    aws_assume_role_arn?: string | undefined;
     aws_region?: string | undefined;
-    destroy?: boolean | undefined;
-    drift_detection?: {
-        enabled?: boolean | undefined;
-    } | undefined;
-    env?: Record<string, string> | undefined;
-    gcs_bucket_name_tfmigrate_history?: string | undefined;
+    aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
     gcp_workload_identity_provider?: string | undefined;
-    providers_lock_opts?: string | undefined;
-    s3_bucket_name_tfmigrate_history?: string | undefined;
     secrets?: {
         env_name: string;
         secret_name: string;
     }[] | undefined;
+    env?: Record<string, string> | undefined;
+    destroy?: boolean | undefined;
+    gcs_bucket_name_tfmigrate_history?: string | undefined;
+    s3_bucket_name_tfmigrate_history?: string | undefined;
     terraform_apply_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1725,16 +1721,16 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_plan_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1753,16 +1749,16 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_apply_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1781,16 +1777,16 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     tfmigrate_plan_config?: {
+        environment?: string | {
+            url: string;
+            name: string;
+        } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_access_token_scopes?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        environment?: string | {
-            url: string;
-            name: string;
-        } | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
@@ -1809,6 +1805,10 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_command?: string | undefined;
+    drift_detection?: {
+        enabled?: boolean | undefined;
+    } | undefined;
+    providers_lock_opts?: string | undefined;
 }>;
 export type TargetConfig = z.infer<typeof TargetConfig>;
 declare const Config: z.ZodObject<{
@@ -1984,16 +1984,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2011,16 +2011,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         }, {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2102,16 +2102,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2129,16 +2129,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         }, {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2220,16 +2220,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2247,16 +2247,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         }, {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2338,16 +2338,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2365,16 +2365,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         }, {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2431,37 +2431,47 @@ declare const Config: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         target: string;
         working_directory: string;
-        aws_region?: string | undefined;
-        aws_assume_role_arn?: string | undefined;
-        destroy?: boolean | undefined;
-        env?: Record<string, string> | undefined;
         environment?: string | {
             url: string;
             name: string;
         } | undefined;
+        aws_region?: string | undefined;
+        aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        gcs_bucket_name_tfmigrate_history?: string | undefined;
-        runs_on?: string | string[] | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
         }[] | undefined;
+        runs_on?: string | string[] | undefined;
+        env?: Record<string, string> | undefined;
+        aws_secrets_manager?: {
+            envs: {
+                env_name: string;
+                secret_key?: string | undefined;
+            }[];
+            secret_id: string;
+            version_id?: string | undefined;
+            version_stage?: string | undefined;
+            aws_region?: string | undefined;
+        }[] | undefined;
+        destroy?: boolean | undefined;
+        gcs_bucket_name_tfmigrate_history?: string | undefined;
         s3_bucket_name_tfmigrate_history?: string | undefined;
         template_dir?: string | undefined;
         terraform_apply_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2480,16 +2490,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_plan_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2508,16 +2518,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_apply_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2536,16 +2546,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_plan_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2563,51 +2573,51 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         } | undefined;
-        aws_secrets_manager?: {
-            envs: {
-                env_name: string;
-                secret_key?: string | undefined;
-            }[];
-            secret_id: string;
-            version_id?: string | undefined;
-            version_stage?: string | undefined;
-            aws_region?: string | undefined;
-        }[] | undefined;
         terraform_command?: string | undefined;
     }, {
         target: string;
         working_directory: string;
-        aws_region?: string | undefined;
-        aws_assume_role_arn?: string | undefined;
-        destroy?: boolean | undefined;
-        env?: Record<string, string> | undefined;
         environment?: string | {
             url: string;
             name: string;
         } | undefined;
+        aws_region?: string | undefined;
+        aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        gcs_bucket_name_tfmigrate_history?: string | undefined;
-        runs_on?: string | string[] | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
         }[] | undefined;
+        runs_on?: string | string[] | undefined;
+        env?: Record<string, string> | undefined;
+        aws_secrets_manager?: {
+            envs: {
+                env_name: string;
+                secret_key?: string | undefined;
+            }[];
+            secret_id: string;
+            version_id?: string | undefined;
+            version_stage?: string | undefined;
+            aws_region?: string | undefined;
+        }[] | undefined;
+        destroy?: boolean | undefined;
+        gcs_bucket_name_tfmigrate_history?: string | undefined;
         s3_bucket_name_tfmigrate_history?: string | undefined;
         template_dir?: string | undefined;
         terraform_apply_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2626,16 +2636,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_plan_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2654,16 +2664,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_apply_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2682,16 +2692,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_plan_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2709,16 +2719,6 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         } | undefined;
-        aws_secrets_manager?: {
-            envs: {
-                env_name: string;
-                secret_key?: string | undefined;
-            }[];
-            secret_id: string;
-            version_id?: string | undefined;
-            version_stage?: string | undefined;
-            aws_region?: string | undefined;
-        }[] | undefined;
         terraform_command?: string | undefined;
     }>, "many">;
     tflint: z.ZodOptional<z.ZodObject<{
@@ -2763,37 +2763,47 @@ declare const Config: z.ZodObject<{
     target_groups: {
         target: string;
         working_directory: string;
-        aws_region?: string | undefined;
-        aws_assume_role_arn?: string | undefined;
-        destroy?: boolean | undefined;
-        env?: Record<string, string> | undefined;
         environment?: string | {
             url: string;
             name: string;
         } | undefined;
+        aws_region?: string | undefined;
+        aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        gcs_bucket_name_tfmigrate_history?: string | undefined;
-        runs_on?: string | string[] | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
         }[] | undefined;
+        runs_on?: string | string[] | undefined;
+        env?: Record<string, string> | undefined;
+        aws_secrets_manager?: {
+            envs: {
+                env_name: string;
+                secret_key?: string | undefined;
+            }[];
+            secret_id: string;
+            version_id?: string | undefined;
+            version_stage?: string | undefined;
+            aws_region?: string | undefined;
+        }[] | undefined;
+        destroy?: boolean | undefined;
+        gcs_bucket_name_tfmigrate_history?: string | undefined;
         s3_bucket_name_tfmigrate_history?: string | undefined;
         template_dir?: string | undefined;
         terraform_apply_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2812,16 +2822,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_plan_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2840,16 +2850,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_apply_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2868,16 +2878,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_plan_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -2895,18 +2905,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         } | undefined;
-        aws_secrets_manager?: {
-            envs: {
-                env_name: string;
-                secret_key?: string | undefined;
-            }[];
-            secret_id: string;
-            version_id?: string | undefined;
-            version_stage?: string | undefined;
-            aws_region?: string | undefined;
-        }[] | undefined;
         terraform_command?: string | undefined;
     }[];
+    env?: Record<string, string> | undefined;
+    terraform_command?: string | undefined;
+    drift_detection?: {
+        issue_repo_owner?: string | undefined;
+        issue_repo_name?: string | undefined;
+        num_of_issues?: number | undefined;
+        minimum_detection_interval?: number | undefined;
+    } | undefined;
     aqua?: {
         update_checksum?: {
             enabled?: boolean | undefined;
@@ -2917,13 +2925,6 @@ declare const Config: z.ZodObject<{
     base_working_directory?: string | undefined;
     conftest_policy_directory?: string | undefined;
     draft_pr?: boolean | undefined;
-    drift_detection?: {
-        issue_repo_owner?: string | undefined;
-        issue_repo_name?: string | undefined;
-        num_of_issues?: number | undefined;
-        minimum_detection_interval?: number | undefined;
-    } | undefined;
-    env?: Record<string, string> | undefined;
     label_prefixes?: {
         target?: string | undefined;
         tfmigrate?: string | undefined;
@@ -2950,7 +2951,6 @@ declare const Config: z.ZodObject<{
     update_local_path_module_caller?: {
         enabled?: boolean | undefined;
     } | undefined;
-    terraform_command?: string | undefined;
     update_related_pull_requests?: {
         enabled?: boolean | undefined;
     } | undefined;
@@ -2960,37 +2960,47 @@ declare const Config: z.ZodObject<{
     target_groups: {
         target: string;
         working_directory: string;
-        aws_region?: string | undefined;
-        aws_assume_role_arn?: string | undefined;
-        destroy?: boolean | undefined;
-        env?: Record<string, string> | undefined;
         environment?: string | {
             url: string;
             name: string;
         } | undefined;
+        aws_region?: string | undefined;
+        aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
         gcp_workload_identity_provider?: string | undefined;
         gcp_remote_backend_service_account?: string | undefined;
         gcp_remote_backend_workload_identity_provider?: string | undefined;
-        gcs_bucket_name_tfmigrate_history?: string | undefined;
-        runs_on?: string | string[] | undefined;
         secrets?: {
             env_name: string;
             secret_name: string;
         }[] | undefined;
+        runs_on?: string | string[] | undefined;
+        env?: Record<string, string> | undefined;
+        aws_secrets_manager?: {
+            envs: {
+                env_name: string;
+                secret_key?: string | undefined;
+            }[];
+            secret_id: string;
+            version_id?: string | undefined;
+            version_stage?: string | undefined;
+            aws_region?: string | undefined;
+        }[] | undefined;
+        destroy?: boolean | undefined;
+        gcs_bucket_name_tfmigrate_history?: string | undefined;
         s3_bucket_name_tfmigrate_history?: string | undefined;
         template_dir?: string | undefined;
         terraform_apply_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -3009,16 +3019,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_plan_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -3037,16 +3047,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_apply_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -3065,16 +3075,16 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         tfmigrate_plan_config?: {
+            environment?: string | {
+                url: string;
+                name: string;
+            } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
             gcp_workload_identity_provider?: string | undefined;
             gcp_access_token_scopes?: string | undefined;
             gcp_remote_backend_service_account?: string | undefined;
             gcp_remote_backend_workload_identity_provider?: string | undefined;
-            environment?: string | {
-                url: string;
-                name: string;
-            } | undefined;
             secrets?: {
                 env_name: string;
                 secret_name: string;
@@ -3092,18 +3102,16 @@ declare const Config: z.ZodObject<{
                 aws_region?: string | undefined;
             }[] | undefined;
         } | undefined;
-        aws_secrets_manager?: {
-            envs: {
-                env_name: string;
-                secret_key?: string | undefined;
-            }[];
-            secret_id: string;
-            version_id?: string | undefined;
-            version_stage?: string | undefined;
-            aws_region?: string | undefined;
-        }[] | undefined;
         terraform_command?: string | undefined;
     }[];
+    env?: Record<string, string> | undefined;
+    terraform_command?: string | undefined;
+    drift_detection?: {
+        issue_repo_owner?: string | undefined;
+        issue_repo_name?: string | undefined;
+        num_of_issues?: number | undefined;
+        minimum_detection_interval?: number | undefined;
+    } | undefined;
     aqua?: {
         update_checksum?: {
             enabled?: boolean | undefined;
@@ -3114,13 +3122,6 @@ declare const Config: z.ZodObject<{
     base_working_directory?: string | undefined;
     conftest_policy_directory?: string | undefined;
     draft_pr?: boolean | undefined;
-    drift_detection?: {
-        issue_repo_owner?: string | undefined;
-        issue_repo_name?: string | undefined;
-        num_of_issues?: number | undefined;
-        minimum_detection_interval?: number | undefined;
-    } | undefined;
-    env?: Record<string, string> | undefined;
     label_prefixes?: {
         target?: string | undefined;
         tfmigrate?: string | undefined;
@@ -3147,7 +3148,6 @@ declare const Config: z.ZodObject<{
     update_local_path_module_caller?: {
         enabled?: boolean | undefined;
     } | undefined;
-    terraform_command?: string | undefined;
     update_related_pull_requests?: {
         enabled?: boolean | undefined;
     } | undefined;

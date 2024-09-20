@@ -74,7 +74,7 @@ export const main = (config: lib.Config, input: Input): Result => {
     aqua_update_checksum_prune: config?.aqua?.update_checksum?.prune ?? false,
     aqua_update_checksum_skip_push: input.drift_issue_number
       ? true
-      : config?.aqua?.update_checksum?.skip_push ?? false,
+      : (config?.aqua?.update_checksum?.skip_push ?? false),
     enable_tfsec: config?.tfsec?.enabled ?? false,
     enable_tflint: config?.tflint?.enabled ?? true,
     enable_trivy: config?.trivy?.enabled ?? true,
