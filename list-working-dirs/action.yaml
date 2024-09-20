@@ -14,15 +14,21 @@ runs:
       id: global-config
     - run: |
         tempfile=$(mktemp)
-        git ls-files "${{ steps.global-config.outputs.base_working_directory }}" | grep -E "/${{ steps.global-config.outputs.working_directory_file }}$" > "$tempfile" || :
+        git ls-files "$BASE_WD" | grep -E "/${WD_FILE}$" > "$tempfile" || :
         echo "file=$tempfile" >> "$GITHUB_OUTPUT"
         cat "$tempfile" >&2
       shell: bash
       id: main
+      env:
+        BASE_WD: ${{ steps.global-config.outputs.base_working_directory }}
+        WD_FILE: ${{ steps.global-config.outputs.working_directory_file }}
     - run: |
         tempfile=$(mktemp)
-        git ls-files "${{ steps.global-config.outputs.module_base_directory }}" | grep -E "/${{ steps.global-config.outputs.module_file }}$" > "$tempfile" || :
+        git ls-files "$MODULE_BASE_DIR" | grep -E "/${MODULE_FILE}$" > "$tempfile" || :
         echo "module_file=$tempfile" >> "$GITHUB_OUTPUT"
         cat "$tempfile" >&2
       shell: bash
       id: module
+      env:
+        MODULE_BASE_DIR: ${{ steps.global-config.outputs.module_base_directory }}
+        MODULE_FILE: ${{ steps.global-config.outputs.module_file }}
