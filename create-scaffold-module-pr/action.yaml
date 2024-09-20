@@ -23,7 +23,7 @@ runs:
       shell: bash
       if: env.TFACTION_MODULE_PATH == ''
 
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v1.6.0-3
       id: global-config
 
     - run: aqua i -l -a
