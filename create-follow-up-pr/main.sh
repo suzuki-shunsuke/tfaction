@@ -45,6 +45,7 @@ fi
 create_opts+=( -b "$pr_body" )
 
 follow_up_pr_url=$(gh pr create "${create_opts[@]}")
+echo "::notice:: The follow up pull request: $follow_up_pr_url"
 
 github-comment post \
 	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
