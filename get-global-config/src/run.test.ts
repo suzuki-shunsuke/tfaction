@@ -31,6 +31,7 @@ test("default", () => {
       enable_tflint: true,
       enable_trivy: true,
       terraform_command: "terraform",
+      create_follow_up_pr_file: false,
     },
   };
   expect(
@@ -99,6 +100,7 @@ test("customize", () => {
       enable_tflint: true,
       enable_trivy: true,
       terraform_command: "tofu",
+      create_follow_up_pr_file: false,
     },
   };
 

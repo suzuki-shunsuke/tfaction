@@ -201,6 +201,11 @@ const Config = z.object({
     }),
   ),
   working_directory_file: z.optional(z.string()),
+  create_follow_up_pr: z.optional(
+    z.object({
+      create_file: z.optional(z.boolean()),
+    }),
+  ),
 });
 
 export type Config = z.infer<typeof Config>;

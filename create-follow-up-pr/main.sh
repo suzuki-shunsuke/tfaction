@@ -6,21 +6,17 @@ set -euo pipefail
 # 1. create a remote branch
 # 2. open pull request
 
-follow_up_branch="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
-ghcp empty-commit \
-	-r "$GITHUB_REPOSITORY" -b "$follow_up_branch" \
-	-m "chore: empty commit to open follow up pull request
+export FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
 
-Follow up #$CI_INFO_PR_NUMBER
-$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+bash "$GITHUB_ACTION_PATH/create_commit.sh"
 
-git pull origin "$follow_up_branch"
-git fetch origin "$follow_up_branch"
-git branch "$follow_up_branch" "origin/$follow_up_branch"
+git pull origin "$FOLLOW_UP_BRANCH"
+git fetch origin "$FOLLOW_UP_BRANCH"
+git branch "$FOLLOW_UP_BRANCH" "origin/$FOLLOW_UP_BRANCH"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
-create_opts=( -H "$follow_up_branch" -t "$pr_title" )
+create_opts=( -H "$FOLLOW_UP_BRANCH" -t "$pr_title" )
 mention=""
 if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
 	create_opts+=( -a "$CI_INFO_PR_AUTHOR" )
