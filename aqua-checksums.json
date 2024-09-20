@@ -196,8 +196,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.220.1/registry.yaml",
-      "checksum": "B081C60660C8F0C2C02B410E6BB78DE52B26FF8001B9BAEA4D28BBF0D801521C",
+      "id": "http/nodejs.org/dist/v20.17.0/node-v20.17.0-darwin-arm64.tar.gz",
+      "checksum": "476324108C4361935465631EEC47DF1C943BA2C87BC050853385B1D1C71F0B1F",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/nodejs.org/dist/v20.17.0/node-v20.17.0-darwin-x64.tar.gz",
+      "checksum": "EEFE9447DBB0B5B233D42730989C6C364487DE4043145DB2F63DA94E9623C380",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/nodejs.org/dist/v20.17.0/node-v20.17.0-linux-arm64.tar.gz",
+      "checksum": "18AFBF2781EDFCC9918343F4BF74A8C35D74D778B85D40A0C09B232ADC0EA82C",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/nodejs.org/dist/v20.17.0/node-v20.17.0-linux-x64.tar.gz",
+      "checksum": "21E656F6F4E34080DDC5D75FBFE58CE8482FE6E70A76AEAE14AFDCDC1E23079D",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "http/nodejs.org/dist/v20.17.0/node-v20.17.0-win-x64.zip",
+      "checksum": "E323FFF0ABA197090FAABD29C4C23F334557FF24454324F0C83FAA7E399DBB74",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.222.0/registry.yaml",
+      "checksum": "F9A938B706FA666417EC5DB1E89B28CBAB40DF7793E7CB4C20F0B23ED84CC620",
       "algorithm": "sha256"
     }
   ]
