@@ -43,7 +43,7 @@ runs:
         GITHUB_TOKEN: ${{inputs.github_token}}
         PR_NUMBER: ${{inputs.pr_number}}
 
-    - run: mkdir -p "$(dirname "${WORKING_DIR}")"
+    - run: mkdir -p "$(dirname "$WORKING_DIR")"
       shell: bash
       env:
         WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
