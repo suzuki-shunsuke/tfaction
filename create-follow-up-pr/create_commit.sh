@@ -13,7 +13,7 @@ if [ "${CREATE_FOLLOW_UP_PR_FILE:-}" = "true" ]; then
 		-r "$GITHUB_REPOSITORY" -b "$FOLLOW_UP_BRANCH" \
 		-m "chore: create a commit to open follow up pull request
 Follow up #$CI_INFO_PR_NUMBER
-$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
 		"$follow_up_pr_file"
 else
 	ghcp empty-commit \
