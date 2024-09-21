@@ -176,26 +176,26 @@ export const run = (input: Input): TargetConfig[] => {
 
   for (const changedWorkingDir of changedWorkingDirs) {
     for (const target of config.target_groups) {
-      if (changedWorkingDir.startsWith(target.working_directory)) {
-        const changedTarget = changedWorkingDir.replace(
-          target.working_directory,
-          target.target,
+      if (!changedWorkingDir.startsWith(target.working_directory)) {
+        continue;
+      }
+      const changedTarget = changedWorkingDir.replace(
+        target.working_directory,
+        target.target,
+      );
+      if (
+        !terraformTargets.has(changedTarget) &&
+        !tfmigrates.has(changedTarget)
+      ) {
+        terraformTargets.add(changedTarget);
+        terraformTargetObjs.push(
+          getTargetConfigByTarget(
+            config.target_groups,
+            changedTarget,
+            isApply,
+            "terraform",
+          ),
         );
-        if (
-          !terraformTargets.has(changedTarget) &&
-          !tfmigrates.has(changedTarget)
-        ) {
-          terraformTargets.add(changedTarget);
-          terraformTargetObjs.push(
-            getTargetConfigByTarget(
-              config.target_groups,
-              changedTarget,
-              isApply,
-              "terraform",
-            ),
-          );
-        }
-        break;
       }
     }
   }
