@@ -29111,7 +29111,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getSecrets = exports.getTargetConfig = exports.setValue = exports.getJobConfig = exports.getJobType = exports.getIsApply = exports.getTarget = exports.getConfig = void 0;
+exports.getConfig = getConfig;
+exports.getTarget = getTarget;
+exports.getIsApply = getIsApply;
+exports.getJobType = getJobType;
+exports.getJobConfig = getJobConfig;
+exports.setValue = setValue;
+exports.getTargetConfig = getTargetConfig;
+exports.getSecrets = getSecrets;
 const fs = __importStar(__nccwpck_require__(7147));
 const core = __importStar(__nccwpck_require__(2186));
 const yaml = __nccwpck_require__(1917);
@@ -29122,7 +29129,6 @@ function getConfig() {
     }
     return yaml.load(fs.readFileSync(configFilePath, "utf8"));
 }
-exports.getConfig = getConfig;
 function getTarget() {
     const target = process.env.TFACTION_TARGET;
     if (target == "" || target == undefined) {
@@ -29130,18 +29136,15 @@ function getTarget() {
     }
     return target;
 }
-exports.getTarget = getTarget;
 function getIsApply() {
     return process.env.TFACTION_IS_APPLY == "true";
 }
-exports.getIsApply = getIsApply;
 function getJobType() {
     if (process.env.TFACTION_JOB_TYPE == undefined) {
         throw new Error("environment variable TFACTION_JOB_TYPE is required");
     }
     return process.env.TFACTION_JOB_TYPE;
 }
-exports.getJobType = getJobType;
 function getJobConfig(config, isApply, jobType) {
     if (isApply) {
         switch (jobType) {
@@ -29162,7 +29165,6 @@ function getJobConfig(config, isApply, jobType) {
             throw new Error(`unknown type: ${jobType}`);
     }
 }
-exports.getJobConfig = getJobConfig;
 function setValue(name, values) {
     for (let i = 0; i < values.length; i++) {
         const value = values[i];
@@ -29172,7 +29174,6 @@ function setValue(name, values) {
         }
     }
 }
-exports.setValue = setValue;
 function getTargetConfig(targets, target) {
     for (let i = 0; i < targets.length; i++) {
         const t = targets[i];
@@ -29182,7 +29183,6 @@ function getTargetConfig(targets, target) {
     }
     throw new Error("target is invalid");
 }
-exports.getTargetConfig = getTargetConfig;
 function setSecretToMap(secrets, m) {
     for (let i = 0; i < secrets.length; i++) {
         const secret = secrets[i];
@@ -29215,7 +29215,6 @@ function getSecrets(targetConfig, jobConfig) {
     }
     return secrets;
 }
-exports.getSecrets = getSecrets;
 
 
 /***/ }),
