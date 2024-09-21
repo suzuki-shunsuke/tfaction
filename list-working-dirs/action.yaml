@@ -10,7 +10,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v1.6.0-6
       id: global-config
     - run: |
         tempfile=$(mktemp)
