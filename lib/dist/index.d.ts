@@ -3,11 +3,11 @@ declare const GitHubEnvironment: z.ZodUnion<[z.ZodString, z.ZodObject<{
     name: z.ZodString;
     url: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    url: string;
     name: string;
+    url: string;
 }, {
-    url: string;
     name: string;
+    url: string;
 }>]>;
 export type GitHubEnvironment = z.infer<typeof GitHubEnvironment>;
 declare const JobType: z.ZodUnion<[z.ZodLiteral<"terraform">, z.ZodLiteral<"tfmigrate">, z.ZodLiteral<"scaffold_working_dir">]>;
@@ -105,11 +105,11 @@ declare const JobConfig: z.ZodObject<{
         name: z.ZodString;
         url: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        url: string;
         name: string;
+        url: string;
     }, {
-        url: string;
         name: string;
+        url: string;
     }>]>>;
     secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
         env_name: z.ZodString;
@@ -159,8 +159,8 @@ declare const JobConfig: z.ZodObject<{
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     environment?: string | {
-        url: string;
         name: string;
+        url: string;
     } | undefined;
     aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
@@ -186,8 +186,8 @@ declare const JobConfig: z.ZodObject<{
     }[] | undefined;
 }, {
     environment?: string | {
-        url: string;
         name: string;
+        url: string;
     } | undefined;
     aws_assume_role_arn?: string | undefined;
     gcp_service_account?: string | undefined;
@@ -222,11 +222,11 @@ declare const TargetGroup: z.ZodObject<{
         name: z.ZodString;
         url: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        url: string;
         name: string;
+        url: string;
     }, {
-        url: string;
         name: string;
+        url: string;
     }>]>>;
     gcp_service_account: z.ZodOptional<z.ZodString>;
     gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
@@ -258,11 +258,11 @@ declare const TargetGroup: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
             env_name: z.ZodString;
@@ -312,8 +312,8 @@ declare const TargetGroup: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -339,8 +339,8 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     }, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -376,11 +376,11 @@ declare const TargetGroup: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
             env_name: z.ZodString;
@@ -430,8 +430,8 @@ declare const TargetGroup: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -457,8 +457,8 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     }, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -494,11 +494,11 @@ declare const TargetGroup: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
             env_name: z.ZodString;
@@ -548,8 +548,8 @@ declare const TargetGroup: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -575,8 +575,8 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     }, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -612,11 +612,11 @@ declare const TargetGroup: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
             env_name: z.ZodString;
@@ -666,8 +666,8 @@ declare const TargetGroup: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -693,8 +693,8 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     }, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -759,8 +759,8 @@ declare const TargetGroup: z.ZodObject<{
     target: string;
     working_directory: string;
     environment?: string | {
-        url: string;
         name: string;
+        url: string;
     } | undefined;
     aws_region?: string | undefined;
     aws_assume_role_arn?: string | undefined;
@@ -790,8 +790,8 @@ declare const TargetGroup: z.ZodObject<{
     template_dir?: string | undefined;
     terraform_apply_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -818,8 +818,8 @@ declare const TargetGroup: z.ZodObject<{
     } | undefined;
     terraform_plan_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -846,8 +846,8 @@ declare const TargetGroup: z.ZodObject<{
     } | undefined;
     tfmigrate_apply_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -874,8 +874,8 @@ declare const TargetGroup: z.ZodObject<{
     } | undefined;
     tfmigrate_plan_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -905,8 +905,8 @@ declare const TargetGroup: z.ZodObject<{
     target: string;
     working_directory: string;
     environment?: string | {
-        url: string;
         name: string;
+        url: string;
     } | undefined;
     aws_region?: string | undefined;
     aws_assume_role_arn?: string | undefined;
@@ -936,8 +936,8 @@ declare const TargetGroup: z.ZodObject<{
     template_dir?: string | undefined;
     terraform_apply_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -964,8 +964,8 @@ declare const TargetGroup: z.ZodObject<{
     } | undefined;
     terraform_plan_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -992,8 +992,8 @@ declare const TargetGroup: z.ZodObject<{
     } | undefined;
     tfmigrate_apply_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1020,8 +1020,8 @@ declare const TargetGroup: z.ZodObject<{
     } | undefined;
     tfmigrate_plan_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1087,11 +1087,11 @@ declare const TargetConfig: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
             env_name: z.ZodString;
@@ -1141,8 +1141,8 @@ declare const TargetConfig: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1168,8 +1168,8 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     }, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1205,11 +1205,11 @@ declare const TargetConfig: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
             env_name: z.ZodString;
@@ -1259,8 +1259,8 @@ declare const TargetConfig: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1286,8 +1286,8 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     }, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1323,11 +1323,11 @@ declare const TargetConfig: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
             env_name: z.ZodString;
@@ -1377,8 +1377,8 @@ declare const TargetConfig: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1404,8 +1404,8 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     }, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1441,11 +1441,11 @@ declare const TargetConfig: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
             env_name: z.ZodString;
@@ -1495,8 +1495,8 @@ declare const TargetConfig: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1522,8 +1522,8 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     }, {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1564,8 +1564,8 @@ declare const TargetConfig: z.ZodObject<{
     s3_bucket_name_tfmigrate_history?: string | undefined;
     terraform_apply_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1592,8 +1592,8 @@ declare const TargetConfig: z.ZodObject<{
     } | undefined;
     terraform_plan_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1620,8 +1620,8 @@ declare const TargetConfig: z.ZodObject<{
     } | undefined;
     tfmigrate_apply_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1648,8 +1648,8 @@ declare const TargetConfig: z.ZodObject<{
     } | undefined;
     tfmigrate_plan_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1694,8 +1694,8 @@ declare const TargetConfig: z.ZodObject<{
     s3_bucket_name_tfmigrate_history?: string | undefined;
     terraform_apply_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1722,8 +1722,8 @@ declare const TargetConfig: z.ZodObject<{
     } | undefined;
     terraform_plan_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1750,8 +1750,8 @@ declare const TargetConfig: z.ZodObject<{
     } | undefined;
     tfmigrate_apply_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1778,8 +1778,8 @@ declare const TargetConfig: z.ZodObject<{
     } | undefined;
     tfmigrate_plan_config?: {
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_assume_role_arn?: string | undefined;
         gcp_service_account?: string | undefined;
@@ -1895,11 +1895,11 @@ declare const Config: z.ZodObject<{
             name: z.ZodString;
             url: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            url: string;
             name: string;
+            url: string;
         }, {
-            url: string;
             name: string;
+            url: string;
         }>]>>;
         gcp_service_account: z.ZodOptional<z.ZodString>;
         gcp_workload_identity_provider: z.ZodOptional<z.ZodString>;
@@ -1931,11 +1931,11 @@ declare const Config: z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
             }, "strip", z.ZodTypeAny, {
-                url: string;
                 name: string;
+                url: string;
             }, {
-                url: string;
                 name: string;
+                url: string;
             }>]>>;
             secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 env_name: z.ZodString;
@@ -1985,8 +1985,8 @@ declare const Config: z.ZodObject<{
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2012,8 +2012,8 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         }, {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2049,11 +2049,11 @@ declare const Config: z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
             }, "strip", z.ZodTypeAny, {
-                url: string;
                 name: string;
+                url: string;
             }, {
-                url: string;
                 name: string;
+                url: string;
             }>]>>;
             secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 env_name: z.ZodString;
@@ -2103,8 +2103,8 @@ declare const Config: z.ZodObject<{
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2130,8 +2130,8 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         }, {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2167,11 +2167,11 @@ declare const Config: z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
             }, "strip", z.ZodTypeAny, {
-                url: string;
                 name: string;
+                url: string;
             }, {
-                url: string;
                 name: string;
+                url: string;
             }>]>>;
             secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 env_name: z.ZodString;
@@ -2221,8 +2221,8 @@ declare const Config: z.ZodObject<{
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2248,8 +2248,8 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         }, {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2285,11 +2285,11 @@ declare const Config: z.ZodObject<{
                 name: z.ZodString;
                 url: z.ZodString;
             }, "strip", z.ZodTypeAny, {
-                url: string;
                 name: string;
+                url: string;
             }, {
-                url: string;
                 name: string;
+                url: string;
             }>]>>;
             secrets: z.ZodOptional<z.ZodArray<z.ZodObject<{
                 env_name: z.ZodString;
@@ -2339,8 +2339,8 @@ declare const Config: z.ZodObject<{
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2366,8 +2366,8 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         }, {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2432,8 +2432,8 @@ declare const Config: z.ZodObject<{
         target: string;
         working_directory: string;
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_region?: string | undefined;
         aws_assume_role_arn?: string | undefined;
@@ -2463,8 +2463,8 @@ declare const Config: z.ZodObject<{
         template_dir?: string | undefined;
         terraform_apply_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2491,8 +2491,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         terraform_plan_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2519,8 +2519,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         tfmigrate_apply_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2547,8 +2547,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         tfmigrate_plan_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2578,8 +2578,8 @@ declare const Config: z.ZodObject<{
         target: string;
         working_directory: string;
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_region?: string | undefined;
         aws_assume_role_arn?: string | undefined;
@@ -2609,8 +2609,8 @@ declare const Config: z.ZodObject<{
         template_dir?: string | undefined;
         terraform_apply_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2637,8 +2637,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         terraform_plan_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2665,8 +2665,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         tfmigrate_apply_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2693,8 +2693,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         tfmigrate_plan_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2764,8 +2764,8 @@ declare const Config: z.ZodObject<{
         target: string;
         working_directory: string;
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_region?: string | undefined;
         aws_assume_role_arn?: string | undefined;
@@ -2795,8 +2795,8 @@ declare const Config: z.ZodObject<{
         template_dir?: string | undefined;
         terraform_apply_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2823,8 +2823,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         terraform_plan_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2851,8 +2851,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         tfmigrate_apply_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2879,8 +2879,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         tfmigrate_plan_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -2961,8 +2961,8 @@ declare const Config: z.ZodObject<{
         target: string;
         working_directory: string;
         environment?: string | {
-            url: string;
             name: string;
+            url: string;
         } | undefined;
         aws_region?: string | undefined;
         aws_assume_role_arn?: string | undefined;
@@ -2992,8 +2992,8 @@ declare const Config: z.ZodObject<{
         template_dir?: string | undefined;
         terraform_apply_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -3020,8 +3020,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         terraform_plan_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -3048,8 +3048,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         tfmigrate_apply_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;
@@ -3076,8 +3076,8 @@ declare const Config: z.ZodObject<{
         } | undefined;
         tfmigrate_plan_config?: {
             environment?: string | {
-                url: string;
                 name: string;
+                url: string;
             } | undefined;
             aws_assume_role_arn?: string | undefined;
             gcp_service_account?: string | undefined;

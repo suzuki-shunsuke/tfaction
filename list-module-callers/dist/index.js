@@ -24999,7 +24999,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.buildModuleToCallers = exports.resolveRelativeCallTree = void 0;
+exports.resolveRelativeCallTree = resolveRelativeCallTree;
+exports.buildModuleToCallers = buildModuleToCallers;
 const node_path_1 = __importDefault(__nccwpck_require__(9411));
 function resolveRelativeCallTree(rawModuleCalls) {
     const moduleCalls = {};
@@ -25015,7 +25016,6 @@ function resolveRelativeCallTree(rawModuleCalls) {
     }
     return moduleCalls;
 }
-exports.resolveRelativeCallTree = resolveRelativeCallTree;
 function buildModuleToCallers(modulesCalls) {
     function findCallers(module) {
         const callers = [];
@@ -25037,7 +25037,6 @@ function buildModuleToCallers(modulesCalls) {
     }
     return moduleToCallers;
 }
-exports.buildModuleToCallers = buildModuleToCallers;
 
 
 /***/ }),
