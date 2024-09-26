@@ -62996,13 +62996,15 @@ const run = (input) => {
     const labels = input.labels;
     const changedFiles = input.changedFiles;
     const configFiles = input.configFiles;
-    const workingDirs = new Set();
+    const workingDirs = new Array();
     for (const configFile of configFiles) {
         if (configFile == "") {
             continue;
         }
-        workingDirs.add(path.dirname(configFile));
+        workingDirs.push(path.dirname(configFile));
     }
+    workingDirs.sort();
+    workingDirs.reverse();
     // Expected followupPRBody include the line:
     // <!-- tfaction follow up pr target=foo -->
     const followupTargetCommentRegex = new RegExp(/<!-- tfaction follow up pr target=([^\s]+).*-->/, "s");
@@ -63049,26 +63051,27 @@ const run = (input) => {
             continue;
         }
         const dir = path.dirname(changedFile);
-        for (let workingDir of workingDirs) {
+        const moduleCallers = moduleCallerMap[dir] || [];
+        for (const caller of moduleCallers) {
+            changedWorkingDirs.add(caller);
+        }
+        for (const workingDir of workingDirs) {
             if (changedFile.startsWith(workingDir + "/")) {
                 changedWorkingDirs.add(workingDir);
-            }
-            const moduleCallers = moduleCallerMap[dir] || [];
-            for (const caller of moduleCallers) {
-                changedWorkingDirs.add(caller);
+                break;
             }
         }
     }
     for (const changedWorkingDir of changedWorkingDirs) {
         for (const target of config.target_groups) {
-            if (changedWorkingDir.startsWith(target.working_directory)) {
-                const changedTarget = changedWorkingDir.replace(target.working_directory, target.target);
-                if (!terraformTargets.has(changedTarget) &&
-                    !tfmigrates.has(changedTarget)) {
-                    terraformTargets.add(changedTarget);
-                    terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedTarget, isApply, "terraform"));
-                }
-                break;
+            if (!changedWorkingDir.startsWith(target.working_directory)) {
+                continue;
+            }
+            const changedTarget = changedWorkingDir.replace(target.working_directory, target.target);
+            if (!terraformTargets.has(changedTarget) &&
+                !tfmigrates.has(changedTarget)) {
+                terraformTargets.add(changedTarget);
+                terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedTarget, isApply, "terraform"));
             }
         }
     }

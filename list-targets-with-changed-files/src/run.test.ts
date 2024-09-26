@@ -209,14 +209,6 @@ test("module callers", () => {
       job_type: "terraform",
       runs_on: "ubuntu-latest",
       secrets: undefined,
-      target: "foo/dev",
-      working_directory: "foo/dev",
-    },
-    {
-      environment: undefined,
-      job_type: "terraform",
-      runs_on: "ubuntu-latest",
-      secrets: undefined,
       target: "foo/bar",
       working_directory: "foo/bar",
     },
@@ -227,6 +219,50 @@ test("module callers", () => {
       secrets: undefined,
       target: "foo/baz",
       working_directory: "foo/baz",
+    },
+    {
+      environment: undefined,
+      job_type: "terraform",
+      runs_on: "ubuntu-latest",
+      secrets: undefined,
+      target: "foo/dev",
+      working_directory: "foo/dev",
+    },
+  ]);
+});
+
+test("nest", () => {
+  expect(
+    run({
+      config: {
+        plan_workflow_name: "plan",
+        target_groups: [
+          {
+            target: "foo/",
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/bar/main.tf"],
+      configFiles: ["foo/tfaction.yaml", "foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "hello",
+        },
+      },
+      module_callers: {},
+    }),
+  ).toStrictEqual([
+    {
+      environment: undefined,
+      job_type: "terraform",
+      runs_on: "ubuntu-latest",
+      secrets: undefined,
+      target: "foo/dev",
+      working_directory: "foo/dev",
     },
   ]);
 });
