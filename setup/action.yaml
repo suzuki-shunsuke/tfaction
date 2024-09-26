@@ -55,7 +55,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v1.6.0
       id: global-config
 
     - run: echo "$GLOBAL_CONFIG"
@@ -63,7 +63,7 @@ runs:
       env:
         GLOBAL_CONFIG: ${{toJSON(steps.global-config.outputs)}}
 
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/get-target-config@v1.6.0
       id: target-config
 
     - run: echo "$TARGET_CONFIG"
@@ -93,7 +93,7 @@ runs:
         role-session-name: samplerolesession
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
+    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@v1.6.0
 
     - uses: google-github-actions/auth@62cf5bd3e4211a0a0b51f2c6d6a37129d828611d # v2.1.5
       id: google-backend-credentials
@@ -119,7 +119,7 @@ runs:
     - uses: google-github-actions/setup-gcloud@f0990588f1e5b5af6827153b93673613abdc6ec7 # v2.1.1
       if: steps.target-config.outputs.gcp_service_account != ''
 
-    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
+    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@v1.6.0
       if: inputs.ssh_key != ''
       with:
         ssh_key: ${{ inputs.ssh_key }}
