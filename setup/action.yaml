@@ -71,7 +71,7 @@ runs:
       env:
         TARGET_CONFIG: ${{toJSON(steps.target-config.outputs)}}
 
-    - uses: aquaproj/update-checksum-action@0fef5fa12e81e046bb29078f76b99bb29fa4e696 # v0.2.3
+    - uses: aquaproj/update-checksum-action@f8df4ca9d89c02df053ba6580c36c0b17c879187 # v0.2.4
       if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'
       with:
         skip_push: ${{ steps.global-config.outputs.aqua_update_checksum_skip_push }}
