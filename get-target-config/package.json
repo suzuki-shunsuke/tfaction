@@ -4,7 +4,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@actions/core": "1.11.0",
+    "@actions/core": "1.11.1",
     "glob": "11.0.0",
     "js-yaml": "4.1.0",
     "lib": "file:../lib/dist"
