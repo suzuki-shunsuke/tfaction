@@ -166,33 +166,23 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.2.1/pinact_darwin_amd64.tar.gz",
-      "checksum": "6E4CEE64BDD8C4D15274FB5923D36D428F2285B943F39BB859AD71D260245602",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v1.0.0/pinact_darwin_amd64.tar.gz",
+      "checksum": "9CAF9C7F17AEA625B1DA1DD1EF5B2988069C65DF0CA43C219D17C07E9DA8CD1B",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.2.1/pinact_darwin_arm64.tar.gz",
-      "checksum": "B992D85D2F9C60137A2436EC63037B29336ACB7E507D11A33FD1B4787FD63C55",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v1.0.0/pinact_darwin_arm64.tar.gz",
+      "checksum": "73D06EA7C7BE9965C47863B2D9C04F298AE1D37EDC18E162C540ACB4AC030314",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.2.1/pinact_linux_amd64.tar.gz",
-      "checksum": "CC136F052903F376FE386F9F5115F951D86D1A962DFF37C716F1E65BB350BFB8",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v1.0.0/pinact_linux_amd64.tar.gz",
+      "checksum": "F6CF07459807F67E79FF4E7E60D414D28C7D5AC916EE3DDEA561738D27C3E6A7",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.2.1/pinact_linux_arm64.tar.gz",
-      "checksum": "E7E1372652F1FA4A15C2BB12CE9679EE76B6D99C216196C424C623625B8DC48C",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.2.1/pinact_windows_amd64.tar.gz",
-      "checksum": "5DDDD19B5F0D2B3080E7219596E987B40D2749F12E522800133DC84FDB2AF4FC",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v0.2.1/pinact_windows_arm64.tar.gz",
-      "checksum": "9EAE49BC72AD6D415761C9897DA8B2A1019DF9E2CF09C3A2C849C34408309D88",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v1.0.0/pinact_linux_arm64.tar.gz",
+      "checksum": "1BFAED4E7B53B15199772688FEBE4CB2A0AA8313B964B06F13767B4E5C3A31E3",
       "algorithm": "sha256"
     },
     {
@@ -221,8 +211,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.228.0/registry.yaml",
-      "checksum": "FE7F63F317CD71045506D7BB28FB735591D8F06A423B04202C0480FDC6B2702D",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.228.1/registry.yaml",
+      "checksum": "4B1D07D29028737282D10C1789BE5946BD3FCA0F74232A03A95D1926A385FC7B",
       "algorithm": "sha256"
     }
   ]
