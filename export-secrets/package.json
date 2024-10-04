@@ -4,7 +4,7 @@
     "test": "true"
   },
   "dependencies": {
-    "@actions/core": "1.11.0",
+    "@actions/core": "1.11.1",
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
