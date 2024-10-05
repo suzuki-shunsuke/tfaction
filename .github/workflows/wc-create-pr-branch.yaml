@@ -75,7 +75,9 @@ jobs:
       - run: git ls-files | grep -E "/action\.yaml$" | xargs git add
       - run: |
           git commit -m "chore: test $PR_NUMBER
-          base revision: ${{steps.base_sha.outputs.base_sha}}"
+          base revision: ${BASE_SHA}"
+        env:
+          BASE_SHA: ${{steps.base_sha.outputs.base_sha}}
       - run: git push origin "$PR_BRANCH" --force
         env:
           GITHUB_TOKEN: ${{steps.generate_token.outputs.token}}
