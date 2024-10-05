@@ -17,3 +17,17 @@ post:
       ```
 
       To update the pull request branch again, please run [the workflow](https://github.com/suzuki-shunsuke/tfaction/actions/workflows/create-pr-branch.yaml).
+
+  create-prelease:
+    template: |
+      # :rocket: Prerelease {{.Vars.tag}} was created
+
+      {{template "link" .}}
+
+      You can try this pull request in your workflows by changing tfaction version to `{{.Vars.tag}}`.
+
+      e.g.
+
+      ```yaml
+      - uses: suzuki-shunsuke/tfaction/setup@{{.Vars.tag}}
+      ```
