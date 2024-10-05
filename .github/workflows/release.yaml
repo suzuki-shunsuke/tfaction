@@ -60,7 +60,7 @@ jobs:
           NOTE: "[Issues](https://github.com/suzuki-shunsuke/tfaction/issues?q=is%3Aissue+is%3Aclosed+milestone%3A${{env.TAG}}) | [Pull Requests](https://github.com/suzuki-shunsuke/tfaction/pulls?q=is%3Apr+is%3Aclosed+milestone%3A${{env.TAG}}) | https://github.com/suzuki-shunsuke/tfaction/compare/${{env.TAG}}...${{env.TAG}} | [Base revision](https://github.com/suzuki-shunsuke/tfaction/tree/${{env.BASE_REVISION}})"
           GITHUB_TOKEN: ${{ github.token }}
 
-      - run: github-comment post -pr "$PR" -k create-prerelease -var "tag:$TAG"
+      - run: github-comment post -pr "$PR" -k pre-release -var "tag:$TAG"
         if: inputs.pr != ''
         env:
           GITHUB_TOKEN: ${{github.token}}
