@@ -1,0 +1,50 @@
+name: Generate Code by `terraform plan -generate-config-out`
+description: Generate Code by `terraform plan -generate-config-out`
+inputs:
+  github_token:
+    description: |
+      GitHub Access Token
+      contents:write - Push a commit
+    required: false
+    default: ${{ github.token }}
+  branch:
+    description: "branch name to be updated"
+    required: true
+  file:
+    description: "file name to be updated"
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+      id: target-config
+
+    - name: Run terraform plan -generate-config-out
+      shell: bash
+      working-directory: ${{steps.target-config.outputs.working_directory}}
+      env:
+        TFACTION_TARGET: ${{steps.target-config.outputs.target}}
+        FILE: ${{inputs.file}}
+      run: |
+        tempfile=generated_${GITHUB_RUN_ID}_$(date +%Y%m%d%H%M%S).tf
+        tfcmt -output "$GITHUB_STEP_SUMMARY" \
+              -var "target:$TFACTION_TARGET" plan \
+          -- terraform plan -generate-config-out "$tempfile"
+        if [ -f "$FILE" ]; then
+          echo "" >> "$FILE"
+        fi
+        grep -v -E "^#|^$" "$tempfile" >> "$FILE"
+        rm "$tempfile"
+
+    - name: Push a commit
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{inputs.github_token}}
+        FILE: ${{inputs.file}}
+        DIR: ${{steps.target-config.outputs.working_directory}}
+      run: |
+        ghcp commit \
+          -r "$GITHUB_REPOSITORY" \
+          -m "chore: import resources" \
+          -b "$BRANCH" \
+          "$DIR/$FILE"
