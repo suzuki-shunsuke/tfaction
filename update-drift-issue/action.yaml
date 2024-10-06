@@ -14,7 +14,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v1.7.0
       id: global-config
     - name: Post a comment
       run: bash "$GITHUB_ACTION_PATH/post-comment.sh"

@@ -7,7 +7,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v1.7.0
       id: global-config
     - run: |
         echo "TFCMT_REPO_OWNER=$REPO_OWNER" >> "$GITHUB_ENV"
