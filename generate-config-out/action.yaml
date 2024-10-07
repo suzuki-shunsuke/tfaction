@@ -44,6 +44,7 @@ runs:
         DIR: ${{steps.target-config.outputs.working_directory}}
       run: |
         export AQUA_CONFIG="$GITHUB_ACTION_PATH/aqua.yaml"
+        github-comment exec -out "file:$GITHUB_STEP_SUMMARY" -- ghcp -v \
         github-comment exec -out "file:$GITHUB_STEP_SUMMARY" -- ghcp commit \
           -r "$GITHUB_REPOSITORY" \
           -m "chore: import resources" \
