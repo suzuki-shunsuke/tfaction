@@ -63,4 +63,4 @@ runs:
       if: steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
-        working_directory: ${{ env.TFACTION_TARGET }}
+        working_directory: ${{ steps.target-config.outputs.working_directory }}
