@@ -1,0 +1,10 @@
+---
+checksum:
+  enabled: true
+  require_checksum: true
+registries:
+  - type: standard
+    ref: v4.230.0 # renovate: depName=aquaproj/aqua-registry
+packages:
+  - name: suzuki-shunsuke/github-comment@v6.3.0
+  - name: int128/ghcp@v1.13.4
