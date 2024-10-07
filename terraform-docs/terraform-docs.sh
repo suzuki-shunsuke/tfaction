@@ -38,6 +38,6 @@ if [ "$created" = "true" ] || ! git diff --quiet README.md; then
 		-var "tfaction_target:${TFACTION_TARGET}" \
 		-- ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
 		-m "docs($TFACTION_TARGET): generate Terraform Module document by terraform-docs" \
-		-C "$GITHUB_WORKSPACE" "$TFACTION_TARGET/README.md"
+		-C "$GITHUB_WORKSPACE" "$TFACTION_WORKING_DIR/README.md"
 	exit 1
 fi

@@ -19,4 +19,5 @@ runs:
       working-directory: ${{ inputs.working_directory }}
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        TFACTION_WORKING_DIR: ${{ inputs.working_directory }}
       run: bash "${GITHUB_ACTION_PATH}/terraform-docs.sh"
