@@ -52,6 +52,12 @@ const TerraformDocsConfig = z.object({
 
 export type TerraformDocsConfig = z.infer<typeof TerraformDocsConfig>;
 
+const ConftestConfig = z.object({
+  hcl_policy: z.optional(z.string()),
+});
+
+export type ConftestConfig = z.infer<typeof ConftestConfig>;
+
 const GitHubSecrets = z.array(
   z.object({
     env_name: z.string(),
@@ -163,6 +169,7 @@ const Config = z.object({
   ),
   base_working_directory: z.optional(z.string()),
   conftest_policy_directory: z.optional(z.string()),
+  conftest: z.optional(ConftestConfig),
   draft_pr: z.optional(z.boolean()),
   drift_detection: z.optional(
     z.object({

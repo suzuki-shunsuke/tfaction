@@ -45,6 +45,14 @@ declare const TerraformDocsConfig: z.ZodObject<{
     enabled?: boolean | undefined;
 }>;
 export type TerraformDocsConfig = z.infer<typeof TerraformDocsConfig>;
+declare const ConftestConfig: z.ZodObject<{
+    hcl_policy: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    hcl_policy?: string | undefined;
+}, {
+    hcl_policy?: string | undefined;
+}>;
+export type ConftestConfig = z.infer<typeof ConftestConfig>;
 declare const GitHubSecrets: z.ZodArray<z.ZodObject<{
     env_name: z.ZodString;
     secret_name: z.ZodString;
@@ -1862,6 +1870,13 @@ declare const Config: z.ZodObject<{
     }>>;
     base_working_directory: z.ZodOptional<z.ZodString>;
     conftest_policy_directory: z.ZodOptional<z.ZodString>;
+    conftest: z.ZodOptional<z.ZodObject<{
+        hcl_policy: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        hcl_policy?: string | undefined;
+    }, {
+        hcl_policy?: string | undefined;
+    }>>;
     draft_pr: z.ZodOptional<z.ZodBoolean>;
     drift_detection: z.ZodOptional<z.ZodObject<{
         issue_repo_owner: z.ZodOptional<z.ZodString>;
@@ -2955,6 +2970,9 @@ declare const Config: z.ZodObject<{
     } | undefined;
     base_working_directory?: string | undefined;
     conftest_policy_directory?: string | undefined;
+    conftest?: {
+        hcl_policy?: string | undefined;
+    } | undefined;
     draft_pr?: boolean | undefined;
     label_prefixes?: {
         target?: string | undefined;
@@ -3155,6 +3173,9 @@ declare const Config: z.ZodObject<{
     } | undefined;
     base_working_directory?: string | undefined;
     conftest_policy_directory?: string | undefined;
+    conftest?: {
+        hcl_policy?: string | undefined;
+    } | undefined;
     draft_pr?: boolean | undefined;
     label_prefixes?: {
         target?: string | undefined;

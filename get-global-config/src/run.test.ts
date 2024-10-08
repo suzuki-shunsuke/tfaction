@@ -15,6 +15,7 @@ test("default", () => {
       skip_create_pr: false,
       plan_workflow_name: "plan",
       conftest_policy_directory: "",
+      conftest_hcl_policy_directory: "",
 
       label_prefix_target: "target:",
       label_prefix_tfmigrate: "tfmigrate:",
@@ -83,6 +84,7 @@ test("customize", () => {
       draft_pr: true,
       skip_create_pr: true,
       conftest_policy_directory: "terraform/policy",
+      conftest_hcl_policy_directory: "",
       update_local_path_module_caller: false,
 
       label_prefix_target: "target:",
