@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+shopt -s nullglob # To ignore *.tf and *.tf.json when no files are found
 
 if [ -n "$CONFTEST_POLICY_DIRECTORY" ] && [ ! -d "$ROOT_DIR/$CONFTEST_POLICY_DIRECTORY" ]; then
 	echo "::error::The conftest directory $CONFTEST_POLICY_DIRECTORY isn't found"
