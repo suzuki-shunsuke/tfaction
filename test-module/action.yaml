@@ -11,10 +11,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@pr/1884
       id: global-config
 
-    - uses: suzuki-shunsuke/tfaction/conftest-hcl@main
+    - uses: suzuki-shunsuke/tfaction/conftest-hcl@pr/1884
       if: |
         steps.global-config.outputs.conftest_hcl_policy_directory != '' || steps.global-config.outputs.conftest_hcl_combine_policy_directory != ''
       with:
@@ -53,7 +53,7 @@ runs:
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/terraform-docs@pr/1884
       if: steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
