@@ -46,6 +46,12 @@ const TrivyConfig = z.object({
 
 export type TrivyConfig = z.infer<typeof TrivyConfig>;
 
+const TerraformDocsConfig = z.object({
+  enabled: z.optional(z.boolean()),
+});
+
+export type TerraformDocsConfig = z.infer<typeof TerraformDocsConfig>;
+
 const GitHubSecrets = z.array(
   z.object({
     env_name: z.string(),
@@ -138,6 +144,7 @@ const TargetConfig = z.object({
   tfmigrate_apply_config: z.optional(JobConfig),
   tfmigrate_plan_config: z.optional(JobConfig),
   terraform_command: z.optional(z.string()),
+  terraform_docs: z.optional(TerraformDocsConfig),
 });
 
 export type TargetConfig = z.infer<typeof TargetConfig>;
@@ -189,6 +196,7 @@ const Config = z.object({
   tflint: z.optional(TflintConfig),
   tfsec: z.optional(TfsecConfig),
   trivy: z.optional(TrivyConfig),
+  terraform_docs: z.optional(TerraformDocsConfig),
   update_local_path_module_caller: z.optional(
     z.object({
       enabled: z.optional(z.boolean()),

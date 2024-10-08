@@ -60,7 +60,7 @@ runs:
         terraform_command: ${{ steps.target-config.outputs.terraform_command }}
 
     - uses: suzuki-shunsuke/tfaction/terraform-docs@main
-      if: steps.target-config.outputs.destroy != 'true'
+      if: fromJSON(steps.target-config.outputs.enable_terraform_docs) && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
