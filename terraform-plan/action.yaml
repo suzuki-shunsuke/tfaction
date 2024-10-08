@@ -44,7 +44,7 @@ runs:
       if: |
         ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
 
-    - uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
+    - uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
       if: |
         ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       with:
