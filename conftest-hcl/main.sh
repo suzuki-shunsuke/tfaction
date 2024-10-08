@@ -3,20 +3,28 @@
 set -euo pipefail
 shopt -s nullglob # To ignore *.tf and *.tf.json when no files are found
 
-if [ -n "$CONFTEST_POLICY_DIRECTORY" ] && [ ! -d "$ROOT_DIR/$CONFTEST_POLICY_DIRECTORY" ]; then
-	echo "::error::The conftest directory $CONFTEST_POLICY_DIRECTORY isn't found"
-	exit 1
-fi
-
-CONFTEST_POLICY_DIRECTORY=$ROOT_DIR/${CONFTEST_POLICY_DIRECTORY:-policy}
-
-if [ ! -d "$CONFTEST_POLICY_DIRECTORY" ]; then
-	exit 0
-fi
-
 conftest -v # Install conftest in advance to exclude aqua lazy install log from github-comment's comment
-github-comment exec \
-	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-	-var "tfaction_target:$TFACTION_TARGET" \
-	-k conftest -- \
-		conftest test --no-color -p "$CONFTEST_POLICY_DIRECTORY" *.tf *.tf.json
+
+if [ -n "$CONFTEST_POLICY_DIRECTORY" ]; then
+	[ ! -d "$ROOT_DIR/$CONFTEST_POLICY_DIRECTORY" ]; then
+		echo "::error::The conftest directory $CONFTEST_POLICY_DIRECTORY isn't found"
+		exit 1
+	fi
+	github-comment exec \
+		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+		-var "tfaction_target:$TFACTION_TARGET" \
+		-k conftest -- \
+			conftest test --no-color -p "$ROOT_DIR/$CONFTEST_POLICY_DIRECTORY" *.tf *.tf.json
+fi
+
+if [ -n "$CONFTEST_COMBINE_POLICY_DIRECTORY" ]; then
+	[ ! -d "$ROOT_DIR/$CONFTEST_COMBINE_POLICY_DIRECTORY" ]; then
+		echo "::error::The conftest directory $CONFTEST_COMBINE_POLICY_DIRECTORY isn't found"
+		exit 1
+	fi
+	github-comment exec \
+		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+		-var "tfaction_target:$TFACTION_TARGET" \
+		-k conftest -- \
+			conftest test --no-color --combine -p "$CONFTEST_COMBINE_POLICY_DIRECTORY" *.tf *.tf.json
+fi

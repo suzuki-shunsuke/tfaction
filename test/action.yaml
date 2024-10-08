@@ -17,7 +17,8 @@ runs:
       id: global-config
 
     - uses: suzuki-shunsuke/tfaction/conftest-hcl@main
-      if: steps.global-config.outputs.conftest_hcl_policy_directory != ''
+      if: |
+        steps.global-config.outputs.conftest_hcl_policy_directory != '' || steps.global-config.outputs.conftest_hcl_combined_policy_directory != ''
       with:
         github_token: ${{ inputs.github_token }}
 

@@ -22,3 +22,4 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         ROOT_DIR: ${{ github.workspace }}
         CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_hcl_policy_directory }}
+        CONFTEST_COMBINE_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_hcl_combine_policy_directory }}

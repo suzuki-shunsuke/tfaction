@@ -54,6 +54,7 @@ export type TerraformDocsConfig = z.infer<typeof TerraformDocsConfig>;
 
 const ConftestConfig = z.object({
   hcl_policy: z.optional(z.string()),
+  hcl_combine_policy: z.optional(z.string()),
 });
 
 export type ConftestConfig = z.infer<typeof ConftestConfig>;
