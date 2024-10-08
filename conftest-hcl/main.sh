@@ -26,5 +26,5 @@ if [ -n "$CONFTEST_COMBINE_POLICY_DIRECTORY" ]; then
 		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 		-var "tfaction_target:$TFACTION_TARGET" \
 		-k conftest -- \
-			conftest test --no-color --combine -p "$CONFTEST_COMBINE_POLICY_DIRECTORY" *.tf *.tf.json
+			conftest test --no-color --combine -p "$ROOT_DIR/$CONFTEST_COMBINE_POLICY_DIRECTORY" *.tf *.tf.json
 fi
