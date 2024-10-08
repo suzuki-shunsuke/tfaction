@@ -32,6 +32,8 @@ outputs:
     description: If true, tflint is enabled in test action
   enable_trivy:
     description: If true, trivy is enabled in test action
+  enable_terraform_docs:
+    description: If true, terraform-docs is enabled in test action
 
   destroy:
     description: If true, terraform plan is run with the `-destroy` option
