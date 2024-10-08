@@ -14,6 +14,11 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
+    - uses: suzuki-shunsuke/tfaction/conftest-hcl@main
+      if: steps.global-config.outputs.conftest_hcl_policy_directory != ''
+      with:
+        github_token: ${{ inputs.github_token }}
+
     - run: github-comment exec -- terraform init
       # https://github.com/suzuki-shunsuke/tfaction/issues/1576
       shell: bash
