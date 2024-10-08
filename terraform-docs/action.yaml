@@ -1,0 +1,23 @@
+name: terraform-docs
+description: terraform-docs
+inputs:
+  github_token:
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments and reviews
+      contents:write - Push commits
+    required: false
+    default: ${{ github.token }}
+  working_directory:
+    description: working directory
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        TFACTION_WORKING_DIR: ${{ inputs.working_directory }}
+      run: bash "${GITHUB_ACTION_PATH}/terraform-docs.sh"
