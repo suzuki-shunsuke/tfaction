@@ -1,45 +1,21 @@
-name: Get target configuration
-description: Get target configuration
-outputs:
-  working_directory:
-    description: working directory
-
-  aws_assume_role_arn:
-    description: AWS Assume Role ARN
-  aws_region:
-    description: AWS Region
-
-  gcp_service_account:
-    description: Google Cloud Platform Service Account for GCP Workload Identity Federation
-  gcp_workload_identity_provider:
-    description: Google Cloud Platform Identity Provider for GCP Workload Identity Federation
-  gcp_access_token_scopes:
-    description: List of OAuth 2.0 access scopes to be included in the generated token for authenticating to Google Cloud
-
-  s3_bucket_name_tfmigrate_history:
-    description: S3 Bucket name for tfmigrate history files
-  gcs_bucket_name_tfmigrate_history:
-    description: GCS Bucket name for tfmigrate history files
-  template_dir:
-    description: Template Directory path for scaffolding a working directory
-
-  providers_lock_opts:
-    description: terraform providers lock options
-
-  enable_tfsec:
-    description: If true, tfsec is enabled in test action
-  enable_tflint:
-    description: If true, tflint is enabled in test action
-  enable_trivy:
-    description: If true, trivy is enabled in test action
-  enable_terraform_docs:
-    description: If true, terraform-docs is enabled in test action
-
-  destroy:
-    description: If true, terraform plan is run with the `-destroy` option
-
-  terraform_command:
-    description: Terraform command. By default, the value is "terraform". If you use OpenTofu, the value is "tofu"
+name: conftest hcl
+description: conftest hcl
+inputs:
+  github_token:
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments
+    required: false
+    default: ${{ github.token }}
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+      id: target-config
+
+    - run: node "$GITHUB_ACTION_PATH/dist/index.js"
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        ROOT_DIR: ${{ github.workspace }}

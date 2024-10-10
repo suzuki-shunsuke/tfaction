@@ -1,10 +1,13 @@
 import * as core from "@actions/core";
+import * as exec from '@actions/exec';
 import * as lib from "lib";
 import * as path from "path";
 
 type Inputs = {
   target?: string;
   workingDir?: string;
+  githubCommentConfig: string;
+  rootDir: string;
 };
 
 export const main = () => {
@@ -12,12 +15,14 @@ export const main = () => {
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
+      githubCommentConfig: path.join(process.env.GITHUB_ACTION_PATH ?? "", "github-comment.yaml"),
+      rootDir: process.env.ROOT_DIR ?? "",
     },
     lib.getConfig(),
   );
 };
 
-export const run = (inputs: Inputs, config: lib.Config) => {
+export const run = async (inputs: Inputs, config: lib.Config) => {
   const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
   let target = inputs.target;
@@ -100,6 +105,28 @@ export const run = (inputs: Inputs, config: lib.Config) => {
       policies.push(policy);
     }
   }
-  for (const policy of policies) {
+  for (const policy of conftest.policies) {
+    /*
+      github-comment exec \
+        --config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+        -var "tfaction_target:$TFACTION_TARGET" \
+        -k conftest -- \
+          conftest test --no-color -p "$ROOT_DIR/$CONFTEST_POLICY_DIRECTORY" *.tf *.tf.json
+    */
+    core.info("Running conftest");
+    const paths: string[] = [];
+    if (policy.tf) {
+      paths.push("*.tf", "*.tf.json");
+    } else if (policy.plan) {
+      paths.push("tfplan.json");
+    }
+    if (!policy.policy) {
+      continue;
+    }
+    await exec.exec("github-comment", [
+      "exec", "-config", inputs.githubCommentConfig, "-var", `tfaction_target:${target}`, "-k", "conftest", "--",
+      "conftest", "test", "--no-color", "-p", path.join(inputs.rootDir, policy.policy)].concat(paths), {
+      cwd: workingDir,
+    });
   }
 };

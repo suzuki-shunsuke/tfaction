@@ -56,7 +56,7 @@ const ConftestPolicyConfig = z.object({
   policy: z.optional(z.string()),
   id: z.optional(z.string()),
   data: z.optional(z.string()),
-  state: z.optional(z.boolean()),
+  plan: z.optional(z.boolean()),
   tf: z.optional(z.boolean()),
   combine: z.optional(z.boolean()),
   enabled: z.optional(z.boolean()),

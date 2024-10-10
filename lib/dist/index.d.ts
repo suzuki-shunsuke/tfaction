@@ -49,24 +49,24 @@ declare const ConftestPolicyConfig: z.ZodObject<{
     policy: z.ZodOptional<z.ZodString>;
     id: z.ZodOptional<z.ZodString>;
     data: z.ZodOptional<z.ZodString>;
-    state: z.ZodOptional<z.ZodBoolean>;
+    plan: z.ZodOptional<z.ZodBoolean>;
     tf: z.ZodOptional<z.ZodBoolean>;
     combine: z.ZodOptional<z.ZodBoolean>;
     enabled: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     data?: string | undefined;
     id?: string | undefined;
-    state?: boolean | undefined;
     enabled?: boolean | undefined;
     policy?: string | undefined;
+    plan?: boolean | undefined;
     tf?: boolean | undefined;
     combine?: boolean | undefined;
 }, {
     data?: string | undefined;
     id?: string | undefined;
-    state?: boolean | undefined;
     enabled?: boolean | undefined;
     policy?: string | undefined;
+    plan?: boolean | undefined;
     tf?: boolean | undefined;
     combine?: boolean | undefined;
 }>;
@@ -77,24 +77,24 @@ declare const ConftestConfig: z.ZodObject<{
         policy: z.ZodOptional<z.ZodString>;
         id: z.ZodOptional<z.ZodString>;
         data: z.ZodOptional<z.ZodString>;
-        state: z.ZodOptional<z.ZodBoolean>;
+        plan: z.ZodOptional<z.ZodBoolean>;
         tf: z.ZodOptional<z.ZodBoolean>;
         combine: z.ZodOptional<z.ZodBoolean>;
         enabled: z.ZodOptional<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         data?: string | undefined;
         id?: string | undefined;
-        state?: boolean | undefined;
         enabled?: boolean | undefined;
         policy?: string | undefined;
+        plan?: boolean | undefined;
         tf?: boolean | undefined;
         combine?: boolean | undefined;
     }, {
         data?: string | undefined;
         id?: string | undefined;
-        state?: boolean | undefined;
         enabled?: boolean | undefined;
         policy?: string | undefined;
+        plan?: boolean | undefined;
         tf?: boolean | undefined;
         combine?: boolean | undefined;
     }>, "many">>;
@@ -103,9 +103,9 @@ declare const ConftestConfig: z.ZodObject<{
     policies?: {
         data?: string | undefined;
         id?: string | undefined;
-        state?: boolean | undefined;
         enabled?: boolean | undefined;
         policy?: string | undefined;
+        plan?: boolean | undefined;
         tf?: boolean | undefined;
         combine?: boolean | undefined;
     }[] | undefined;
@@ -114,9 +114,9 @@ declare const ConftestConfig: z.ZodObject<{
     policies?: {
         data?: string | undefined;
         id?: string | undefined;
-        state?: boolean | undefined;
         enabled?: boolean | undefined;
         policy?: string | undefined;
+        plan?: boolean | undefined;
         tf?: boolean | undefined;
         combine?: boolean | undefined;
     }[] | undefined;
@@ -846,24 +846,24 @@ declare const TargetGroup: z.ZodObject<{
             policy: z.ZodOptional<z.ZodString>;
             id: z.ZodOptional<z.ZodString>;
             data: z.ZodOptional<z.ZodString>;
-            state: z.ZodOptional<z.ZodBoolean>;
+            plan: z.ZodOptional<z.ZodBoolean>;
             tf: z.ZodOptional<z.ZodBoolean>;
             combine: z.ZodOptional<z.ZodBoolean>;
             enabled: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }, {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }>, "many">>;
@@ -872,9 +872,9 @@ declare const TargetGroup: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -883,9 +883,9 @@ declare const TargetGroup: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -1041,9 +1041,9 @@ declare const TargetGroup: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -1199,9 +1199,9 @@ declare const TargetGroup: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -1721,24 +1721,24 @@ declare const TargetConfig: z.ZodObject<{
             policy: z.ZodOptional<z.ZodString>;
             id: z.ZodOptional<z.ZodString>;
             data: z.ZodOptional<z.ZodString>;
-            state: z.ZodOptional<z.ZodBoolean>;
+            plan: z.ZodOptional<z.ZodBoolean>;
             tf: z.ZodOptional<z.ZodBoolean>;
             combine: z.ZodOptional<z.ZodBoolean>;
             enabled: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }, {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }>, "many">>;
@@ -1747,9 +1747,9 @@ declare const TargetConfig: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -1758,9 +1758,9 @@ declare const TargetConfig: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -1896,9 +1896,9 @@ declare const TargetConfig: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -2041,9 +2041,9 @@ declare const TargetConfig: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -2093,24 +2093,24 @@ declare const Config: z.ZodObject<{
             policy: z.ZodOptional<z.ZodString>;
             id: z.ZodOptional<z.ZodString>;
             data: z.ZodOptional<z.ZodString>;
-            state: z.ZodOptional<z.ZodBoolean>;
+            plan: z.ZodOptional<z.ZodBoolean>;
             tf: z.ZodOptional<z.ZodBoolean>;
             combine: z.ZodOptional<z.ZodBoolean>;
             enabled: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }, {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }>, "many">>;
@@ -2119,9 +2119,9 @@ declare const Config: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -2130,9 +2130,9 @@ declare const Config: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -2730,24 +2730,24 @@ declare const Config: z.ZodObject<{
                 policy: z.ZodOptional<z.ZodString>;
                 id: z.ZodOptional<z.ZodString>;
                 data: z.ZodOptional<z.ZodString>;
-                state: z.ZodOptional<z.ZodBoolean>;
+                plan: z.ZodOptional<z.ZodBoolean>;
                 tf: z.ZodOptional<z.ZodBoolean>;
                 combine: z.ZodOptional<z.ZodBoolean>;
                 enabled: z.ZodOptional<z.ZodBoolean>;
             }, "strip", z.ZodTypeAny, {
                 data?: string | undefined;
                 id?: string | undefined;
-                state?: boolean | undefined;
                 enabled?: boolean | undefined;
                 policy?: string | undefined;
+                plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
             }, {
                 data?: string | undefined;
                 id?: string | undefined;
-                state?: boolean | undefined;
                 enabled?: boolean | undefined;
                 policy?: string | undefined;
+                plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
             }>, "many">>;
@@ -2756,9 +2756,9 @@ declare const Config: z.ZodObject<{
             policies?: {
                 data?: string | undefined;
                 id?: string | undefined;
-                state?: boolean | undefined;
                 enabled?: boolean | undefined;
                 policy?: string | undefined;
+                plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
             }[] | undefined;
@@ -2767,9 +2767,9 @@ declare const Config: z.ZodObject<{
             policies?: {
                 data?: string | undefined;
                 id?: string | undefined;
-                state?: boolean | undefined;
                 enabled?: boolean | undefined;
                 policy?: string | undefined;
+                plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
             }[] | undefined;
@@ -2925,9 +2925,9 @@ declare const Config: z.ZodObject<{
             policies?: {
                 data?: string | undefined;
                 id?: string | undefined;
-                state?: boolean | undefined;
                 enabled?: boolean | undefined;
                 policy?: string | undefined;
+                plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
             }[] | undefined;
@@ -3083,9 +3083,9 @@ declare const Config: z.ZodObject<{
             policies?: {
                 data?: string | undefined;
                 id?: string | undefined;
-                state?: boolean | undefined;
                 enabled?: boolean | undefined;
                 policy?: string | undefined;
+                plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
             }[] | undefined;
@@ -3288,9 +3288,9 @@ declare const Config: z.ZodObject<{
             policies?: {
                 data?: string | undefined;
                 id?: string | undefined;
-                state?: boolean | undefined;
                 enabled?: boolean | undefined;
                 policy?: string | undefined;
+                plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
             }[] | undefined;
@@ -3303,9 +3303,9 @@ declare const Config: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
@@ -3512,9 +3512,9 @@ declare const Config: z.ZodObject<{
             policies?: {
                 data?: string | undefined;
                 id?: string | undefined;
-                state?: boolean | undefined;
                 enabled?: boolean | undefined;
                 policy?: string | undefined;
+                plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
             }[] | undefined;
@@ -3527,9 +3527,9 @@ declare const Config: z.ZodObject<{
         policies?: {
             data?: string | undefined;
             id?: string | undefined;
-            state?: boolean | undefined;
             enabled?: boolean | undefined;
             policy?: string | undefined;
+            plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
         }[] | undefined;
