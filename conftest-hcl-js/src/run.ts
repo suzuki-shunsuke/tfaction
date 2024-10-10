@@ -123,9 +123,11 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     if (!policy.policy) {
       continue;
     }
-    await exec.exec("github-comment", [
+    const args = [
       "exec", "-config", inputs.githubCommentConfig, "-var", `tfaction_target:${target}`, "-k", "conftest", "--",
-      "conftest", "test", "--no-color", "-p", path.join(inputs.rootDir, policy.policy)].concat(paths), {
+      "conftest", "test", "--no-color", "-p", path.join(inputs.rootDir, policy.policy)].concat(paths);
+    core.info("github-comment " + args.join(" "));
+    await exec.exec("github-comment", args, {
       cwd: workingDir,
     });
   }
