@@ -60235,7 +60235,11 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         const args = [
             "exec", "-config", inputs.githubCommentConfig, "-var", `tfaction_target:${target}`, "-k", "conftest", "--",
             "conftest", "test", "--no-color", "-p", path.join(inputs.rootDir, policy.policy)
-        ].concat(paths);
+        ];
+        if (policy.combine) {
+            args.push("--combine");
+        }
+        args.push(...paths);
         core.info("github-comment " + args.join(" "));
         yield exec.exec("github-comment", args, {
             cwd: workingDir,
