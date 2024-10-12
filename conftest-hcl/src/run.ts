@@ -8,6 +8,7 @@ type Inputs = {
   workingDir?: string;
   githubCommentConfig: string;
   rootDir: string;
+  plan: boolean;
 };
 
 export const main = () => {
@@ -17,6 +18,7 @@ export const main = () => {
       workingDir: process.env.TFACTION_WORKING_DIR,
       githubCommentConfig: path.join(process.env.GITHUB_ACTION_PATH ?? "", "github-comment.yaml"),
       rootDir: process.env.ROOT_DIR ?? "",
+      plan: process.env.PLAN !== "false",
     },
     lib.getConfig(),
   );
@@ -101,7 +103,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     }
   }
   for (const policy of conftest.policies) {
-    if (policy.enabled !== false) {
+    if (policy.enabled !== false && inputs.plan === policy.plan) {
       policies.push(policy);
     }
   }

@@ -60142,6 +60142,7 @@ const main = () => {
         workingDir: process.env.TFACTION_WORKING_DIR,
         githubCommentConfig: path.join((_a = process.env.GITHUB_ACTION_PATH) !== null && _a !== void 0 ? _a : "", "github-comment.yaml"),
         rootDir: (_b = process.env.ROOT_DIR) !== null && _b !== void 0 ? _b : "",
+        plan: process.env.PLAN !== "false",
     }, lib.getConfig());
 };
 exports.main = main;
@@ -60209,7 +60210,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     for (const policy of conftest.policies) {
-        if (policy.enabled !== false) {
+        if (policy.enabled !== false && inputs.plan === policy.plan) {
             policies.push(policy);
         }
     }
