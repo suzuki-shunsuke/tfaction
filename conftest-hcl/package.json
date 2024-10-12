@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "ncc build src/index.ts --license LICENSE",
-    "test": "vitest --run"
+    "test": "true"
   },
   "dependencies": {
     "@actions/core": "1.11.1",

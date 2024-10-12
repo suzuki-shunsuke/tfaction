@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import * as exec from '@actions/exec';
+import * as exec from "@actions/exec";
 import * as lib from "lib";
 import * as path from "path";
 
@@ -16,7 +16,10 @@ export const main = () => {
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
-      githubCommentConfig: path.join(process.env.GITHUB_ACTION_PATH ?? "", "github-comment.yaml"),
+      githubCommentConfig: path.join(
+        process.env.GITHUB_ACTION_PATH ?? "",
+        "github-comment.yaml",
+      ),
       rootDir: process.env.ROOT_DIR ?? "",
       plan: process.env.PLAN !== "false",
     },
@@ -126,8 +129,20 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       continue;
     }
     const args = [
-      "exec", "-config", inputs.githubCommentConfig, "-var", `tfaction_target:${target}`, "-k", "conftest", "--",
-      "conftest", "test", "--no-color", "-p", path.join(inputs.rootDir, policy.policy)];
+      "exec",
+      "-config",
+      inputs.githubCommentConfig,
+      "-var",
+      `tfaction_target:${target}`,
+      "-k",
+      "conftest",
+      "--",
+      "conftest",
+      "test",
+      "--no-color",
+      "-p",
+      path.join(inputs.rootDir, policy.policy),
+    ];
     if (policy.combine) {
       args.push("--combine");
     }
