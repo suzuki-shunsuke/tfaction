@@ -60231,14 +60231,12 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             policies.push(policy);
         }
     }
+    if (policies.length !== 0) {
+        yield exec.exec("github-comment", ["exec", "--", "conftest", "-v"], {
+            cwd: workingDir,
+        });
+    }
     for (const policy of policies) {
-        /*
-          github-comment exec \
-            --config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-            -var "tfaction_target:$TFACTION_TARGET" \
-            -k conftest -- \
-              conftest test --no-color -p "$ROOT_DIR/$CONFTEST_POLICY_DIRECTORY" *.tf *.tf.json
-        */
         core.info("Running conftest");
         const paths = [];
         if (policy.tf) {
