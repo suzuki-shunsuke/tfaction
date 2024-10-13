@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as lib from "lib";
 import * as path from "path";
+import fs from "fs";
 
 type Inputs = {
   target?: string;
@@ -74,6 +75,19 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
   }
   if (conftest.policies === undefined) {
     conftest.policies = [];
+    if (config.conftest_policy_directory) {
+      conftest.policies.push({
+        policy: config.conftest_policy_directory,
+        plan: true,
+      });
+    } else {
+      if (fs.existsSync("policy")) {
+        conftest.policies.push({
+          policy: "policy",
+          plan: true,
+        });
+      }
+    }
   }
 
   for (const cfg of [targetConfig, wdConfig]) {

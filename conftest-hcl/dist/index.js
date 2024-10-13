@@ -60129,12 +60129,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = exports.main = void 0;
 const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
 const lib = __importStar(__nccwpck_require__(6311));
 const path = __importStar(__nccwpck_require__(6928));
+const fs_1 = __importDefault(__nccwpck_require__(9896));
 const main = () => {
     var _a, _b;
     (0, exports.run)({
@@ -60179,6 +60183,20 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
     }
     if (conftest.policies === undefined) {
         conftest.policies = [];
+        if (config.conftest_policy_directory) {
+            conftest.policies.push({
+                policy: config.conftest_policy_directory,
+                plan: true,
+            });
+        }
+        else {
+            if (fs_1.default.existsSync("policy")) {
+                conftest.policies.push({
+                    policy: "policy",
+                    plan: true,
+                });
+            }
+        }
     }
     for (const cfg of [targetConfig, wdConfig]) {
         if ((_e = cfg.conftest) === null || _e === void 0 ? void 0 : _e.disable_all) {
@@ -60234,8 +60252,19 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             continue;
         }
         const args = [
-            "exec", "-config", inputs.githubCommentConfig, "-var", `tfaction_target:${target}`, "-k", "conftest", "--",
-            "conftest", "test", "--no-color", "-p", path.join(inputs.rootDir, policy.policy)
+            "exec",
+            "-config",
+            inputs.githubCommentConfig,
+            "-var",
+            `tfaction_target:${target}`,
+            "-k",
+            "conftest",
+            "--",
+            "conftest",
+            "test",
+            "--no-color",
+            "-p",
+            path.join(inputs.rootDir, policy.policy),
         ];
         if (policy.combine) {
             args.push("--combine");
