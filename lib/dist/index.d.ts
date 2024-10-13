@@ -45,15 +45,81 @@ declare const TerraformDocsConfig: z.ZodObject<{
     enabled?: boolean | undefined;
 }>;
 export type TerraformDocsConfig = z.infer<typeof TerraformDocsConfig>;
-declare const ConftestConfig: z.ZodObject<{
-    hcl_policy: z.ZodOptional<z.ZodString>;
-    hcl_combine_policy: z.ZodOptional<z.ZodString>;
+declare const ConftestPolicyConfig: z.ZodObject<{
+    policy: z.ZodOptional<z.ZodString>;
+    id: z.ZodOptional<z.ZodString>;
+    data: z.ZodOptional<z.ZodString>;
+    plan: z.ZodOptional<z.ZodBoolean>;
+    tf: z.ZodOptional<z.ZodBoolean>;
+    combine: z.ZodOptional<z.ZodBoolean>;
+    enabled: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    hcl_policy?: string | undefined;
-    hcl_combine_policy?: string | undefined;
+    data?: string | undefined;
+    id?: string | undefined;
+    enabled?: boolean | undefined;
+    policy?: string | undefined;
+    plan?: boolean | undefined;
+    tf?: boolean | undefined;
+    combine?: boolean | undefined;
 }, {
-    hcl_policy?: string | undefined;
-    hcl_combine_policy?: string | undefined;
+    data?: string | undefined;
+    id?: string | undefined;
+    enabled?: boolean | undefined;
+    policy?: string | undefined;
+    plan?: boolean | undefined;
+    tf?: boolean | undefined;
+    combine?: boolean | undefined;
+}>;
+export type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;
+declare const ConftestConfig: z.ZodObject<{
+    disable_all: z.ZodOptional<z.ZodBoolean>;
+    policies: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        policy: z.ZodOptional<z.ZodString>;
+        id: z.ZodOptional<z.ZodString>;
+        data: z.ZodOptional<z.ZodString>;
+        plan: z.ZodOptional<z.ZodBoolean>;
+        tf: z.ZodOptional<z.ZodBoolean>;
+        combine: z.ZodOptional<z.ZodBoolean>;
+        enabled: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        data?: string | undefined;
+        id?: string | undefined;
+        enabled?: boolean | undefined;
+        policy?: string | undefined;
+        plan?: boolean | undefined;
+        tf?: boolean | undefined;
+        combine?: boolean | undefined;
+    }, {
+        data?: string | undefined;
+        id?: string | undefined;
+        enabled?: boolean | undefined;
+        policy?: string | undefined;
+        plan?: boolean | undefined;
+        tf?: boolean | undefined;
+        combine?: boolean | undefined;
+    }>, "many">>;
+}, "strip", z.ZodTypeAny, {
+    disable_all?: boolean | undefined;
+    policies?: {
+        data?: string | undefined;
+        id?: string | undefined;
+        enabled?: boolean | undefined;
+        policy?: string | undefined;
+        plan?: boolean | undefined;
+        tf?: boolean | undefined;
+        combine?: boolean | undefined;
+    }[] | undefined;
+}, {
+    disable_all?: boolean | undefined;
+    policies?: {
+        data?: string | undefined;
+        id?: string | undefined;
+        enabled?: boolean | undefined;
+        policy?: string | undefined;
+        plan?: boolean | undefined;
+        tf?: boolean | undefined;
+        combine?: boolean | undefined;
+    }[] | undefined;
 }>;
 export type ConftestConfig = z.infer<typeof ConftestConfig>;
 declare const GitHubSecrets: z.ZodArray<z.ZodObject<{
@@ -774,6 +840,56 @@ declare const TargetGroup: z.ZodObject<{
         aws_region?: string | undefined;
     }>, "many">>;
     terraform_command: z.ZodOptional<z.ZodString>;
+    conftest: z.ZodOptional<z.ZodObject<{
+        disable_all: z.ZodOptional<z.ZodBoolean>;
+        policies: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            policy: z.ZodOptional<z.ZodString>;
+            id: z.ZodOptional<z.ZodString>;
+            data: z.ZodOptional<z.ZodString>;
+            plan: z.ZodOptional<z.ZodBoolean>;
+            tf: z.ZodOptional<z.ZodBoolean>;
+            combine: z.ZodOptional<z.ZodBoolean>;
+            enabled: z.ZodOptional<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }, {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }>, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    }, {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    }>>;
 }, "strip", z.ZodTypeAny, {
     target: string;
     working_directory: string;
@@ -920,6 +1036,18 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_command?: string | undefined;
+    conftest?: {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    } | undefined;
 }, {
     target: string;
     working_directory: string;
@@ -1066,6 +1194,18 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_command?: string | undefined;
+    conftest?: {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    } | undefined;
 }>;
 export type TargetGroup = z.infer<typeof TargetGroup>;
 declare const TargetConfig: z.ZodObject<{
@@ -1575,6 +1715,56 @@ declare const TargetConfig: z.ZodObject<{
     }, {
         enabled?: boolean | undefined;
     }>>;
+    conftest: z.ZodOptional<z.ZodObject<{
+        disable_all: z.ZodOptional<z.ZodBoolean>;
+        policies: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            policy: z.ZodOptional<z.ZodString>;
+            id: z.ZodOptional<z.ZodString>;
+            data: z.ZodOptional<z.ZodString>;
+            plan: z.ZodOptional<z.ZodBoolean>;
+            tf: z.ZodOptional<z.ZodBoolean>;
+            combine: z.ZodOptional<z.ZodBoolean>;
+            enabled: z.ZodOptional<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }, {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }>, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    }, {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    }>>;
 }, "strip", z.ZodTypeAny, {
     destroy?: boolean | undefined;
     env?: Record<string, string> | undefined;
@@ -1701,6 +1891,18 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_command?: string | undefined;
+    conftest?: {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    } | undefined;
     drift_detection?: {
         enabled?: boolean | undefined;
     } | undefined;
@@ -1834,6 +2036,18 @@ declare const TargetConfig: z.ZodObject<{
         }[] | undefined;
     } | undefined;
     terraform_command?: string | undefined;
+    conftest?: {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    } | undefined;
     drift_detection?: {
         enabled?: boolean | undefined;
     } | undefined;
@@ -1874,14 +2088,54 @@ declare const Config: z.ZodObject<{
     base_working_directory: z.ZodOptional<z.ZodString>;
     conftest_policy_directory: z.ZodOptional<z.ZodString>;
     conftest: z.ZodOptional<z.ZodObject<{
-        hcl_policy: z.ZodOptional<z.ZodString>;
-        hcl_combine_policy: z.ZodOptional<z.ZodString>;
+        disable_all: z.ZodOptional<z.ZodBoolean>;
+        policies: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            policy: z.ZodOptional<z.ZodString>;
+            id: z.ZodOptional<z.ZodString>;
+            data: z.ZodOptional<z.ZodString>;
+            plan: z.ZodOptional<z.ZodBoolean>;
+            tf: z.ZodOptional<z.ZodBoolean>;
+            combine: z.ZodOptional<z.ZodBoolean>;
+            enabled: z.ZodOptional<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }, {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        hcl_policy?: string | undefined;
-        hcl_combine_policy?: string | undefined;
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
     }, {
-        hcl_policy?: string | undefined;
-        hcl_combine_policy?: string | undefined;
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
     }>>;
     draft_pr: z.ZodOptional<z.ZodBoolean>;
     drift_detection: z.ZodOptional<z.ZodObject<{
@@ -2470,6 +2724,56 @@ declare const Config: z.ZodObject<{
             aws_region?: string | undefined;
         }>, "many">>;
         terraform_command: z.ZodOptional<z.ZodString>;
+        conftest: z.ZodOptional<z.ZodObject<{
+            disable_all: z.ZodOptional<z.ZodBoolean>;
+            policies: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                policy: z.ZodOptional<z.ZodString>;
+                id: z.ZodOptional<z.ZodString>;
+                data: z.ZodOptional<z.ZodString>;
+                plan: z.ZodOptional<z.ZodBoolean>;
+                tf: z.ZodOptional<z.ZodBoolean>;
+                combine: z.ZodOptional<z.ZodBoolean>;
+                enabled: z.ZodOptional<z.ZodBoolean>;
+            }, "strip", z.ZodTypeAny, {
+                data?: string | undefined;
+                id?: string | undefined;
+                enabled?: boolean | undefined;
+                policy?: string | undefined;
+                plan?: boolean | undefined;
+                tf?: boolean | undefined;
+                combine?: boolean | undefined;
+            }, {
+                data?: string | undefined;
+                id?: string | undefined;
+                enabled?: boolean | undefined;
+                policy?: string | undefined;
+                plan?: boolean | undefined;
+                tf?: boolean | undefined;
+                combine?: boolean | undefined;
+            }>, "many">>;
+        }, "strip", z.ZodTypeAny, {
+            disable_all?: boolean | undefined;
+            policies?: {
+                data?: string | undefined;
+                id?: string | undefined;
+                enabled?: boolean | undefined;
+                policy?: string | undefined;
+                plan?: boolean | undefined;
+                tf?: boolean | undefined;
+                combine?: boolean | undefined;
+            }[] | undefined;
+        }, {
+            disable_all?: boolean | undefined;
+            policies?: {
+                data?: string | undefined;
+                id?: string | undefined;
+                enabled?: boolean | undefined;
+                policy?: string | undefined;
+                plan?: boolean | undefined;
+                tf?: boolean | undefined;
+                combine?: boolean | undefined;
+            }[] | undefined;
+        }>>;
     }, "strip", z.ZodTypeAny, {
         target: string;
         working_directory: string;
@@ -2616,6 +2920,18 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_command?: string | undefined;
+        conftest?: {
+            disable_all?: boolean | undefined;
+            policies?: {
+                data?: string | undefined;
+                id?: string | undefined;
+                enabled?: boolean | undefined;
+                policy?: string | undefined;
+                plan?: boolean | undefined;
+                tf?: boolean | undefined;
+                combine?: boolean | undefined;
+            }[] | undefined;
+        } | undefined;
     }, {
         target: string;
         working_directory: string;
@@ -2762,6 +3078,18 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_command?: string | undefined;
+        conftest?: {
+            disable_all?: boolean | undefined;
+            policies?: {
+                data?: string | undefined;
+                id?: string | undefined;
+                enabled?: boolean | undefined;
+                policy?: string | undefined;
+                plan?: boolean | undefined;
+                tf?: boolean | undefined;
+                combine?: boolean | undefined;
+            }[] | undefined;
+        } | undefined;
     }>, "many">;
     tflint: z.ZodOptional<z.ZodObject<{
         enabled: z.ZodOptional<z.ZodBoolean>;
@@ -2955,9 +3283,33 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_command?: string | undefined;
+        conftest?: {
+            disable_all?: boolean | undefined;
+            policies?: {
+                data?: string | undefined;
+                id?: string | undefined;
+                enabled?: boolean | undefined;
+                policy?: string | undefined;
+                plan?: boolean | undefined;
+                tf?: boolean | undefined;
+                combine?: boolean | undefined;
+            }[] | undefined;
+        } | undefined;
     }[];
     env?: Record<string, string> | undefined;
     terraform_command?: string | undefined;
+    conftest?: {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    } | undefined;
     drift_detection?: {
         issue_repo_owner?: string | undefined;
         issue_repo_name?: string | undefined;
@@ -2976,10 +3328,6 @@ declare const Config: z.ZodObject<{
     } | undefined;
     base_working_directory?: string | undefined;
     conftest_policy_directory?: string | undefined;
-    conftest?: {
-        hcl_policy?: string | undefined;
-        hcl_combine_policy?: string | undefined;
-    } | undefined;
     draft_pr?: boolean | undefined;
     label_prefixes?: {
         target?: string | undefined;
@@ -3159,9 +3507,33 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
         terraform_command?: string | undefined;
+        conftest?: {
+            disable_all?: boolean | undefined;
+            policies?: {
+                data?: string | undefined;
+                id?: string | undefined;
+                enabled?: boolean | undefined;
+                policy?: string | undefined;
+                plan?: boolean | undefined;
+                tf?: boolean | undefined;
+                combine?: boolean | undefined;
+            }[] | undefined;
+        } | undefined;
     }[];
     env?: Record<string, string> | undefined;
     terraform_command?: string | undefined;
+    conftest?: {
+        disable_all?: boolean | undefined;
+        policies?: {
+            data?: string | undefined;
+            id?: string | undefined;
+            enabled?: boolean | undefined;
+            policy?: string | undefined;
+            plan?: boolean | undefined;
+            tf?: boolean | undefined;
+            combine?: boolean | undefined;
+        }[] | undefined;
+    } | undefined;
     drift_detection?: {
         issue_repo_owner?: string | undefined;
         issue_repo_name?: string | undefined;
@@ -3180,10 +3552,6 @@ declare const Config: z.ZodObject<{
     } | undefined;
     base_working_directory?: string | undefined;
     conftest_policy_directory?: string | undefined;
-    conftest?: {
-        hcl_policy?: string | undefined;
-        hcl_combine_policy?: string | undefined;
-    } | undefined;
     draft_pr?: boolean | undefined;
     label_prefixes?: {
         target?: string | undefined;

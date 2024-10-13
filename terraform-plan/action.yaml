@@ -38,6 +38,11 @@ runs:
         CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
+    - uses: suzuki-shunsuke/tfaction/conftest@main
+      with:
+        plan: "true"
+        github_token: ${{inputs.github_token}}
+
     - run: echo "value=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
       id: artifact_name
       shell: bash

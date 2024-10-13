@@ -36,4 +36,4 @@ github-comment exec \
 	-var "tfaction_target:$TFACTION_TARGET" \
 	-- tfmigrate plan --out tfplan.binary
 
-bash "$GITHUB_ACTION_PATH/conftest.sh"
+github-comment exec -- "$TF_COMMAND" show -json tfplan.binary >tfplan.json

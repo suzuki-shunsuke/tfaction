@@ -19,9 +19,6 @@ interface Outputs {
   draft_pr: boolean;
   skip_create_pr: boolean;
   plan_workflow_name: string;
-  conftest_policy_directory: string;
-  conftest_hcl_policy_directory: string;
-  conftest_hcl_combine_policy_directory: string;
 
   label_prefix_target: string;
   label_prefix_tfmigrate: string;
@@ -61,10 +58,6 @@ export const main = (config: lib.Config, input: Input): Result => {
     draft_pr: !!config.draft_pr,
     skip_create_pr: !!config.skip_create_pr,
     plan_workflow_name: config.plan_workflow_name,
-    conftest_policy_directory: config.conftest_policy_directory ?? "",
-    conftest_hcl_policy_directory: config?.conftest?.hcl_policy ?? "",
-    conftest_hcl_combine_policy_directory:
-      config?.conftest?.hcl_combine_policy ?? "",
     label_prefix_target: config?.label_prefixes?.target || "target:",
     label_prefix_tfmigrate: config?.label_prefixes?.tfmigrate || "tfmigrate:",
     label_prefix_skip: config?.label_prefixes?.skip || "skip:",

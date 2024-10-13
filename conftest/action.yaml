@@ -1,0 +1,23 @@
+name: conftest hcl
+description: conftest hcl
+inputs:
+  plan:
+    description: |
+      Whether conftest is run on the terraform plan file
+    required: false
+    default: "false"
+  github_token:
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: composite
+  steps:
+    - run: node "$GITHUB_ACTION_PATH/dist/index.js"
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        ROOT_DIR: ${{ github.workspace }}
+        PLAN: ${{ inputs.plan }}
