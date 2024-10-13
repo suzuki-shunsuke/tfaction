@@ -35,3 +35,5 @@ github-comment exec \
 	-k tfmigrate-plan \
 	-var "tfaction_target:$TFACTION_TARGET" \
 	-- tfmigrate plan --out tfplan.binary
+
+github-comment exec -- "$TF_COMMAND" show -json tfplan.binary >tfplan.json
