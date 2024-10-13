@@ -25790,6 +25790,12 @@ const TargetConfig = zod_1.z.object({
     terraform_docs: zod_1.z.optional(TerraformDocsConfig),
     conftest: zod_1.z.optional(ConftestConfig),
 });
+const Replace = zod_1.z.object({
+    patterns: zod_1.z.array(zod_1.z.object({
+        regexp: zod_1.z.string(),
+        replace: zod_1.z.string(),
+    })),
+});
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
         update_checksum: zod_1.z.optional(zod_1.z.object({
@@ -25837,6 +25843,7 @@ const Config = zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
     working_directory_file: zod_1.z.optional(zod_1.z.string()),
+    replace: zod_1.z.optional(Replace),
 });
 const getConfig = () => {
     let configFilePath = process.env.TFACTION_CONFIG;
@@ -60142,7 +60149,7 @@ const main = () => {
 };
 exports.main = main;
 const run = (inputs, config) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     const workingDirectoryFile = (_a = config.working_directory_file) !== null && _a !== void 0 ? _a : "tfaction.yaml";
     const envs = new Map();
     const outputs = new Map();
@@ -60161,7 +60168,13 @@ const run = (inputs, config) => {
         if (!targetConfig) {
             throw new Error("target config is not found in target_groups");
         }
-        target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
+        target = workingDir;
+        for (const pattern of (_c = (_b = config.replace) === null || _b === void 0 ? void 0 : _b.patterns) !== null && _c !== void 0 ? _c : []) {
+            target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+        }
+        if (targetConfig.target !== undefined) {
+            target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
+        }
         envs.set("TFACTION_TARGET", target);
     }
     else {
@@ -60172,9 +60185,9 @@ const run = (inputs, config) => {
     for (const [key, value] of lib.setOutputs(["template_dir"], [targetConfig])) {
         outputs.set(key, value);
     }
-    outputs.set("enable_tfsec", (_c = (_b = config === null || config === void 0 ? void 0 : config.tfsec) === null || _b === void 0 ? void 0 : _b.enabled) !== null && _c !== void 0 ? _c : false);
-    outputs.set("enable_tflint", (_e = (_d = config === null || config === void 0 ? void 0 : config.tflint) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : true);
-    outputs.set("enable_trivy", (_g = (_f = config === null || config === void 0 ? void 0 : config.trivy) === null || _f === void 0 ? void 0 : _f.enabled) !== null && _g !== void 0 ? _g : true);
+    outputs.set("enable_tfsec", (_e = (_d = config === null || config === void 0 ? void 0 : config.tfsec) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : false);
+    outputs.set("enable_tflint", (_g = (_f = config === null || config === void 0 ? void 0 : config.tflint) === null || _f === void 0 ? void 0 : _f.enabled) !== null && _g !== void 0 ? _g : true);
+    outputs.set("enable_trivy", (_j = (_h = config === null || config === void 0 ? void 0 : config.trivy) === null || _h === void 0 ? void 0 : _h.enabled) !== null && _j !== void 0 ? _j : true);
     outputs.set("terraform_command", "terraform");
     if (inputs.jobType === "scaffold_working_dir") {
         const m = lib.setOutputs([
@@ -60218,7 +60231,7 @@ const run = (inputs, config) => {
             outputs.set(key, value);
         }
         outputs.set("destroy", wdConfig.destroy ? true : false);
-        outputs.set("enable_terraform_docs", (_l = (_j = (_h = wdConfig === null || wdConfig === void 0 ? void 0 : wdConfig.terraform_docs) === null || _h === void 0 ? void 0 : _h.enabled) !== null && _j !== void 0 ? _j : (_k = config === null || config === void 0 ? void 0 : config.terraform_docs) === null || _k === void 0 ? void 0 : _k.enabled) !== null && _l !== void 0 ? _l : false);
+        outputs.set("enable_terraform_docs", (_o = (_l = (_k = wdConfig === null || wdConfig === void 0 ? void 0 : wdConfig.terraform_docs) === null || _k === void 0 ? void 0 : _k.enabled) !== null && _l !== void 0 ? _l : (_m = config === null || config === void 0 ? void 0 : config.terraform_docs) === null || _m === void 0 ? void 0 : _m.enabled) !== null && _o !== void 0 ? _o : false);
         const m3 = lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
         for (const [key, value] of m3) {
             envs.set(key, value);

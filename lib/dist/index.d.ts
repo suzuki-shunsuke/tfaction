@@ -2079,6 +2079,29 @@ declare const TargetConfig: z.ZodObject<{
     } | undefined;
 }>;
 export type TargetConfig = z.infer<typeof TargetConfig>;
+declare const Replace: z.ZodObject<{
+    patterns: z.ZodArray<z.ZodObject<{
+        regexp: z.ZodString;
+        replace: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        replace: string;
+        regexp: string;
+    }, {
+        replace: string;
+        regexp: string;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    patterns: {
+        replace: string;
+        regexp: string;
+    }[];
+}, {
+    patterns: {
+        replace: string;
+        regexp: string;
+    }[];
+}>;
+export type Replace = z.infer<typeof Replace>;
 declare const Config: z.ZodObject<{
     aqua: z.ZodOptional<z.ZodObject<{
         update_checksum: z.ZodOptional<z.ZodObject<{
@@ -3169,6 +3192,28 @@ declare const Config: z.ZodObject<{
         enabled?: boolean | undefined;
     }>>;
     working_directory_file: z.ZodOptional<z.ZodString>;
+    replace: z.ZodOptional<z.ZodObject<{
+        patterns: z.ZodArray<z.ZodObject<{
+            regexp: z.ZodString;
+            replace: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            replace: string;
+            regexp: string;
+        }, {
+            replace: string;
+            regexp: string;
+        }>, "many">;
+    }, "strip", z.ZodTypeAny, {
+        patterns: {
+            replace: string;
+            regexp: string;
+        }[];
+    }, {
+        patterns: {
+            replace: string;
+            regexp: string;
+        }[];
+    }>>;
 }, "strip", z.ZodTypeAny, {
     plan_workflow_name: string;
     target_groups: {
@@ -3331,6 +3376,12 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }[];
+    replace?: {
+        patterns: {
+            replace: string;
+            regexp: string;
+        }[];
+    } | undefined;
     env?: Record<string, string> | undefined;
     terraform_command?: string | undefined;
     conftest?: {
@@ -3557,6 +3608,12 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }[];
+    replace?: {
+        patterns: {
+            replace: string;
+            regexp: string;
+        }[];
+    } | undefined;
     env?: Record<string, string> | undefined;
     terraform_command?: string | undefined;
     conftest?: {

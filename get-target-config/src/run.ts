@@ -59,10 +59,16 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
     if (!targetConfig) {
       throw new Error("target config is not found in target_groups");
     }
-    target = workingDir.replace(
-      targetConfig.working_directory,
-      targetConfig.target,
-    );
+    target = workingDir;
+    for (const pattern of config.replace?.patterns ?? []) {
+      target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+    }
+    if (targetConfig.target !== undefined) {
+      target = workingDir.replace(
+        targetConfig.working_directory,
+        targetConfig.target,
+      );
+    }
     envs.set("TFACTION_TARGET", target);
   } else {
     throw new Error(
@@ -153,8 +159,8 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
     outputs.set(
       "enable_terraform_docs",
       wdConfig?.terraform_docs?.enabled ??
-        config?.terraform_docs?.enabled ??
-        false,
+      config?.terraform_docs?.enabled ??
+      false,
     );
 
     const m3 = lib.setEnvs(

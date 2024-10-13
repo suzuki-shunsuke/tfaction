@@ -171,6 +171,15 @@ const TargetConfig = z.object({
 
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
+const Replace = z.object({
+  patterns: z.array(z.object({
+    regexp: z.string(),
+    replace: z.string(),
+  })),
+});
+
+export type Replace = z.infer<typeof Replace>;
+
 const Config = z.object({
   aqua: z.optional(
     z.object({
@@ -232,6 +241,7 @@ const Config = z.object({
     }),
   ),
   working_directory_file: z.optional(z.string()),
+  replace: z.optional(Replace),
 });
 
 export type Config = z.infer<typeof Config>;
