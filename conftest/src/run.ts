@@ -3,6 +3,7 @@ import * as exec from "@actions/exec";
 import * as lib from "lib";
 import * as path from "path";
 import fs from "fs";
+import { globSync } from "glob";
 
 type Inputs = {
   target?: string;
@@ -132,7 +133,13 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     core.info("Running conftest");
     const paths: string[] = [];
     if (policy.tf) {
-      paths.push("*.tf", "*.tf.json");
+      const tfFiles = globSync(path.join(workingDir, "*.tf"), {
+        ignore: ".terraform/**",
+      });
+      const tfJSONFiles = globSync(path.join(workingDir, "*.tf.json"), {
+        ignore: ".terraform/**",
+      });
+      paths.push(...tfFiles, ...tfJSONFiles);
     } else if (policy.plan) {
       paths.push("tfplan.json");
     }
