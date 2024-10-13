@@ -114,12 +114,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     }
   }
   const policies = [];
-  for (const [key, value] of policyMap) {
-    if (value.enabled !== false) {
-      policies.push(value);
-    }
-  }
-  for (const policy of conftest.policies) {
+  for (const policy of conftest.policies.concat(...policyMap.values())) {
     if (policy.enabled !== false && inputs.plan === !!policy.plan) {
       policies.push(policy);
     }
