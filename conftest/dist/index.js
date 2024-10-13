@@ -60509,7 +60509,16 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     if (policies.length !== 0) {
-        yield exec.exec("github-comment", ["exec", "--", "conftest", "-v"], {
+        yield exec.exec("github-comment", [
+            "exec",
+            "-config",
+            inputs.githubCommentConfig,
+            "-var",
+            `tfaction_target:${target}`,
+            "--",
+            "conftest",
+            "-v",
+        ], {
             cwd: workingDir,
         });
     }

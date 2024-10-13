@@ -120,9 +120,22 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     }
   }
   if (policies.length !== 0) {
-    await exec.exec("github-comment", ["exec", "--", "conftest", "-v"], {
-      cwd: workingDir,
-    });
+    await exec.exec(
+      "github-comment",
+      [
+        "exec",
+        "-config",
+        inputs.githubCommentConfig,
+        "-var",
+        `tfaction_target:${target}`,
+        "--",
+        "conftest",
+        "-v",
+      ],
+      {
+        cwd: workingDir,
+      },
+    );
   }
   for (const policy of policies) {
     if (!policy.policy) {
