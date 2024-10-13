@@ -147,6 +147,15 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       }
     } else if (policy.plan) {
       paths.push("tfplan.json");
+    } else if (policy.paths) {
+      for (const p of policy.paths) {
+        const files = globSync(path.join(workingDir, p), {
+          ignore: ".terraform/**",
+        });
+        for (const file of files) {
+          paths.push(path.relative(workingDir, file));
+        }
+      }
     }
     const args = [
       "exec",
