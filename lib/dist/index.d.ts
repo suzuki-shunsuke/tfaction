@@ -53,6 +53,7 @@ declare const ConftestPolicyConfig: z.ZodObject<{
     tf: z.ZodOptional<z.ZodBoolean>;
     combine: z.ZodOptional<z.ZodBoolean>;
     enabled: z.ZodOptional<z.ZodBoolean>;
+    paths: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     data?: string | undefined;
     id?: string | undefined;
@@ -61,6 +62,7 @@ declare const ConftestPolicyConfig: z.ZodObject<{
     plan?: boolean | undefined;
     tf?: boolean | undefined;
     combine?: boolean | undefined;
+    paths?: string[] | undefined;
 }, {
     data?: string | undefined;
     id?: string | undefined;
@@ -69,6 +71,7 @@ declare const ConftestPolicyConfig: z.ZodObject<{
     plan?: boolean | undefined;
     tf?: boolean | undefined;
     combine?: boolean | undefined;
+    paths?: string[] | undefined;
 }>;
 export type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;
 declare const ConftestConfig: z.ZodObject<{
@@ -81,6 +84,7 @@ declare const ConftestConfig: z.ZodObject<{
         tf: z.ZodOptional<z.ZodBoolean>;
         combine: z.ZodOptional<z.ZodBoolean>;
         enabled: z.ZodOptional<z.ZodBoolean>;
+        paths: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         data?: string | undefined;
         id?: string | undefined;
@@ -89,6 +93,7 @@ declare const ConftestConfig: z.ZodObject<{
         plan?: boolean | undefined;
         tf?: boolean | undefined;
         combine?: boolean | undefined;
+        paths?: string[] | undefined;
     }, {
         data?: string | undefined;
         id?: string | undefined;
@@ -97,6 +102,7 @@ declare const ConftestConfig: z.ZodObject<{
         plan?: boolean | undefined;
         tf?: boolean | undefined;
         combine?: boolean | undefined;
+        paths?: string[] | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     disable_all?: boolean | undefined;
@@ -108,6 +114,7 @@ declare const ConftestConfig: z.ZodObject<{
         plan?: boolean | undefined;
         tf?: boolean | undefined;
         combine?: boolean | undefined;
+        paths?: string[] | undefined;
     }[] | undefined;
 }, {
     disable_all?: boolean | undefined;
@@ -119,6 +126,7 @@ declare const ConftestConfig: z.ZodObject<{
         plan?: boolean | undefined;
         tf?: boolean | undefined;
         combine?: boolean | undefined;
+        paths?: string[] | undefined;
     }[] | undefined;
 }>;
 export type ConftestConfig = z.infer<typeof ConftestConfig>;
@@ -850,6 +858,7 @@ declare const TargetGroup: z.ZodObject<{
             tf: z.ZodOptional<z.ZodBoolean>;
             combine: z.ZodOptional<z.ZodBoolean>;
             enabled: z.ZodOptional<z.ZodBoolean>;
+            paths: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
             data?: string | undefined;
             id?: string | undefined;
@@ -858,6 +867,7 @@ declare const TargetGroup: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }, {
             data?: string | undefined;
             id?: string | undefined;
@@ -866,6 +876,7 @@ declare const TargetGroup: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         disable_all?: boolean | undefined;
@@ -877,6 +888,7 @@ declare const TargetGroup: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     }, {
         disable_all?: boolean | undefined;
@@ -888,6 +900,7 @@ declare const TargetGroup: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
@@ -1046,6 +1059,7 @@ declare const TargetGroup: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     } | undefined;
 }, {
@@ -1204,6 +1218,7 @@ declare const TargetGroup: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     } | undefined;
 }>;
@@ -1725,6 +1740,7 @@ declare const TargetConfig: z.ZodObject<{
             tf: z.ZodOptional<z.ZodBoolean>;
             combine: z.ZodOptional<z.ZodBoolean>;
             enabled: z.ZodOptional<z.ZodBoolean>;
+            paths: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
             data?: string | undefined;
             id?: string | undefined;
@@ -1733,6 +1749,7 @@ declare const TargetConfig: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }, {
             data?: string | undefined;
             id?: string | undefined;
@@ -1741,6 +1758,7 @@ declare const TargetConfig: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         disable_all?: boolean | undefined;
@@ -1752,6 +1770,7 @@ declare const TargetConfig: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     }, {
         disable_all?: boolean | undefined;
@@ -1763,6 +1782,7 @@ declare const TargetConfig: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
@@ -1901,6 +1921,7 @@ declare const TargetConfig: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     } | undefined;
     drift_detection?: {
@@ -2046,6 +2067,7 @@ declare const TargetConfig: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     } | undefined;
     drift_detection?: {
@@ -2097,6 +2119,7 @@ declare const Config: z.ZodObject<{
             tf: z.ZodOptional<z.ZodBoolean>;
             combine: z.ZodOptional<z.ZodBoolean>;
             enabled: z.ZodOptional<z.ZodBoolean>;
+            paths: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
             data?: string | undefined;
             id?: string | undefined;
@@ -2105,6 +2128,7 @@ declare const Config: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }, {
             data?: string | undefined;
             id?: string | undefined;
@@ -2113,6 +2137,7 @@ declare const Config: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         disable_all?: boolean | undefined;
@@ -2124,6 +2149,7 @@ declare const Config: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     }, {
         disable_all?: boolean | undefined;
@@ -2135,6 +2161,7 @@ declare const Config: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     }>>;
     draft_pr: z.ZodOptional<z.ZodBoolean>;
@@ -2734,6 +2761,7 @@ declare const Config: z.ZodObject<{
                 tf: z.ZodOptional<z.ZodBoolean>;
                 combine: z.ZodOptional<z.ZodBoolean>;
                 enabled: z.ZodOptional<z.ZodBoolean>;
+                paths: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
                 data?: string | undefined;
                 id?: string | undefined;
@@ -2742,6 +2770,7 @@ declare const Config: z.ZodObject<{
                 plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
+                paths?: string[] | undefined;
             }, {
                 data?: string | undefined;
                 id?: string | undefined;
@@ -2750,6 +2779,7 @@ declare const Config: z.ZodObject<{
                 plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
+                paths?: string[] | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
             disable_all?: boolean | undefined;
@@ -2761,6 +2791,7 @@ declare const Config: z.ZodObject<{
                 plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
+                paths?: string[] | undefined;
             }[] | undefined;
         }, {
             disable_all?: boolean | undefined;
@@ -2772,6 +2803,7 @@ declare const Config: z.ZodObject<{
                 plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
+                paths?: string[] | undefined;
             }[] | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
@@ -2930,6 +2962,7 @@ declare const Config: z.ZodObject<{
                 plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
+                paths?: string[] | undefined;
             }[] | undefined;
         } | undefined;
     }, {
@@ -3088,6 +3121,7 @@ declare const Config: z.ZodObject<{
                 plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
+                paths?: string[] | undefined;
             }[] | undefined;
         } | undefined;
     }>, "many">;
@@ -3293,6 +3327,7 @@ declare const Config: z.ZodObject<{
                 plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
+                paths?: string[] | undefined;
             }[] | undefined;
         } | undefined;
     }[];
@@ -3308,6 +3343,7 @@ declare const Config: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     } | undefined;
     drift_detection?: {
@@ -3517,6 +3553,7 @@ declare const Config: z.ZodObject<{
                 plan?: boolean | undefined;
                 tf?: boolean | undefined;
                 combine?: boolean | undefined;
+                paths?: string[] | undefined;
             }[] | undefined;
         } | undefined;
     }[];
@@ -3532,6 +3569,7 @@ declare const Config: z.ZodObject<{
             plan?: boolean | undefined;
             tf?: boolean | undefined;
             combine?: boolean | undefined;
+            paths?: string[] | undefined;
         }[] | undefined;
     } | undefined;
     drift_detection?: {

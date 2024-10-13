@@ -25989,6 +25989,7 @@ const ConftestPolicyConfig = zod_1.z.object({
     tf: zod_1.z.optional(zod_1.z.boolean()),
     combine: zod_1.z.optional(zod_1.z.boolean()),
     enabled: zod_1.z.optional(zod_1.z.boolean()),
+    paths: zod_1.z.optional(zod_1.z.array(zod_1.z.string())),
 });
 const ConftestConfig = zod_1.z.object({
     disable_all: zod_1.z.optional(zod_1.z.boolean()),
@@ -60502,12 +60503,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     const policies = [];
-    for (const [key, value] of policyMap) {
-        if (value.enabled !== false) {
-            policies.push(value);
-        }
-    }
-    for (const policy of conftest.policies) {
+    for (const policy of conftest.policies.concat(...policyMap.values())) {
         if (policy.enabled !== false && inputs.plan === !!policy.plan) {
             policies.push(policy);
         }
@@ -60536,6 +60532,16 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else if (policy.plan) {
             paths.push("tfplan.json");
+        }
+        else if (policy.paths) {
+            for (const p of policy.paths) {
+                const files = (0, glob_1.globSync)(path.join(workingDir, p), {
+                    ignore: ".terraform/**",
+                });
+                for (const file of files) {
+                    paths.push(path.relative(workingDir, file));
+                }
+            }
         }
         const args = [
             "exec",
