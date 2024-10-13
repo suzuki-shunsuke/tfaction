@@ -94,7 +94,6 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     if (cfg.conftest?.disable_all) {
       for (const [key, value] of policyMap) {
         value.enabled = false;
-        conftest.policies.push(value);
       }
       for (const policy of conftest.policies) {
         policy.enabled = false;
@@ -124,7 +123,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       policies.push(policy);
     }
   }
-  for (const policy of conftest.policies) {
+  for (const policy of policies) {
     /*
       github-comment exec \
         --config "${GITHUB_ACTION_PATH}/github-comment.yaml" \

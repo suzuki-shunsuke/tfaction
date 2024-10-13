@@ -60202,7 +60202,6 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         if ((_e = cfg.conftest) === null || _e === void 0 ? void 0 : _e.disable_all) {
             for (const [key, value] of policyMap) {
                 value.enabled = false;
-                conftest.policies.push(value);
             }
             for (const policy of conftest.policies) {
                 policy.enabled = false;
@@ -60232,7 +60231,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             policies.push(policy);
         }
     }
-    for (const policy of conftest.policies) {
+    for (const policy of policies) {
         /*
           github-comment exec \
             --config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
