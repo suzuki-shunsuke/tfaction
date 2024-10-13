@@ -119,7 +119,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     }
   }
   for (const policy of conftest.policies) {
-    if (policy.enabled !== false && inputs.plan === policy.plan) {
+    if (policy.enabled !== false && inputs.plan == policy.plan) {
       policies.push(policy);
     }
   }
