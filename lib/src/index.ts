@@ -60,6 +60,7 @@ const ConftestPolicyConfig = z.object({
   tf: z.optional(z.boolean()),
   combine: z.optional(z.boolean()),
   enabled: z.optional(z.boolean()),
+  paths: z.optional(z.array(z.string())),
 });
 
 export type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;

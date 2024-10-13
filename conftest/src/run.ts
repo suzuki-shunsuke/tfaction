@@ -114,12 +114,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     }
   }
   const policies = [];
-  for (const [key, value] of policyMap) {
-    if (value.enabled !== false) {
-      policies.push(value);
-    }
-  }
-  for (const policy of conftest.policies) {
+  for (const policy of conftest.policies.concat(...policyMap.values())) {
     if (policy.enabled !== false && inputs.plan === !!policy.plan) {
       policies.push(policy);
     }
@@ -147,6 +142,15 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       }
     } else if (policy.plan) {
       paths.push("tfplan.json");
+    } else if (policy.paths) {
+      for (const p of policy.paths) {
+        const files = globSync(path.join(workingDir, p), {
+          ignore: ".terraform/**",
+        });
+        for (const file of files) {
+          paths.push(path.relative(workingDir, file));
+        }
+      }
     }
     const args = [
       "exec",
