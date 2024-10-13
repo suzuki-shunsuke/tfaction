@@ -25701,9 +25701,18 @@ const TrivyConfig = zod_1.z.object({
 const TerraformDocsConfig = zod_1.z.object({
     enabled: zod_1.z.optional(zod_1.z.boolean()),
 });
+const ConftestPolicyConfig = zod_1.z.object({
+    policy: zod_1.z.optional(zod_1.z.string()),
+    id: zod_1.z.optional(zod_1.z.string()),
+    data: zod_1.z.optional(zod_1.z.string()),
+    plan: zod_1.z.optional(zod_1.z.boolean()),
+    tf: zod_1.z.optional(zod_1.z.boolean()),
+    combine: zod_1.z.optional(zod_1.z.boolean()),
+    enabled: zod_1.z.optional(zod_1.z.boolean()),
+});
 const ConftestConfig = zod_1.z.object({
-    hcl_policy: zod_1.z.optional(zod_1.z.string()),
-    hcl_combine_policy: zod_1.z.optional(zod_1.z.string()),
+    disable_all: zod_1.z.optional(zod_1.z.boolean()),
+    policies: zod_1.z.optional(zod_1.z.array(ConftestPolicyConfig)),
 });
 const GitHubSecrets = zod_1.z.array(zod_1.z.object({
     env_name: zod_1.z.string(),
@@ -25756,6 +25765,7 @@ const TargetGroup = zod_1.z.object({
     working_directory: zod_1.z.string(),
     aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
     terraform_command: zod_1.z.optional(zod_1.z.string()),
+    conftest: zod_1.z.optional(ConftestConfig),
 });
 const TargetConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
@@ -25777,6 +25787,7 @@ const TargetConfig = zod_1.z.object({
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
     terraform_command: zod_1.z.optional(zod_1.z.string()),
     terraform_docs: zod_1.z.optional(TerraformDocsConfig),
+    conftest: zod_1.z.optional(ConftestConfig),
 });
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
@@ -60100,7 +60111,7 @@ catch (error) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.main = void 0;
 const main = (config, input) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
     if (!config.plan_workflow_name) {
         throw new Error('The setting "plan_workflow_name" is required in tfaction-root.yaml');
     }
@@ -60113,28 +60124,25 @@ const main = (config, input) => {
         draft_pr: !!config.draft_pr,
         skip_create_pr: !!config.skip_create_pr,
         plan_workflow_name: config.plan_workflow_name,
-        conftest_policy_directory: (_a = config.conftest_policy_directory) !== null && _a !== void 0 ? _a : "",
-        conftest_hcl_policy_directory: (_c = (_b = config === null || config === void 0 ? void 0 : config.conftest) === null || _b === void 0 ? void 0 : _b.hcl_policy) !== null && _c !== void 0 ? _c : "",
-        conftest_hcl_combine_policy_directory: (_e = (_d = config === null || config === void 0 ? void 0 : config.conftest) === null || _d === void 0 ? void 0 : _d.hcl_combine_policy) !== null && _e !== void 0 ? _e : "",
-        label_prefix_target: ((_f = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _f === void 0 ? void 0 : _f.target) || "target:",
-        label_prefix_tfmigrate: ((_g = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _g === void 0 ? void 0 : _g.tfmigrate) || "tfmigrate:",
-        label_prefix_skip: ((_h = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _h === void 0 ? void 0 : _h.skip) || "skip:",
-        disable_update_related_pull_requests: !((_k = (_j = config === null || config === void 0 ? void 0 : config.update_related_pull_requests) === null || _j === void 0 ? void 0 : _j.enabled) !== null && _k !== void 0 ? _k : true),
-        update_local_path_module_caller: (_m = (_l = config === null || config === void 0 ? void 0 : config.update_local_path_module_caller) === null || _l === void 0 ? void 0 : _l.enabled) !== null && _m !== void 0 ? _m : false,
-        aqua_update_checksum_enabled: (_q = (_p = (_o = config === null || config === void 0 ? void 0 : config.aqua) === null || _o === void 0 ? void 0 : _o.update_checksum) === null || _p === void 0 ? void 0 : _p.enabled) !== null && _q !== void 0 ? _q : false,
-        aqua_update_checksum_prune: (_t = (_s = (_r = config === null || config === void 0 ? void 0 : config.aqua) === null || _r === void 0 ? void 0 : _r.update_checksum) === null || _s === void 0 ? void 0 : _s.prune) !== null && _t !== void 0 ? _t : false,
+        label_prefix_target: ((_a = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _a === void 0 ? void 0 : _a.target) || "target:",
+        label_prefix_tfmigrate: ((_b = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _b === void 0 ? void 0 : _b.tfmigrate) || "tfmigrate:",
+        label_prefix_skip: ((_c = config === null || config === void 0 ? void 0 : config.label_prefixes) === null || _c === void 0 ? void 0 : _c.skip) || "skip:",
+        disable_update_related_pull_requests: !((_e = (_d = config === null || config === void 0 ? void 0 : config.update_related_pull_requests) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : true),
+        update_local_path_module_caller: (_g = (_f = config === null || config === void 0 ? void 0 : config.update_local_path_module_caller) === null || _f === void 0 ? void 0 : _f.enabled) !== null && _g !== void 0 ? _g : false,
+        aqua_update_checksum_enabled: (_k = (_j = (_h = config === null || config === void 0 ? void 0 : config.aqua) === null || _h === void 0 ? void 0 : _h.update_checksum) === null || _j === void 0 ? void 0 : _j.enabled) !== null && _k !== void 0 ? _k : false,
+        aqua_update_checksum_prune: (_o = (_m = (_l = config === null || config === void 0 ? void 0 : config.aqua) === null || _l === void 0 ? void 0 : _l.update_checksum) === null || _m === void 0 ? void 0 : _m.prune) !== null && _o !== void 0 ? _o : false,
         aqua_update_checksum_skip_push: input.drift_issue_number
             ? true
-            : ((_w = (_v = (_u = config === null || config === void 0 ? void 0 : config.aqua) === null || _u === void 0 ? void 0 : _u.update_checksum) === null || _v === void 0 ? void 0 : _v.skip_push) !== null && _w !== void 0 ? _w : false),
-        enable_tfsec: (_y = (_x = config === null || config === void 0 ? void 0 : config.tfsec) === null || _x === void 0 ? void 0 : _x.enabled) !== null && _y !== void 0 ? _y : false,
-        enable_tflint: (_0 = (_z = config === null || config === void 0 ? void 0 : config.tflint) === null || _z === void 0 ? void 0 : _z.enabled) !== null && _0 !== void 0 ? _0 : true,
-        enable_trivy: (_2 = (_1 = config === null || config === void 0 ? void 0 : config.trivy) === null || _1 === void 0 ? void 0 : _1.enabled) !== null && _2 !== void 0 ? _2 : true,
+            : ((_r = (_q = (_p = config === null || config === void 0 ? void 0 : config.aqua) === null || _p === void 0 ? void 0 : _p.update_checksum) === null || _q === void 0 ? void 0 : _q.skip_push) !== null && _r !== void 0 ? _r : false),
+        enable_tfsec: (_t = (_s = config === null || config === void 0 ? void 0 : config.tfsec) === null || _s === void 0 ? void 0 : _s.enabled) !== null && _t !== void 0 ? _t : false,
+        enable_tflint: (_v = (_u = config === null || config === void 0 ? void 0 : config.tflint) === null || _u === void 0 ? void 0 : _u.enabled) !== null && _v !== void 0 ? _v : true,
+        enable_trivy: (_x = (_w = config === null || config === void 0 ? void 0 : config.trivy) === null || _w === void 0 ? void 0 : _w.enabled) !== null && _x !== void 0 ? _x : true,
         terraform_command: (config === null || config === void 0 ? void 0 : config.terraform_command) || "terraform",
         drift_issue_repo_owner: "",
         drift_issue_repo_name: "",
     };
     const envs = {
-        TFACTION_SKIP_ADDING_AQUA_PACKAGES: (_4 = (_3 = config === null || config === void 0 ? void 0 : config.scaffold_working_directory) === null || _3 === void 0 ? void 0 : _3.skip_adding_aqua_packages) !== null && _4 !== void 0 ? _4 : true,
+        TFACTION_SKIP_ADDING_AQUA_PACKAGES: (_z = (_y = config === null || config === void 0 ? void 0 : config.scaffold_working_directory) === null || _y === void 0 ? void 0 : _y.skip_adding_aqua_packages) !== null && _z !== void 0 ? _z : true,
     };
     if (config.drift_detection && config.drift_detection.issue_repo_owner) {
         outputs.drift_issue_repo_owner = config.drift_detection.issue_repo_owner;

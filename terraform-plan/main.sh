@@ -21,7 +21,7 @@ if [ "$code" -eq 1 ]; then
 	exit 1
 fi
 
-bash "$GITHUB_ACTION_PATH/conftest.sh"
+github-comment exec -- "$TF_COMMAND" show -json tfplan.binary >tfplan.json
 
 if [ "$code" = "0" ]; then
 	exit 0

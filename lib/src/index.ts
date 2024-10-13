@@ -52,9 +52,21 @@ const TerraformDocsConfig = z.object({
 
 export type TerraformDocsConfig = z.infer<typeof TerraformDocsConfig>;
 
+const ConftestPolicyConfig = z.object({
+  policy: z.optional(z.string()),
+  id: z.optional(z.string()),
+  data: z.optional(z.string()),
+  plan: z.optional(z.boolean()),
+  tf: z.optional(z.boolean()),
+  combine: z.optional(z.boolean()),
+  enabled: z.optional(z.boolean()),
+});
+
+export type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;
+
 const ConftestConfig = z.object({
-  hcl_policy: z.optional(z.string()),
-  hcl_combine_policy: z.optional(z.string()),
+  disable_all: z.optional(z.boolean()),
+  policies: z.optional(z.array(ConftestPolicyConfig)),
 });
 
 export type ConftestConfig = z.infer<typeof ConftestConfig>;
@@ -126,6 +138,7 @@ const TargetGroup = z.object({
   working_directory: z.string(),
   aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
   terraform_command: z.optional(z.string()),
+  conftest: z.optional(ConftestConfig),
 });
 
 export type TargetGroup = z.infer<typeof TargetGroup>;
@@ -152,6 +165,7 @@ const TargetConfig = z.object({
   tfmigrate_plan_config: z.optional(JobConfig),
   terraform_command: z.optional(z.string()),
   terraform_docs: z.optional(TerraformDocsConfig),
+  conftest: z.optional(ConftestConfig),
 });
 
 export type TargetConfig = z.infer<typeof TargetConfig>;
