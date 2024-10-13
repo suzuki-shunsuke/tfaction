@@ -60518,6 +60518,9 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     for (const policy of policies) {
+        if (!policy.policy) {
+            continue;
+        }
         core.info("Running conftest");
         const paths = [];
         if (policy.tf) {
@@ -60533,9 +60536,6 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else if (policy.plan) {
             paths.push("tfplan.json");
-        }
-        if (!policy.policy) {
-            continue;
         }
         const args = [
             "exec",
@@ -60554,6 +60554,9 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         ];
         if (policy.combine) {
             args.push("--combine");
+        }
+        if (policy.data) {
+            args.push("--data", path.join(workingDir, policy.data));
         }
         args.push(...paths);
         core.info("github-comment " + args.join(" "));
