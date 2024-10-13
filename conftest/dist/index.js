@@ -60227,7 +60227,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     for (const policy of conftest.policies) {
-        if (policy.enabled !== false && inputs.plan == policy.plan) {
+        if (policy.enabled !== false && inputs.plan === !!policy.plan) {
             policies.push(policy);
         }
     }
