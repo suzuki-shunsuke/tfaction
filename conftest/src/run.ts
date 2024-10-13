@@ -139,7 +139,9 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       const tfJSONFiles = globSync(path.join(workingDir, "*.tf.json"), {
         ignore: ".terraform/**",
       });
-      paths.push(...tfFiles, ...tfJSONFiles);
+      for (const tfFile of tfFiles.concat(tfJSONFiles)) {
+        paths.push(path.relative(workingDir, tfFile));
+      }
     } else if (policy.plan) {
       paths.push("tfplan.json");
     }

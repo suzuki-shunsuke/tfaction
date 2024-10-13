@@ -60521,9 +60521,15 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         core.info("Running conftest");
         const paths = [];
         if (policy.tf) {
-            const tfFiles = (0, glob_1.globSync)(path.join(workingDir, "*.tf"), { ignore: ".terraform/**" });
-            const tfJSONFiles = (0, glob_1.globSync)(path.join(workingDir, "*.tf.json"), { ignore: ".terraform/**" });
-            paths.push(...tfFiles, ...tfJSONFiles);
+            const tfFiles = (0, glob_1.globSync)(path.join(workingDir, "*.tf"), {
+                ignore: ".terraform/**",
+            });
+            const tfJSONFiles = (0, glob_1.globSync)(path.join(workingDir, "*.tf.json"), {
+                ignore: ".terraform/**",
+            });
+            for (const tfFile of tfFiles.concat(tfJSONFiles)) {
+                paths.push(path.relative(workingDir, tfFile));
+            }
         }
         else if (policy.plan) {
             paths.push("tfplan.json");
