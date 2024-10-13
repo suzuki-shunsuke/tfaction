@@ -75,6 +75,7 @@ const ConftestPolicyConfig = zod_1.z.object({
     tf: zod_1.z.optional(zod_1.z.boolean()),
     combine: zod_1.z.optional(zod_1.z.boolean()),
     enabled: zod_1.z.optional(zod_1.z.boolean()),
+    paths: zod_1.z.optional(zod_1.z.array(zod_1.z.string())),
 });
 const ConftestConfig = zod_1.z.object({
     disable_all: zod_1.z.optional(zod_1.z.boolean()),
