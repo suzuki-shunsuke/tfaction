@@ -67,6 +67,19 @@ const TrivyConfig = zod_1.z.object({
 const TerraformDocsConfig = zod_1.z.object({
     enabled: zod_1.z.optional(zod_1.z.boolean()),
 });
+const ConftestPolicyConfig = zod_1.z.object({
+    policy: zod_1.z.optional(zod_1.z.string()),
+    id: zod_1.z.optional(zod_1.z.string()),
+    data: zod_1.z.optional(zod_1.z.string()),
+    plan: zod_1.z.optional(zod_1.z.boolean()),
+    tf: zod_1.z.optional(zod_1.z.boolean()),
+    combine: zod_1.z.optional(zod_1.z.boolean()),
+    enabled: zod_1.z.optional(zod_1.z.boolean()),
+});
+const ConftestConfig = zod_1.z.object({
+    disable_all: zod_1.z.optional(zod_1.z.boolean()),
+    policies: zod_1.z.optional(zod_1.z.array(ConftestPolicyConfig)),
+});
 const GitHubSecrets = zod_1.z.array(zod_1.z.object({
     env_name: zod_1.z.string(),
     secret_name: zod_1.z.string(),
@@ -118,6 +131,7 @@ const TargetGroup = zod_1.z.object({
     working_directory: zod_1.z.string(),
     aws_secrets_manager: zod_1.z.optional(zod_1.z.array(AWSSecretsManagerSecret)),
     terraform_command: zod_1.z.optional(zod_1.z.string()),
+    conftest: zod_1.z.optional(ConftestConfig),
 });
 const TargetConfig = zod_1.z.object({
     aws_assume_role_arn: zod_1.z.optional(zod_1.z.string()),
@@ -139,6 +153,7 @@ const TargetConfig = zod_1.z.object({
     tfmigrate_plan_config: zod_1.z.optional(JobConfig),
     terraform_command: zod_1.z.optional(zod_1.z.string()),
     terraform_docs: zod_1.z.optional(TerraformDocsConfig),
+    conftest: zod_1.z.optional(ConftestConfig),
 });
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
@@ -150,6 +165,7 @@ const Config = zod_1.z.object({
     })),
     base_working_directory: zod_1.z.optional(zod_1.z.string()),
     conftest_policy_directory: zod_1.z.optional(zod_1.z.string()),
+    conftest: zod_1.z.optional(ConftestConfig),
     draft_pr: zod_1.z.optional(zod_1.z.boolean()),
     drift_detection: zod_1.z.optional(zod_1.z.object({
         issue_repo_owner: zod_1.z.optional(zod_1.z.string()),

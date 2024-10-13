@@ -38,7 +38,7 @@ runs:
         CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
-    - uses: suzuki-shunsuke/tfaction/conftest-hcl@main
+    - uses: suzuki-shunsuke/tfaction/conftest@main
       with:
         plan: "true"
         github_token: ${{inputs.github_token}}

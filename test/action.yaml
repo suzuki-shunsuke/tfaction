@@ -16,7 +16,7 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
-    - uses: suzuki-shunsuke/tfaction/conftest-hcl@main
+    - uses: suzuki-shunsuke/tfaction/conftest@main
       with:
         github_token: ${{ inputs.github_token }}
 
