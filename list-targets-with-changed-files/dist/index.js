@@ -64577,8 +64577,7 @@ const run = (input) => {
         if (target === undefined) {
             throw new Error(`No target is found for the working directory ${changedWorkingDir}`);
         }
-        if (!terraformTargets.has(target) &&
-            !tfmigrates.has(target)) {
+        if (!terraformTargets.has(target) && !tfmigrates.has(target)) {
             terraformTargets.add(target);
             terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedWorkingDir, target, isApply, "terraform"));
         }
