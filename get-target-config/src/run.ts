@@ -42,60 +42,13 @@ export const run = async (
   const envs = new Map<string, any>();
   const outputs = new Map<string, any>();
 
-  let target = inputs.target;
-  let workingDir = inputs.workingDir;
-  let targetConfig = undefined;
+  const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
+  const workingDir = t.workingDir;
+  const target = t.target;
+  const targetConfig = t.group;
 
-  if (workingDir) {
-    targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
-      config.target_groups,
-      workingDir,
-    );
-    if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
-    }
-    target = workingDir;
-    for (const pattern of config.replace?.patterns ?? []) {
-      target = target.replace(new RegExp(pattern.regexp), pattern.replace);
-    }
-    if (targetConfig.target !== undefined) {
-      target = workingDir.replace(
-        targetConfig.working_directory,
-        targetConfig.target,
-      );
-    }
-    envs.set("TFACTION_TARGET", target);
-  } else if (target) {
-    const out = await exec.getExecOutput("git", ["ls-files"], {
-      silent: true,
-    });
-    const wds: string[] = [];
-    for (const line of out.stdout.split("\n")) {
-      if (line.endsWith(config.working_directory_file ?? "tfaction.yaml")) {
-        wds.push(path.dirname(line));
-      }
-    }
-    const m = lib.createWDTargetMap(wds, config);
-    for (const [wd, t] of m) {
-      if (t === target) {
-        envs.set("TFACTION_WORKING_DIR", wd);
-        workingDir = wd;
-        break;
-      }
-    }
-    if (workingDir === undefined) {
-      throw new Error(`No working directory is found for the target ${target}`);
-    }
-    targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
-      config.target_groups,
-      workingDir,
-    );
-  } else {
-    throw new Error(
-      "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",
-    );
-  }
-
+  envs.set("TFACTION_WORKING_DIR", workingDir);
+  envs.set("TFACTION_TARGET", target);
   outputs.set("working_directory", workingDir);
   outputs.set(
     "providers_lock_opts",

@@ -1,5 +1,7 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import { load } from "js-yaml";
 import { z } from "zod";
 
@@ -406,3 +408,78 @@ export const setEnvs = (
 //   }
 //   throw new Error("target is invalid");
 // }
+
+export type Target = {
+  target: string;
+  workingDir: string;
+  group: TargetGroup;
+};
+
+export const getTargetGroup = async (
+  config: Config,
+  target?: string,
+  workingDir?: string,
+): Promise<Target> => {
+  if (workingDir) {
+    const targetConfig = getTargetFromTargetGroupsByWorkingDir(
+      config.target_groups,
+      workingDir,
+    );
+    if (!targetConfig) {
+      throw new Error("target config is not found in target_groups");
+    }
+    target = workingDir;
+    for (const pattern of config.replace?.patterns ?? []) {
+      target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+    }
+    if (targetConfig.target !== undefined) {
+      target = workingDir.replace(
+        targetConfig.working_directory,
+        targetConfig.target,
+      );
+    }
+    return {
+      target: target,
+      workingDir: workingDir,
+      group: targetConfig,
+    };
+  }
+
+  if (target === undefined) {
+    throw new Error(
+      "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",
+    );
+  }
+
+  const out = await exec.getExecOutput("git", ["ls-files"], {
+    silent: true,
+  });
+  const wds: string[] = [];
+  for (const line of out.stdout.split("\n")) {
+    if (line.endsWith(config.working_directory_file ?? "tfaction.yaml")) {
+      wds.push(path.dirname(line));
+    }
+  }
+  const m = createWDTargetMap(wds, config);
+  for (const [wd, t] of m) {
+    if (t === target) {
+      workingDir = wd;
+      break;
+    }
+  }
+  if (workingDir === undefined) {
+    throw new Error(`No working directory is found for the target ${target}`);
+  }
+  const targetConfig = getTargetFromTargetGroupsByWorkingDir(
+    config.target_groups,
+    workingDir,
+  );
+  if (!targetConfig) {
+    throw new Error("target config is not found in target_groups");
+  }
+  return {
+    target: target,
+    workingDir: workingDir,
+    group: targetConfig,
+  };
+};

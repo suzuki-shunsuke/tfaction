@@ -25663,10 +25663,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getIsApply = exports.getWorkingDir = exports.getTarget = exports.createWDTargetMap = exports.getConfig = exports.getJobType = void 0;
+exports.getTargetGroup = exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getIsApply = exports.getWorkingDir = exports.getTarget = exports.createWDTargetMap = exports.getConfig = exports.getJobType = void 0;
 const fs = __importStar(__nccwpck_require__(9896));
+const path = __importStar(__nccwpck_require__(6928));
 const core = __importStar(__nccwpck_require__(4426));
+const exec = __importStar(__nccwpck_require__(1978));
 const js_yaml_1 = __nccwpck_require__(9595);
 const zod_1 = __nccwpck_require__(4523);
 const GitHubEnvironment = zod_1.z.union([
@@ -25972,17 +25983,59 @@ const setEnvs = (...objs) => {
     return envs;
 };
 exports.setEnvs = setEnvs;
-// export function getTargetGroup(
-//   targets: Array<TargetGroup>,
-//   target: string,
-// ): TargetGroup {
-//   for (const t of targets) {
-//     if (target.startsWith(t.target)) {
-//       return t;
-//     }
-//   }
-//   throw new Error("target is invalid");
-// }
+const getTargetGroup = (config, target, workingDir) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
+    if (workingDir) {
+        const targetConfig = (0, exports.getTargetFromTargetGroupsByWorkingDir)(config.target_groups, workingDir);
+        if (!targetConfig) {
+            throw new Error("target config is not found in target_groups");
+        }
+        target = workingDir;
+        for (const pattern of (_b = (_a = config.replace) === null || _a === void 0 ? void 0 : _a.patterns) !== null && _b !== void 0 ? _b : []) {
+            target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+        }
+        if (targetConfig.target !== undefined) {
+            target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
+        }
+        return {
+            target: target,
+            workingDir: workingDir,
+            group: targetConfig,
+        };
+    }
+    if (target === undefined) {
+        throw new Error("Either TFACTION_TARGET or TFACTION_WORKING_DIR is required");
+    }
+    const out = yield exec.getExecOutput("git", ["ls-files"], {
+        silent: true,
+    });
+    const wds = [];
+    for (const line of out.stdout.split("\n")) {
+        if (line.endsWith((_c = config.working_directory_file) !== null && _c !== void 0 ? _c : "tfaction.yaml")) {
+            wds.push(path.dirname(line));
+        }
+    }
+    const m = (0, exports.createWDTargetMap)(wds, config);
+    for (const [wd, t] of m) {
+        if (t === target) {
+            workingDir = wd;
+            break;
+        }
+    }
+    if (workingDir === undefined) {
+        throw new Error(`No working directory is found for the target ${target}`);
+    }
+    const targetConfig = (0, exports.getTargetFromTargetGroupsByWorkingDir)(config.target_groups, workingDir);
+    if (!targetConfig) {
+        throw new Error("target config is not found in target_groups");
+    }
+    return {
+        target: target,
+        workingDir: workingDir,
+        group: targetConfig,
+    };
+});
+exports.getTargetGroup = getTargetGroup;
 
 
 /***/ }),

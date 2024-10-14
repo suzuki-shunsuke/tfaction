@@ -3694,4 +3694,10 @@ type HasEnv = {
     env?: Record<string, string>;
 };
 export declare const setEnvs: (...objs: Array<HasEnv | undefined>) => Map<string, any>;
+export type Target = {
+    target: string;
+    workingDir: string;
+    group: TargetGroup;
+};
+export declare const getTargetGroup: (config: Config, target?: string, workingDir?: string) => Promise<Target>;
 export {};
