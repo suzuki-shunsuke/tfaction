@@ -1,8 +1,10 @@
 import { run, Result } from "./run";
 
-test("default", () => {
+test("default", async () => {
   const result: Result = {
-    envs: new Map<string, any>(),
+    envs: new Map<string, any>([
+      ["TFACTION_WORKING_DIR", "tests/aws/foo"],
+    ]),
     outputs: new Map<string, any>([
       ["working_directory", "tests/aws/foo"],
       [
@@ -20,7 +22,7 @@ test("default", () => {
     ]),
   };
   expect(
-    run(
+    await run(
       {
         target: "tests/aws/foo",
         workingDir: "",
@@ -41,9 +43,11 @@ test("default", () => {
   ).toStrictEqual(result);
 });
 
-test("config", () => {
+test("config", async () => {
   const result: Result = {
-    envs: new Map<string, any>(),
+    envs: new Map<string, any>([
+      ["TFACTION_WORKING_DIR", "tests/aws/foo"],
+    ]),
     outputs: new Map<string, any>([
       ["working_directory", "tests/aws/foo"],
       [
@@ -61,7 +65,7 @@ test("config", () => {
     ]),
   };
   expect(
-    run(
+    await run(
       {
         target: "tests/aws/foo",
         workingDir: "",
@@ -93,9 +97,11 @@ test("config", () => {
   ).toStrictEqual(result);
 });
 
-test("scaffold_working_dir", () => {
+test("scaffold_working_dir", async () => {
   const result: Result = {
-    envs: new Map<string, any>(),
+    envs: new Map<string, any>([
+      ["TFACTION_WORKING_DIR", "tests/aws/foo"],
+    ]),
     outputs: new Map<string, any>([
       ["working_directory", "tests/aws/foo"],
       [
@@ -110,7 +116,7 @@ test("scaffold_working_dir", () => {
     ]),
   };
   expect(
-    run(
+    await run(
       {
         target: "tests/aws/foo",
         workingDir: "",

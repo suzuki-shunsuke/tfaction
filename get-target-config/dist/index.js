@@ -60234,6 +60234,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         if (workingDir === undefined) {
             throw new Error("No working directory is found for the target");
         }
+        targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, workingDir);
     }
     else {
         throw new Error("Either TFACTION_TARGET or TFACTION_WORKING_DIR is required");

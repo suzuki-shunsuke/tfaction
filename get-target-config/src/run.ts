@@ -84,6 +84,10 @@ export const run = async (inputs: Inputs, config: lib.Config): Promise<Result> =
         "No working directory is found for the target",
       );
     }
+    targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
+      config.target_groups,
+      workingDir,
+    );
   } else {
     throw new Error(
       "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",
