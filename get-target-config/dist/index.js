@@ -60215,12 +60215,13 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         envs.set("TFACTION_TARGET", target);
     }
     else if (target) {
-        const out = yield exec.getExecOutput("git", ["ls-files"], {});
+        const out = yield exec.getExecOutput("git", ["ls-files"], {
+            silent: true,
+        });
         const wds = [];
         for (const line of out.stdout.split("\n")) {
             if (line.endsWith((_d = config.working_directory_file) !== null && _d !== void 0 ? _d : "tfaction.yaml")) {
                 wds.push(path.dirname(line));
-                break;
             }
         }
         const m = lib.createWDTargetMap(wds, config);

@@ -66,12 +66,13 @@ export const run = async (
     }
     envs.set("TFACTION_TARGET", target);
   } else if (target) {
-    const out = await exec.getExecOutput("git", ["ls-files"], {});
+    const out = await exec.getExecOutput("git", ["ls-files"], {
+      silent: true,
+    });
     const wds: string[] = [];
     for (const line of out.stdout.split("\n")) {
       if (line.endsWith(config.working_directory_file ?? "tfaction.yaml")) {
         wds.push(path.dirname(line));
-        break;
       }
     }
     const m = lib.createWDTargetMap(wds, config);
