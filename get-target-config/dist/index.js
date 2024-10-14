@@ -60232,7 +60232,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         if (workingDir === undefined) {
-            throw new Error("No working directory is found for the target");
+            throw new Error(`No working directory is found for the target ${target}`);
         }
         targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, workingDir);
     }
