@@ -6,8 +6,8 @@ import fs from "fs";
 import { globSync } from "glob";
 
 type Inputs = {
-  target?: string;
   workingDir?: string;
+  target?: string;
   githubCommentConfig: string;
   rootDir: string;
   plan: boolean;
@@ -16,8 +16,8 @@ type Inputs = {
 export const main = () => {
   run(
     {
-      target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
+      target: process.env.TFACTION_TARGET,
       githubCommentConfig: path.join(
         process.env.GITHUB_ACTION_PATH ?? "",
         "github-comment.yaml",
@@ -32,39 +32,14 @@ export const main = () => {
 export const run = async (inputs: Inputs, config: lib.Config) => {
   const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
-  let target = inputs.target;
-  let workingDir = inputs.workingDir;
-  let targetConfig = null;
+  const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
 
-  if (target) {
-    targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
-    if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
-    }
-    workingDir = target.replace(
-      targetConfig.target,
-      targetConfig.working_directory,
-    );
-  } else if (workingDir) {
-    targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
-      config.target_groups,
-      workingDir,
-    );
-    if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
-    }
-    target = workingDir.replace(
-      targetConfig.working_directory,
-      targetConfig.target,
-    );
-  } else {
-    throw new Error(
-      "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",
-    );
+  if (!t.group) {
+    throw new Error("target config is not found in target_groups");
   }
 
   const wdConfig = lib.readTargetConfig(
-    path.join(workingDir, workingDirectoryFile),
+    path.join(t.workingDir, workingDirectoryFile),
   );
 
   const policyMap = new Map<string, lib.ConftestPolicyConfig>();
@@ -91,7 +66,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     }
   }
 
-  for (const cfg of [targetConfig, wdConfig]) {
+  for (const cfg of [t.group, wdConfig]) {
     if (cfg.conftest?.disable_all) {
       for (const [key, value] of policyMap) {
         value.enabled = false;
@@ -127,13 +102,13 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
         "-config",
         inputs.githubCommentConfig,
         "-var",
-        `tfaction_target:${target}`,
+        `tfaction_target:${t.target}`,
         "--",
         "conftest",
         "-v",
       ],
       {
-        cwd: workingDir,
+        cwd: t.workingDir,
       },
     );
   }
@@ -144,24 +119,24 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     core.info("Running conftest");
     const paths: string[] = [];
     if (policy.tf) {
-      const tfFiles = globSync(path.join(workingDir, "*.tf"), {
+      const tfFiles = globSync(path.join(t.workingDir, "*.tf"), {
         ignore: ".terraform/**",
       });
-      const tfJSONFiles = globSync(path.join(workingDir, "*.tf.json"), {
+      const tfJSONFiles = globSync(path.join(t.workingDir, "*.tf.json"), {
         ignore: ".terraform/**",
       });
       for (const tfFile of tfFiles.concat(tfJSONFiles)) {
-        paths.push(path.relative(workingDir, tfFile));
+        paths.push(path.relative(t.workingDir, tfFile));
       }
     } else if (policy.plan) {
       paths.push("tfplan.json");
     } else if (policy.paths) {
       for (const p of policy.paths) {
-        const files = globSync(path.join(workingDir, p), {
+        const files = globSync(path.join(t.workingDir, p), {
           ignore: ".terraform/**",
         });
         for (const file of files) {
-          paths.push(path.relative(workingDir, file));
+          paths.push(path.relative(t.workingDir, file));
         }
       }
     }
@@ -170,7 +145,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       "-config",
       inputs.githubCommentConfig,
       "-var",
-      `tfaction_target:${target}`,
+      `tfaction_target:${t.target}`,
       "-k",
       "conftest",
       "--",
@@ -184,12 +159,12 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       args.push("--combine");
     }
     if (policy.data) {
-      args.push("--data", path.join(workingDir, policy.data));
+      args.push("--data", path.join(t.workingDir, policy.data));
     }
     args.push(...paths);
     core.info("github-comment " + args.join(" "));
     await exec.exec("github-comment", args, {
-      cwd: workingDir,
+      cwd: t.workingDir,
     });
   }
 };

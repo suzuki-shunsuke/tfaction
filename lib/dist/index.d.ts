@@ -338,7 +338,7 @@ declare const TargetGroup: z.ZodObject<{
         secret_name: string;
     }>, "many">>;
     s3_bucket_name_tfmigrate_history: z.ZodOptional<z.ZodString>;
-    target: z.ZodString;
+    target: z.ZodOptional<z.ZodString>;
     template_dir: z.ZodOptional<z.ZodString>;
     terraform_apply_config: z.ZodOptional<z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
@@ -904,8 +904,8 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    target: string;
     working_directory: string;
+    target?: string | undefined;
     environment?: string | {
         name: string;
         url: string;
@@ -1063,8 +1063,8 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
 }, {
-    target: string;
     working_directory: string;
+    target?: string | undefined;
     environment?: string | {
         name: string;
         url: string;
@@ -2079,6 +2079,34 @@ declare const TargetConfig: z.ZodObject<{
     } | undefined;
 }>;
 export type TargetConfig = z.infer<typeof TargetConfig>;
+declare const Replace: z.ZodObject<{
+    patterns: z.ZodArray<z.ZodObject<{
+        regexp: z.ZodString;
+        replace: z.ZodString;
+        flags: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        replace: string;
+        regexp: string;
+        flags?: string | undefined;
+    }, {
+        replace: string;
+        regexp: string;
+        flags?: string | undefined;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    patterns: {
+        replace: string;
+        regexp: string;
+        flags?: string | undefined;
+    }[];
+}, {
+    patterns: {
+        replace: string;
+        regexp: string;
+        flags?: string | undefined;
+    }[];
+}>;
+export type Replace = z.infer<typeof Replace>;
 declare const Config: z.ZodObject<{
     aqua: z.ZodOptional<z.ZodObject<{
         update_checksum: z.ZodOptional<z.ZodObject<{
@@ -2241,7 +2269,7 @@ declare const Config: z.ZodObject<{
             secret_name: string;
         }>, "many">>;
         s3_bucket_name_tfmigrate_history: z.ZodOptional<z.ZodString>;
-        target: z.ZodString;
+        target: z.ZodOptional<z.ZodString>;
         template_dir: z.ZodOptional<z.ZodString>;
         terraform_apply_config: z.ZodOptional<z.ZodObject<{
             aws_assume_role_arn: z.ZodOptional<z.ZodString>;
@@ -2807,8 +2835,8 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        target: string;
         working_directory: string;
+        target?: string | undefined;
         environment?: string | {
             name: string;
             url: string;
@@ -2966,8 +2994,8 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }, {
-        target: string;
         working_directory: string;
+        target?: string | undefined;
         environment?: string | {
             name: string;
             url: string;
@@ -3169,11 +3197,38 @@ declare const Config: z.ZodObject<{
         enabled?: boolean | undefined;
     }>>;
     working_directory_file: z.ZodOptional<z.ZodString>;
+    replace: z.ZodOptional<z.ZodObject<{
+        patterns: z.ZodArray<z.ZodObject<{
+            regexp: z.ZodString;
+            replace: z.ZodString;
+            flags: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            replace: string;
+            regexp: string;
+            flags?: string | undefined;
+        }, {
+            replace: string;
+            regexp: string;
+            flags?: string | undefined;
+        }>, "many">;
+    }, "strip", z.ZodTypeAny, {
+        patterns: {
+            replace: string;
+            regexp: string;
+            flags?: string | undefined;
+        }[];
+    }, {
+        patterns: {
+            replace: string;
+            regexp: string;
+            flags?: string | undefined;
+        }[];
+    }>>;
 }, "strip", z.ZodTypeAny, {
     plan_workflow_name: string;
     target_groups: {
-        target: string;
         working_directory: string;
+        target?: string | undefined;
         environment?: string | {
             name: string;
             url: string;
@@ -3331,6 +3386,13 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }[];
+    replace?: {
+        patterns: {
+            replace: string;
+            regexp: string;
+            flags?: string | undefined;
+        }[];
+    } | undefined;
     env?: Record<string, string> | undefined;
     terraform_command?: string | undefined;
     conftest?: {
@@ -3398,8 +3460,8 @@ declare const Config: z.ZodObject<{
 }, {
     plan_workflow_name: string;
     target_groups: {
-        target: string;
         working_directory: string;
+        target?: string | undefined;
         environment?: string | {
             name: string;
             url: string;
@@ -3557,6 +3619,13 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }[];
+    replace?: {
+        patterns: {
+            replace: string;
+            regexp: string;
+            flags?: string | undefined;
+        }[];
+    } | undefined;
     env?: Record<string, string> | undefined;
     terraform_command?: string | undefined;
     conftest?: {
@@ -3624,9 +3693,10 @@ declare const Config: z.ZodObject<{
 }>;
 export type Config = z.infer<typeof Config>;
 export declare const getConfig: () => Config;
-export declare const getTarget: () => string;
+export declare const createWDTargetMap: (wds: string[], config: Config) => Map<string, string>;
+export declare const getTarget: () => string | undefined;
+export declare const getWorkingDir: () => string | undefined;
 export declare const getIsApply: () => boolean;
-export declare const getTargetFromTargetGroups: (targetGroups: Array<TargetGroup>, target: string) => TargetGroup | undefined;
 export declare const getTargetFromTargetGroupsByWorkingDir: (targetGroups: Array<TargetGroup>, wd: string) => TargetGroup | undefined;
 export declare const readTargetConfig: (p: string) => TargetConfig;
 export declare const getJobConfig: (config: TargetConfig | undefined, isApply: boolean, jobType: JobType) => JobConfig | undefined;
@@ -3636,5 +3706,10 @@ type HasEnv = {
     env?: Record<string, string>;
 };
 export declare const setEnvs: (...objs: Array<HasEnv | undefined>) => Map<string, any>;
-export declare function getTargetGroup(targets: Array<TargetGroup>, target: string): TargetGroup;
+export type Target = {
+    target: string;
+    workingDir: string;
+    group: TargetGroup;
+};
+export declare const getTargetGroup: (config: Config, target?: string, workingDir?: string) => Promise<Target>;
 export {};

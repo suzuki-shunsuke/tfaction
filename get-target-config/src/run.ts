@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import * as lib from "lib";
 import * as path from "path";
 
@@ -14,8 +15,8 @@ export type Result = {
   outputs: Map<string, any>;
 };
 
-export const main = () => {
-  const result = run(
+export const main = async () => {
+  const result = await run(
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
@@ -32,44 +33,22 @@ export const main = () => {
   }
 };
 
-export const run = (inputs: Inputs, config: lib.Config): Result => {
+export const run = async (
+  inputs: Inputs,
+  config: lib.Config,
+): Promise<Result> => {
   const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
   const envs = new Map<string, any>();
   const outputs = new Map<string, any>();
 
-  let target = inputs.target;
-  let workingDir = inputs.workingDir;
-  let targetConfig = null;
+  const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
+  const workingDir = t.workingDir;
+  const target = t.target;
+  const targetConfig = t.group;
 
-  if (target) {
-    targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
-    if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
-    }
-    workingDir = target.replace(
-      targetConfig.target,
-      targetConfig.working_directory,
-    );
-  } else if (workingDir) {
-    targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
-      config.target_groups,
-      workingDir,
-    );
-    if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
-    }
-    target = workingDir.replace(
-      targetConfig.working_directory,
-      targetConfig.target,
-    );
-    envs.set("TFACTION_TARGET", target);
-  } else {
-    throw new Error(
-      "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",
-    );
-  }
-
+  envs.set("TFACTION_WORKING_DIR", workingDir);
+  envs.set("TFACTION_TARGET", target);
   outputs.set("working_directory", workingDir);
   outputs.set(
     "providers_lock_opts",
