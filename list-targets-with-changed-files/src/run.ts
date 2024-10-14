@@ -127,9 +127,14 @@ export const run = (input: Input): TargetConfig[] => {
         terraformTargets.add(target);
         const wd = targetWDMap.get(target);
         if (wd === undefined) {
-          throw new Error(`No working directory is found for the target ${target}`);
+          throw new Error(
+            `No working directory is found for the target ${target}`,
+          );
         }
-        const tg = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, wd);
+        const tg = lib.getTargetFromTargetGroupsByWorkingDir(
+          config.target_groups,
+          wd,
+        );
         terraformTargetObjs.push(
           getTargetConfigByTarget(
             config.target_groups,
@@ -148,7 +153,9 @@ export const run = (input: Input): TargetConfig[] => {
         tfmigrates.add(target);
         const wd = targetWDMap.get(target);
         if (wd === undefined) {
-          throw new Error(`No working directory is found for the target ${target}`);
+          throw new Error(
+            `No working directory is found for the target ${target}`,
+          );
         }
         tfmigrateObjs.push(
           getTargetConfigByTarget(
@@ -190,12 +197,11 @@ export const run = (input: Input): TargetConfig[] => {
   for (const changedWorkingDir of changedWorkingDirs) {
     const target = wdTargetMap.get(changedWorkingDir);
     if (target === undefined) {
-      throw new Error(`No target is found for the working directory ${changedWorkingDir}`);
+      throw new Error(
+        `No target is found for the working directory ${changedWorkingDir}`,
+      );
     }
-    if (
-      !terraformTargets.has(target) &&
-      !tfmigrates.has(target)
-    ) {
+    if (!terraformTargets.has(target) && !tfmigrates.has(target)) {
       terraformTargets.add(target);
       terraformTargetObjs.push(
         getTargetConfigByTarget(
@@ -216,7 +222,9 @@ export const run = (input: Input): TargetConfig[] => {
   ) {
     const wd = targetWDMap.get(followupTarget);
     if (wd === undefined) {
-      throw new Error(`No working directory is found for the target ${followupTarget}`);
+      throw new Error(
+        `No working directory is found for the target ${followupTarget}`,
+      );
     }
     terraformTargets.add(followupTarget);
     terraformTargetObjs.push(

@@ -172,10 +172,12 @@ const TargetConfig = z.object({
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
 const Replace = z.object({
-  patterns: z.array(z.object({
-    regexp: z.string(),
-    replace: z.string(),
-  })),
+  patterns: z.array(
+    z.object({
+      regexp: z.string(),
+      replace: z.string(),
+    }),
+  ),
 });
 
 export type Replace = z.infer<typeof Replace>;
@@ -254,7 +256,10 @@ export const getConfig = (): Config => {
   return Config.parse(load(fs.readFileSync(configFilePath, "utf8")));
 };
 
-export const createWDTargetMap = (wds: string[], config: Config): Map<string, string> => {
+export const createWDTargetMap = (
+  wds: string[],
+  config: Config,
+): Map<string, string> => {
   const m = new Map<string, string>();
   for (const wd of wds) {
     let target = wd;

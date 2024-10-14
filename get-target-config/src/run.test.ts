@@ -2,9 +2,7 @@ import { run, Result } from "./run";
 
 test("default", async () => {
   const result: Result = {
-    envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "tests/aws/foo"],
-    ]),
+    envs: new Map<string, any>([["TFACTION_WORKING_DIR", "tests/aws/foo"]]),
     outputs: new Map<string, any>([
       ["working_directory", "tests/aws/foo"],
       [
@@ -45,9 +43,7 @@ test("default", async () => {
 
 test("config", async () => {
   const result: Result = {
-    envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "tests/aws/foo"],
-    ]),
+    envs: new Map<string, any>([["TFACTION_WORKING_DIR", "tests/aws/foo"]]),
     outputs: new Map<string, any>([
       ["working_directory", "tests/aws/foo"],
       [
@@ -99,9 +95,7 @@ test("config", async () => {
 
 test("scaffold_working_dir", async () => {
   const result: Result = {
-    envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "tests/aws/foo"],
-    ]),
+    envs: new Map<string, any>([["TFACTION_WORKING_DIR", "tests/aws/foo"]]),
     outputs: new Map<string, any>([
       ["working_directory", "tests/aws/foo"],
       [

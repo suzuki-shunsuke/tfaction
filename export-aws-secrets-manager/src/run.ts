@@ -75,7 +75,10 @@ export const run = async (): Promise<void> => {
   const wd = lib.getWorkingDir();
   const jobType = lib.getJobType();
   const isApply = lib.getIsApply();
-  const targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, wd);
+  const targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
+    config.target_groups,
+    wd,
+  );
   if (targetConfig === undefined) {
     throw new Error("No target group is found");
   }

@@ -191,7 +191,11 @@ test("module callers", () => {
       isApply: false,
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
-      configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml", "foo/baz/tfaction.yaml"],
+      configFiles: [
+        "foo/dev/tfaction.yaml",
+        "foo/bar/tfaction.yaml",
+        "foo/baz/tfaction.yaml",
+      ],
       pr: "",
       payload: {
         pull_request: {
