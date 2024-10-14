@@ -282,20 +282,12 @@ export const createWDTargetMap = (
   return m;
 };
 
-export const getTarget = (): string => {
-  const target = process.env.TFACTION_TARGET;
-  if (target) {
-    return target;
-  }
-  throw new Error("the environment variable TFACTION_TARGET is required");
+export const getTarget = (): string | undefined => {
+  return process.env.TFACTION_TARGET;
 };
 
-export const getWorkingDir = (): string => {
-  const wd = process.env.TFACTION_WORKING_DIR;
-  if (wd === undefined) {
-    throw new Error("the environment variable TFACTION_TARGET is required");
-  }
-  return wd;
+export const getWorkingDir = (): string | undefined => {
+  return process.env.TFACTION_WORKING_DIR;
 };
 
 export const getIsApply = (): boolean => {

@@ -25886,19 +25886,11 @@ const createWDTargetMap = (wds, config) => {
 };
 exports.createWDTargetMap = createWDTargetMap;
 const getTarget = () => {
-    const target = process.env.TFACTION_TARGET;
-    if (target) {
-        return target;
-    }
-    throw new Error("the environment variable TFACTION_TARGET is required");
+    return process.env.TFACTION_TARGET;
 };
 exports.getTarget = getTarget;
 const getWorkingDir = () => {
-    const wd = process.env.TFACTION_WORKING_DIR;
-    if (wd === undefined) {
-        throw new Error("the environment variable TFACTION_TARGET is required");
-    }
-    return wd;
+    return process.env.TFACTION_WORKING_DIR;
 };
 exports.getWorkingDir = getWorkingDir;
 const getIsApply = () => {

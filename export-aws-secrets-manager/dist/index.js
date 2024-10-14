@@ -46701,19 +46701,11 @@ const createWDTargetMap = (wds, config) => {
 };
 exports.createWDTargetMap = createWDTargetMap;
 const getTarget = () => {
-    const target = process.env.TFACTION_TARGET;
-    if (target) {
-        return target;
-    }
-    throw new Error("the environment variable TFACTION_TARGET is required");
+    return process.env.TFACTION_TARGET;
 };
 exports.getTarget = getTarget;
 const getWorkingDir = () => {
-    const wd = process.env.TFACTION_WORKING_DIR;
-    if (wd === undefined) {
-        throw new Error("the environment variable TFACTION_TARGET is required");
-    }
-    return wd;
+    return process.env.TFACTION_WORKING_DIR;
 };
 exports.getWorkingDir = getWorkingDir;
 const getIsApply = () => {
@@ -81102,22 +81094,19 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const wd = lib.getWorkingDir();
     const jobType = lib.getJobType();
     const isApply = lib.getIsApply();
-    const targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, wd);
-    if (targetConfig === undefined) {
-        throw new Error("No target group is found");
-    }
-    const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
+    const t = yield lib.getTargetGroup(config, targetS, wd);
+    const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
     let awsClient = null;
-    if (targetConfig.aws_secrets_manager) {
+    if (t.group.aws_secrets_manager) {
         awsClient = new client_secrets_manager_1.SecretsManagerClient({
-            region: targetConfig.aws_region,
+            region: t.group.aws_region,
         });
-        yield exportSecrets(awsClient, targetConfig.aws_secrets_manager);
+        yield exportSecrets(awsClient, t.group.aws_secrets_manager);
     }
     if (jobConfig && jobConfig.aws_secrets_manager) {
         if (!awsClient) {
             awsClient = new client_secrets_manager_1.SecretsManagerClient({
-                region: targetConfig.aws_region,
+                region: t.group.aws_region,
             });
         }
         yield exportSecrets(awsClient, jobConfig.aws_secrets_manager);

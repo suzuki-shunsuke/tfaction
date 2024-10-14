@@ -3682,8 +3682,8 @@ declare const Config: z.ZodObject<{
 export type Config = z.infer<typeof Config>;
 export declare const getConfig: () => Config;
 export declare const createWDTargetMap: (wds: string[], config: Config) => Map<string, string>;
-export declare const getTarget: () => string;
-export declare const getWorkingDir: () => string;
+export declare const getTarget: () => string | undefined;
+export declare const getWorkingDir: () => string | undefined;
 export declare const getIsApply: () => boolean;
 export declare const getTargetFromTargetGroupsByWorkingDir: (targetGroups: Array<TargetGroup>, wd: string) => TargetGroup | undefined;
 export declare const readTargetConfig: (p: string) => TargetConfig;
