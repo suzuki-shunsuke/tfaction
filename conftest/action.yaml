@@ -1,5 +1,5 @@
-name: conftest hcl
-description: conftest hcl
+name: Conftest
+description: Conftest
 inputs:
   plan:
     description: |

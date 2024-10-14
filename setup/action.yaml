@@ -44,6 +44,9 @@ runs:
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
+    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+      id: target-config
+
     - run: |
         curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ github.event.pull_request.number }}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
@@ -62,9 +65,6 @@ runs:
       shell: bash
       env:
         GLOBAL_CONFIG: ${{toJSON(steps.global-config.outputs)}}
-
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
-      id: target-config
 
     - run: echo "$TARGET_CONFIG"
       shell: bash

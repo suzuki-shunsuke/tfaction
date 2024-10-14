@@ -1,5 +1,7 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import { load } from "js-yaml";
 import { z } from "zod";
 
@@ -130,7 +132,7 @@ const TargetGroup = z.object({
   runs_on: z.optional(z.union([z.string(), z.array(z.string())])),
   secrets: z.optional(GitHubSecrets),
   s3_bucket_name_tfmigrate_history: z.optional(z.string()),
-  target: z.string(),
+  target: z.optional(z.string()),
   template_dir: z.optional(z.string()),
   terraform_apply_config: z.optional(JobConfig),
   terraform_plan_config: z.optional(JobConfig),
@@ -170,6 +172,18 @@ const TargetConfig = z.object({
 });
 
 export type TargetConfig = z.infer<typeof TargetConfig>;
+
+const Replace = z.object({
+  patterns: z.array(
+    z.object({
+      regexp: z.string(),
+      replace: z.string(),
+      flags: z.optional(z.string()),
+    }),
+  ),
+});
+
+export type Replace = z.infer<typeof Replace>;
 
 const Config = z.object({
   aqua: z.optional(
@@ -232,6 +246,7 @@ const Config = z.object({
     }),
   ),
   working_directory_file: z.optional(z.string()),
+  replace: z.optional(Replace),
 });
 
 export type Config = z.infer<typeof Config>;
@@ -244,28 +259,43 @@ export const getConfig = (): Config => {
   return Config.parse(load(fs.readFileSync(configFilePath, "utf8")));
 };
 
-export const getTarget = (): string => {
-  const target = process.env.TFACTION_TARGET;
-  if (target) {
-    return target;
+export const createWDTargetMap = (
+  wds: string[],
+  config: Config,
+): Map<string, string> => {
+  const m = new Map<string, string>();
+  for (const wd of wds) {
+    let target = wd;
+    for (const tg of config.target_groups) {
+      if (!wd.startsWith(tg.working_directory)) {
+        continue;
+      }
+      if (tg.target !== undefined) {
+        target = tg.target + wd.slice(tg.working_directory.length);
+      }
+      for (const pattern of config.replace?.patterns ?? []) {
+        target = target.replace(
+          new RegExp(pattern.regexp, pattern.flags),
+          pattern.replace,
+        );
+      }
+      break;
+    }
+    m.set(wd, target);
   }
-  throw new Error("the environment variable TFACTION_TARGET is required");
+  return m;
+};
+
+export const getTarget = (): string | undefined => {
+  return process.env.TFACTION_TARGET;
+};
+
+export const getWorkingDir = (): string | undefined => {
+  return process.env.TFACTION_WORKING_DIR;
 };
 
 export const getIsApply = (): boolean => {
   return process.env.TFACTION_IS_APPLY === "true";
-};
-
-export const getTargetFromTargetGroups = (
-  targetGroups: Array<TargetGroup>,
-  target: string,
-): TargetGroup | undefined => {
-  for (const targetConfig of targetGroups) {
-    if (target.startsWith(targetConfig.target)) {
-      return targetConfig;
-    }
-  }
-  return undefined;
 };
 
 export const getTargetFromTargetGroupsByWorkingDir = (
@@ -351,14 +381,77 @@ export const setEnvs = (
   return envs;
 };
 
-export function getTargetGroup(
-  targets: Array<TargetGroup>,
-  target: string,
-): TargetGroup {
-  for (const t of targets) {
-    if (target.startsWith(t.target)) {
-      return t;
+export type Target = {
+  target: string;
+  workingDir: string;
+  group: TargetGroup;
+};
+
+export const getTargetGroup = async (
+  config: Config,
+  target?: string,
+  workingDir?: string,
+): Promise<Target> => {
+  if (workingDir) {
+    const targetConfig = getTargetFromTargetGroupsByWorkingDir(
+      config.target_groups,
+      workingDir,
+    );
+    if (!targetConfig) {
+      throw new Error("target config is not found in target_groups");
+    }
+    target = workingDir;
+    for (const pattern of config.replace?.patterns ?? []) {
+      target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+    }
+    if (targetConfig.target !== undefined) {
+      target = workingDir.replace(
+        targetConfig.working_directory,
+        targetConfig.target,
+      );
+    }
+    return {
+      target: target,
+      workingDir: workingDir,
+      group: targetConfig,
+    };
+  }
+
+  if (target === undefined) {
+    throw new Error(
+      "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",
+    );
+  }
+
+  const out = await exec.getExecOutput("git", ["ls-files"], {
+    silent: true,
+  });
+  const wds: string[] = [];
+  for (const line of out.stdout.split("\n")) {
+    if (line.endsWith(config.working_directory_file ?? "tfaction.yaml")) {
+      wds.push(path.dirname(line));
     }
   }
-  throw new Error("target is invalid");
-}
+  const m = createWDTargetMap(wds, config);
+  for (const [wd, t] of m) {
+    if (t === target) {
+      workingDir = wd;
+      break;
+    }
+  }
+  if (workingDir === undefined) {
+    throw new Error(`No working directory is found for the target ${target}`);
+  }
+  const targetConfig = getTargetFromTargetGroupsByWorkingDir(
+    config.target_groups,
+    workingDir,
+  );
+  if (!targetConfig) {
+    throw new Error("target config is not found in target_groups");
+  }
+  return {
+    target: target,
+    workingDir: workingDir,
+    group: targetConfig,
+  };
+};

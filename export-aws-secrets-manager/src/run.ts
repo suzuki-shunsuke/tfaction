@@ -72,22 +72,23 @@ async function exportSecrets(
 export const run = async (): Promise<void> => {
   const config = lib.getConfig();
   const targetS = lib.getTarget();
+  const wd = lib.getWorkingDir();
   const jobType = lib.getJobType();
   const isApply = lib.getIsApply();
-  const targetConfig = lib.getTargetGroup(config.target_groups, targetS);
-  const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
+  const t = await lib.getTargetGroup(config, targetS, wd);
+  const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
   let awsClient = null;
-  if (targetConfig.aws_secrets_manager) {
+  if (t.group.aws_secrets_manager) {
     awsClient = new SecretsManagerClient({
-      region: targetConfig.aws_region,
+      region: t.group.aws_region,
     });
-    await exportSecrets(awsClient, targetConfig.aws_secrets_manager);
+    await exportSecrets(awsClient, t.group.aws_secrets_manager);
   }
 
   if (jobConfig && jobConfig.aws_secrets_manager) {
     if (!awsClient) {
       awsClient = new SecretsManagerClient({
-        region: targetConfig.aws_region,
+        region: t.group.aws_region,
       });
     }
     await exportSecrets(awsClient, jobConfig.aws_secrets_manager);

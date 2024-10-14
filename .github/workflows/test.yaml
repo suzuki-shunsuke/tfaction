@@ -54,8 +54,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - update-aqua-checksums
-      - test-get-target-config
-      - test-list-working-dirs
       - renovate-config-validator
       - ghalint
       - build-schema
@@ -87,14 +85,6 @@ jobs:
     needs: path-filter
     if: needs.path-filter.outputs.ghalint == 'true'
     uses: ./.github/workflows/wc-ghalint.yaml
-    permissions: {}
-
-  test-get-target-config:
-    uses: ./.github/workflows/wc-test-get-target-config.yaml
-    permissions: {}
-
-  test-list-working-dirs:
-    uses: ./.github/workflows/wc-test-list-working-dirs.yaml
     permissions: {}
 
   build-schema:

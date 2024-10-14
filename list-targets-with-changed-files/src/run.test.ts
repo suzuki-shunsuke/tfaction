@@ -143,7 +143,7 @@ test("pr comment", () => {
       isApply: false,
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
-      configFiles: ["foo/dev/tfaction.yaml"],
+      configFiles: ["foo/dev/tfaction.yaml", "yoo/services/dev/tfaction.yaml"],
       pr: "",
       payload: {
         pull_request: {
@@ -162,7 +162,7 @@ test("pr comment with updated body", () => {
       isApply: false,
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
-      configFiles: ["foo/dev/tfaction.yaml"],
+      configFiles: ["foo/dev/tfaction.yaml", "yoo/services/dev/tfaction.yaml"],
       pr: "",
       payload: {
         pull_request: {
@@ -191,7 +191,11 @@ test("module callers", () => {
       isApply: false,
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
-      configFiles: ["foo/dev/tfaction.yaml"],
+      configFiles: [
+        "foo/dev/tfaction.yaml",
+        "foo/bar/tfaction.yaml",
+        "foo/baz/tfaction.yaml",
+      ],
       pr: "",
       payload: {
         pull_request: {
