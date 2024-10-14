@@ -2083,22 +2083,27 @@ declare const Replace: z.ZodObject<{
     patterns: z.ZodArray<z.ZodObject<{
         regexp: z.ZodString;
         replace: z.ZodString;
+        flags: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         replace: string;
         regexp: string;
+        flags?: string | undefined;
     }, {
         replace: string;
         regexp: string;
+        flags?: string | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
     patterns: {
         replace: string;
         regexp: string;
+        flags?: string | undefined;
     }[];
 }, {
     patterns: {
         replace: string;
         regexp: string;
+        flags?: string | undefined;
     }[];
 }>;
 export type Replace = z.infer<typeof Replace>;
@@ -3196,22 +3201,27 @@ declare const Config: z.ZodObject<{
         patterns: z.ZodArray<z.ZodObject<{
             regexp: z.ZodString;
             replace: z.ZodString;
+            flags: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             replace: string;
             regexp: string;
+            flags?: string | undefined;
         }, {
             replace: string;
             regexp: string;
+            flags?: string | undefined;
         }>, "many">;
     }, "strip", z.ZodTypeAny, {
         patterns: {
             replace: string;
             regexp: string;
+            flags?: string | undefined;
         }[];
     }, {
         patterns: {
             replace: string;
             regexp: string;
+            flags?: string | undefined;
         }[];
     }>>;
 }, "strip", z.ZodTypeAny, {
@@ -3380,6 +3390,7 @@ declare const Config: z.ZodObject<{
         patterns: {
             replace: string;
             regexp: string;
+            flags?: string | undefined;
         }[];
     } | undefined;
     env?: Record<string, string> | undefined;
@@ -3612,6 +3623,7 @@ declare const Config: z.ZodObject<{
         patterns: {
             replace: string;
             regexp: string;
+            flags?: string | undefined;
         }[];
     } | undefined;
     env?: Record<string, string> | undefined;

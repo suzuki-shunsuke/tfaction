@@ -178,6 +178,7 @@ const Replace = z.object({
     z.object({
       regexp: z.string(),
       replace: z.string(),
+      flags: z.optional(z.string()),
     }),
   ),
 });
@@ -273,7 +274,10 @@ export const createWDTargetMap = (
         target = tg.target + wd.slice(tg.working_directory.length);
       }
       for (const pattern of config.replace?.patterns ?? []) {
-        target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+        target = target.replace(
+          new RegExp(pattern.regexp, pattern.flags),
+          pattern.replace,
+        );
       }
       break;
     }

@@ -170,6 +170,7 @@ const Replace = zod_1.z.object({
     patterns: zod_1.z.array(zod_1.z.object({
         regexp: zod_1.z.string(),
         replace: zod_1.z.string(),
+        flags: zod_1.z.optional(zod_1.z.string()),
     })),
 });
 const Config = zod_1.z.object({
@@ -242,7 +243,7 @@ const createWDTargetMap = (wds, config) => {
                 target = tg.target + wd.slice(tg.working_directory.length);
             }
             for (const pattern of (_b = (_a = config.replace) === null || _a === void 0 ? void 0 : _a.patterns) !== null && _b !== void 0 ? _b : []) {
-                target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+                target = target.replace(new RegExp(pattern.regexp, pattern.flags), pattern.replace);
             }
             break;
         }
