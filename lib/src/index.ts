@@ -294,18 +294,6 @@ export const getIsApply = (): boolean => {
   return process.env.TFACTION_IS_APPLY === "true";
 };
 
-// export const getTargetFromTargetGroups = (
-//   targetGroups: Array<TargetGroup>,
-//   target: string,
-// ): TargetGroup | undefined => {
-//   for (const targetConfig of targetGroups) {
-//     if (target.startsWith(targetConfig.target)) {
-//       return targetConfig;
-//     }
-//   }
-//   return undefined;
-// };
-
 export const getTargetFromTargetGroupsByWorkingDir = (
   targetGroups: Array<TargetGroup>,
   wd: string,
@@ -388,18 +376,6 @@ export const setEnvs = (
   }
   return envs;
 };
-
-// export function getTargetGroup(
-//   targets: Array<TargetGroup>,
-//   target: string,
-// ): TargetGroup {
-//   for (const t of targets) {
-//     if (target.startsWith(t.target)) {
-//       return t;
-//     }
-//   }
-//   throw new Error("target is invalid");
-// }
 
 export type Target = {
   target: string;

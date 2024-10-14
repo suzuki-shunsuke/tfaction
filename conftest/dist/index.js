@@ -26177,17 +26177,6 @@ const getIsApply = () => {
     return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
-// export const getTargetFromTargetGroups = (
-//   targetGroups: Array<TargetGroup>,
-//   target: string,
-// ): TargetGroup | undefined => {
-//   for (const targetConfig of targetGroups) {
-//     if (target.startsWith(targetConfig.target)) {
-//       return targetConfig;
-//     }
-//   }
-//   return undefined;
-// };
 const getTargetFromTargetGroupsByWorkingDir = (targetGroups, wd) => {
     for (const targetConfig of targetGroups) {
         if (wd.startsWith(targetConfig.working_directory)) {
@@ -60521,20 +60510,11 @@ exports.main = main;
 const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g;
     const workingDirectoryFile = (_a = config.working_directory_file) !== null && _a !== void 0 ? _a : "tfaction.yaml";
-    const workingDir = inputs.workingDir;
-    if (workingDir === undefined) {
-        throw new Error("TFACTION_WORKING_DIR is required");
-    }
-    const target = inputs.target;
-    if (target === undefined) {
-        throw new Error("TFACTION_TARGET is required");
-    }
-    let targetConfig = null;
-    targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, workingDir);
-    if (!targetConfig) {
+    const t = yield lib.getTargetGroup(config, inputs.target, inputs.workingDir);
+    if (!t.group) {
         throw new Error("target config is not found in target_groups");
     }
-    const wdConfig = lib.readTargetConfig(path.join(workingDir, workingDirectoryFile));
+    const wdConfig = lib.readTargetConfig(path.join(t.workingDir, workingDirectoryFile));
     const policyMap = new Map();
     const conftest = (_b = config.conftest) !== null && _b !== void 0 ? _b : {};
     for (const policy of (_d = (_c = config.conftest) === null || _c === void 0 ? void 0 : _c.policies) !== null && _d !== void 0 ? _d : []) {
@@ -60559,7 +60539,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
     }
-    for (const cfg of [targetConfig, wdConfig]) {
+    for (const cfg of [t.group, wdConfig]) {
         if ((_e = cfg.conftest) === null || _e === void 0 ? void 0 : _e.disable_all) {
             for (const [key, value] of policyMap) {
                 value.enabled = false;
@@ -60593,12 +60573,12 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             "-config",
             inputs.githubCommentConfig,
             "-var",
-            `tfaction_target:${target}`,
+            `tfaction_target:${t.target}`,
             "--",
             "conftest",
             "-v",
         ], {
-            cwd: workingDir,
+            cwd: t.workingDir,
         });
     }
     for (const policy of policies) {
@@ -60608,14 +60588,14 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         core.info("Running conftest");
         const paths = [];
         if (policy.tf) {
-            const tfFiles = (0, glob_1.globSync)(path.join(workingDir, "*.tf"), {
+            const tfFiles = (0, glob_1.globSync)(path.join(t.workingDir, "*.tf"), {
                 ignore: ".terraform/**",
             });
-            const tfJSONFiles = (0, glob_1.globSync)(path.join(workingDir, "*.tf.json"), {
+            const tfJSONFiles = (0, glob_1.globSync)(path.join(t.workingDir, "*.tf.json"), {
                 ignore: ".terraform/**",
             });
             for (const tfFile of tfFiles.concat(tfJSONFiles)) {
-                paths.push(path.relative(workingDir, tfFile));
+                paths.push(path.relative(t.workingDir, tfFile));
             }
         }
         else if (policy.plan) {
@@ -60623,11 +60603,11 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else if (policy.paths) {
             for (const p of policy.paths) {
-                const files = (0, glob_1.globSync)(path.join(workingDir, p), {
+                const files = (0, glob_1.globSync)(path.join(t.workingDir, p), {
                     ignore: ".terraform/**",
                 });
                 for (const file of files) {
-                    paths.push(path.relative(workingDir, file));
+                    paths.push(path.relative(t.workingDir, file));
                 }
             }
         }
@@ -60636,7 +60616,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             "-config",
             inputs.githubCommentConfig,
             "-var",
-            `tfaction_target:${target}`,
+            `tfaction_target:${t.target}`,
             "-k",
             "conftest",
             "--",
@@ -60650,12 +60630,12 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             args.push("--combine");
         }
         if (policy.data) {
-            args.push("--data", path.join(workingDir, policy.data));
+            args.push("--data", path.join(t.workingDir, policy.data));
         }
         args.push(...paths);
         core.info("github-comment " + args.join(" "));
         yield exec.exec("github-comment", args, {
-            cwd: workingDir,
+            cwd: t.workingDir,
         });
     }
 });

@@ -263,17 +263,6 @@ const getIsApply = () => {
     return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
-// export const getTargetFromTargetGroups = (
-//   targetGroups: Array<TargetGroup>,
-//   target: string,
-// ): TargetGroup | undefined => {
-//   for (const targetConfig of targetGroups) {
-//     if (target.startsWith(targetConfig.target)) {
-//       return targetConfig;
-//     }
-//   }
-//   return undefined;
-// };
 const getTargetFromTargetGroupsByWorkingDir = (targetGroups, wd) => {
     for (const targetConfig of targetGroups) {
         if (wd.startsWith(targetConfig.working_directory)) {
