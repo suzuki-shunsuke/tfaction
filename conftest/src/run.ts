@@ -159,7 +159,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       args.push("--combine");
     }
     if (policy.data) {
-      args.push("--data", path.join(t.workingDir, policy.data));
+      args.push("--data", path.join(inputs.rootDir, policy.data));
     }
     args.push(...paths);
     core.info("github-comment " + args.join(" "));
