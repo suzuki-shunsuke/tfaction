@@ -72,9 +72,13 @@ async function exportSecrets(
 export const run = async (): Promise<void> => {
   const config = lib.getConfig();
   const targetS = lib.getTarget();
+  const wd = lib.getWorkingDir();
   const jobType = lib.getJobType();
   const isApply = lib.getIsApply();
-  const targetConfig = lib.getTargetGroup(config.target_groups, targetS);
+  const targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, wd);
+  if (targetConfig === undefined) {
+    throw new Error("No target group is found");
+  }
   const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
   let awsClient = null;
   if (targetConfig.aws_secrets_manager) {

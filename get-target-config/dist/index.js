@@ -25664,8 +25664,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
-exports.getTargetGroup = getTargetGroup;
+exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getIsApply = exports.getWorkingDir = exports.getTarget = exports.createWDTargetMap = exports.getConfig = exports.getJobType = void 0;
 const fs = __importStar(__nccwpck_require__(9896));
 const core = __importStar(__nccwpck_require__(4426));
 const js_yaml_1 = __nccwpck_require__(9595);
@@ -25757,7 +25756,7 @@ const TargetGroup = zod_1.z.object({
     runs_on: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
     secrets: zod_1.z.optional(GitHubSecrets),
     s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
-    target: zod_1.z.string(),
+    target: zod_1.z.optional(zod_1.z.string()),
     template_dir: zod_1.z.optional(zod_1.z.string()),
     terraform_apply_config: zod_1.z.optional(JobConfig),
     terraform_plan_config: zod_1.z.optional(JobConfig),
@@ -25853,6 +25852,28 @@ const getConfig = () => {
     return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, "utf8")));
 };
 exports.getConfig = getConfig;
+const createWDTargetMap = (wds, config) => {
+    var _a, _b;
+    const m = new Map();
+    for (const wd of wds) {
+        let target = wd;
+        for (const tg of config.target_groups) {
+            if (!wd.startsWith(tg.working_directory)) {
+                continue;
+            }
+            if (tg.target !== undefined) {
+                target = tg.target + wd.slice(tg.working_directory.length);
+            }
+            for (const pattern of (_b = (_a = config.replace) === null || _a === void 0 ? void 0 : _a.patterns) !== null && _b !== void 0 ? _b : []) {
+                target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+            }
+            break;
+        }
+        m.set(wd, target);
+    }
+    return m;
+};
+exports.createWDTargetMap = createWDTargetMap;
 const getTarget = () => {
     const target = process.env.TFACTION_TARGET;
     if (target) {
@@ -25861,19 +25882,29 @@ const getTarget = () => {
     throw new Error("the environment variable TFACTION_TARGET is required");
 };
 exports.getTarget = getTarget;
+const getWorkingDir = () => {
+    const wd = process.env.TFACTION_WORKING_DIR;
+    if (wd === undefined) {
+        throw new Error("the environment variable TFACTION_TARGET is required");
+    }
+    return wd;
+};
+exports.getWorkingDir = getWorkingDir;
 const getIsApply = () => {
     return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
-const getTargetFromTargetGroups = (targetGroups, target) => {
-    for (const targetConfig of targetGroups) {
-        if (target.startsWith(targetConfig.target)) {
-            return targetConfig;
-        }
-    }
-    return undefined;
-};
-exports.getTargetFromTargetGroups = getTargetFromTargetGroups;
+// export const getTargetFromTargetGroups = (
+//   targetGroups: Array<TargetGroup>,
+//   target: string,
+// ): TargetGroup | undefined => {
+//   for (const targetConfig of targetGroups) {
+//     if (target.startsWith(targetConfig.target)) {
+//       return targetConfig;
+//     }
+//   }
+//   return undefined;
+// };
 const getTargetFromTargetGroupsByWorkingDir = (targetGroups, wd) => {
     for (const targetConfig of targetGroups) {
         if (wd.startsWith(targetConfig.working_directory)) {
@@ -25941,14 +25972,17 @@ const setEnvs = (...objs) => {
     return envs;
 };
 exports.setEnvs = setEnvs;
-function getTargetGroup(targets, target) {
-    for (const t of targets) {
-        if (target.startsWith(t.target)) {
-            return t;
-        }
-    }
-    throw new Error("target is invalid");
-}
+// export function getTargetGroup(
+//   targets: Array<TargetGroup>,
+//   target: string,
+// ): TargetGroup {
+//   for (const t of targets) {
+//     if (target.startsWith(t.target)) {
+//       return t;
+//     }
+//   }
+//   throw new Error("target is invalid");
+// }
 
 
 /***/ }),
@@ -60128,13 +60162,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = exports.main = void 0;
 const core = __importStar(__nccwpck_require__(7484));
+const exec = __importStar(__nccwpck_require__(5236));
 const lib = __importStar(__nccwpck_require__(6311));
 const path = __importStar(__nccwpck_require__(6928));
-const main = () => {
-    const result = (0, exports.run)({
+const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield (0, exports.run)({
         target: process.env.TFACTION_TARGET,
         workingDir: process.env.TFACTION_WORKING_DIR,
         isApply: lib.getIsApply(),
@@ -60146,24 +60190,17 @@ const main = () => {
     for (const [key, value] of result.outputs) {
         core.setOutput(key, value);
     }
-};
+});
 exports.main = main;
-const run = (inputs, config) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
     const workingDirectoryFile = (_a = config.working_directory_file) !== null && _a !== void 0 ? _a : "tfaction.yaml";
     const envs = new Map();
     const outputs = new Map();
     let target = inputs.target;
     let workingDir = inputs.workingDir;
-    let targetConfig = null;
-    if (target) {
-        targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
-        if (!targetConfig) {
-            throw new Error("target config is not found in target_groups");
-        }
-        workingDir = target.replace(targetConfig.target, targetConfig.working_directory);
-    }
-    else if (workingDir) {
+    let targetConfig = undefined;
+    if (workingDir) {
         targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, workingDir);
         if (!targetConfig) {
             throw new Error("target config is not found in target_groups");
@@ -60177,6 +60214,27 @@ const run = (inputs, config) => {
         }
         envs.set("TFACTION_TARGET", target);
     }
+    else if (target) {
+        const out = yield exec.getExecOutput("git", ["ls-files"], {});
+        const wds = [];
+        for (const line of out.stdout.split("\n")) {
+            if (line.endsWith((_d = config.working_directory_file) !== null && _d !== void 0 ? _d : "tfaction.yaml")) {
+                wds.push(path.dirname(line));
+                break;
+            }
+        }
+        const m = lib.createWDTargetMap(wds, config);
+        for (const [wd, t] of m) {
+            if (t === target) {
+                envs.set("TFACTION_WORKING_DIR", wd);
+                workingDir = wd;
+                break;
+            }
+        }
+        if (workingDir === undefined) {
+            throw new Error("No working directory is found for the target");
+        }
+    }
     else {
         throw new Error("Either TFACTION_TARGET or TFACTION_WORKING_DIR is required");
     }
@@ -60185,9 +60243,9 @@ const run = (inputs, config) => {
     for (const [key, value] of lib.setOutputs(["template_dir"], [targetConfig])) {
         outputs.set(key, value);
     }
-    outputs.set("enable_tfsec", (_e = (_d = config === null || config === void 0 ? void 0 : config.tfsec) === null || _d === void 0 ? void 0 : _d.enabled) !== null && _e !== void 0 ? _e : false);
-    outputs.set("enable_tflint", (_g = (_f = config === null || config === void 0 ? void 0 : config.tflint) === null || _f === void 0 ? void 0 : _f.enabled) !== null && _g !== void 0 ? _g : true);
-    outputs.set("enable_trivy", (_j = (_h = config === null || config === void 0 ? void 0 : config.trivy) === null || _h === void 0 ? void 0 : _h.enabled) !== null && _j !== void 0 ? _j : true);
+    outputs.set("enable_tfsec", (_f = (_e = config === null || config === void 0 ? void 0 : config.tfsec) === null || _e === void 0 ? void 0 : _e.enabled) !== null && _f !== void 0 ? _f : false);
+    outputs.set("enable_tflint", (_h = (_g = config === null || config === void 0 ? void 0 : config.tflint) === null || _g === void 0 ? void 0 : _g.enabled) !== null && _h !== void 0 ? _h : true);
+    outputs.set("enable_trivy", (_k = (_j = config === null || config === void 0 ? void 0 : config.trivy) === null || _j === void 0 ? void 0 : _j.enabled) !== null && _k !== void 0 ? _k : true);
     outputs.set("terraform_command", "terraform");
     if (inputs.jobType === "scaffold_working_dir") {
         const m = lib.setOutputs([
@@ -60231,7 +60289,7 @@ const run = (inputs, config) => {
             outputs.set(key, value);
         }
         outputs.set("destroy", wdConfig.destroy ? true : false);
-        outputs.set("enable_terraform_docs", (_o = (_l = (_k = wdConfig === null || wdConfig === void 0 ? void 0 : wdConfig.terraform_docs) === null || _k === void 0 ? void 0 : _k.enabled) !== null && _l !== void 0 ? _l : (_m = config === null || config === void 0 ? void 0 : config.terraform_docs) === null || _m === void 0 ? void 0 : _m.enabled) !== null && _o !== void 0 ? _o : false);
+        outputs.set("enable_terraform_docs", (_p = (_m = (_l = wdConfig === null || wdConfig === void 0 ? void 0 : wdConfig.terraform_docs) === null || _l === void 0 ? void 0 : _l.enabled) !== null && _m !== void 0 ? _m : (_o = config === null || config === void 0 ? void 0 : config.terraform_docs) === null || _o === void 0 ? void 0 : _o.enabled) !== null && _p !== void 0 ? _p : false);
         const m3 = lib.setEnvs(config, targetConfig, rootJobConfig, wdConfig, jobConfig);
         for (const [key, value] of m3) {
             envs.set(key, value);
@@ -60241,7 +60299,7 @@ const run = (inputs, config) => {
         outputs: outputs,
         envs: envs,
     };
-};
+});
 exports.run = run;
 
 

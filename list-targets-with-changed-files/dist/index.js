@@ -30,8 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
-exports.getTargetGroup = getTargetGroup;
+exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getIsApply = exports.getWorkingDir = exports.getTarget = exports.createWDTargetMap = exports.getConfig = exports.getJobType = void 0;
 const fs = __importStar(__nccwpck_require__(9896));
 const core = __importStar(__nccwpck_require__(4426));
 const js_yaml_1 = __nccwpck_require__(9595);
@@ -123,7 +122,7 @@ const TargetGroup = zod_1.z.object({
     runs_on: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
     secrets: zod_1.z.optional(GitHubSecrets),
     s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
-    target: zod_1.z.string(),
+    target: zod_1.z.optional(zod_1.z.string()),
     template_dir: zod_1.z.optional(zod_1.z.string()),
     terraform_apply_config: zod_1.z.optional(JobConfig),
     terraform_plan_config: zod_1.z.optional(JobConfig),
@@ -155,6 +154,12 @@ const TargetConfig = zod_1.z.object({
     terraform_command: zod_1.z.optional(zod_1.z.string()),
     terraform_docs: zod_1.z.optional(TerraformDocsConfig),
     conftest: zod_1.z.optional(ConftestConfig),
+});
+const Replace = zod_1.z.object({
+    patterns: zod_1.z.array(zod_1.z.object({
+        regexp: zod_1.z.string(),
+        replace: zod_1.z.string(),
+    })),
 });
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
@@ -203,6 +208,7 @@ const Config = zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
     working_directory_file: zod_1.z.optional(zod_1.z.string()),
+    replace: zod_1.z.optional(Replace),
 });
 const getConfig = () => {
     let configFilePath = process.env.TFACTION_CONFIG;
@@ -212,6 +218,28 @@ const getConfig = () => {
     return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, "utf8")));
 };
 exports.getConfig = getConfig;
+const createWDTargetMap = (wds, config) => {
+    var _a, _b;
+    const m = new Map();
+    for (const wd of wds) {
+        let target = wd;
+        for (const tg of config.target_groups) {
+            if (!wd.startsWith(tg.working_directory)) {
+                continue;
+            }
+            if (tg.target !== undefined) {
+                target = tg.target + wd.slice(tg.working_directory.length);
+            }
+            for (const pattern of (_b = (_a = config.replace) === null || _a === void 0 ? void 0 : _a.patterns) !== null && _b !== void 0 ? _b : []) {
+                target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+            }
+            break;
+        }
+        m.set(wd, target);
+    }
+    return m;
+};
+exports.createWDTargetMap = createWDTargetMap;
 const getTarget = () => {
     const target = process.env.TFACTION_TARGET;
     if (target) {
@@ -220,19 +248,29 @@ const getTarget = () => {
     throw new Error("the environment variable TFACTION_TARGET is required");
 };
 exports.getTarget = getTarget;
+const getWorkingDir = () => {
+    const wd = process.env.TFACTION_WORKING_DIR;
+    if (wd === undefined) {
+        throw new Error("the environment variable TFACTION_TARGET is required");
+    }
+    return wd;
+};
+exports.getWorkingDir = getWorkingDir;
 const getIsApply = () => {
     return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
-const getTargetFromTargetGroups = (targetGroups, target) => {
-    for (const targetConfig of targetGroups) {
-        if (target.startsWith(targetConfig.target)) {
-            return targetConfig;
-        }
-    }
-    return undefined;
-};
-exports.getTargetFromTargetGroups = getTargetFromTargetGroups;
+// export const getTargetFromTargetGroups = (
+//   targetGroups: Array<TargetGroup>,
+//   target: string,
+// ): TargetGroup | undefined => {
+//   for (const targetConfig of targetGroups) {
+//     if (target.startsWith(targetConfig.target)) {
+//       return targetConfig;
+//     }
+//   }
+//   return undefined;
+// };
 const getTargetFromTargetGroupsByWorkingDir = (targetGroups, wd) => {
     for (const targetConfig of targetGroups) {
         if (wd.startsWith(targetConfig.working_directory)) {
@@ -300,14 +338,17 @@ const setEnvs = (...objs) => {
     return envs;
 };
 exports.setEnvs = setEnvs;
-function getTargetGroup(targets, target) {
-    for (const t of targets) {
-        if (target.startsWith(t.target)) {
-            return t;
-        }
-    }
-    throw new Error("target is invalid");
-}
+// export function getTargetGroup(
+//   targets: Array<TargetGroup>,
+//   target: string,
+// ): TargetGroup {
+//   for (const t of targets) {
+//     if (target.startsWith(t.target)) {
+//       return t;
+//     }
+//   }
+//   throw new Error("target is invalid");
+// }
 
 
 /***/ }),
@@ -64400,38 +64441,31 @@ const github = __importStar(__nccwpck_require__(3228));
 const fs = __importStar(__nccwpck_require__(9896));
 const path = __importStar(__nccwpck_require__(6928));
 const lib = __importStar(__nccwpck_require__(6311));
-const getTargetConfigByTarget = (targets, target, isApply, jobType) => {
-    for (const t of targets) {
-        if (!target.startsWith(t.target)) {
-            continue;
-        }
-        const jobConfig = lib.getJobConfig(t, isApply, jobType);
-        if (jobConfig === undefined) {
-            return {
-                target: target,
-                working_directory: target.replace(t.target, t.working_directory),
-                runs_on: t.runs_on ? t.runs_on : "ubuntu-latest",
-                environment: t === null || t === void 0 ? void 0 : t.environment,
-                secrets: t.secrets,
-                job_type: jobType,
-            };
-        }
+const getTargetConfigByTarget = (targets, wd, target, isApply, jobType) => {
+    var _a, _b, _c, _d, _e;
+    const tg = lib.getTargetFromTargetGroupsByWorkingDir(targets, wd);
+    if (tg === undefined) {
+        throw new Error(`No target group is found for the working directory ${wd}`);
+    }
+    const jobConfig = lib.getJobConfig(tg, isApply, jobType);
+    if (jobConfig === undefined) {
         return {
             target: target,
-            working_directory: target.replace(t.target, t.working_directory),
-            runs_on: jobConfig.runs_on
-                ? jobConfig.runs_on
-                : t.runs_on
-                    ? t.runs_on
-                    : "ubuntu-latest",
-            environment: jobConfig.environment
-                ? jobConfig.environment
-                : t === null || t === void 0 ? void 0 : t.environment,
-            secrets: jobConfig.secrets ? jobConfig.secrets : t.secrets,
+            working_directory: wd,
+            runs_on: (_a = tg.runs_on) !== null && _a !== void 0 ? _a : "ubuntu-latest",
+            environment: tg === null || tg === void 0 ? void 0 : tg.environment,
+            secrets: tg.secrets,
             job_type: jobType,
         };
     }
-    throw new Error("target is invalid");
+    return {
+        target: target,
+        working_directory: wd,
+        runs_on: (_c = (_b = jobConfig.runs_on) !== null && _b !== void 0 ? _b : tg.runs_on) !== null && _c !== void 0 ? _c : "ubuntu-latest",
+        environment: (_d = jobConfig.environment) !== null && _d !== void 0 ? _d : tg.environment,
+        secrets: (_e = jobConfig.secrets) !== null && _e !== void 0 ? _e : tg.secrets,
+        job_type: jobType,
+    };
 };
 const getPRBody = (prStr, payload) => {
     if (payload.pull_request) {
@@ -64451,7 +64485,9 @@ const run = (input) => {
     const configTargetMap = new Map();
     for (const target of config.target_groups) {
         configWorkingDirMap.set(target.working_directory, target);
-        configTargetMap.set(target.target, target);
+        if (target.target !== undefined) {
+            configTargetMap.set(target.target, target);
+        }
     }
     const labels = input.labels;
     const changedFiles = input.changedFiles;
@@ -64465,6 +64501,11 @@ const run = (input) => {
     }
     workingDirs.sort();
     workingDirs.reverse();
+    const wdTargetMap = lib.createWDTargetMap(workingDirs, config);
+    const targetWDMap = new Map();
+    for (const [wd, t] of wdTargetMap) {
+        targetWDMap.set(t, wd);
+    }
     // Expected followupPRBody include the line:
     // <!-- tfaction follow up pr target=foo -->
     const followupTargetCommentRegex = new RegExp(/<!-- tfaction follow up pr target=([^\s]+).*-->/, "s");
@@ -64487,7 +64528,12 @@ const run = (input) => {
             const target = label.slice(targetPrefix.length);
             if (!terraformTargets.has(target)) {
                 terraformTargets.add(target);
-                terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, target, isApply, "terraform"));
+                const wd = targetWDMap.get(target);
+                if (wd === undefined) {
+                    throw new Error(`No working directory is found for the target ${target}`);
+                }
+                const tg = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, wd);
+                terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, wd, target, isApply, "terraform"));
             }
             continue;
         }
@@ -64495,7 +64541,11 @@ const run = (input) => {
             const target = label.slice(tfmigratePrefix.length);
             if (!tfmigrates.has(target)) {
                 tfmigrates.add(target);
-                tfmigrateObjs.push(getTargetConfigByTarget(config.target_groups, target, isApply, "tfmigrate"));
+                const wd = targetWDMap.get(target);
+                if (wd === undefined) {
+                    throw new Error(`No working directory is found for the target ${target}`);
+                }
+                tfmigrateObjs.push(getTargetConfigByTarget(config.target_groups, wd, target, isApply, "tfmigrate"));
             }
             continue;
         }
@@ -64523,23 +64573,25 @@ const run = (input) => {
         }
     }
     for (const changedWorkingDir of changedWorkingDirs) {
-        for (const target of config.target_groups) {
-            if (!changedWorkingDir.startsWith(target.working_directory)) {
-                continue;
-            }
-            const changedTarget = changedWorkingDir.replace(target.working_directory, target.target);
-            if (!terraformTargets.has(changedTarget) &&
-                !tfmigrates.has(changedTarget)) {
-                terraformTargets.add(changedTarget);
-                terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedTarget, isApply, "terraform"));
-            }
+        const target = wdTargetMap.get(changedWorkingDir);
+        if (target === undefined) {
+            throw new Error(`No target is found for the working directory ${changedWorkingDir}`);
+        }
+        if (!terraformTargets.has(target) &&
+            !tfmigrates.has(target)) {
+            terraformTargets.add(target);
+            terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, changedWorkingDir, target, isApply, "terraform"));
         }
     }
     if (followupTarget &&
         !tfmigrates.has(followupTarget) &&
         !terraformTargets.has(followupTarget)) {
+        const wd = targetWDMap.get(followupTarget);
+        if (wd === undefined) {
+            throw new Error(`No working directory is found for the target ${followupTarget}`);
+        }
         terraformTargets.add(followupTarget);
-        terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, followupTarget, isApply, "terraform"));
+        terraformTargetObjs.push(getTargetConfigByTarget(config.target_groups, wd, followupTarget, isApply, "terraform"));
     }
     return terraformTargetObjs.concat(tfmigrateObjs);
 };

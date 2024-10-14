@@ -46479,8 +46479,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getTargetFromTargetGroups = exports.getIsApply = exports.getTarget = exports.getConfig = exports.getJobType = void 0;
-exports.getTargetGroup = getTargetGroup;
+exports.setEnvs = exports.setOutputs = exports.setValues = exports.getJobConfig = exports.readTargetConfig = exports.getTargetFromTargetGroupsByWorkingDir = exports.getIsApply = exports.getWorkingDir = exports.getTarget = exports.createWDTargetMap = exports.getConfig = exports.getJobType = void 0;
 const fs = __importStar(__nccwpck_require__(9896));
 const core = __importStar(__nccwpck_require__(4426));
 const js_yaml_1 = __nccwpck_require__(9595);
@@ -46572,7 +46571,7 @@ const TargetGroup = zod_1.z.object({
     runs_on: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
     secrets: zod_1.z.optional(GitHubSecrets),
     s3_bucket_name_tfmigrate_history: zod_1.z.optional(zod_1.z.string()),
-    target: zod_1.z.string(),
+    target: zod_1.z.optional(zod_1.z.string()),
     template_dir: zod_1.z.optional(zod_1.z.string()),
     terraform_apply_config: zod_1.z.optional(JobConfig),
     terraform_plan_config: zod_1.z.optional(JobConfig),
@@ -46604,6 +46603,12 @@ const TargetConfig = zod_1.z.object({
     terraform_command: zod_1.z.optional(zod_1.z.string()),
     terraform_docs: zod_1.z.optional(TerraformDocsConfig),
     conftest: zod_1.z.optional(ConftestConfig),
+});
+const Replace = zod_1.z.object({
+    patterns: zod_1.z.array(zod_1.z.object({
+        regexp: zod_1.z.string(),
+        replace: zod_1.z.string(),
+    })),
 });
 const Config = zod_1.z.object({
     aqua: zod_1.z.optional(zod_1.z.object({
@@ -46652,6 +46657,7 @@ const Config = zod_1.z.object({
         enabled: zod_1.z.optional(zod_1.z.boolean()),
     })),
     working_directory_file: zod_1.z.optional(zod_1.z.string()),
+    replace: zod_1.z.optional(Replace),
 });
 const getConfig = () => {
     let configFilePath = process.env.TFACTION_CONFIG;
@@ -46661,6 +46667,28 @@ const getConfig = () => {
     return Config.parse((0, js_yaml_1.load)(fs.readFileSync(configFilePath, "utf8")));
 };
 exports.getConfig = getConfig;
+const createWDTargetMap = (wds, config) => {
+    var _a, _b;
+    const m = new Map();
+    for (const wd of wds) {
+        let target = wd;
+        for (const tg of config.target_groups) {
+            if (!wd.startsWith(tg.working_directory)) {
+                continue;
+            }
+            if (tg.target !== undefined) {
+                target = tg.target + wd.slice(tg.working_directory.length);
+            }
+            for (const pattern of (_b = (_a = config.replace) === null || _a === void 0 ? void 0 : _a.patterns) !== null && _b !== void 0 ? _b : []) {
+                target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+            }
+            break;
+        }
+        m.set(wd, target);
+    }
+    return m;
+};
+exports.createWDTargetMap = createWDTargetMap;
 const getTarget = () => {
     const target = process.env.TFACTION_TARGET;
     if (target) {
@@ -46669,19 +46697,29 @@ const getTarget = () => {
     throw new Error("the environment variable TFACTION_TARGET is required");
 };
 exports.getTarget = getTarget;
+const getWorkingDir = () => {
+    const wd = process.env.TFACTION_WORKING_DIR;
+    if (wd === undefined) {
+        throw new Error("the environment variable TFACTION_TARGET is required");
+    }
+    return wd;
+};
+exports.getWorkingDir = getWorkingDir;
 const getIsApply = () => {
     return process.env.TFACTION_IS_APPLY === "true";
 };
 exports.getIsApply = getIsApply;
-const getTargetFromTargetGroups = (targetGroups, target) => {
-    for (const targetConfig of targetGroups) {
-        if (target.startsWith(targetConfig.target)) {
-            return targetConfig;
-        }
-    }
-    return undefined;
-};
-exports.getTargetFromTargetGroups = getTargetFromTargetGroups;
+// export const getTargetFromTargetGroups = (
+//   targetGroups: Array<TargetGroup>,
+//   target: string,
+// ): TargetGroup | undefined => {
+//   for (const targetConfig of targetGroups) {
+//     if (target.startsWith(targetConfig.target)) {
+//       return targetConfig;
+//     }
+//   }
+//   return undefined;
+// };
 const getTargetFromTargetGroupsByWorkingDir = (targetGroups, wd) => {
     for (const targetConfig of targetGroups) {
         if (wd.startsWith(targetConfig.working_directory)) {
@@ -46749,14 +46787,17 @@ const setEnvs = (...objs) => {
     return envs;
 };
 exports.setEnvs = setEnvs;
-function getTargetGroup(targets, target) {
-    for (const t of targets) {
-        if (target.startsWith(t.target)) {
-            return t;
-        }
-    }
-    throw new Error("target is invalid");
-}
+// export function getTargetGroup(
+//   targets: Array<TargetGroup>,
+//   target: string,
+// ): TargetGroup {
+//   for (const t of targets) {
+//     if (target.startsWith(t.target)) {
+//       return t;
+//     }
+//   }
+//   throw new Error("target is invalid");
+// }
 
 
 /***/ }),
@@ -81005,9 +81046,13 @@ function exportSecrets(client, secrets) {
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const config = lib.getConfig();
     const targetS = lib.getTarget();
+    const wd = lib.getWorkingDir();
     const jobType = lib.getJobType();
     const isApply = lib.getIsApply();
-    const targetConfig = lib.getTargetGroup(config.target_groups, targetS);
+    const targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, wd);
+    if (targetConfig === undefined) {
+        throw new Error("No target group is found");
+    }
     const jobConfig = lib.getJobConfig(targetConfig, isApply, jobType);
     let awsClient = null;
     if (targetConfig.aws_secrets_manager) {

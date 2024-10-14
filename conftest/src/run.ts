@@ -6,8 +6,8 @@ import fs from "fs";
 import { globSync } from "glob";
 
 type Inputs = {
-  target?: string;
   workingDir?: string;
+  target?: string;
   githubCommentConfig: string;
   rootDir: string;
   plan: boolean;
@@ -16,8 +16,8 @@ type Inputs = {
 export const main = () => {
   run(
     {
-      target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
+      target: process.env.TFACTION_TARGET,
       githubCommentConfig: path.join(
         process.env.GITHUB_ACTION_PATH ?? "",
         "github-comment.yaml",
@@ -32,35 +32,23 @@ export const main = () => {
 export const run = async (inputs: Inputs, config: lib.Config) => {
   const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
-  let target = inputs.target;
-  let workingDir = inputs.workingDir;
+  const workingDir = inputs.workingDir;
+  if (workingDir === undefined) {
+    throw new Error("TFACTION_WORKING_DIR is required");
+  }
+  const target = inputs.target;
+  if (target === undefined) {
+    throw new Error("TFACTION_TARGET is required");
+  }
+
   let targetConfig = null;
 
-  if (target) {
-    targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
-    if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
-    }
-    workingDir = target.replace(
-      targetConfig.target,
-      targetConfig.working_directory,
-    );
-  } else if (workingDir) {
-    targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
-      config.target_groups,
-      workingDir,
-    );
-    if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
-    }
-    target = workingDir.replace(
-      targetConfig.working_directory,
-      targetConfig.target,
-    );
-  } else {
-    throw new Error(
-      "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",
-    );
+  targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
+    config.target_groups,
+    workingDir,
+  );
+  if (!targetConfig) {
+    throw new Error("target config is not found in target_groups");
   }
 
   const wdConfig = lib.readTargetConfig(

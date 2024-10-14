@@ -15,41 +15,34 @@ type TargetConfig = {
 
 const getTargetConfigByTarget = (
   targets: Array<lib.TargetGroup>,
+  wd: string,
   target: string,
   isApply: boolean,
   jobType: lib.JobType,
 ): TargetConfig => {
-  for (const t of targets) {
-    if (!target.startsWith(t.target)) {
-      continue;
-    }
-    const jobConfig = lib.getJobConfig(t, isApply, jobType);
-    if (jobConfig === undefined) {
-      return {
-        target: target,
-        working_directory: target.replace(t.target, t.working_directory),
-        runs_on: t.runs_on ? t.runs_on : "ubuntu-latest",
-        environment: t?.environment,
-        secrets: t.secrets,
-        job_type: jobType,
-      };
-    }
+  const tg = lib.getTargetFromTargetGroupsByWorkingDir(targets, wd);
+  if (tg === undefined) {
+    throw new Error(`No target group is found for the working directory ${wd}`);
+  }
+  const jobConfig = lib.getJobConfig(tg, isApply, jobType);
+  if (jobConfig === undefined) {
     return {
       target: target,
-      working_directory: target.replace(t.target, t.working_directory),
-      runs_on: jobConfig.runs_on
-        ? jobConfig.runs_on
-        : t.runs_on
-          ? t.runs_on
-          : "ubuntu-latest",
-      environment: jobConfig.environment
-        ? jobConfig.environment
-        : t?.environment,
-      secrets: jobConfig.secrets ? jobConfig.secrets : t.secrets,
+      working_directory: wd,
+      runs_on: tg.runs_on ?? "ubuntu-latest",
+      environment: tg?.environment,
+      secrets: tg.secrets,
       job_type: jobType,
     };
   }
-  throw new Error("target is invalid");
+  return {
+    target: target,
+    working_directory: wd,
+    runs_on: jobConfig.runs_on ?? tg.runs_on ?? "ubuntu-latest",
+    environment: jobConfig.environment ?? tg.environment,
+    secrets: jobConfig.secrets ?? tg.secrets,
+    job_type: jobType,
+  };
 };
 
 type Payload = {
@@ -79,12 +72,15 @@ export const run = (input: Input): TargetConfig[] => {
   const configTargetMap = new Map();
   for (const target of config.target_groups) {
     configWorkingDirMap.set(target.working_directory, target);
-    configTargetMap.set(target.target, target);
+    if (target.target !== undefined) {
+      configTargetMap.set(target.target, target);
+    }
   }
 
   const labels = input.labels;
   const changedFiles = input.changedFiles;
   const configFiles = input.configFiles;
+
   const workingDirs = new Array<string>();
   for (const configFile of configFiles) {
     if (configFile == "") {
@@ -94,6 +90,12 @@ export const run = (input: Input): TargetConfig[] => {
   }
   workingDirs.sort();
   workingDirs.reverse();
+
+  const wdTargetMap = lib.createWDTargetMap(workingDirs, config);
+  const targetWDMap = new Map<string, string>();
+  for (const [wd, t] of wdTargetMap) {
+    targetWDMap.set(t, wd);
+  }
 
   // Expected followupPRBody include the line:
   // <!-- tfaction follow up pr target=foo -->
@@ -123,9 +125,15 @@ export const run = (input: Input): TargetConfig[] => {
       const target = label.slice(targetPrefix.length);
       if (!terraformTargets.has(target)) {
         terraformTargets.add(target);
+        const wd = targetWDMap.get(target);
+        if (wd === undefined) {
+          throw new Error(`No working directory is found for the target ${target}`);
+        }
+        const tg = lib.getTargetFromTargetGroupsByWorkingDir(config.target_groups, wd);
         terraformTargetObjs.push(
           getTargetConfigByTarget(
             config.target_groups,
+            wd,
             target,
             isApply,
             "terraform",
@@ -138,9 +146,14 @@ export const run = (input: Input): TargetConfig[] => {
       const target = label.slice(tfmigratePrefix.length);
       if (!tfmigrates.has(target)) {
         tfmigrates.add(target);
+        const wd = targetWDMap.get(target);
+        if (wd === undefined) {
+          throw new Error(`No working directory is found for the target ${target}`);
+        }
         tfmigrateObjs.push(
           getTargetConfigByTarget(
             config.target_groups,
+            wd,
             target,
             isApply,
             "tfmigrate",
@@ -175,28 +188,24 @@ export const run = (input: Input): TargetConfig[] => {
   }
 
   for (const changedWorkingDir of changedWorkingDirs) {
-    for (const target of config.target_groups) {
-      if (!changedWorkingDir.startsWith(target.working_directory)) {
-        continue;
-      }
-      const changedTarget = changedWorkingDir.replace(
-        target.working_directory,
-        target.target,
+    const target = wdTargetMap.get(changedWorkingDir);
+    if (target === undefined) {
+      throw new Error(`No target is found for the working directory ${changedWorkingDir}`);
+    }
+    if (
+      !terraformTargets.has(target) &&
+      !tfmigrates.has(target)
+    ) {
+      terraformTargets.add(target);
+      terraformTargetObjs.push(
+        getTargetConfigByTarget(
+          config.target_groups,
+          changedWorkingDir,
+          target,
+          isApply,
+          "terraform",
+        ),
       );
-      if (
-        !terraformTargets.has(changedTarget) &&
-        !tfmigrates.has(changedTarget)
-      ) {
-        terraformTargets.add(changedTarget);
-        terraformTargetObjs.push(
-          getTargetConfigByTarget(
-            config.target_groups,
-            changedTarget,
-            isApply,
-            "terraform",
-          ),
-        );
-      }
     }
   }
 
@@ -205,10 +214,15 @@ export const run = (input: Input): TargetConfig[] => {
     !tfmigrates.has(followupTarget) &&
     !terraformTargets.has(followupTarget)
   ) {
+    const wd = targetWDMap.get(followupTarget);
+    if (wd === undefined) {
+      throw new Error(`No working directory is found for the target ${followupTarget}`);
+    }
     terraformTargets.add(followupTarget);
     terraformTargetObjs.push(
       getTargetConfigByTarget(
         config.target_groups,
+        wd,
         followupTarget,
         isApply,
         "terraform",

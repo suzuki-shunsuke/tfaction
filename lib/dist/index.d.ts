@@ -338,7 +338,7 @@ declare const TargetGroup: z.ZodObject<{
         secret_name: string;
     }>, "many">>;
     s3_bucket_name_tfmigrate_history: z.ZodOptional<z.ZodString>;
-    target: z.ZodString;
+    target: z.ZodOptional<z.ZodString>;
     template_dir: z.ZodOptional<z.ZodString>;
     terraform_apply_config: z.ZodOptional<z.ZodObject<{
         aws_assume_role_arn: z.ZodOptional<z.ZodString>;
@@ -904,8 +904,8 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    target: string;
     working_directory: string;
+    target?: string | undefined;
     environment?: string | {
         name: string;
         url: string;
@@ -1063,8 +1063,8 @@ declare const TargetGroup: z.ZodObject<{
         }[] | undefined;
     } | undefined;
 }, {
-    target: string;
     working_directory: string;
+    target?: string | undefined;
     environment?: string | {
         name: string;
         url: string;
@@ -2264,7 +2264,7 @@ declare const Config: z.ZodObject<{
             secret_name: string;
         }>, "many">>;
         s3_bucket_name_tfmigrate_history: z.ZodOptional<z.ZodString>;
-        target: z.ZodString;
+        target: z.ZodOptional<z.ZodString>;
         template_dir: z.ZodOptional<z.ZodString>;
         terraform_apply_config: z.ZodOptional<z.ZodObject<{
             aws_assume_role_arn: z.ZodOptional<z.ZodString>;
@@ -2830,8 +2830,8 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        target: string;
         working_directory: string;
+        target?: string | undefined;
         environment?: string | {
             name: string;
             url: string;
@@ -2989,8 +2989,8 @@ declare const Config: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }, {
-        target: string;
         working_directory: string;
+        target?: string | undefined;
         environment?: string | {
             name: string;
             url: string;
@@ -3217,8 +3217,8 @@ declare const Config: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     plan_workflow_name: string;
     target_groups: {
-        target: string;
         working_directory: string;
+        target?: string | undefined;
         environment?: string | {
             name: string;
             url: string;
@@ -3449,8 +3449,8 @@ declare const Config: z.ZodObject<{
 }, {
     plan_workflow_name: string;
     target_groups: {
-        target: string;
         working_directory: string;
+        target?: string | undefined;
         environment?: string | {
             name: string;
             url: string;
@@ -3681,9 +3681,10 @@ declare const Config: z.ZodObject<{
 }>;
 export type Config = z.infer<typeof Config>;
 export declare const getConfig: () => Config;
+export declare const createWDTargetMap: (wds: string[], config: Config) => Map<string, string>;
 export declare const getTarget: () => string;
+export declare const getWorkingDir: () => string;
 export declare const getIsApply: () => boolean;
-export declare const getTargetFromTargetGroups: (targetGroups: Array<TargetGroup>, target: string) => TargetGroup | undefined;
 export declare const getTargetFromTargetGroupsByWorkingDir: (targetGroups: Array<TargetGroup>, wd: string) => TargetGroup | undefined;
 export declare const readTargetConfig: (p: string) => TargetConfig;
 export declare const getJobConfig: (config: TargetConfig | undefined, isApply: boolean, jobType: JobType) => JobConfig | undefined;
@@ -3693,5 +3694,4 @@ type HasEnv = {
     env?: Record<string, string>;
 };
 export declare const setEnvs: (...objs: Array<HasEnv | undefined>) => Map<string, any>;
-export declare function getTargetGroup(targets: Array<TargetGroup>, target: string): TargetGroup;
 export {};

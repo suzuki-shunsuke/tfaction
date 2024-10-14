@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import * as lib from "lib";
 import * as path from "path";
 
@@ -14,8 +15,8 @@ export type Result = {
   outputs: Map<string, any>;
 };
 
-export const main = () => {
-  const result = run(
+export const main = async () => {
+  const result = await run(
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
@@ -32,7 +33,7 @@ export const main = () => {
   }
 };
 
-export const run = (inputs: Inputs, config: lib.Config): Result => {
+export const run = async (inputs: Inputs, config: lib.Config): Promise<Result> => {
   const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
   const envs = new Map<string, any>();
@@ -40,18 +41,9 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
 
   let target = inputs.target;
   let workingDir = inputs.workingDir;
-  let targetConfig = null;
+  let targetConfig = undefined;
 
-  if (target) {
-    targetConfig = lib.getTargetFromTargetGroups(config.target_groups, target);
-    if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
-    }
-    workingDir = target.replace(
-      targetConfig.target,
-      targetConfig.working_directory,
-    );
-  } else if (workingDir) {
+  if (workingDir) {
     targetConfig = lib.getTargetFromTargetGroupsByWorkingDir(
       config.target_groups,
       workingDir,
@@ -70,6 +62,28 @@ export const run = (inputs: Inputs, config: lib.Config): Result => {
       );
     }
     envs.set("TFACTION_TARGET", target);
+  } else if (target) {
+    const out = await exec.getExecOutput("git", ["ls-files"], {});
+    const wds: string[] = [];
+    for (const line of out.stdout.split("\n")) {
+      if (line.endsWith(config.working_directory_file ?? "tfaction.yaml")) {
+        wds.push(path.dirname(line));
+        break;
+      }
+    }
+    const m = lib.createWDTargetMap(wds, config);
+    for (const [wd, t] of m) {
+      if (t === target) {
+        envs.set("TFACTION_WORKING_DIR", wd);
+        workingDir = wd;
+        break;
+      }
+    }
+    if (workingDir === undefined) {
+      throw new Error(
+        "No working directory is found for the target",
+      );
+    }
   } else {
     throw new Error(
       "Either TFACTION_TARGET or TFACTION_WORKING_DIR is required",

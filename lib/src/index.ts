@@ -130,7 +130,7 @@ const TargetGroup = z.object({
   runs_on: z.optional(z.union([z.string(), z.array(z.string())])),
   secrets: z.optional(GitHubSecrets),
   s3_bucket_name_tfmigrate_history: z.optional(z.string()),
-  target: z.string(),
+  target: z.optional(z.string()),
   template_dir: z.optional(z.string()),
   terraform_apply_config: z.optional(JobConfig),
   terraform_plan_config: z.optional(JobConfig),
@@ -254,6 +254,27 @@ export const getConfig = (): Config => {
   return Config.parse(load(fs.readFileSync(configFilePath, "utf8")));
 };
 
+export const createWDTargetMap = (wds: string[], config: Config): Map<string, string> => {
+  const m = new Map<string, string>();
+  for (const wd of wds) {
+    let target = wd;
+    for (const tg of config.target_groups) {
+      if (!wd.startsWith(tg.working_directory)) {
+        continue;
+      }
+      if (tg.target !== undefined) {
+        target = tg.target + wd.slice(tg.working_directory.length);
+      }
+      for (const pattern of config.replace?.patterns ?? []) {
+        target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+      }
+      break;
+    }
+    m.set(wd, target);
+  }
+  return m;
+};
+
 export const getTarget = (): string => {
   const target = process.env.TFACTION_TARGET;
   if (target) {
@@ -262,21 +283,29 @@ export const getTarget = (): string => {
   throw new Error("the environment variable TFACTION_TARGET is required");
 };
 
+export const getWorkingDir = (): string => {
+  const wd = process.env.TFACTION_WORKING_DIR;
+  if (wd === undefined) {
+    throw new Error("the environment variable TFACTION_TARGET is required");
+  }
+  return wd;
+};
+
 export const getIsApply = (): boolean => {
   return process.env.TFACTION_IS_APPLY === "true";
 };
 
-export const getTargetFromTargetGroups = (
-  targetGroups: Array<TargetGroup>,
-  target: string,
-): TargetGroup | undefined => {
-  for (const targetConfig of targetGroups) {
-    if (target.startsWith(targetConfig.target)) {
-      return targetConfig;
-    }
-  }
-  return undefined;
-};
+// export const getTargetFromTargetGroups = (
+//   targetGroups: Array<TargetGroup>,
+//   target: string,
+// ): TargetGroup | undefined => {
+//   for (const targetConfig of targetGroups) {
+//     if (target.startsWith(targetConfig.target)) {
+//       return targetConfig;
+//     }
+//   }
+//   return undefined;
+// };
 
 export const getTargetFromTargetGroupsByWorkingDir = (
   targetGroups: Array<TargetGroup>,
@@ -361,14 +390,14 @@ export const setEnvs = (
   return envs;
 };
 
-export function getTargetGroup(
-  targets: Array<TargetGroup>,
-  target: string,
-): TargetGroup {
-  for (const t of targets) {
-    if (target.startsWith(t.target)) {
-      return t;
-    }
-  }
-  throw new Error("target is invalid");
-}
+// export function getTargetGroup(
+//   targets: Array<TargetGroup>,
+//   target: string,
+// ): TargetGroup {
+//   for (const t of targets) {
+//     if (target.startsWith(t.target)) {
+//       return t;
+//     }
+//   }
+//   throw new Error("target is invalid");
+// }
