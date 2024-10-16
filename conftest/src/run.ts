@@ -155,10 +155,10 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     ];
 
     if (typeof policy.policy === "string") {
-      args.push("-p", policy.policy);
+      args.push("-p", path.join(inputs.rootDir, policy.policy));
     } else {
       for (const p of policy.policy) {
-        args.push("-p", p);
+        args.push("-p", path.join(inputs.rootDir, p));
       }
     }
 
@@ -171,7 +171,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
         args.push("--data", policy.data);
       } else {
         for (const p of policy.data) {
-          args.push("--data", p);
+          args.push("--data", path.join(inputs.rootDir, p));
         }
       }
     }
@@ -206,24 +206,24 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     if (policy.tls) {
       args.push("--tls");
     }
-    if (policy.ignore) {
-      args.push("--ignore", policy.ignore);
-    }
+    // if (policy.ignore) {
+    //   args.push("--ignore", policy.ignore);
+    // }
     if (policy.parser) {
       args.push("--parser", policy.parser);
     }
-    if (policy.capabilities) {
-      args.push("--capabilities", policy.capabilities);
-    }
+    // if (policy.capabilities) {
+    //   args.push("--capabilities", policy.capabilities);
+    // }
     if (policy.output) {
       args.push("--output", policy.output);
     }
     for (const n of policy.namespaces ?? []) {
       args.push("-n", n);
     }
-    for (const n of policy.proto_file_dirs ?? []) {
-      args.push("--proto-file-dirs", n);
-    }
+    // for (const n of policy.proto_file_dirs ?? []) {
+    //   args.push("--proto-file-dirs", n);
+    // }
 
     args.push(...paths);
     core.info("github-comment " + args.join(" "));
