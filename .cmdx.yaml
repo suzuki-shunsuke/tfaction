@@ -24,6 +24,9 @@ tasks:
   - name: build
     description: build TypeScript
     usage: build TypeScript
+    shell:
+      - bash
+      - -c
     script: |
       set -euo pipefail
       pushd lib
@@ -40,6 +43,9 @@ tasks:
     short: t
     description: Test
     usage: Test
+    shell:
+      - bash
+      - -c
     script: |
       set -euo pipefail
       pushd lib
@@ -56,6 +62,9 @@ tasks:
     short: u
     description: Update
     usage: Update
+    shell:
+      - bash
+      - -c
     script: |
       set -euo pipefail
       pushd lib
