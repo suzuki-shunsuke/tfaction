@@ -181,8 +181,10 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     tmp.setGracefulCleanup();
     const tmpobj = tmp.dirSync();
     const data = {
-      target: t.target,
-      working_directory: t.workingDir,
+      tfaction: {
+        target: t.target,
+        working_directory: t.workingDir,
+      },
     };
     const tmpFile = path.join(tmpobj.name, "data.json");
     fs.writeFileSync(tmpFile, JSON.stringify(data));
