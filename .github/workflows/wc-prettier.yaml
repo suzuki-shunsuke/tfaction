@@ -42,7 +42,8 @@ jobs:
             ]
           permissions: >-
             {
-              "contents": "write"
+              "contents": "write",
+              "workflows": "write"
             }
 
       - run: npm run fmt

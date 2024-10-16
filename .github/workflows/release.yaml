@@ -8,7 +8,7 @@ on:
         description: "tag"
         required: true
       ref:
-        description: "released ref (branch, tag or SHA). By default, the default branch is used"
+        description: 'released ref (branch, tag or SHA). By default, the default branch is used'
         required: false
       pr:
         description: "pr number (pre-release)"
