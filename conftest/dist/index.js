@@ -25992,13 +25992,29 @@ const TerraformDocsConfig = zod_1.z.object({
     enabled: zod_1.z.optional(zod_1.z.boolean()),
 });
 const ConftestPolicyConfig = zod_1.z.object({
-    policy: zod_1.z.optional(zod_1.z.string()),
-    id: zod_1.z.optional(zod_1.z.string()),
-    data: zod_1.z.optional(zod_1.z.string()),
-    plan: zod_1.z.optional(zod_1.z.boolean()),
     tf: zod_1.z.optional(zod_1.z.boolean()),
-    combine: zod_1.z.optional(zod_1.z.boolean()),
+    plan: zod_1.z.optional(zod_1.z.boolean()),
+    id: zod_1.z.optional(zod_1.z.string()),
     enabled: zod_1.z.optional(zod_1.z.boolean()),
+    policy: zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())]),
+    data: zod_1.z.optional(zod_1.z.union([zod_1.z.string(), zod_1.z.array(zod_1.z.string())])),
+    fail_on_warn: zod_1.z.optional(zod_1.z.boolean()),
+    no_fail: zod_1.z.optional(zod_1.z.boolean()),
+    all_namespaces: zod_1.z.optional(zod_1.z.boolean()),
+    quiet: zod_1.z.optional(zod_1.z.boolean()),
+    trace: zod_1.z.optional(zod_1.z.boolean()),
+    strict: zod_1.z.optional(zod_1.z.boolean()),
+    show_builtin_errors: zod_1.z.optional(zod_1.z.boolean()),
+    junit_hide_message: zod_1.z.optional(zod_1.z.boolean()),
+    suppress_exceptions: zod_1.z.optional(zod_1.z.boolean()),
+    combine: zod_1.z.optional(zod_1.z.boolean()),
+    tls: zod_1.z.optional(zod_1.z.boolean()),
+    ignore: zod_1.z.optional(zod_1.z.string()),
+    parser: zod_1.z.optional(zod_1.z.string()),
+    capabilities: zod_1.z.optional(zod_1.z.string()),
+    output: zod_1.z.optional(zod_1.z.string()),
+    namespaces: zod_1.z.optional(zod_1.z.array(zod_1.z.string())),
+    proto_file_dirs: zod_1.z.optional(zod_1.z.array(zod_1.z.string())),
     paths: zod_1.z.optional(zod_1.z.array(zod_1.z.string())),
 });
 const ConftestConfig = zod_1.z.object({
@@ -60509,7 +60525,7 @@ const main = () => {
 };
 exports.main = main;
 const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     const workingDirectoryFile = (_a = config.working_directory_file) !== null && _a !== void 0 ? _a : "tfaction.yaml";
     const t = yield lib.getTargetGroup(config, inputs.target, inputs.workingDir);
     if (!t.group) {
@@ -60624,14 +60640,75 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             "conftest",
             "test",
             "--no-color",
-            "-p",
-            path.join(inputs.rootDir, policy.policy),
         ];
+        if (typeof policy.policy === "string") {
+            args.push("-p", policy.policy);
+        }
+        else {
+            for (const p of policy.policy) {
+                args.push("-p", p);
+            }
+        }
         if (policy.combine) {
             args.push("--combine");
         }
-        if (policy.data) {
-            args.push("--data", path.join(inputs.rootDir, policy.data));
+        if (policy.data !== undefined) {
+            if (typeof policy.data === "string") {
+                args.push("--data", policy.data);
+            }
+            else {
+                for (const p of policy.data) {
+                    args.push("--data", p);
+                }
+            }
+        }
+        if (policy.fail_on_warn) {
+            args.push("--fail-on-warn");
+        }
+        if (policy.no_fail) {
+            args.push("--no-fail");
+        }
+        if (policy.all_namespaces) {
+            args.push("--all-namespaces");
+        }
+        if (policy.quiet) {
+            args.push("--quiet");
+        }
+        if (policy.trace) {
+            args.push("--trace");
+        }
+        if (policy.strict) {
+            args.push("--strict");
+        }
+        if (policy.show_builtin_errors) {
+            args.push("--show-builtin-errors");
+        }
+        if (policy.junit_hide_message) {
+            args.push("--junit-hide-message");
+        }
+        if (policy.suppress_exceptions) {
+            args.push("--suppress-exceptions");
+        }
+        if (policy.tls) {
+            args.push("--tls");
+        }
+        if (policy.ignore) {
+            args.push("--ignore", policy.ignore);
+        }
+        if (policy.parser) {
+            args.push("--parser", policy.parser);
+        }
+        if (policy.capabilities) {
+            args.push("--capabilities", policy.capabilities);
+        }
+        if (policy.output) {
+            args.push("--output", policy.output);
+        }
+        for (const n of (_h = policy.namespaces) !== null && _h !== void 0 ? _h : []) {
+            args.push("-n", n);
+        }
+        for (const n of (_j = policy.proto_file_dirs) !== null && _j !== void 0 ? _j : []) {
+            args.push("--proto-file-dirs", n);
         }
         args.push(...paths);
         core.info("github-comment " + args.join(" "));
