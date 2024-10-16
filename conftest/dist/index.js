@@ -60654,7 +60654,7 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
         if (policy.data !== undefined) {
             if (typeof policy.data === "string") {
-                args.push("--data", policy.data);
+                args.push("--data", path.join(inputs.rootDir, policy.data));
             }
             else {
                 for (const p of policy.data) {

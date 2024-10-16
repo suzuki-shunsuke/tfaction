@@ -168,7 +168,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
 
     if (policy.data !== undefined) {
       if (typeof policy.data === "string") {
-        args.push("--data", policy.data);
+        args.push("--data", path.join(inputs.rootDir, policy.data));
       } else {
         for (const p of policy.data) {
           args.push("--data", path.join(inputs.rootDir, p));
