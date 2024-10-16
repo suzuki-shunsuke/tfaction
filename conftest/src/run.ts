@@ -152,15 +152,79 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       "conftest",
       "test",
       "--no-color",
-      "-p",
-      path.join(inputs.rootDir, policy.policy),
     ];
+
+    if (typeof policy.policy === "string") {
+      args.push("-p", policy.policy);
+    } else {
+      for (const p of policy.policy) {
+        args.push("-p", p);
+      }
+    }
+
     if (policy.combine) {
       args.push("--combine");
     }
-    if (policy.data) {
-      args.push("--data", path.join(inputs.rootDir, policy.data));
+
+    if (policy.data !== undefined) {
+      if (typeof policy.data === "string") {
+        args.push("--data", policy.data);
+      } else {
+        for (const p of policy.data) {
+          args.push("--data", p);
+        }
+      }
     }
+
+    if (policy.fail_on_warn) {
+      args.push("--fail-on-warn");
+    }
+    if (policy.no_fail) {
+      args.push("--no-fail");
+    }
+    if (policy.all_namespaces) {
+      args.push("--all-namespaces");
+    }
+    if (policy.quiet) {
+      args.push("--quiet");
+    }
+    if (policy.trace) {
+      args.push("--trace");
+    }
+    if (policy.strict) {
+      args.push("--strict");
+    }
+    if (policy.show_builtin_errors) {
+      args.push("--show-builtin-errors");
+    }
+    if (policy.junit_hide_message) {
+      args.push("--junit-hide-message");
+    }
+    if (policy.suppress_exceptions) {
+      args.push("--suppress-exceptions");
+    }
+    if (policy.tls) {
+      args.push("--tls");
+    }
+    if (policy.ignore) {
+      args.push("--ignore", policy.ignore);
+    }
+    if (policy.parser) {
+      args.push("--parser", policy.parser);
+    }
+    if (policy.capabilities) {
+      args.push("--capabilities", policy.capabilities);
+    }
+    if (policy.output) {
+      args.push("--output", policy.output);
+    }
+    for (const n of policy.namespaces ?? []) {
+      args.push("-n", n);
+    }
+    for (const n of policy.proto_file_dirs ?? []) {
+      args.push("--proto-file-dirs", n);
+    }
+
     args.push(...paths);
     core.info("github-comment " + args.join(" "));
     await exec.exec("github-comment", args, {
