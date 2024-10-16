@@ -21,6 +21,14 @@ jobs:
           cache: npm
       - run: npm i
 
+      - uses: aquaproj/aqua-installer@6ce1f8848ec8e61f14d57bd5d7597057a6dd187c # v3.0.1
+        if: |
+          github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
+        with:
+          aqua_version: v2.36.1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+
       - id: token
         uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         if: |
