@@ -34,12 +34,18 @@ tasks:
       npm run build
       popd
 
+      cnt=$(git ls-files |
+        grep package.json |
+        grep -v -E '^package\.json' |
+        grep -v lib/package.json |
+        wc -l)
+
       git ls-files |
         grep package.json |
         grep -v -E '^package\.json' |
         grep -v lib/package.json |
         xargs -n 1 dirname |
-        xargs -P 5 bash scripts/build.sh
+        xargs -n 1 -P "$cnt" bash scripts/build.sh
   - name: test
     short: t
     description: Test
