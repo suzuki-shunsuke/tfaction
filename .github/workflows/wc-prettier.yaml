@@ -63,6 +63,7 @@ jobs:
               -r "$GITHUB_REPOSITORY" \
               -m "style: format by prettier" \
               -b "$GITHUB_HEAD_REF"
+          exit 1
 
       - run: npm t
         if: |
