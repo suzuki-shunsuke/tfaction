@@ -1,6 +1,12 @@
 ---
 name: Prettier
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      gh_app_id:
+        required: false
+      gh_app_private_key:
+        required: false
 
 jobs:
   prettier:
@@ -14,4 +20,51 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm i
+
+      - uses: aquaproj/aqua-installer@6ce1f8848ec8e61f14d57bd5d7597057a6dd187c # v3.0.1
+        if: |
+          github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
+        with:
+          aqua_version: v2.36.1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+
+      - id: token
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        if: |
+          github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
+        with:
+          app_id: ${{ secrets.gh_app_id }}
+          private_key: ${{ secrets.gh_app_private_key }}
+          repositories: >-
+            [
+              "${{ github.event.repository.name }}"
+            ]
+          permissions: >-
+            {
+              "contents": "write",
+              "workflows": "write"
+            }
+
+      - run: npm run fmt
+        if: |
+          github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
+
+      - if: |
+          github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
+        env:
+          GITHUB_TOKEN: ${{ steps.token.outputs.token }}
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git diff --name-only |
+            xargs ghcp commit \
+              -r "$GITHUB_REPOSITORY" \
+              -m "style: format by prettier" \
+              -b "$GITHUB_HEAD_REF"
+          exit 1
+
       - run: npm t
+        if: |
+          github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork

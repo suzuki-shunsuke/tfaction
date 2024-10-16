@@ -69,6 +69,8 @@ jobs:
       - run: git fetch origin "pull/$PR_NUMBER/merge:$PR_BRANCH"
       - run: git checkout "$PR_BRANCH"
 
+      - run: cmdx build
+      - run: find ./*/dist/* -print0 | xargs -0 git add -f
       - run: |
           git ls-files | grep -E "/action\.yaml$" |
             xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@$PR_BRANCH|"
