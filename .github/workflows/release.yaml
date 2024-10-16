@@ -52,6 +52,9 @@ jobs:
       - run: git config user.name "github-actions[bot]"
       - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - run: cmdx build
+      - run: find ./*/dist/* -print0 | xargs -0 git add -f
+
       - run: |
           git ls-files | grep -E "/action\.yaml$" |
             xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@${TAG}|"
