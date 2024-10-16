@@ -60525,7 +60525,7 @@ const main = () => {
 };
 exports.main = main;
 const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const workingDirectoryFile = (_a = config.working_directory_file) !== null && _a !== void 0 ? _a : "tfaction.yaml";
     const t = yield lib.getTargetGroup(config, inputs.target, inputs.workingDir);
     if (!t.group) {
@@ -60642,11 +60642,11 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
             "--no-color",
         ];
         if (typeof policy.policy === "string") {
-            args.push("-p", policy.policy);
+            args.push("-p", path.join(inputs.rootDir, policy.policy));
         }
         else {
             for (const p of policy.policy) {
-                args.push("-p", p);
+                args.push("-p", path.join(inputs.rootDir, p));
             }
         }
         if (policy.combine) {
@@ -60654,11 +60654,11 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         }
         if (policy.data !== undefined) {
             if (typeof policy.data === "string") {
-                args.push("--data", policy.data);
+                args.push("--data", path.join(inputs.rootDir, policy.data));
             }
             else {
                 for (const p of policy.data) {
-                    args.push("--data", p);
+                    args.push("--data", path.join(inputs.rootDir, p));
                 }
             }
         }
@@ -60692,24 +60692,24 @@ const run = (inputs, config) => __awaiter(void 0, void 0, void 0, function* () {
         if (policy.tls) {
             args.push("--tls");
         }
-        if (policy.ignore) {
-            args.push("--ignore", policy.ignore);
-        }
+        // if (policy.ignore) {
+        //   args.push("--ignore", policy.ignore);
+        // }
         if (policy.parser) {
             args.push("--parser", policy.parser);
         }
-        if (policy.capabilities) {
-            args.push("--capabilities", policy.capabilities);
-        }
+        // if (policy.capabilities) {
+        //   args.push("--capabilities", policy.capabilities);
+        // }
         if (policy.output) {
             args.push("--output", policy.output);
         }
         for (const n of (_h = policy.namespaces) !== null && _h !== void 0 ? _h : []) {
             args.push("-n", n);
         }
-        for (const n of (_j = policy.proto_file_dirs) !== null && _j !== void 0 ? _j : []) {
-            args.push("--proto-file-dirs", n);
-        }
+        // for (const n of policy.proto_file_dirs ?? []) {
+        //   args.push("--proto-file-dirs", n);
+        // }
         args.push(...paths);
         core.info("github-comment " + args.join(" "));
         yield exec.exec("github-comment", args, {
