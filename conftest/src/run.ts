@@ -3,6 +3,7 @@ import * as exec from "@actions/exec";
 import * as lib from "lib";
 import * as path from "path";
 import fs from "fs";
+import tmp from "tmp";
 import { globSync } from "glob";
 
 type Inputs = {
@@ -175,6 +176,17 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
         }
       }
     }
+
+    // create a special data file
+    tmp.setGracefulCleanup();
+    const tmpobj = tmp.dirSync();
+    const data = {
+      target: t.target,
+      working_directory: t.workingDir,
+    };
+    const tmpFile = path.join(tmpobj.name, "data.json");
+    fs.writeFileSync(tmpFile, JSON.stringify(data));
+    args.push("--data", tmpFile);
 
     if (policy.fail_on_warn) {
       args.push("--fail-on-warn");
