@@ -2,7 +2,7 @@ name: plan
 description: plan
 inputs:
   github_token:
-    description: "GitHub Access Token"
+    description: 'GitHub Access Token'
     required: false
     default: ${{ github.token }}
 runs:

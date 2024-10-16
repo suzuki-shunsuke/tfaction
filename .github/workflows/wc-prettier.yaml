@@ -42,8 +42,7 @@ jobs:
             ]
           permissions: >-
             {
-              "contents": "write",
-              "actions": "write"
+              "contents": "write"
             }
 
       - run: npm run fmt
