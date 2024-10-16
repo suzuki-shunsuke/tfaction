@@ -42,7 +42,8 @@ jobs:
             ]
           permissions: >-
             {
-              "contents": "write"
+              "contents": "write",
+              "actions": "write"
             }
 
       - run: npm run fmt
@@ -52,7 +53,6 @@ jobs:
       - if: |
           github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
         env:
-          BRANCH: ${{ github.event.pull_request.default_branch }}
           GITHUB_TOKEN: ${{ steps.token.outputs.token }}
         run: |
           if git diff --quiet; then
