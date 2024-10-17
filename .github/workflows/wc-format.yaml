@@ -1,5 +1,5 @@
 ---
-name: Prettier
+name: Format
 on:
   workflow_call:
     secrets:
@@ -9,7 +9,7 @@ on:
         required: false
 
 jobs:
-  prettier:
+  format:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions: {}
