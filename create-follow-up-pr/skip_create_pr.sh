@@ -5,21 +5,22 @@ set -euo pipefail
 # create a branch with empty commit
 # 1. create a remote branch
 
-export FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
+FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
+export FOLLOW_UP_BRANCH
 bash "$GITHUB_ACTION_PATH/create_commit.sh"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
-create_opts=( -R "$GITHUB_REPOSITORY" -H "$FOLLOW_UP_BRANCH" -t "\"$pr_title\"" -b "\"Follow up #$CI_INFO_PR_NUMBER\"" )
+create_opts=(-R "$GITHUB_REPOSITORY" -H "$FOLLOW_UP_BRANCH" -t "\"$pr_title\"" -b "\"Follow up #$CI_INFO_PR_NUMBER\"")
 mention=""
-if ! [[ "$CI_INFO_PR_AUTHOR" =~ \[bot\] ]]; then
+if ! [[ $CI_INFO_PR_AUTHOR =~ \[bot\] ]]; then
 	mention="@$CI_INFO_PR_AUTHOR"
 fi
-if ! [[ "$GITHUB_ACTOR" =~ \[bot\] ]] && [ "$CI_INFO_PR_AUTHOR" != "$GITHUB_ACTOR" ]; then
+if ! [[ $GITHUB_ACTOR =~ \[bot\] ]] && [ "$CI_INFO_PR_AUTHOR" != "$GITHUB_ACTOR" ]; then
 	mention="@$GITHUB_ACTOR $mention"
 fi
 if [ "$TFACTION_DRAFT_PR" = "true" ]; then
-	create_opts+=( -d )
+	create_opts+=(-d)
 fi
 
 github-comment post \

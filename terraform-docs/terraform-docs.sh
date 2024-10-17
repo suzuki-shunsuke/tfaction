@@ -28,7 +28,7 @@ terraform-docs -v
 config=""
 for file in .terraform-docs.yml .terraform-docs.yaml .config/.terraform-docs.yml .config/.terraform-docs.yaml; do
 	if [ -f "$file" ]; then
-		cofig="$file"
+		config="$file"
 		break
 	fi
 done
@@ -36,7 +36,7 @@ done
 if [ -z "$config" ]; then
 	for file in .terraform-docs.yml .terraform-docs.yaml .config/.terraform-docs.yml .config/.terraform-docs.yaml; do
 		if [ -f "$pwd/$file" ]; then
-			cofig="$pwd/$file"
+			config="$pwd/$file"
 			break
 		fi
 	done
@@ -47,11 +47,12 @@ if [ -n "$config" ]; then
 	opts="-c $config"
 fi
 
+# shellcheck disable=SC2086
 if ! github-comment exec \
 	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-var "tfaction_target:${TFACTION_TARGET}" \
 	-k terraform-docs \
-	-- terraform-docs $opts . > "$tempfile"; then
+	-- terraform-docs $opts . >"$tempfile"; then
 	cat "$tempfile"
 	rm "$tempfile"
 	exit 1
@@ -64,7 +65,7 @@ fi
 
 if ! grep -q '<!-- BEGIN_TF_DOCS -->' README.md; then
 	# output.file is disabled
-	cat "$tempfile" > README.md
+	cat "$tempfile" >README.md
 fi
 
 rm "$tempfile"

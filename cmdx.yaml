@@ -19,6 +19,7 @@ tasks:
       exec:
         - generate-schema-doc
     script: |
+      set -eu
       mkdir -p build
       generate-schema-doc --expand-buttons --link-to-reused-ref schema build
   - name: build
@@ -91,11 +92,33 @@ tasks:
     description: Format with prettier
     usage: Format with prettier
     script: |
+      set -eu
       npm run fmt
+      cmdx shfmt
 
   - name: pinact
     description: Run pinact
     usage: Run pinact
+    shell:
+      - bash
+      - -c
     script: |
+      set -euo pipefail
       pinact run
       find . -name action.yaml | xargs pinact run
+
+  - name: shellcheck
+    shell:
+      - bash
+      - -c
+    script: |
+      set -euo pipefail
+      git ls-files | grep -E "\.sh$" | xargs shellcheck
+
+  - name: shfmt
+    shell:
+      - bash
+      - -c
+    script: |
+      set -euo pipefail
+      git ls-files | grep -E "\.sh$" | xargs shfmt -w -s

@@ -1,5 +1,5 @@
 ---
-name: Prettier
+name: Format
 on:
   workflow_call:
     secrets:
@@ -9,7 +9,7 @@ on:
         required: false
 
 jobs:
-  prettier:
+  format:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions: {}
@@ -46,7 +46,7 @@ jobs:
               "workflows": "write"
             }
 
-      - run: npm run fmt
+      - run: cmdx fmt
         if: |
           github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
 
@@ -61,7 +61,7 @@ jobs:
           git diff --name-only |
             xargs ghcp commit \
               -r "$GITHUB_REPOSITORY" \
-              -m "style: format by prettier" \
+              -m "style: format by prettier and shfmt" \
               -b "$GITHUB_HEAD_REF"
           exit 1
 

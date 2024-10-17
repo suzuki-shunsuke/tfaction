@@ -16,6 +16,31 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/mvdan/sh/v3.9.0/shfmt_v3.9.0_darwin_amd64",
+      "checksum": "3E1AC72E91BA88CE483766E57A1AA41FA502A0F9D5A47F5F5CD3663BADCECEE4",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/mvdan/sh/v3.9.0/shfmt_v3.9.0_darwin_arm64",
+      "checksum": "7D89694369A516B2D5A68B31F8BE2DA04C91F50FB7CDD8E41003081B814BA3E8",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/mvdan/sh/v3.9.0/shfmt_v3.9.0_linux_amd64",
+      "checksum": "D99B06506AEE2AC9113DAEC3049922E70DC8CFFB84658E3AE512C6A6CBE101B6",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/mvdan/sh/v3.9.0/shfmt_v3.9.0_linux_arm64",
+      "checksum": "5E511463068F3D27AE1B087FB597FB9E8AD865BE2AC501964A222A834FC1C463",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/mvdan/sh/v3.9.0/shfmt_v3.9.0_windows_amd64.exe",
+      "checksum": "4EA136134248AC8EBBF9103370DDCD951B515A9E9BFBA903252F12FD067BB5E9",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/reviewdog/reviewdog/v0.20.2/reviewdog_0.20.2_Darwin_arm64.tar.gz",
       "checksum": "595D340888463796B4585FF5D1F2B0B9084E20E9A76692B4271EC92C6F4D6C64",
       "algorithm": "sha256"
@@ -221,8 +246,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.235.0/registry.yaml",
-      "checksum": "0DDAE5D0F13867A41C8E6483ACBC54B722179CBA1FA00632A7CA774E4E7C0E53",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.236.0/registry.yaml",
+      "checksum": "5C30F7A14593E54760FD6B22365DC91465BF496441EABDC800B7B634E9B310D3",
       "algorithm": "sha256"
     }
   ]
