@@ -10,6 +10,7 @@ jobs:
       update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
       renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
       ghalint: ${{steps.changes.outputs.ghalint}}
+      shellcheck: ${{steps.changes.outputs.shellcheck}}
     runs-on: ubuntu-latest
     permissions: {}
     steps:
@@ -32,7 +33,12 @@ jobs:
             build-schema:
               - .github/workflows/test.yaml
               - .github/workflows/wc-deploy-schema.yaml
-              - schema/**
+              - "schema/**"
+            shellcheck:
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-shellcheck.yaml
+              - aqua/shellcheck.yaml
+              - "**/*.sh"
 
   status-check:
     # This job is used for main branch's branch protection rule's status check.
@@ -72,6 +78,12 @@ jobs:
     needs: path-filter
     if: needs.path-filter.outputs.ghalint == 'true'
     uses: ./.github/workflows/wc-ghalint.yaml
+    permissions: {}
+
+  shellcheck:
+    needs: path-filter
+    if: needs.path-filter.outputs.shellcheck == 'true'
+    uses: ./.github/workflows/wc-shellcheck.yaml
     permissions: {}
 
   build-schema:
