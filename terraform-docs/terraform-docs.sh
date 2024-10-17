@@ -28,7 +28,7 @@ terraform-docs -v
 config=""
 for file in .terraform-docs.yml .terraform-docs.yaml .config/.terraform-docs.yml .config/.terraform-docs.yaml; do
 	if [ -f "$file" ]; then
-		cofig="$file"
+		config="$file"
 		break
 	fi
 done
@@ -36,7 +36,7 @@ done
 if [ -z "$config" ]; then
 	for file in .terraform-docs.yml .terraform-docs.yaml .config/.terraform-docs.yml .config/.terraform-docs.yaml; do
 		if [ -f "$pwd/$file" ]; then
-			cofig="$pwd/$file"
+			config="$pwd/$file"
 			break
 		fi
 	done
