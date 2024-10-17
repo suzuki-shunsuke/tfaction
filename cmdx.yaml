@@ -96,6 +96,18 @@ tasks:
   - name: pinact
     description: Run pinact
     usage: Run pinact
+    shell:
+      - bash
+      - -c
     script: |
+      set -euo pipefail
       pinact run
       find . -name action.yaml | xargs pinact run
+
+  - name: shellcheck
+    shell:
+      - bash
+      - -c
+    script: |
+      set -euo pipefail
+      git ls-files | grep -E "\.sh$" | xargs shellcheck

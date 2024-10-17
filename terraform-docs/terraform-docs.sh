@@ -47,6 +47,7 @@ if [ -n "$config" ]; then
 	opts="-c $config"
 fi
 
+# shellcheck disable=SC2086
 if ! github-comment exec \
 	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-var "tfaction_target:${TFACTION_TARGET}" \
