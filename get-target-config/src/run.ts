@@ -127,6 +127,15 @@ export const run = async (
     for (const [key, value] of m2) {
       outputs.set(key, value);
     }
+    if (!outputs.has("aws_role_session_name")) {
+      const name = `tfaction-${inputs.isApply ? "apply" : "plan"}-${target}`;
+      outputs.set(
+        "aws_role_session_name",
+        name.length > 64
+          ? `tfaction-${inputs.isApply ? "apply" : "plan"}`
+          : name,
+      );
+    }
 
     outputs.set("destroy", wdConfig.destroy ? true : false);
 
