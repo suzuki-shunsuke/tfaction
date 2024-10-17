@@ -61,7 +61,7 @@ jobs:
           git diff --name-only |
             xargs ghcp commit \
               -r "$GITHUB_REPOSITORY" \
-              -m "style: format by prettier" \
+              -m "style: format by prettier and shfmt" \
               -b "$GITHUB_HEAD_REF"
           exit 1
 

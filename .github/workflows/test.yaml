@@ -45,7 +45,7 @@ jobs:
       - ghalint
       - build-schema
       - create-pr-branch
-      - prettier
+      - format
     permissions: {}
     if: failure()
     steps:
@@ -91,8 +91,8 @@ jobs:
       gh_app_id: ${{secrets.APP_ID}}
       gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
-  prettier:
-    uses: ./.github/workflows/wc-prettier.yaml
+  format:
+    uses: ./.github/workflows/wc-format.yaml
     permissions: {}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
