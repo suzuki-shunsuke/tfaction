@@ -90,7 +90,7 @@ runs:
       if: steps.target-config.outputs.aws_assume_role_arn != ''
       with:
         role-to-assume: ${{ steps.target-config.outputs.aws_assume_role_arn }}
-        role-session-name: samplerolesession
+        role-session-name: ${{ steps.target-config.outputs.aws_role_session_name }}
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
     - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
