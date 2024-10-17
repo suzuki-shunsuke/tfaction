@@ -16,7 +16,7 @@ github-comment exec -- gh version
 pr_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
 
 # https://github.com/suzuki-shunsuke/tfaction/pull/1570#issuecomment-1987382651
-# We don't use gh run list's -c option because 
+# We don't use gh run list's -c option because
 # 1. this requires GitHub CLI v2.40.0 or newer
 # 2. we should check the latest workflow run
 body=$(github-comment exec \

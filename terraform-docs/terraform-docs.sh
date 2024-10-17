@@ -52,7 +52,7 @@ if ! github-comment exec \
 	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-var "tfaction_target:${TFACTION_TARGET}" \
 	-k terraform-docs \
-	-- terraform-docs $opts . > "$tempfile"; then
+	-- terraform-docs $opts . >"$tempfile"; then
 	cat "$tempfile"
 	rm "$tempfile"
 	exit 1
@@ -65,7 +65,7 @@ fi
 
 if ! grep -q '<!-- BEGIN_TF_DOCS -->' README.md; then
 	# output.file is disabled
-	cat "$tempfile" > README.md
+	cat "$tempfile" >README.md
 fi
 
 rm "$tempfile"
