@@ -20,7 +20,7 @@ export const main = async () => {
   const cfg = lib.getConfig();
   if (!cfg.drift_detection) {
     // dirft detection is disabled
-    return
+    return;
   }
 
   const ghToken = process.env.GITHUB_TOKEN;
@@ -29,9 +29,11 @@ export const main = async () => {
   }
   const octokit = github.getOctokit(ghToken);
 
-  const repoOwner = cfg.drift_detection.issue_repo_owner ??
+  const repoOwner =
+    cfg.drift_detection.issue_repo_owner ??
     (process.env.GITHUB_REPOSITORY ?? "").split("/")[0];
-  const repoName = cfg.drift_detection.issue_repo_name ??
+  const repoName =
+    cfg.drift_detection.issue_repo_name ??
     (process.env.GITHUB_REPOSITORY ?? "").split("/")[1];
   if (!repoOwner || !repoName) {
     throw new Error("repo_owner and repo_name are required");
@@ -94,7 +96,11 @@ export const main = async () => {
   );
 };
 
-const checkEnabled = (cfg: lib.Config, targetGroup: lib.TargetGroup, wdCfg: lib.TargetConfig): boolean => {
+const checkEnabled = (
+  cfg: lib.Config,
+  targetGroup: lib.TargetGroup,
+  wdCfg: lib.TargetConfig,
+): boolean => {
   if (wdCfg.drift_detection) {
     return wdCfg.drift_detection.enabled ?? true;
   }
@@ -103,7 +109,6 @@ const checkEnabled = (cfg: lib.Config, targetGroup: lib.TargetGroup, wdCfg: lib.
   }
   return cfg.drift_detection?.enabled ?? false;
 };
-
 
 export const run = async (
   inputs: Inputs,
@@ -204,8 +209,8 @@ export const run = async (
     outputs.set(
       "enable_terraform_docs",
       wdConfig?.terraform_docs?.enabled ??
-      config?.terraform_docs?.enabled ??
-      false,
+        config?.terraform_docs?.enabled ??
+        false,
     );
 
     const m3 = lib.setEnvs(
