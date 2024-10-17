@@ -158,6 +158,11 @@ const TargetGroup = z.object({
   aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
   terraform_command: z.optional(z.string()),
   conftest: z.optional(ConftestConfig),
+  drift_detection: z.optional(
+    z.object({
+      enabled: z.optional(z.boolean()),
+    }),
+  ),
 });
 
 export type TargetGroup = z.infer<typeof TargetGroup>;
@@ -223,6 +228,7 @@ const Config = z.object({
       issue_repo_name: z.optional(z.string()),
       num_of_issues: z.optional(z.number()),
       minimum_detection_interval: z.optional(z.number()),
+      enabled: z.optional(z.boolean()),
     }),
   ),
   env: z.optional(z.record(z.string())),
