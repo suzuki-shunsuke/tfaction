@@ -115,6 +115,7 @@ export const run = async (
       [
         "aws_region",
         "aws_assume_role_arn",
+        "aws_role_session_name",
         "gcp_service_account",
         "gcp_workload_identity_provider",
         "gcp_access_token_scopes",
