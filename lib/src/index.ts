@@ -120,6 +120,7 @@ export type AWSSecretsManagerSecret = z.infer<typeof AWSSecretsManagerSecret>;
 
 const JobConfig = z.object({
   aws_assume_role_arn: z.optional(z.string()),
+  aws_role_session_name: z.optional(z.string()),
   gcp_service_account: z.optional(z.string()),
   gcp_workload_identity_provider: z.optional(z.string()),
   gcp_access_token_scopes: z.optional(z.string()),
@@ -137,6 +138,7 @@ export type JobConfig = z.infer<typeof JobConfig>;
 const TargetGroup = z.object({
   aws_region: z.optional(z.string()),
   aws_assume_role_arn: z.optional(z.string()),
+  aws_role_session_name: z.optional(z.string()),
   destroy: z.optional(z.boolean()),
   env: z.optional(z.record(z.string())),
   environment: z.optional(GitHubEnvironment),

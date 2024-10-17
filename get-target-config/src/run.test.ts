@@ -64,6 +64,7 @@ test("config", async () => {
       ["terraform_command", "tofu"],
       ["destroy", false],
       ["aws_region", "us-east-1"],
+      ["aws_role_session_name", "test"],
     ]),
   };
   expect(
@@ -92,6 +93,7 @@ test("config", async () => {
             working_directory: "tests/aws/",
             template_dir: "templates/aws",
             aws_region: "ap-northeast-1",
+            aws_role_session_name: "test",
           },
         ],
       },
