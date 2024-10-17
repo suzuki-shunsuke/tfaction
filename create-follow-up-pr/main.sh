@@ -6,7 +6,8 @@ set -euo pipefail
 # 1. create a remote branch
 # 2. open pull request
 
-export FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
+FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
+export FOLLOW_UP_BRANCH
 
 bash "$GITHUB_ACTION_PATH/create_commit.sh"
 
