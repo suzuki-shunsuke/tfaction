@@ -46,7 +46,7 @@ jobs:
               "workflows": "write"
             }
 
-      - run: npm run fmt
+      - run: cmdx fmt
         if: |
           github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
 
