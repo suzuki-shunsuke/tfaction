@@ -141,7 +141,7 @@ export const run = async (
         if (name.length > 64) {
           continue;
         }
-        outputs.set("aws_role_session_name", name,);
+        outputs.set("aws_role_session_name", name);
         break;
       }
     }
@@ -151,8 +151,8 @@ export const run = async (
     outputs.set(
       "enable_terraform_docs",
       wdConfig?.terraform_docs?.enabled ??
-      config?.terraform_docs?.enabled ??
-      false,
+        config?.terraform_docs?.enabled ??
+        false,
     );
 
     const m3 = lib.setEnvs(
