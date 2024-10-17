@@ -5,7 +5,8 @@ set -euo pipefail
 # create a branch with empty commit
 # 1. create a remote branch
 
-export FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
+FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
+export FOLLOW_UP_BRANCH
 bash "$GITHUB_ACTION_PATH/create_commit.sh"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
