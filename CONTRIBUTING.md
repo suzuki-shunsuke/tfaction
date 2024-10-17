@@ -37,18 +37,27 @@ This project supports a lot of Node.js version managers.
 
 These versions must be same.
 
-## Build TypeScript
+## Node.js package manager
+
+We manage Node.js packages using npm, not [yarn](https://yarnpkg.com/) and [pnpm](https://pnpm.io/).
+
+## `lib` directory
+
+[lib](lib) is a shared JavaScript library.
+tfaction's JavaScript actions depend on this.
+
+If you update `lib`, you have to build it before testing actions depending on `lib`.
 
 ```sh
+cd lib
 npm run build
 ```
 
-Build all JavaScript Actions.
-If you update [lib](lib), you have to run this command.
+## `dist` directories aren't committed
 
-```sh
-cmdx build
-```
+[#1913](https://github.com/suzuki-shunsuke/tfaction/pull/1913)
+
+We don't manage transpiled JavaScript files in the main branch and feature branches anymore.
 
 ## Test JavaScript Actions
 
