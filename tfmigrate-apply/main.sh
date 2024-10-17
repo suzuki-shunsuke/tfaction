@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-if [ -z "${TFMIGRATE_EXEC_PATH:-}" ] && [ "$TF_COMMAND" != terraform ] ; then
+if [ -z "${TFMIGRATE_EXEC_PATH:-}" ] && [ "$TF_COMMAND" != terraform ]; then
 	TFMIGRATE_EXEC_PATH=$TF_COMMAND
 fi
 
@@ -13,13 +13,13 @@ github-comment exec \
 	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-var "tfaction_target:$TFACTION_TARGET" \
 	-k tfmigrate-apply -- \
-		tfmigrate apply 2>&1 | tee "$apply_output"
+	tfmigrate apply 2>&1 | tee "$apply_output"
 code=$?
 set -e
 
 if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	github-comment exec \
-	  --config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 		-org "$TFACTION_DRIFT_ISSUE_REPO_OWNER" \
 		-repo "$TFACTION_DRIFT_ISSUE_REPO_NAME" \
 		-pr "$TFACTION_DRIFT_ISSUE_NUMBER" \

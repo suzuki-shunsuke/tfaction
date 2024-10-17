@@ -22,7 +22,7 @@ body=$(gh api graphql -q '.data.repository.issue.comments.nodes[0].body' -F owne
 
 job_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
-if [[ "$body" =~ .*$job_url.* ]]; then
+if [[ $body =~ .*$job_url.* ]]; then
 	exit 0
 fi
 
