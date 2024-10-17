@@ -127,6 +127,24 @@ export const run = async (
     for (const [key, value] of m2) {
       outputs.set(key, value);
     }
+    if (!outputs.has("aws_role_session_name")) {
+      const prefix = `tfaction-${inputs.isApply ? "apply" : "plan"}`;
+      const normalizedTarget = target.replaceAll("/", "_");
+      const runID = process.env.GITHUB_RUN_ID ?? "";
+      const names = [
+        `${prefix}-${normalizedTarget}-${runID}`,
+        `${prefix}-${normalizedTarget}`,
+        `${prefix}-${runID}`,
+        `${prefix}`,
+      ];
+      for (const name of names) {
+        if (name.length > 64) {
+          continue;
+        }
+        outputs.set("aws_role_session_name", name);
+        break;
+      }
+    }
 
     outputs.set("destroy", wdConfig.destroy ? true : false);
 
