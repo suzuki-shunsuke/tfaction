@@ -5,14 +5,14 @@
   },
   "dependencies": {
     "@actions/core": "1.11.1",
-    "@aws-sdk/client-secrets-manager": "3.670.0",
+    "@aws-sdk/client-secrets-manager": "3.675.0",
     "js-yaml": "4.1.0",
     "lib": "file:../lib/dist"
   },
   "devDependencies": {
     "typescript": "5.6.3",
     "@types/js-yaml": "4.0.9",
-    "@types/node": "20.16.12",
+    "@types/node": "20.16.13",
     "@vercel/ncc": "0.38.2"
   }
 }
