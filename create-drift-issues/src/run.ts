@@ -1,19 +1,28 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
+import { Octokit } from "@octokit/core";
+import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import * as lib from "lib";
 import * as path from "path";
 
 type Inputs = {
   target?: string;
   workingDir?: string;
-  isApply: boolean;
-  jobType: lib.JobType;
+  ghToken?: string;
+  repo?: string;
 };
 
-export type Result = {
-  envs: Map<string, any>;
-  outputs: Map<string, any>;
+type Result = {
+  number: number;
+  state: string;
+  url: string;
+};
+
+type Issue = {
+  url: string;
+  number: number;
+  state: string;
 };
 
 export const main = async () => {
@@ -23,24 +32,38 @@ export const main = async () => {
     return;
   }
 
-  const ghToken = process.env.GITHUB_TOKEN;
-  if (!ghToken) {
-    throw new Error("GITHUB_TOKEN is required");
+  const result = await run({
+    target: process.env.TFACTION_TARGET,
+    workingDir: process.env.TFACTION_WORKING_DIR,
+    ghToken: process.env.GITHUB_TOKEN,
+    repo: process.env.GITHUB_REPOSITORY,
+  });
+
+  if (result === undefined) {
+    return;
   }
-  const octokit = github.getOctokit(ghToken);
+
+  core.exportVariable("TFACTION_DRIFT_ISSUE_NUMBER", result.number);
+  core.exportVariable("TFACTION_DRIFT_ISSUE_STATE", result.state);
+  core.info(result.url);
+  core.summary.addRaw(`Drift Issue: ${result.url}`, true);
+};
+
+export const run = async (inputs: Inputs): Promise<Result | undefined> => {
+  const cfg = lib.getConfig();
+  if (!cfg.drift_detection) {
+    core.info("drift detection is disabled");
+    return undefined;
+  }
 
   const repoOwner =
-    cfg.drift_detection.issue_repo_owner ??
-    (process.env.GITHUB_REPOSITORY ?? "").split("/")[0];
+    cfg.drift_detection.issue_repo_owner ?? (inputs.repo ?? "").split("/")[0];
   const repoName =
-    cfg.drift_detection.issue_repo_name ??
-    (process.env.GITHUB_REPOSITORY ?? "").split("/")[1];
+    cfg.drift_detection.issue_repo_name ?? (inputs.repo ?? "").split("/")[1];
   if (!repoOwner || !repoName) {
     throw new Error("repo_owner and repo_name are required");
   }
-  let target = process.env.TFACTION_TARGET;
-  let wd = process.env.TFACTION_WORKING_DIR;
-  const tg = await lib.getTargetGroup(cfg, target, wd);
+  const tg = await lib.getTargetGroup(cfg, inputs.target, inputs.workingDir);
   const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
 
   const wdConfig = lib.readTargetConfig(
@@ -48,52 +71,101 @@ export const main = async () => {
   );
 
   if (!checkEnabled(cfg, tg.group, wdConfig)) {
+    core.info("drift detection is disabled");
     return;
   }
+  core.info("drift detection is enabled");
 
-  /*
-  var q struct {
-    Search struct {
-      Nodes []struct {
-        Issue struct {
-          Number githubv4.Int
-          Title  githubv4.String
-          State  githubv4.String
-        } `graphql:"... on Issue"`
-      }
-      PageInfo struct {
-        EndCursor   githubv4.String
-        HasNextPage bool
-      }
-    } `graphql:"search(first: 100, after: $issuesCursor, query: $searchQuery, type: $searchType)"`
+  if (!inputs.ghToken) {
+    throw new Error("GITHUB_TOKEN is required");
   }
-  variables := map[string]interface{}{
-    "searchQuery":  githubv4.String(fmt.Sprintf(`repo:%s/%s "%s" in:title`, repoOwner, repoName, title)),
-    "searchType":   githubv4.SearchTypeIssue,
-    "issuesCursor": (*githubv4.String)(nil), // Null after argument to get first page.
-  }
-  */
 
-  const { repository } = await octokit.graphql(
-    `
-      {
-        repository(owner: "octokit", name: "graphql.js") {
-          issues(last: 3) {
-            edges {
-              node {
-                title
-              }
-            }
-          }
-        }
-      }
-    `,
-    {
-      headers: {
-        authorization: `token secret123`,
-      },
-    },
+  const MyOctokit = Octokit.plugin(paginateGraphQL);
+  const octokit = new MyOctokit({ auth: inputs.ghToken });
+
+  let issue = await getIssue(
+    tg.target,
+    inputs.ghToken,
+    `${repoOwner}/${repoName}`,
   );
+  if (issue === undefined) {
+    core.info("creating a drift issue");
+    issue = await createIssue(tg.target, inputs.ghToken, repoOwner, repoName);
+  }
+
+  return {
+    number: issue.number,
+    state: issue.state,
+    url: issue.url,
+  };
+};
+
+const createIssue = async (
+  target: string,
+  ghToken: string,
+  repoOwner: string,
+  repoName: string,
+): Promise<Issue> => {
+  const octokit = github.getOctokit(ghToken);
+  const body = `
+  This issus was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
+  
+  About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
+  `;
+
+  const issue = await octokit.rest.issues.create({
+    owner: repoOwner,
+    repo: repoName,
+    title: `Terraform Drift (${target})`,
+    body: body,
+  });
+  return {
+    url: issue.data.html_url,
+    number: issue.data.number,
+    state: issue.data.state,
+  };
+};
+
+const getIssue = async (
+  target: string,
+  ghToken: string,
+  repo: string,
+): Promise<Issue | undefined> => {
+  const MyOctokit = Octokit.plugin(paginateGraphQL);
+  const octokit = new MyOctokit({ auth: ghToken });
+
+  const title = `Terraform Drift (${target})`;
+  const query = `query($cursor: String, $searchQuery: String!) {
+  search(first: 100, after: $cursor, query: $searchQuery, type: ISSUE) {
+    nodes {
+    	... on Issue {
+    		number
+    		title
+    		state
+    		url
+    	}
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}`;
+
+  const pageIterator = await octokit.graphql.paginate.iterator(query, {
+    issuesCursor: null,
+    searchQuery: `repo:${repo} "${title}" in:title`,
+  });
+
+  for await (const response of pageIterator) {
+    for (const issue of response.nodes) {
+      if (issue.title !== title) {
+        continue;
+      }
+      return issue;
+    }
+  }
+  return undefined;
 };
 
 const checkEnabled = (
@@ -108,125 +180,4 @@ const checkEnabled = (
     return targetGroup.drift_detection.enabled ?? true;
   }
   return cfg.drift_detection?.enabled ?? false;
-};
-
-export const run = async (
-  inputs: Inputs,
-  config: lib.Config,
-): Promise<Result> => {
-  const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
-
-  const envs = new Map<string, any>();
-  const outputs = new Map<string, any>();
-
-  const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
-  const workingDir = t.workingDir;
-  const target = t.target;
-  const targetConfig = t.group;
-
-  envs.set("TFACTION_WORKING_DIR", workingDir);
-  envs.set("TFACTION_TARGET", target);
-  outputs.set("working_directory", workingDir);
-  outputs.set(
-    "providers_lock_opts",
-    "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
-  );
-  for (const [key, value] of lib.setOutputs(["template_dir"], [targetConfig])) {
-    outputs.set(key, value);
-  }
-
-  outputs.set("enable_tfsec", config?.tfsec?.enabled ?? false);
-  outputs.set("enable_tflint", config?.tflint?.enabled ?? true);
-  outputs.set("enable_trivy", config?.trivy?.enabled ?? true);
-
-  outputs.set("terraform_command", "terraform");
-
-  if (inputs.jobType === "scaffold_working_dir") {
-    const m = lib.setOutputs(
-      [
-        "s3_bucket_name_tfmigrate_history",
-        "gcs_bucket_name_tfmigrate_history",
-        "aws_region",
-        "aws_assume_role_arn",
-        "gcp_service_account",
-        "gcp_workload_identity_provider",
-        "gcp_access_token_scopes",
-        "gcp_remote_backend_service_account",
-        "gcp_remote_backend_workload_identity_provider",
-      ],
-      [targetConfig],
-    );
-    for (const [key, value] of m) {
-      outputs.set(key, value);
-    }
-  } else {
-    const rootJobConfig = lib.getJobConfig(
-      targetConfig,
-      inputs.isApply,
-      inputs.jobType,
-    );
-
-    const wdConfig = lib.readTargetConfig(
-      path.join(workingDir, workingDirectoryFile),
-    );
-    const jobConfig = lib.getJobConfig(
-      wdConfig,
-      inputs.isApply,
-      inputs.jobType,
-    );
-
-    const m1 = lib.setOutputs(
-      [
-        "s3_bucket_name_tfmigrate_history",
-        "gcs_bucket_name_tfmigrate_history",
-        "providers_lock_opts",
-        "terraform_command",
-      ],
-      [wdConfig, targetConfig, config],
-    );
-    for (const [key, value] of m1) {
-      outputs.set(key, value);
-    }
-
-    const m2 = lib.setOutputs(
-      [
-        "aws_region",
-        "aws_assume_role_arn",
-        "gcp_service_account",
-        "gcp_workload_identity_provider",
-        "gcp_access_token_scopes",
-        "gcp_remote_backend_service_account",
-        "gcp_remote_backend_workload_identity_provider",
-      ],
-      [jobConfig, wdConfig, rootJobConfig, targetConfig, config],
-    );
-    for (const [key, value] of m2) {
-      outputs.set(key, value);
-    }
-
-    outputs.set("destroy", wdConfig.destroy ? true : false);
-
-    outputs.set(
-      "enable_terraform_docs",
-      wdConfig?.terraform_docs?.enabled ??
-        config?.terraform_docs?.enabled ??
-        false,
-    );
-
-    const m3 = lib.setEnvs(
-      config,
-      targetConfig,
-      rootJobConfig,
-      wdConfig,
-      jobConfig,
-    );
-    for (const [key, value] of m3) {
-      envs.set(key, value);
-    }
-  }
-
-  return {
-    outputs: outputs,
-    envs: envs,
-  };
 };
