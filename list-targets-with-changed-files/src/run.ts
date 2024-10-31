@@ -65,7 +65,12 @@ const getPRBody = (prStr: string, payload: Payload): string => {
   return pr?.body || "";
 };
 
-export const run = (input: Input): TargetConfig[] => {
+type Result = {
+  targetConfigs: TargetConfig[];
+  modules: string[];
+};
+
+export const run = (input: Input): Result => {
   const config = input.config;
   const isApply = input.isApply;
 
@@ -98,7 +103,15 @@ export const run = (input: Input): TargetConfig[] => {
   modules.sort();
   modules.reverse();
 
+  const moduleDirs = input.moduleFiles.map((moduleFile) => {
+    return path.dirname(moduleFile);
+  });
+  moduleDirs.sort();
+  moduleDirs.reverse();
+  const moduleSet = new Set(moduleDirs);
+
   const changedWorkingDirs = new Set<string>();
+  const changedModules = new Set<string>();
   for (const changedFile of input.changedFiles) {
     if (changedFile == "") {
       continue;
@@ -109,13 +122,22 @@ export const run = (input: Input): TargetConfig[] => {
           if (wdTargetMap.has(caller)) {
             changedWorkingDirs.add(caller);
           }
-        });
+          if (moduleSet.has(caller)) {
+            changedModules.add(caller);
+          }
+        })
         break;
       }
     }
     for (const workingDir of workingDirs) {
       if (changedFile.startsWith(workingDir + "/")) {
         changedWorkingDirs.add(workingDir);
+        break;
+      }
+    }
+    for (const module of moduleDirs) {
+      if (changedFile.startsWith(module + "/")) {
+        changedModules.add(module);
         break;
       }
     }
@@ -167,7 +189,10 @@ export const run = (input: Input): TargetConfig[] => {
     );
   }
 
-  return terraformTargetObjs.concat(tfmigrateObjs);
+  return {
+    targetConfigs: terraformTargetObjs.concat(tfmigrateObjs),
+    modules: Array.from(changedModules),
+  }
 };
 
 type Input = {
@@ -176,6 +201,7 @@ type Input = {
   labels: string[];
   changedFiles: string[];
   configFiles: string[];
+  moduleFiles: string[];
   pr: string;
   payload: Payload;
   module_callers: Map<string, string[]>;
@@ -284,7 +310,7 @@ export const main = () => {
   const prPath = core.getInput("pull_request");
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
 
-  const targetConfigs = run({
+  const result = run({
     labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
     config: lib.getConfig(),
     isApply: lib.getIsApply(),
@@ -293,6 +319,9 @@ export const main = () => {
       .split("\n"),
     configFiles: fs
       .readFileSync(core.getInput("config_files"), "utf8")
+      .split("\n"),
+    moduleFiles: fs
+      .readFileSync(core.getInput("module_files"), "utf8")
       .split("\n"),
     pr,
     payload: github.context.payload,
@@ -308,6 +337,7 @@ export const main = () => {
     >,
   });
 
-  core.info(`targets: ${JSON.stringify(targetConfigs)}`);
-  core.setOutput("targets", targetConfigs);
+  core.info(`result: ${JSON.stringify(result)}`);
+  core.setOutput("targets", result.targetConfigs);
+  core.setOutput("modules", result.modules);
 };
