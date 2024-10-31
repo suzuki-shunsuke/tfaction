@@ -125,7 +125,7 @@ export const run = (input: Input): Result => {
           if (moduleSet.has(caller)) {
             changedModules.add(caller);
           }
-        })
+        });
         break;
       }
     }
@@ -192,7 +192,7 @@ export const run = (input: Input): Result => {
   return {
     targetConfigs: terraformTargetObjs.concat(tfmigrateObjs),
     modules: Array.from(changedModules),
-  }
+  };
 };
 
 type Input = {
