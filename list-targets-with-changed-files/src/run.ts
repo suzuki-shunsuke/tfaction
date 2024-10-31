@@ -3,7 +3,6 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "lib";
-import { get } from "http";
 
 type TargetConfig = {
   target: string;
