@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "lib";
+import { get } from "http";
 
 type TargetConfig = {
   target: string;
@@ -68,19 +69,110 @@ export const run = (input: Input): TargetConfig[] => {
   const config = input.config;
   const isApply = input.isApply;
 
-  const configWorkingDirMap = new Map();
-  const configTargetMap = new Map();
-  for (const target of config.target_groups) {
-    configWorkingDirMap.set(target.working_directory, target);
-    if (target.target !== undefined) {
-      configTargetMap.set(target.target, target);
+  const workingDirs = listWD(input.configFiles);
+
+  const wdTargetMap = lib.createWDTargetMap(workingDirs, config);
+  const targetWDMap = new Map<string, string>();
+  for (const [wd, t] of wdTargetMap) {
+    targetWDMap.set(t, wd);
+  }
+
+  const terraformTargets = new Set<string>();
+  const tfmigrates = new Set<string>();
+  const terraformTargetObjs = new Array<TargetConfig>();
+  const tfmigrateObjs = new Array<TargetConfig>();
+
+  handleLabels(input.labels, isApply, terraformTargets, targetWDMap, config, terraformTargetObjs, tfmigrateObjs, tfmigrates);
+
+  const moduleCallerMap = input.module_callers;
+  const modules = [...moduleCallerMap.keys()];
+  modules.sort();
+  modules.reverse();
+
+  const changedWorkingDirs = new Set<string>();
+  for (const changedFile of input.changedFiles) {
+    if (changedFile == "") {
+      continue;
+    }
+    for (const module of modules) {
+      if (changedFile.startsWith(module + "/")) {
+        moduleCallerMap.get(module)?.forEach((caller) => {
+          if (wdTargetMap.has(caller)) {
+            changedWorkingDirs.add(caller);
+          }
+        })
+        break;
+      }
+    }
+    for (const workingDir of workingDirs) {
+      if (changedFile.startsWith(workingDir + "/")) {
+        changedWorkingDirs.add(workingDir);
+        break;
+      }
     }
   }
 
-  const labels = input.labels;
-  const changedFiles = input.changedFiles;
-  const configFiles = input.configFiles;
+  for (const changedWorkingDir of changedWorkingDirs) {
+    const target = wdTargetMap.get(changedWorkingDir);
+    if (target === undefined) {
+      throw new Error(
+        `No target is found for the working directory ${changedWorkingDir}`,
+      );
+    }
+    if (!terraformTargets.has(target) && !tfmigrates.has(target)) {
+      terraformTargets.add(target);
+      terraformTargetObjs.push(
+        getTargetConfigByTarget(
+          config.target_groups,
+          changedWorkingDir,
+          target,
+          isApply,
+          "terraform",
+        ),
+      );
+    }
+  }
 
+  const followupTarget = getFollowupTarget(input);
+
+  if (
+    followupTarget &&
+    !tfmigrates.has(followupTarget) &&
+    !terraformTargets.has(followupTarget)
+  ) {
+    const wd = targetWDMap.get(followupTarget);
+    if (wd === undefined) {
+      throw new Error(
+        `No working directory is found for the target ${followupTarget}`,
+      );
+    }
+    terraformTargets.add(followupTarget);
+    terraformTargetObjs.push(
+      getTargetConfigByTarget(
+        config.target_groups,
+        wd,
+        followupTarget,
+        isApply,
+        "terraform",
+      ),
+    );
+  }
+
+  return terraformTargetObjs.concat(tfmigrateObjs);
+};
+
+type Input = {
+  config: lib.Config;
+  isApply: boolean;
+  labels: string[];
+  changedFiles: string[];
+  configFiles: string[];
+  pr: string;
+  payload: Payload;
+  module_callers: Map<string, string[]>;
+};
+
+const listWD = (configFiles: string[]): string[] => {
   const workingDirs = new Array<string>();
   for (const configFile of configFiles) {
     if (configFile == "") {
@@ -90,13 +182,10 @@ export const run = (input: Input): TargetConfig[] => {
   }
   workingDirs.sort();
   workingDirs.reverse();
+  return workingDirs;
+};
 
-  const wdTargetMap = lib.createWDTargetMap(workingDirs, config);
-  const targetWDMap = new Map<string, string>();
-  for (const [wd, t] of wdTargetMap) {
-    targetWDMap.set(t, wd);
-  }
-
+const getFollowupTarget = (input: Input): string => {
   // Expected followupPRBody include the line:
   // <!-- tfaction follow up pr target=foo -->
   const followupTargetCommentRegex = new RegExp(
@@ -105,18 +194,14 @@ export const run = (input: Input): TargetConfig[] => {
   );
   const prBody = getPRBody(input.pr, input.payload);
   const matchResult = prBody.match(followupTargetCommentRegex);
-  const followupTarget = matchResult ? matchResult[1] : "";
+  return matchResult ? matchResult[1] : "";
+};
 
-  const terraformTargets = new Set<string>();
-  const tfmigrates = new Set<string>();
+const handleLabels = (labels: string[], isApply: boolean, terraformTargets: Set<string>, targetWDMap: Map<string, string>, config: lib.Config, terraformTargetObjs: Array<TargetConfig>, tfmigrateObjs: Array<TargetConfig>, tfmigrates: Set<string>) => {
   const skips = new Set<string>();
-  const terraformTargetObjs = new Array<TargetConfig>();
-  const tfmigrateObjs = new Array<TargetConfig>();
-
   const targetPrefix = config?.label_prefixes?.target || "target:";
   const skipPrefix = config?.label_prefixes?.skip || "skip:";
   const tfmigratePrefix = config?.label_prefixes?.tfmigrate || "tfmigrate:";
-
   for (const label of labels) {
     if (label == "") {
       continue;
@@ -174,83 +259,7 @@ export const run = (input: Input): TargetConfig[] => {
       continue;
     }
   }
-
-  const moduleCallerMap = input.module_callers;
-  const changedWorkingDirs = new Set<string>();
-  for (const changedFile of changedFiles) {
-    if (changedFile == "") {
-      continue;
-    }
-    const dir = path.dirname(changedFile);
-    const moduleCallers: string[] = moduleCallerMap[dir] || [];
-    for (const caller of moduleCallers) {
-      changedWorkingDirs.add(caller);
-    }
-    for (const workingDir of workingDirs) {
-      if (changedFile.startsWith(workingDir + "/")) {
-        changedWorkingDirs.add(workingDir);
-        break;
-      }
-    }
-  }
-
-  for (const changedWorkingDir of changedWorkingDirs) {
-    const target = wdTargetMap.get(changedWorkingDir);
-    if (target === undefined) {
-      throw new Error(
-        `No target is found for the working directory ${changedWorkingDir}`,
-      );
-    }
-    if (!terraformTargets.has(target) && !tfmigrates.has(target)) {
-      terraformTargets.add(target);
-      terraformTargetObjs.push(
-        getTargetConfigByTarget(
-          config.target_groups,
-          changedWorkingDir,
-          target,
-          isApply,
-          "terraform",
-        ),
-      );
-    }
-  }
-
-  if (
-    followupTarget &&
-    !tfmigrates.has(followupTarget) &&
-    !terraformTargets.has(followupTarget)
-  ) {
-    const wd = targetWDMap.get(followupTarget);
-    if (wd === undefined) {
-      throw new Error(
-        `No working directory is found for the target ${followupTarget}`,
-      );
-    }
-    terraformTargets.add(followupTarget);
-    terraformTargetObjs.push(
-      getTargetConfigByTarget(
-        config.target_groups,
-        wd,
-        followupTarget,
-        isApply,
-        "terraform",
-      ),
-    );
-  }
-
-  return terraformTargetObjs.concat(tfmigrateObjs);
-};
-
-type Input = {
-  config: lib.Config;
-  isApply: boolean;
-  labels: string[];
-  changedFiles: string[];
-  configFiles: string[];
-  pr: string;
-  payload: Payload;
-  module_callers: Record<string, string[]>;
-};
+}
 
 export const main = () => {
   // The path to ci-info's pr.json.
@@ -269,9 +278,15 @@ export const main = () => {
       .split("\n"),
     pr,
     payload: github.context.payload,
+    /*
+    {
+      // caller is a directory where uses the module
+      module1: [caller1, caller2],
+    }
+    */
     module_callers: JSON.parse(
       core.getInput("module_callers") || "{}",
-    ) as Record<string, string[]>,
+    ) as Map<string, string[]>,
   });
 
   core.info(`targets: ${JSON.stringify(targetConfigs)}`);
