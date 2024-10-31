@@ -82,7 +82,16 @@ export const run = (input: Input): TargetConfig[] => {
   const terraformTargetObjs = new Array<TargetConfig>();
   const tfmigrateObjs = new Array<TargetConfig>();
 
-  handleLabels(input.labels, isApply, terraformTargets, targetWDMap, config, terraformTargetObjs, tfmigrateObjs, tfmigrates);
+  handleLabels(
+    input.labels,
+    isApply,
+    terraformTargets,
+    targetWDMap,
+    config,
+    terraformTargetObjs,
+    tfmigrateObjs,
+    tfmigrates,
+  );
 
   const moduleCallerMap = input.module_callers;
   const modules = [...moduleCallerMap.keys()];
@@ -100,7 +109,7 @@ export const run = (input: Input): TargetConfig[] => {
           if (wdTargetMap.has(caller)) {
             changedWorkingDirs.add(caller);
           }
-        })
+        });
         break;
       }
     }
@@ -197,7 +206,16 @@ const getFollowupTarget = (input: Input): string => {
   return matchResult ? matchResult[1] : "";
 };
 
-const handleLabels = (labels: string[], isApply: boolean, terraformTargets: Set<string>, targetWDMap: Map<string, string>, config: lib.Config, terraformTargetObjs: Array<TargetConfig>, tfmigrateObjs: Array<TargetConfig>, tfmigrates: Set<string>) => {
+const handleLabels = (
+  labels: string[],
+  isApply: boolean,
+  terraformTargets: Set<string>,
+  targetWDMap: Map<string, string>,
+  config: lib.Config,
+  terraformTargetObjs: Array<TargetConfig>,
+  tfmigrateObjs: Array<TargetConfig>,
+  tfmigrates: Set<string>,
+) => {
   const skips = new Set<string>();
   const targetPrefix = config?.label_prefixes?.target || "target:";
   const skipPrefix = config?.label_prefixes?.skip || "skip:";
@@ -259,7 +277,7 @@ const handleLabels = (labels: string[], isApply: boolean, terraformTargets: Set<
       continue;
     }
   }
-}
+};
 
 export const main = () => {
   // The path to ci-info's pr.json.
@@ -284,9 +302,10 @@ export const main = () => {
       module1: [caller1, caller2],
     }
     */
-    module_callers: JSON.parse(
-      core.getInput("module_callers") || "{}",
-    ) as Map<string, string[]>,
+    module_callers: JSON.parse(core.getInput("module_callers") || "{}") as Map<
+      string,
+      string[]
+    >,
   });
 
   core.info(`targets: ${JSON.stringify(targetConfigs)}`);
