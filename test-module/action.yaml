@@ -11,12 +11,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/get-global-config@v1.11.2-1
       id: global-config
 
     # TODO Run conftest on modules
     # https://github.com/suzuki-shunsuke/tfaction/issues/1908#issuecomment-2415572321
-    # - uses: suzuki-shunsuke/tfaction/conftest@main
+    # - uses: suzuki-shunsuke/tfaction/conftest@v1.11.2-1
     #   with:
     #     github_token: ${{ inputs.github_token }}
 
@@ -53,7 +53,7 @@ runs:
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/terraform-docs@v1.11.2-1
       if: steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
