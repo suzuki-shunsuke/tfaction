@@ -97,7 +97,9 @@ export const run = (input: Input): Result => {
     tfmigrates,
   );
 
-  const moduleCallerMap: Map<string, string[]> = new Map(Object.entries(input.moduleCallers));
+  const moduleCallerMap: Map<string, string[]> = new Map(
+    Object.entries(input.moduleCallers),
+  );
   const modules = [...moduleCallerMap.keys()];
   modules.sort();
   modules.reverse();
