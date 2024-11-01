@@ -10,6 +10,9 @@ inputs:
   config_files:
     description: "config file paths"
     required: true
+  module_files:
+    description: "module file paths"
+    required: true
   pull_request:
     description: "pull request file"
     required: false

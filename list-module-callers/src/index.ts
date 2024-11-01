@@ -12,6 +12,7 @@ try {
     .readFileSync(core.getInput("module_files"), "utf8")
     .split("\n");
 
+  // directory where uses modules => modules which are used
   const rawModuleCalls: Record<string, Array<string>> = {};
 
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);

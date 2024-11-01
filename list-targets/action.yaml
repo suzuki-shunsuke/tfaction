@@ -10,7 +10,7 @@ inputs:
 outputs:
   modules:
     description: list of changed modules
-    value: ${{ steps.list-modules.outputs.modules }}
+    value: ${{ steps.list-targets.outputs.modules }}
 
   targets:
     description: list of targets
@@ -57,8 +57,4 @@ runs:
         pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
         module_callers: ${{ steps.list-module-callers.outputs.file }}
-    - uses: suzuki-shunsuke/tfaction/list-changed-modules@main
-      id: list-modules
-      with:
-        changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
-        config_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
+        module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}

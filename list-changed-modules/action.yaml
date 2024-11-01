@@ -1,3 +1,7 @@
+# Deprecation: Please don't use this module anymore.
+# This action was merged into list-targets-with-changed-files action.
+# Please use list-targets action.
+# https://github.com/suzuki-shunsuke/tfaction/pull/1975
 name: List changed modules
 description: List changed modules
 inputs:
