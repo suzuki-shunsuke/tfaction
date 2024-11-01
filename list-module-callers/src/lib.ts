@@ -1,8 +1,8 @@
 import path from "node:path";
 
-type ModuleCalls = Record<string, string[]>;
+type ModuleCalls = Record<string, string[]>; // directory where uses modules => modules which are used
 
-type ModuleToCallers = Record<string, string[]>;
+type ModuleToCallers = Record<string, string[]>; // module => directories where use the module
 
 export function resolveRelativeCallTree(
   rawModuleCalls: ModuleCalls,
