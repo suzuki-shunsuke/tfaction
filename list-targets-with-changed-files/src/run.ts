@@ -97,7 +97,7 @@ export const run = (input: Input): Result => {
     tfmigrates,
   );
 
-  const moduleCallerMap = input.module_callers;
+  const moduleCallerMap: Map<string, string[]> = new Map(Object.entries(input.moduleCallers));
   const modules = [...moduleCallerMap.keys()];
   modules.sort();
   modules.reverse();
@@ -203,7 +203,7 @@ type Input = {
   moduleFiles: string[];
   pr: string;
   payload: Payload;
-  module_callers: Map<string, string[]>;
+  moduleCallers: any;
 };
 
 const listWD = (configFiles: string[]): string[] => {
@@ -330,10 +330,7 @@ export const main = () => {
       module1: [caller1, caller2],
     }
     */
-    module_callers: JSON.parse(core.getInput("module_callers") || "{}") as Map<
-      string,
-      string[]
-    >,
+    moduleCallers: JSON.parse(core.getInput("module_callers") || "{}"),
   });
 
   core.info(`result: ${JSON.stringify(result)}`);
