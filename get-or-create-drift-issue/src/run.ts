@@ -90,7 +90,12 @@ export const run = async (inputs: Inputs): Promise<Result | undefined> => {
   );
   if (issue === undefined) {
     core.info("creating a drift issue");
-    issue = await lib.createIssue(tg.target, inputs.ghToken, repoOwner, repoName);
+    issue = await lib.createIssue(
+      tg.target,
+      inputs.ghToken,
+      repoOwner,
+      repoName,
+    );
   }
 
   return {
