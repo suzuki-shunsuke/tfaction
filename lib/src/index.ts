@@ -4,6 +4,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { load } from "js-yaml";
 import { z } from "zod";
+import * as github from "@actions/github";
 
 const GitHubEnvironment = z.union([
   z.string(),
@@ -492,4 +493,40 @@ export const listWorkingDirFiles = async (file: string): Promise<string[]> => {
     }
   }
   return files;
+};
+
+type Issue = {
+  url: string;
+  number: number;
+  state: string;
+  title: string;
+  target: string;
+};
+
+export const createIssue = async (
+  target: string,
+  ghToken: string,
+  repoOwner: string,
+  repoName: string,
+): Promise<Issue> => {
+  const octokit = github.getOctokit(ghToken);
+  const body = `
+  This issus was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
+  
+  About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
+  `;
+
+  const issue = await octokit.rest.issues.create({
+    owner: repoOwner,
+    repo: repoName,
+    title: `Terraform Drift (${target})`,
+    body: body,
+  });
+  return {
+    url: issue.data.html_url,
+    number: issue.data.number,
+    title: issue.data.title,
+    target: target,
+    state: issue.data.state,
+  };
 };

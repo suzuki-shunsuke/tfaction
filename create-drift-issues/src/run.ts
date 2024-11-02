@@ -97,7 +97,7 @@ export const run = async (inputs: Inputs): Promise<Result | undefined> => {
     if (issueMap.has(target)) {
       continue;
     }
-    const issue = await createIssue(
+    const issue = await lib.createIssue(
       target,
       inputs.ghToken,
       repoOwner,
@@ -122,34 +122,6 @@ export const run = async (inputs: Inputs): Promise<Result | undefined> => {
 };
 
 const titlePattern = /^Terraform Drift \((\S+)\)$/;
-
-const createIssue = async (
-  target: string,
-  ghToken: string,
-  repoOwner: string,
-  repoName: string,
-): Promise<Issue> => {
-  const octokit = github.getOctokit(ghToken);
-  const body = `
-  This issus was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
-  
-  About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
-  `;
-
-  const issue = await octokit.rest.issues.create({
-    owner: repoOwner,
-    repo: repoName,
-    title: `Terraform Drift (${target})`,
-    body: body,
-  });
-  return {
-    url: issue.data.html_url,
-    number: issue.data.number,
-    title: issue.data.title,
-    target: target,
-    state: issue.data.state,
-  };
-};
 
 const closeIssue = async (
   ghToken: string,

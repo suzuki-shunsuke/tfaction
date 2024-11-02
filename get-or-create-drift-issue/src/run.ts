@@ -90,39 +90,13 @@ export const run = async (inputs: Inputs): Promise<Result | undefined> => {
   );
   if (issue === undefined) {
     core.info("creating a drift issue");
-    issue = await createIssue(tg.target, inputs.ghToken, repoOwner, repoName);
+    issue = await lib.createIssue(tg.target, inputs.ghToken, repoOwner, repoName);
   }
 
   return {
     number: issue.number,
     state: issue.state,
     url: issue.url,
-  };
-};
-
-const createIssue = async (
-  target: string,
-  ghToken: string,
-  repoOwner: string,
-  repoName: string,
-): Promise<Issue> => {
-  const octokit = github.getOctokit(ghToken);
-  const body = `
-  This issus was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
-  
-  About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
-  `;
-
-  const issue = await octokit.rest.issues.create({
-    owner: repoOwner,
-    repo: repoName,
-    title: `Terraform Drift (${target})`,
-    body: body,
-  });
-  return {
-    url: issue.data.html_url,
-    number: issue.data.number,
-    state: issue.data.state,
   };
 };
 
