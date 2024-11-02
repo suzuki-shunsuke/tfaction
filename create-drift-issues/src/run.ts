@@ -23,6 +23,8 @@ type Issue = {
   url: string;
   number: number;
   state: string;
+  title: string;
+  target: string;
 };
 
 export const main = async () => {
@@ -50,6 +52,9 @@ export const main = async () => {
 };
 
 export const run = async (inputs: Inputs): Promise<Result | undefined> => {
+  if (inputs.ghToken === undefined) {
+    throw new Error("GITHUB_TOKEN is required");
+  }
   const cfg = lib.getConfig();
   if (!cfg.drift_detection) {
     core.info("drift detection is disabled");
@@ -63,42 +68,49 @@ export const run = async (inputs: Inputs): Promise<Result | undefined> => {
   if (!repoOwner || !repoName) {
     throw new Error("repo_owner and repo_name are required");
   }
-  const tg = await lib.getTargetGroup(cfg, inputs.target, inputs.workingDir);
   const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
 
-  const wdConfig = lib.readTargetConfig(
-    path.join(tg.workingDir, workingDirectoryFile),
-  );
-
-  if (!checkEnabled(cfg, tg.group, wdConfig)) {
-    core.info("drift detection is disabled");
-    return;
-  }
-  core.info("drift detection is enabled");
-
-  if (!inputs.ghToken) {
-    throw new Error("GITHUB_TOKEN is required");
+  const files = await lib.listWorkingDirFiles(workingDirectoryFile);
+  const dirs: string[] = [];
+  for (const file of files) {
+    dirs.push(path.dirname(file));
   }
 
-  const MyOctokit = Octokit.plugin(paginateGraphQL);
-  const octokit = new MyOctokit({ auth: inputs.ghToken });
-
-  let issue = await getIssue(
-    tg.target,
-    inputs.ghToken,
-    `${repoOwner}/${repoName}`,
-  );
-  if (issue === undefined) {
-    core.info("creating a drift issue");
-    issue = await createIssue(tg.target, inputs.ghToken, repoOwner, repoName);
+  // map working directories and targets
+  const m = lib.createWDTargetMap(dirs, cfg);
+  const targetWDMap = new Map<string, string>();
+  for (const [k, v] of m) {
+    targetWDMap.set(v, k);
   }
 
-  return {
-    number: issue.number,
-    state: issue.state,
-    url: issue.url,
-  };
+  // search github issues
+  const issues = await listIssues(repoOwner + "/" + repoName, inputs.ghToken);
+  core.debug(`found ${issues.length} issues`);
+  // map issues and targets
+  const issueMap = new Map<string, Issue>();
+  for (const issue of issues) {
+    issueMap.set(issue.target, issue);
+  }
+
+  // create issues if not exists
+  for (const target of m.values()) {
+    if (issueMap.has(target)) {
+      continue;
+    }
+    const issue = await createIssue(target, inputs.ghToken, repoOwner, repoName);
+    await closeIssue(inputs.ghToken, repoOwner, repoName, issue.number);
+    issueMap.set(target, issue);
+  }
+  // archive issues if targets don't exist
+  for (const [target, issue] of issueMap) {
+    if (targetWDMap.has(target)) {
+      continue;
+    }
+    await archiveIssue(inputs.ghToken, repoOwner, repoName, issue.title, issue.number);
+  }
 };
+
+const titlePattern = /^Terraform Drift \((\S+)\)$/;
 
 const createIssue = async (
   target: string,
@@ -122,19 +134,51 @@ const createIssue = async (
   return {
     url: issue.data.html_url,
     number: issue.data.number,
+    title: issue.data.title,
+    target: target,
     state: issue.data.state,
   };
 };
 
-const getIssue = async (
-  target: string,
+const closeIssue = async (
   ghToken: string,
+  repoOwner: string,
+  repoName: string,
+  num: number,
+) => {
+  const octokit = github.getOctokit(ghToken);
+  await octokit.rest.issues.update({
+    owner: repoOwner,
+    repo: repoName,
+    issue_number: num,
+    state: "closed",
+  });
+};
+
+const archiveIssue = async (
+  ghToken: string,
+  repoOwner: string,
+  repoName: string,
+  title: string,
+  num: number,
+) => {
+  const octokit = github.getOctokit(ghToken);
+  await octokit.rest.issues.update({
+    owner: repoOwner,
+    repo: repoName,
+    issue_number: num,
+    title: `Archived ${title}`,
+    state: "closed",
+  });
+};
+
+const listIssues = async (
   repo: string,
-): Promise<Issue | undefined> => {
+  ghToken: string,
+): Promise<Issue[]> => {
   const MyOctokit = Octokit.plugin(paginateGraphQL);
   const octokit = new MyOctokit({ auth: ghToken });
 
-  const title = `Terraform Drift (${target})`;
   const query = `query($cursor: String, $searchQuery: String!) {
   search(first: 100, after: $cursor, query: $searchQuery, type: ISSUE) {
     nodes {
@@ -154,30 +198,21 @@ const getIssue = async (
 
   const pageIterator = await octokit.graphql.paginate.iterator(query, {
     issuesCursor: null,
-    searchQuery: `repo:${repo} "${title}" in:title`,
+    searchQuery: `repo:${repo} "Terraform Drift" in:title`,
   });
 
+  const issues: Issue[] = [];
   for await (const response of pageIterator) {
+    core.debug("response: " + JSON.stringify(response));
     for (const issue of response.nodes) {
-      if (issue.title !== title) {
-        continue;
+      // extract target from the title
+      const found = issue.title.match(titlePattern);
+      if (found === null) {
+        continue
       }
-      return issue;
+      issue.target = found[1];
+      issues.push(issue);
     }
   }
-  return undefined;
-};
-
-const checkEnabled = (
-  cfg: lib.Config,
-  targetGroup: lib.TargetGroup,
-  wdCfg: lib.TargetConfig,
-): boolean => {
-  if (wdCfg.drift_detection) {
-    return wdCfg.drift_detection.enabled ?? true;
-  }
-  if (targetGroup.drift_detection) {
-    return targetGroup.drift_detection.enabled ?? true;
-  }
-  return cfg.drift_detection?.enabled ?? false;
+  return issues;
 };

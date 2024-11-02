@@ -451,10 +451,9 @@ export const getTargetGroup = async (
     silent: true,
   });
   const wds: string[] = [];
-  for (const line of out.stdout.split("\n")) {
-    if (line.endsWith(config.working_directory_file ?? "tfaction.yaml")) {
-      wds.push(path.dirname(line));
-    }
+  const files = await listWorkingDirFiles(config.working_directory_file ?? "tfaction.yaml");
+  for (const file of files) {
+    wds.push(path.dirname(file));
   }
   const m = createWDTargetMap(wds, config);
   for (const [wd, t] of m) {
@@ -478,4 +477,17 @@ export const getTargetGroup = async (
     workingDir: workingDir,
     group: targetConfig,
   };
+};
+
+export const listWorkingDirFiles = async (file: string): Promise<string[]> => {
+  const out = await exec.getExecOutput("git", ["ls-files"], {
+    silent: true,
+  });
+  const files: string[] = [];
+  for (const line of out.stdout.split("\n")) {
+    if (line.endsWith(file)) {
+      files.push(line);
+    }
+  }
+  return files;
 };
