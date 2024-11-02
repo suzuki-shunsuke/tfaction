@@ -97,7 +97,12 @@ export const run = async (inputs: Inputs): Promise<Result | undefined> => {
     if (issueMap.has(target)) {
       continue;
     }
-    const issue = await createIssue(target, inputs.ghToken, repoOwner, repoName);
+    const issue = await createIssue(
+      target,
+      inputs.ghToken,
+      repoOwner,
+      repoName,
+    );
     await closeIssue(inputs.ghToken, repoOwner, repoName, issue.number);
     issueMap.set(target, issue);
   }
@@ -106,7 +111,13 @@ export const run = async (inputs: Inputs): Promise<Result | undefined> => {
     if (targetWDMap.has(target)) {
       continue;
     }
-    await archiveIssue(inputs.ghToken, repoOwner, repoName, issue.title, issue.number);
+    await archiveIssue(
+      inputs.ghToken,
+      repoOwner,
+      repoName,
+      issue.title,
+      issue.number,
+    );
   }
 };
 
@@ -172,10 +183,7 @@ const archiveIssue = async (
   });
 };
 
-const listIssues = async (
-  repo: string,
-  ghToken: string,
-): Promise<Issue[]> => {
+const listIssues = async (repo: string, ghToken: string): Promise<Issue[]> => {
   const MyOctokit = Octokit.plugin(paginateGraphQL);
   const octokit = new MyOctokit({ auth: ghToken });
 
@@ -208,7 +216,7 @@ const listIssues = async (
       // extract target from the title
       const found = issue.title.match(titlePattern);
       if (found === null) {
-        continue
+        continue;
       }
       issue.target = found[1];
       issues.push(issue);

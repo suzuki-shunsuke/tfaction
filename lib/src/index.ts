@@ -451,7 +451,9 @@ export const getTargetGroup = async (
     silent: true,
   });
   const wds: string[] = [];
-  const files = await listWorkingDirFiles(config.working_directory_file ?? "tfaction.yaml");
+  const files = await listWorkingDirFiles(
+    config.working_directory_file ?? "tfaction.yaml",
+  );
   for (const file of files) {
     wds.push(path.dirname(file));
   }
