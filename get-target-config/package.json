@@ -10,7 +10,7 @@
     "lib": "file:../lib/dist"
   },
   "devDependencies": {
-    "@types/node": "20.17.5",
+    "@types/node": "20.17.6",
     "@vercel/ncc": "0.38.2",
     "vitest": "2.1.4",
     "typescript": "5.6.3"
