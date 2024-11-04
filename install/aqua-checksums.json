@@ -1,11 +1,6 @@
 {
   "checksums": [
     {
-      "id": "github_release/github.com/cli/cli/v2.60.1/gh_2.60.1_linux_amd64.tar.gz",
-      "checksum": "DFCD9926DE38A797E88E604C3111ECF9DDF13C524706712B2B0D2E2FC4A6ED7F",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/cli/cli/v2.60.1/gh_2.60.1_linux_arm64.tar.gz",
       "checksum": "A2842ED6D1F9E260043305749383BB1EB77D817BB57E22CF8C01DA0A48CAFF66",
       "algorithm": "sha256"
