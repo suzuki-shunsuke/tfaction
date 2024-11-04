@@ -31,7 +31,6 @@ runs:
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        AQUA_CONFIG: ${{steps.install.outputs.config}}
 
     - name: Check if the commit is latest
       shell: bash
@@ -82,7 +81,6 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
-        AQUA_CONFIG: ${{steps.install.outputs.config}}
 
     - run: aqua i -l -a
       shell: bash
@@ -136,5 +134,3 @@ runs:
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
         terraform_command: ${{ steps.target-config.outputs.terraform_command }}
-      env:
-        AQUA_CONFIG: ${{steps.install.outputs.config}}

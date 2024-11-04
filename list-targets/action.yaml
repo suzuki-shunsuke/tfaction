@@ -26,7 +26,6 @@ runs:
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        AQUA_CONFIG: ${{steps.install.outputs.config}}
 
     - name: Check if the commit is latest
       shell: bash
@@ -52,8 +51,6 @@ runs:
       with:
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
         module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
-      env:
-        AQUA_CONFIG: ${{steps.install.outputs.config}}
     - uses: suzuki-shunsuke/tfaction/list-targets-with-changed-files@main
       id: list-targets
       with:
