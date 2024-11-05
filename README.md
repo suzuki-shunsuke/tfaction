@@ -25,6 +25,8 @@ https://suzuki-shunsuke.github.io/tfaction/docs/
 - [Luup, Inc.](https://luup.sc/)
   - [2022-12-18 tfaction導入のお話](https://zenn.dev/luup_developers/articles/sre-nakanishi-20221218)
 - [Wantedly, Inc.](https://wantedlyinc.com/)
+- [newmo, Inc.](https://newmo.me/)
+  - [tfactionを使ったGitHub Actions Workflowの構築](https://tech.newmo.me/entry/tfaction-github-terraform-workflow)
 
 ## LICENSE
 
