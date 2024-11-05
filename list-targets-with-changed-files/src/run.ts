@@ -147,9 +147,8 @@ export const run = (input: Input): Result => {
   for (const changedWorkingDir of changedWorkingDirs) {
     const target = wdTargetMap.get(changedWorkingDir);
     if (target === undefined) {
-      throw new Error(
-        `No target is found for the working directory ${changedWorkingDir}`,
-      );
+      core.warning(`No target is found for the working directory ${changedWorkingDir}`);
+      continue
     }
     if (!terraformTargets.has(target) && !tfmigrates.has(target)) {
       terraformTargets.add(target);
