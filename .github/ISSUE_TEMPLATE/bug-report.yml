@@ -14,7 +14,6 @@ body:
     id: overview
     attributes:
       label: Overview
-      value:
     validations:
       required: true
   - type: textarea
@@ -44,12 +43,6 @@ body:
 
         ```
 
-        Other related code such as local Registry
-
-        ```
-
-        ```
-
         GitHub Actions' log
 
         ```
@@ -60,23 +53,14 @@ body:
     id: expected-behaviour
     attributes:
       label: Expected behaviour
-      value:
     validations:
       required: true
   - type: textarea
     id: actual-behaviour
     attributes:
       label: Actual behaviour
-      value:
     validations:
       required: true
-  - type: textarea
-    id: important-factoid
-    attributes:
-      label: Important Factoids
-      value:
-    validations:
-      required: false
   - type: textarea
     id: note
     attributes:
