@@ -10,7 +10,7 @@
   "devDependencies": {
     "@vercel/ncc": "0.38.2",
     "@types/node": "20.17.6",
-    "vitest": "2.1.4",
+    "vitest": "2.1.5",
     "typescript": "5.6.3"
   }
 }
