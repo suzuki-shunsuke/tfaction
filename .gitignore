@@ -1,5 +1,4 @@
 node_modules
 *.log
-build
 .DS_Store
 dist
