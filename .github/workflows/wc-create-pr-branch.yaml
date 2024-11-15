@@ -43,14 +43,6 @@ jobs:
         with:
           branch: ${{env.PR_BRANCH}}
 
-      - run: |
-          git ls-files | grep -E "/action\.yaml$" |
-            xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@$PR_BRANCH|"
-      - run: git ls-files | grep -E "/action\.yaml$" | xargs git add
-      - run: |
-          git commit -m "chore: test $PR_NUMBER
-          base revision: ${BASE_REVISION}"
-
       - run: git push origin "$PR_BRANCH" --force
         env:
           GITHUB_TOKEN: ${{github.token}}

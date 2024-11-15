@@ -2,6 +2,7 @@ name: build
 description: build
 inputs:
   branch:
+    # "pr/<pr number>", "latest" or "release/<tag>"
     description: branch
     required: true
 runs:
@@ -33,3 +34,24 @@ runs:
       shell: bash
     - run: find ./*/dist/* -print0 | xargs -0 git add -f
       shell: bash
+
+    - run: |
+        echo "tag=${BRANCH#release/}" >> "$GITHUB_OUTPUT"
+      shell: bash
+      id: tag
+      env:
+        BRANCH: ${{inputs.branch}}
+
+    - run: |
+        git ls-files | grep -E "/action\.yaml$" |
+          xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@${TAG}|"
+      shell: bash
+      env:
+        TAG: ${{steps.tag.outputs.tag}}
+
+    - run: |
+        git commit -a -m "chore: release ${TAG}
+        base revision: $BASE_REVISION"
+      shell: bash
+      env:
+        TAG: ${{steps.tag.outputs.tag}}

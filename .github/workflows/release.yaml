@@ -40,14 +40,6 @@ jobs:
         with:
           branch: release/${{env.TAG}}
 
-      - run: |
-          git ls-files | grep -E "/action\.yaml$" |
-            xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@${TAG}|"
-
-      - run: |
-          git commit -a -m "chore: release ${TAG}
-          base revision: $BASE_REVISION"
-
       - run: git tag "$TAG"
       - run: git push origin "$TAG"
       - run: |
