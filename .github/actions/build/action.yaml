@@ -1,0 +1,35 @@
+name: build
+description: build
+inputs:
+  branch:
+    description: branch
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: aquaproj/aqua-installer@6ce1f8848ec8e61f14d57bd5d7597057a6dd187c # v3.0.1
+      with:
+        aqua_version: v2.37.2
+      env:
+        GITHUB_TOKEN: ${{github.token}}
+    - run: gh auth setup-git
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{github.token}}
+    # https://github.community/t/github-actions-bot-email-address/17204/5
+    - run: git config user.name "github-actions[bot]"
+      shell: bash
+    - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      shell: bash
+    - run: echo "BASE_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      shell: bash
+
+    - run: git checkout -b "$BRANCH"
+      shell: bash
+      env:
+        BRANCH: ${{inputs.branch}}
+
+    - run: cmdx build
+      shell: bash
+    - run: find ./*/dist/* -print0 | xargs -0 git add -f
+      shell: bash

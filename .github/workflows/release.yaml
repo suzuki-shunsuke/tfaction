@@ -36,31 +36,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
 
-      - uses: aquaproj/aqua-installer@6ce1f8848ec8e61f14d57bd5d7597057a6dd187c # v3.0.1
+      - uses: ./.github/actions/build
         with:
-          aqua_version: v2.37.2
-        env:
-          AQUA_GITHUB_TOKEN: ${{github.token}}
-
-      - run: echo "BASE_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-
-      - run: gh auth setup-git
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      # https://github.community/t/github-actions-bot-email-address/17204/5
-      - run: git config user.name "github-actions[bot]"
-      - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - run: cmdx build
-      - run: find ./*/dist/* -print0 | xargs -0 git add -f
+          branch: release/${{env.TAG}}
 
       - run: |
           git ls-files | grep -E "/action\.yaml$" |
             xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@${TAG}|"
-      - run: git checkout -b "release/${TAG}"
+
       - run: |
           git commit -a -m "chore: release ${TAG}
           base revision: $BASE_REVISION"
+
       - run: git tag "$TAG"
       - run: git push origin "$TAG"
       - run: |
