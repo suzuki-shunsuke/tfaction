@@ -43,7 +43,7 @@ runs:
         BRANCH: ${{inputs.branch}}
 
     - run: |
-        git ls-files | grep -E "/action\.yaml$" |
+        git ls-files | grep -E "/action\.yaml$" | grep -v -E "^\.github/actions" |
           xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@${TAG}|"
       shell: bash
       env:
