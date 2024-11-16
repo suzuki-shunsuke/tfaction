@@ -1,23 +1,25 @@
 name: pull request
-
 on:
   push:
     branches:
       - main
-
 jobs:
   build:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      BRANCH: latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: ./.github/actions/build
+
+      - uses: aquaproj/aqua-installer@6ce1f8848ec8e61f14d57bd5d7597057a6dd187c # v3.0.1
         with:
-          branch: ${{env.BRANCH}}
-      - run: git push origin "$BRANCH" --force
+          aqua_version: v2.37.2
         env:
           GITHUB_TOKEN: ${{github.token}}
+      - run: cmdx build
+        shell: bash
+
+      - uses: suzuki-shunsuke/release-js-action@964d814f9200bb928f4713098c38218881cfc493 # v0.1.0
+        with:
+          version: latest
