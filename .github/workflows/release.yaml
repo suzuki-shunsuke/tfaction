@@ -7,61 +7,6 @@ on:
       tag:
         description: "tag"
         required: true
-      ref:
-        description: "released ref (branch, tag or SHA). By default, the default branch is used"
-        required: false
-      pr:
-        description: "pr number (pre-release)"
-        required: false
-permissions:
-  contents: write
-  pull-requests: write
-jobs:
-  release:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    env:
-      PR: ${{inputs.pr}}
-      TAG: ${{inputs.tag}}
-    steps:
-      - run: |
-          echo "::notice::tag: $TAG, pr: $PR, ref: $REF"
-        env:
-          REF: ${{inputs.ref}}
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{inputs.ref}}
-      - run: gh pr checkout "$PR"
-        if: inputs.pr != ''
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-
-      - uses: ./.github/actions/build
-        with:
-          branch: release/${{env.TAG}}
-
-      - run: git tag "$TAG"
-      - run: git push origin "$TAG"
-      - run: |
-          gh release create "$TAG" -p --title "$TAG" -n "$NOTE"
-        env:
-          NOTE: "[Issues](https://github.com/suzuki-shunsuke/tfaction/issues?q=is%3Aissue+is%3Aclosed+milestone%3A${{env.TAG}}) | [Pull Requests](https://github.com/suzuki-shunsuke/tfaction/pulls?q=is%3Apr+is%3Aclosed+milestone%3A${{env.TAG}}) | https://github.com/suzuki-shunsuke/tfaction/compare/${{env.TAG}}...${{env.TAG}} | [Base revision](https://github.com/suzuki-shunsuke/tfaction/tree/${{env.BASE_REVISION}})"
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - run: github-comment post -pr "$PR" -k pre-release -var "tag:$TAG"
-        if: inputs.pr != ''
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-
----
-name: Release
-run-name: Release ${{inputs.tag}}
-on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "tag"
-        required: true
       pr:
         description: "pr number (pre-release)"
         required: false
