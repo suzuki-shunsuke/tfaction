@@ -33,7 +33,7 @@ jobs:
       - run: cmdx build
         shell: bash
 
-      - uses: suzuki-shunsuke/release-js-action@feat-fist-pr
+      - uses: suzuki-shunsuke/release-js-action@964d814f9200bb928f4713098c38218881cfc493 # v0.1.0
         with:
           version: ${{inputs.tag}}
           pr: ${{inputs.pr}}
