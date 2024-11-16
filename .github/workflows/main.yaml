@@ -1,4 +1,4 @@
-name: pull request
+name: Update the latest branch
 on:
   push:
     branches:
