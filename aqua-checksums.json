@@ -191,33 +191,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v20.18.0/node-v20.18.0-darwin-arm64.tar.gz",
-      "checksum": "92E180624259D082562592BB12548037C6A417069BE29E452EC5D158D657B4BE",
+      "id": "http/nodejs.org/dist/v20.18.1/node-v20.18.1-darwin-arm64.tar.gz",
+      "checksum": "9E92CE1032455A9CC419FE71E908B27AE477799371B45A0844EEDB02279922A4",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v20.18.0/node-v20.18.0-darwin-x64.tar.gz",
-      "checksum": "C02AA7560612A4E2CC359FD89FAE7AEDDE370C06DB621F2040A4A9F830A125DC",
+      "id": "http/nodejs.org/dist/v20.18.1/node-v20.18.1-darwin-x64.tar.gz",
+      "checksum": "C5497DD17C8875B53712EDAF99052F961013CEDC203964583FC0CFC0AAF93581",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v20.18.0/node-v20.18.0-linux-arm64.tar.gz",
-      "checksum": "38BCCB35C06EE4EDBCD00C77976E3FAD1D69D2E57C3C0C363D1700A2A2493278",
+      "id": "http/nodejs.org/dist/v20.18.1/node-v20.18.1-linux-arm64.tar.gz",
+      "checksum": "73CD297378572E0BC9DFC187C5EC8CCA8D43AEE6A596C10EBEA1ED5F9EC682B6",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v20.18.0/node-v20.18.0-linux-x64.tar.gz",
-      "checksum": "24A5D58A1D4C2903478F4B7C3CFD2EEB5CEA2CAE3BAEE11A4DC6A1FED25FEC6C",
+      "id": "http/nodejs.org/dist/v20.18.1/node-v20.18.1-linux-x64.tar.gz",
+      "checksum": "259E5A8BF2E15ECECE65BD2A47153262EDA71C0B2C9700D5E703CE4951572784",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v20.18.0/node-v20.18.0-win-x64.zip",
-      "checksum": "F5CEA43414CC33024BBE5867F208D1C9C915D6A38E92ABEEE07ED9E563662297",
+      "id": "http/nodejs.org/dist/v20.18.1/node-v20.18.1-win-x64.zip",
+      "checksum": "56E5AACDEEE7168871721B75819CCACF2367DE8761B78EACEACDECD41E04CA03",
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.254.0/registry.yaml",
-      "checksum": "6FFA6314EC9B401A2F01BB9B44CBA1199A7EDCC924A6C5094691255D306978FF",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.255.0/registry.yaml",
+      "checksum": "411100EBE76F914BCF64C07ED195D4C66B743A5F944F3A2511AC28756ED36873",
       "algorithm": "sha256"
     }
   ]
