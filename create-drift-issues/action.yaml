@@ -1,0 +1,5 @@
+name: Create drift issues
+description: Create drift issues
+runs:
+  using: node20
+  main: dist/index.js
