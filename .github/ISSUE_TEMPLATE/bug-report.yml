@@ -1,5 +1,7 @@
 name: Bug Report
-description: If something isn't working as expected.
+description: |
+  Please report the bug of tfaction.
+  If you're not sure if it's a bug or not, please use the template `Support Request` instead.
 labels:
   - bug
 body:
@@ -41,11 +43,6 @@ body:
 
         ```yaml
 
-        ```
-
-        GitHub Actions' log
-
-        ```
         ```
     validations:
       required: true
