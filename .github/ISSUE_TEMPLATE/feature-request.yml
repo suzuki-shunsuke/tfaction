@@ -1,5 +1,5 @@
 name: Feature Request
-description: If you want to add a feature.
+description: Add a feature.
 labels:
   - enhancement
 body:
@@ -7,7 +7,6 @@ body:
     id: feature-overview
     attributes:
       label: Feature Overview
-      value:
     validations:
       required: true
   - type: textarea
@@ -22,7 +21,7 @@ body:
     attributes:
       label: Example Code
       description: |
-        Please explain the feature with code
+        Please explain the feature with code.
       value: |
         GitHub Actions
 
