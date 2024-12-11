@@ -11,7 +11,7 @@
     "tmp": "^0.2.3"
   },
   "devDependencies": {
-    "@types/node": "20.17.9",
+    "@types/node": "20.17.10",
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.3",
     "typescript": "5.7.2",
