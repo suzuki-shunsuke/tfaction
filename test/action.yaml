@@ -56,7 +56,7 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
-        fix: ${{ steps.target-config.outputs.tflint_fix }}
+        fix: ${{ steps.target-config.outputs.tflint_fix == 'true' }}
 
     - uses: suzuki-shunsuke/github-action-terraform-fmt@bdc85c3536e31ae189339cc09c5a0f9768d0ffa7 # v0.2.2
       if: steps.target-config.outputs.destroy != 'true'
