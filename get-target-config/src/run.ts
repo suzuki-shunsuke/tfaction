@@ -61,7 +61,7 @@ export const run = async (
   outputs.set("enable_tfsec", config?.tfsec?.enabled ?? false);
   outputs.set("enable_tflint", config?.tflint?.enabled ?? true);
   outputs.set("enable_trivy", config?.trivy?.enabled ?? true);
-  outputs.set("tflint_fix", config?.tflint?.fix ?? true);
+  outputs.set("tflint_fix", config?.tflint?.fix ?? false);
 
   outputs.set("terraform_command", "terraform");
 
@@ -152,8 +152,8 @@ export const run = async (
     outputs.set(
       "enable_terraform_docs",
       wdConfig?.terraform_docs?.enabled ??
-        config?.terraform_docs?.enabled ??
-        false,
+      config?.terraform_docs?.enabled ??
+      false,
     );
 
     const m3 = lib.setEnvs(
