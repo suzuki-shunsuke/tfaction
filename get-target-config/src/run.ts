@@ -152,8 +152,8 @@ export const run = async (
     outputs.set(
       "enable_terraform_docs",
       wdConfig?.terraform_docs?.enabled ??
-      config?.terraform_docs?.enabled ??
-      false,
+        config?.terraform_docs?.enabled ??
+        false,
     );
 
     const m3 = lib.setEnvs(
