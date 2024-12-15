@@ -61,6 +61,7 @@ export const run = async (
   outputs.set("enable_tfsec", config?.tfsec?.enabled ?? false);
   outputs.set("enable_tflint", config?.tflint?.enabled ?? true);
   outputs.set("enable_trivy", config?.trivy?.enabled ?? true);
+  outputs.set("tflint_fix", config?.tflint?.fix ?? true);
 
   outputs.set("terraform_command", "terraform");
 
