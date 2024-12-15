@@ -38,6 +38,7 @@ export type TfsecConfig = z.infer<typeof TfsecConfig>;
 
 const TflintConfig = z.object({
   enabled: z.optional(z.boolean()),
+  fix: z.optional(z.boolean()),
 });
 
 export type TflintConfig = z.infer<typeof TflintConfig>;

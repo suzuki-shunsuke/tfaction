@@ -50,12 +50,13 @@ runs:
         ignore_hcl_errors: "true"
 
     # deep check requires AWS credentials
-    - uses: suzuki-shunsuke/github-action-tflint@aaa3b6550823e887ef1de7d2a1c8e1bbb83abd7b # v1.1.1
+    - uses: suzuki-shunsuke/github-action-tflint@feat-fix
       if: fromJSON(steps.target-config.outputs.enable_tflint) && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
+        fix: ${{ steps.target-config.outputs.tflint_fix }}
 
     - uses: suzuki-shunsuke/github-action-terraform-fmt@bdc85c3536e31ae189339cc09c5a0f9768d0ffa7 # v0.2.2
       if: steps.target-config.outputs.destroy != 'true'
