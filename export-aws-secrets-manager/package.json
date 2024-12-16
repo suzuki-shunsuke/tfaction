@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "@actions/core": "1.11.1",
-    "@aws-sdk/client-secrets-manager": "3.712.0",
+    "@aws-sdk/client-secrets-manager": "3.713.0",
     "js-yaml": "4.1.0",
     "lib": "file:../lib/dist"
   },
