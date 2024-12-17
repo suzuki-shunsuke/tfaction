@@ -73,4 +73,3 @@ runs:
       id: global-config
       with:
         action: get-global-config
-
