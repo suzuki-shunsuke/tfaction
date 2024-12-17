@@ -23,6 +23,8 @@ outputs:
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/install@main
+      id: install
     - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
       if: |
@@ -36,7 +38,7 @@ runs:
       run: |
         set -euo pipefail
 
-        latest_head_sha=$(jq -r ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
+        latest_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
         if [ "$HEAD_SHA" != "$latest_head_sha" ]; then
           echo "::error::The head sha ($HEAD_SHA) isn't latest ($latest_head_sha)."
           exit 1
@@ -48,7 +50,7 @@ runs:
       id: target-config
 
     - run: |
-        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ github.event.pull_request.number }}/labels" \
+        curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$CI_INFO_PR_NUMBER/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Accept: application/json" \
           -H "Content-type: application/json" \
@@ -71,7 +73,7 @@ runs:
       env:
         TARGET_CONFIG: ${{toJSON(steps.target-config.outputs)}}
 
-    - uses: aquaproj/update-checksum-action@f8df4ca9d89c02df053ba6580c36c0b17c879187 # v0.2.4
+    - uses: aquaproj/update-checksum-action@4963338fe99be2c6fc0ecd972c3b683239e7d85a # v0.2.5
       if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'
       with:
         skip_push: ${{ steps.global-config.outputs.aqua_update_checksum_skip_push }}

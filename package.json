@@ -8,7 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "prettier": "3.3.3"
+    "prettier": "3.4.2"
   },
   "scripts": {
     "fmt": "prettier -w .",
@@ -17,6 +17,6 @@
   "author": "",
   "license": "MIT",
   "volta": {
-    "node": "20.18.0"
+    "node": "20.18.1"
   }
 }

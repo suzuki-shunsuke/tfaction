@@ -1,5 +1,7 @@
 name: Bug Report
-description: If something isn't working as expected.
+description: |
+  Please report the bug of tfaction.
+  If you're not sure if it's a bug or not, please use the template `Support Request` instead.
 labels:
   - bug
 body:
@@ -14,7 +16,6 @@ body:
     id: overview
     attributes:
       label: Overview
-      value:
     validations:
       required: true
   - type: textarea
@@ -43,40 +44,20 @@ body:
         ```yaml
 
         ```
-
-        Other related code such as local Registry
-
-        ```
-
-        ```
-
-        GitHub Actions' log
-
-        ```
-        ```
     validations:
       required: true
   - type: textarea
     id: expected-behaviour
     attributes:
       label: Expected behaviour
-      value:
     validations:
       required: true
   - type: textarea
     id: actual-behaviour
     attributes:
       label: Actual behaviour
-      value:
     validations:
       required: true
-  - type: textarea
-    id: important-factoid
-    attributes:
-      label: Important Factoids
-      value:
-    validations:
-      required: false
   - type: textarea
     id: note
     attributes:

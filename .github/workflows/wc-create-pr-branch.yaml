@@ -13,80 +13,30 @@ on:
         required: false
         default: false
         type: boolean
-    secrets:
-      gh_app_id:
-        required: true
-      gh_app_private_key:
-        required: true
-
-permissions:
-  contents: write
-  pull-requests: write
-
-env:
-  PR_NUMBER: ${{inputs.pr}}
-  PR_BRANCH: pr/${{inputs.pr}}
-
 jobs:
   create-pr-branch:
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: gh pr checkout "$PR"
+        if: inputs.pr != ''
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+          PR: ${{inputs.pr}}
 
-      - id: generate_token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+      - uses: aquaproj/aqua-installer@f13c5d2f0357708d85477aabe50fd3f725528745 # v3.1.0
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "contents": "write"
-            }
-          repositories: >-
-            [
-              "${{github.event.repository.name}}"
-            ]
-
-      - uses: aquaproj/aqua-installer@6ce1f8848ec8e61f14d57bd5d7597057a6dd187c # v3.0.1
-        with:
-          aqua_version: v2.36.2
+          aqua_version: v2.39.1
         env:
           GITHUB_TOKEN: ${{github.token}}
-
-      - run: gh auth setup-git
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      # https://github.community/t/github-actions-bot-email-address/17204/5
-      - run: git config user.name "github-actions[bot]"
-      - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - run: gh pr checkout "$PR_NUMBER"
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      - run: echo "base_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-        id: base_sha
-      - run: git fetch origin "pull/$PR_NUMBER/merge:$PR_BRANCH"
-      - run: git checkout "$PR_BRANCH"
-
       - run: cmdx build
-      - run: find ./*/dist/* -print0 | xargs -0 git add -f
-      - run: |
-          git ls-files | grep -E "/action\.yaml$" |
-            xargs -n 1 sed -i "s|- uses: suzuki-shunsuke/tfaction/\(.*\)@main|- uses: suzuki-shunsuke/tfaction/\1@$PR_BRANCH|"
-      - run: git ls-files | grep -E "/action\.yaml$" | xargs git add
-      - run: |
-          git commit -m "chore: test $PR_NUMBER
-          base revision: ${BASE_SHA}"
-        env:
-          BASE_SHA: ${{steps.base_sha.outputs.base_sha}}
-      - run: git push origin "$PR_BRANCH" --force
-        env:
-          GITHUB_TOKEN: ${{steps.generate_token.outputs.token}}
+        shell: bash
 
-      - run: echo "[Pull Request](https://github.com/suzuki-shunsuke/tfaction/pull/$PR_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
-
-      - run: github-comment post -pr "$PR_NUMBER" -k create-pr-branch
-        if: inputs.is_comment
-        env:
-          GITHUB_TOKEN: ${{github.token}}
+      - uses: suzuki-shunsuke/release-js-action@e171d621cbdcf5e0f64b9746ed88a2210ef51bdd # v0.1.2
+        with:
+          version: pr/${{inputs.pr}}
+          is_comment: ${{inputs.is_comment}}

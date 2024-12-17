@@ -41,7 +41,7 @@ runs:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: "true"
 
-    - uses: suzuki-shunsuke/github-action-tflint@0b7fbc35b0d512749f35c3036df57c3a95d3e9e1 # v1.1.0
+    - uses: suzuki-shunsuke/github-action-tflint@6039e959cc626f0fd8b8bd3cae61c54283f23540 # v1.2.0
       if: fromJSON(steps.global-config.outputs.enable_tflint)
       with:
         github_token: ${{ inputs.github_token }}

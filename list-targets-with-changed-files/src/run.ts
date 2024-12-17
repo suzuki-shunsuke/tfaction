@@ -19,10 +19,11 @@ const getTargetConfigByTarget = (
   target: string,
   isApply: boolean,
   jobType: lib.JobType,
-): TargetConfig => {
+): TargetConfig | undefined => {
   const tg = lib.getTargetFromTargetGroupsByWorkingDir(targets, wd);
   if (tg === undefined) {
-    throw new Error(`No target group is found for the working directory ${wd}`);
+    core.warning(`No target group is found for the working directory ${wd}`);
+    return undefined;
   }
   const jobConfig = lib.getJobConfig(tg, isApply, jobType);
   if (jobConfig === undefined) {
@@ -147,21 +148,23 @@ export const run = (input: Input): Result => {
   for (const changedWorkingDir of changedWorkingDirs) {
     const target = wdTargetMap.get(changedWorkingDir);
     if (target === undefined) {
-      throw new Error(
+      core.warning(
         `No target is found for the working directory ${changedWorkingDir}`,
       );
+      continue;
     }
     if (!terraformTargets.has(target) && !tfmigrates.has(target)) {
-      terraformTargets.add(target);
-      terraformTargetObjs.push(
-        getTargetConfigByTarget(
-          config.target_groups,
-          changedWorkingDir,
-          target,
-          isApply,
-          "terraform",
-        ),
+      const obj = getTargetConfigByTarget(
+        config.target_groups,
+        changedWorkingDir,
+        target,
+        isApply,
+        "terraform",
       );
+      if (obj !== undefined) {
+        terraformTargets.add(target);
+        terraformTargetObjs.push(obj);
+      }
     }
   }
 
@@ -178,16 +181,17 @@ export const run = (input: Input): Result => {
         `No working directory is found for the target ${followupTarget}`,
       );
     }
-    terraformTargets.add(followupTarget);
-    terraformTargetObjs.push(
-      getTargetConfigByTarget(
-        config.target_groups,
-        wd,
-        followupTarget,
-        isApply,
-        "terraform",
-      ),
+    const obj = getTargetConfigByTarget(
+      config.target_groups,
+      wd,
+      followupTarget,
+      isApply,
+      "terraform",
     );
+    if (obj !== undefined) {
+      terraformTargets.add(followupTarget);
+      terraformTargetObjs.push(obj);
+    }
   }
 
   return {
@@ -265,15 +269,17 @@ const handleLabels = (
           config.target_groups,
           wd,
         );
-        terraformTargetObjs.push(
-          getTargetConfigByTarget(
-            config.target_groups,
-            wd,
-            target,
-            isApply,
-            "terraform",
-          ),
+        const obj = getTargetConfigByTarget(
+          config.target_groups,
+          wd,
+          target,
+          isApply,
+          "terraform",
         );
+        if (obj === undefined) {
+          throw new Error(`No target config is found for the target ${target}`);
+        }
+        terraformTargetObjs.push(obj);
       }
       continue;
     }
@@ -287,15 +293,17 @@ const handleLabels = (
             `No working directory is found for the target ${target}`,
           );
         }
-        tfmigrateObjs.push(
-          getTargetConfigByTarget(
-            config.target_groups,
-            wd,
-            target,
-            isApply,
-            "tfmigrate",
-          ),
+        const obj = getTargetConfigByTarget(
+          config.target_groups,
+          wd,
+          target,
+          isApply,
+          "tfmigrate",
         );
+        if (obj === undefined) {
+          throw new Error(`No target config is found for the target ${target}`);
+        }
+        tfmigrateObjs.push(obj);
       }
       continue;
     }
