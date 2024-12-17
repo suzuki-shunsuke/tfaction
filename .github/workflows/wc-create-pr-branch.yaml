@@ -45,8 +45,16 @@ jobs:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_TARGET: js/test/aws/foo/dev
           TFACTION_JOB_TYPE: terraform
+      - name: Test get-target-config
+        uses: ./get-target-config
+        id: target-config
+        env:
+          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_TARGET: js/test/aws/foo/dev
+          TFACTION_JOB_TYPE: terraform
       - run: "true"
         env:
+          GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
 
       - uses: suzuki-shunsuke/release-js-action@e171d621cbdcf5e0f64b9746ed88a2210ef51bdd # v0.1.2
