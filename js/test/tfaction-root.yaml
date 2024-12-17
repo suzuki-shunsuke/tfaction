@@ -5,7 +5,7 @@ label_prefixes:
   tfmigrate: "migrate:"
 skip_terraform_by_renovate: true
 renovate_terraform_labels:
-- terraform
+  - terraform
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_amd64
 tfcmt_plan_patch: true
 # conftest_policy_directory: conftest-policy
@@ -50,21 +50,21 @@ drift_detection:
 
 replace:
   patterns:
-  - regexp: /services/
-    replace: /
+    - regexp: /services/
+      replace: /
 
 target_groups:
-- working_directory: js/test/aws/
-  target: js/test/aws/
-  aws_region: ap-northeast-1
-  s3_bucket_name_tfmigrate_history: 0000-0000-0000-suzuki-shunsuke-tfmigrate-history
-  template_dir: js/test/templates/aws
+  - working_directory: js/test/aws/
+    target: js/test/aws/
+    aws_region: ap-northeast-1
+    s3_bucket_name_tfmigrate_history: 0000-0000-0000-suzuki-shunsuke-tfmigrate-history
+    template_dir: js/test/templates/aws
 
-  terraform_plan_config:
-    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan
-  tfmigrate_plan_config:
-    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_plan
-  terraform_apply_config:
-    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_apply
-  tfmigrate_apply_config:
-    aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_apply
+    terraform_plan_config:
+      aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan
+    tfmigrate_plan_config:
+      aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_plan
+    terraform_apply_config:
+      aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_apply
+    tfmigrate_apply_config:
+      aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_apply
