@@ -67,6 +67,6 @@ runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction/js@main
-      id: get-target-config
+      id: target-config
       with:
         action: get-target-config
