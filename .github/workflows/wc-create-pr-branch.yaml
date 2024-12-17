@@ -36,6 +36,11 @@ jobs:
       - run: cmdx build
         shell: bash
 
+      - uses: suzuki-shunsuke/release-js-action@e171d621cbdcf5e0f64b9746ed88a2210ef51bdd # v0.1.2
+        with:
+          version: pr/${{inputs.pr}}
+          is_comment: ${{inputs.is_comment}}
+
       - name: Test js/get-target-config
         uses: ./js
         id: js-target-config
@@ -56,8 +61,3 @@ jobs:
         env:
           GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
-
-      - uses: suzuki-shunsuke/release-js-action@e171d621cbdcf5e0f64b9746ed88a2210ef51bdd # v0.1.2
-        with:
-          version: pr/${{inputs.pr}}
-          is_comment: ${{inputs.is_comment}}
