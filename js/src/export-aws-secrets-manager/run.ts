@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import * as lib from "lib";
+import * as lib from "../lib";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
