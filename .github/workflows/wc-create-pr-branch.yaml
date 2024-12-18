@@ -76,6 +76,9 @@ jobs:
         id: js-check-terraform-skip
         with:
           action: check-terraform-skip
+          labels: js/test/labels.txt
+          skip_label_prefix: "skip:"
+          pr_author: suzuki-shunsuke
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
