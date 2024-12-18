@@ -10,12 +10,12 @@ type Inputs = {
   jobType: lib.JobType;
 };
 
-export type Result = {
+type Result = {
   envs: Map<string, any>;
   outputs: Map<string, any>;
 };
 
-export const getTargetConfig = async () => {
+export const main = async () => {
   const result = await run(
     {
       target: process.env.TFACTION_TARGET,
@@ -33,7 +33,7 @@ export const getTargetConfig = async () => {
   }
 };
 
-export const run = async (
+const run = async (
   inputs: Inputs,
   config: lib.Config,
 ): Promise<Result> => {
@@ -152,8 +152,8 @@ export const run = async (
     outputs.set(
       "enable_terraform_docs",
       wdConfig?.terraform_docs?.enabled ??
-        config?.terraform_docs?.enabled ??
-        false,
+      config?.terraform_docs?.enabled ??
+      false,
     );
 
     const m3 = lib.setEnvs(

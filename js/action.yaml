@@ -15,6 +15,17 @@ inputs:
     description: "Pull Request Author"
     required: false
 
+  # list-changed-modules
+  changed_files:
+    description: "Changed Files"
+    required: false
+  config_files:
+    description: "config file paths"
+    required: false
+  config:
+    description: "config file path"
+    required: false
+
 outputs:
   # get-target-config
   working_directory:
@@ -87,6 +98,10 @@ outputs:
   # check-terraform-skip
   skip_terraform:
     description: whether terraform is skipped
+
+  # list-changed-modules
+  modules:
+    description: list of modules
 runs:
   using: node20
   main: dist/index.js

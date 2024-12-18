@@ -1,4 +1,19 @@
-import * as lib from "../../lib";
+import * as core from "@actions/core";
+import * as lib from "../lib";
+
+export const main = async () => {
+  const config = lib.getConfig();
+  const result = main_(config, {
+    repository: process.env.GITHUB_REPOSITORY,
+    drift_issue_number: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
+  });
+  for (const [key, value] of Object.entries(result.envs)) {
+    core.exportVariable(key, value);
+  }
+  for (const [key, value] of Object.entries(result.outputs)) {
+    core.setOutput(key, value);
+  }
+};
 
 interface Input {
   repository?: string;
@@ -42,7 +57,7 @@ interface Envs {
   TFACTION_SKIP_ADDING_AQUA_PACKAGES: boolean;
 }
 
-export const main = (config: lib.Config, input: Input): Result => {
+export const main_ = (config: lib.Config, input: Input): Result => {
   if (!config.plan_workflow_name) {
     throw new Error(
       'The setting "plan_workflow_name" is required in tfaction-root.yaml',
