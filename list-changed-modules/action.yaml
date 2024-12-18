@@ -18,6 +18,14 @@ inputs:
 outputs:
   modules:
     description: list of modules
+    value: ${{steps.main.outputs.modules}}
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: main
+      with:
+        action: list-changed-modules
+        changed_files: ${{inputs.changed_files}}
+        config_files: ${{inputs.config_files}}
+        config: ${{inputs.config}}
