@@ -29,7 +29,7 @@ inputs:
   # list-module-callers
   module_files:
     description: "module file paths"
-    required: true
+    required: false
 
 outputs:
   # get-target-config
