@@ -1,3 +1,2 @@
-js/test/aws/foo/dev/main.tf
-js/test/aws/foo/dev/backend.tf
+js/test/modules/foo/main.tf
 js/test/README.md
