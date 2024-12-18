@@ -14,6 +14,13 @@ outputs:
       {
         "module1": ["caller1", "caller2"],
       }
+    value: ${{steps.main.outputs.file}}
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: main
+      with:
+        action: export-secrets
+        config_files: ${{inputs.config_files}}
+        module_files: ${{inputs.module_files}}

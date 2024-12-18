@@ -26,6 +26,11 @@ inputs:
     description: "config file path"
     required: false
 
+  # list-module-callers
+  module_files:
+    description: "module file paths"
+    required: true
+
 outputs:
   # get-target-config
   working_directory:
@@ -102,6 +107,14 @@ outputs:
   # list-changed-modules
   modules:
     description: list of modules
+
+  # list-module-caller
+  file:
+    description: |
+      A JSON representing a map whose keys are module directories and values are directories where the module is used.
+      {
+        "module1": ["caller1", "caller2"],
+      }
 runs:
   using: node20
   main: dist/index.js

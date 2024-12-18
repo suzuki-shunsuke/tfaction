@@ -4,7 +4,7 @@ import * as path from "path";
 import * as child_process from "child_process";
 import { buildModuleToCallers, resolveRelativeCallTree } from "./lib";
 
-try {
+export const main = async () => {
   const configFiles = fs
     .readFileSync(core.getInput("config_files"), "utf8")
     .split("\n");
@@ -47,8 +47,4 @@ try {
   const json = JSON.stringify(moduleCallers);
   core.info(`file: ${json}`);
   core.setOutput("file", json);
-} catch (error) {
-  core.setFailed(
-    error instanceof Error ? error.message : JSON.stringify(error),
-  );
-}
+};
