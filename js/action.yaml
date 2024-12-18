@@ -72,6 +72,10 @@ outputs:
     description: aqua update-checksum's `prune`
   plan_workflow_name:
     description: GitHub Actions Workflow name running tfaction/terraform-plan action
+
+  # check-terraform-skip
+  skip_terraform:
+    description: whether terraform is skipped
 runs:
   using: node20
   main: dist/index.js

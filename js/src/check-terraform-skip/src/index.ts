@@ -1,4 +1,4 @@
-import * as lib from "lib";
+import * as lib from "../../lib";
 import * as core from "@actions/core";
 import * as fs from "fs";
 
@@ -9,7 +9,7 @@ type Inputs = {
   target?: string;
 };
 
-export const main = () => {
+export const checkTerraformSkip = () => {
   const inputs = {
     skipLabelPrefix: core.getInput("skip_label_prefix", { required: true }),
     labels: core.getInput("labels", { required: true }),

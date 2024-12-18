@@ -71,9 +71,18 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
+      - name: Test js/check-terraform-skip
+        uses: ./js
+        id: js-check-terraform-skip
+        with:
+          action: check-terraform-skip
+        env:
+          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_JOB_TYPE: terraform
       - run: "true"
         env:
           GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           GET_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
           JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
           JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
+          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
