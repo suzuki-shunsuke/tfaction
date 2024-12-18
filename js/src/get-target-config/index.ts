@@ -33,10 +33,7 @@ export const main = async () => {
   }
 };
 
-const run = async (
-  inputs: Inputs,
-  config: lib.Config,
-): Promise<Result> => {
+const run = async (inputs: Inputs, config: lib.Config): Promise<Result> => {
   const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
   const envs = new Map<string, any>();
@@ -152,8 +149,8 @@ const run = async (
     outputs.set(
       "enable_terraform_docs",
       wdConfig?.terraform_docs?.enabled ??
-      config?.terraform_docs?.enabled ??
-      false,
+        config?.terraform_docs?.enabled ??
+        false,
     );
 
     const m3 = lib.setEnvs(

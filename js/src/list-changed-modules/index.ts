@@ -15,10 +15,7 @@ export const main = async () => {
   core.setOutput("modules", Array.from(modules));
 };
 
-const run = (
-  configFiles: string[],
-  changedFiles: string[],
-): string[] => {
+const run = (configFiles: string[], changedFiles: string[]): string[] => {
   const workingDirs = new Set<string>();
   for (const configFile of configFiles) {
     if (configFile === "") {
