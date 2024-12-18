@@ -57,6 +57,7 @@ jobs:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_TARGET: js/test/aws/foo/dev
           TFACTION_JOB_TYPE: terraform
+
       - name: Test js/get-global-config
         uses: ./js
         id: js-global-config
@@ -71,6 +72,7 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
+
       - name: Test js/check-terraform-skip
         uses: ./js
         id: js-check-terraform-skip
@@ -92,11 +94,28 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
+
+      - name: Test js/list-changed-modules
+        uses: ./js
+        id: js-list-changed-modules
+        with:
+          action: list-changed-modules
+          changed_files: js/test/changed_files.txt
+          config_files: js/test/modules.txt
+      - name: Test list-changed-modules
+        uses: ./list-changed-modules
+        id: list-changed-modules
+        with:
+          changed_files: js/test/changed_files.txt
+          config_files: js/test/modules.txt
+
       - run: "true"
         env:
           GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
-          GET_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
           JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
+          GET_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
           JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
-          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
           CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
+          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
+          LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
+          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
