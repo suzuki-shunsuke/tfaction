@@ -3,6 +3,7 @@ import * as getGlobalConfig from "./get-global-config";
 import * as checkTerraformSkip from "./check-terraform-skip";
 import * as listChangeModules from "./list-changed-modules";
 import * as exportAWSSecretsManager from "./export-aws-secrets-manager";
+import * as exportSecrets from "./export-secrets";
 
 type Inputs = {
   action: string;
@@ -16,6 +17,7 @@ export const main = async (inputs: Inputs) => {
   const actions = new Map<string, API>([
     ["check-terraform-skip", checkTerraformSkip],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
+    ["export-secrets", exportSecrets],
     ["get-global-config", getGlobalConfig],
     ["get-target-config", getTargetConfig],
     ["list-changed-modules", listChangeModules],

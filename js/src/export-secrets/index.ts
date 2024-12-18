@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as core from "@actions/core";
-import * as lib from "lib";
+import * as lib from "../lib";
 
 const yaml = require("js-yaml");
 

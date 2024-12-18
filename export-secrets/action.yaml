@@ -5,5 +5,10 @@ inputs:
     description: "secrets context"
     required: true
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: main
+      with:
+        action: export-secrets
+        secrets: ${{inputs.secrets}}
