@@ -61,6 +61,7 @@ jobs:
       - build-schema
       - create-pr-branch
       - format
+      - test
     permissions: {}
     if: failure()
     steps:
@@ -109,6 +110,10 @@ jobs:
     uses: ./.github/workflows/wc-deploy-schema.yaml
     permissions:
       contents: write
+
+  test:
+    uses: ./.github/workflows/wc-test.yaml
+    permissions: {}
 
   create-pr-branch:
     uses: ./.github/workflows/wc-create-pr-branch.yaml

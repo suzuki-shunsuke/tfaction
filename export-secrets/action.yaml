@@ -5,5 +5,13 @@ inputs:
     description: "secrets context"
     required: true
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: composite
+  steps:
+    - run: |
+        echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
+      shell: bash
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: main
+      with:
+        action: export-secrets
+        secrets: ${{inputs.secrets}}

@@ -13,6 +13,17 @@ inputs:
 outputs:
   skip_terraform:
     description: whether terraform is skipped
+    value: ${{steps.main.outputs.skip_terraform}}
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: composite
+  steps:
+    - run: |
+        echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
+      shell: bash
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: main
+      with:
+        action: check-terraform-skip
+        labels: ${{inputs.labels}}
+        skip_label_prefix: ${{inputs.skip_label_prefix}}
+        pr_author: ${{inputs.pr_author}}

@@ -46,8 +46,10 @@ runs:
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: target-config
+      with:
+        action: get-target-config
 
     - run: |
         curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$CI_INFO_PR_NUMBER/labels" \
@@ -60,8 +62,10 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
+      with:
+        action: get-global-config
 
     - run: echo "$GLOBAL_CONFIG"
       shell: bash
@@ -95,7 +99,9 @@ runs:
         role-session-name: ${{ steps.target-config.outputs.aws_role_session_name }}
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/export-aws-secrets-manager@main
+    - uses: suzuki-shunsuke/tfaction/js@main
+      with:
+        action: export-aws-secrets-manager
 
     - uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
       id: google-backend-credentials

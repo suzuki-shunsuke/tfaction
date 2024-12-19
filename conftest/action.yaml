@@ -15,9 +15,14 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: node "$GITHUB_ACTION_PATH/dist/index.js"
+    - run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
       shell: bash
+      id: action_path
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: main
+      with:
+        action: conftest
+        plan: ${{inputs.plan}}
+        github_token: ${{inputs.github_token}}
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        ROOT_DIR: ${{ github.workspace }}
-        PLAN: ${{ inputs.plan }}
+        GH_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
