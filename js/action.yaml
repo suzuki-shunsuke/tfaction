@@ -39,6 +39,19 @@ inputs:
     description: "A json that describes module's direct and transitive callers"
     required: false
 
+  # conftest
+  plan:
+    description: |
+      Whether conftest is run on the terraform plan file
+    required: false
+    default: "false"
+  github_token:
+    description: |
+      GitHub Access Token
+      pull-requests:write - Create pull request comments
+    required: false
+    default: ${{ github.token }}
+
 outputs:
   # get-target-config
   working_directory:

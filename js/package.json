@@ -10,11 +10,13 @@
     "@aws-sdk/client-secrets-manager": "3.714.0",
     "glob": "11.0.0",
     "js-yaml": "4.1.0",
+    "tmp": "^0.2.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.9",
     "@types/node": "20.17.10",
+    "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.3",
     "typescript": "5.7.2",
     "vitest": "2.1.8"

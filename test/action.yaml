@@ -16,9 +16,14 @@ runs:
     - uses: suzuki-shunsuke/tfaction/get-global-config@main
       id: global-config
 
+    - shell: bash
+      id: action_path
+      run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
     - uses: suzuki-shunsuke/tfaction/conftest@main
       with:
         github_token: ${{ inputs.github_token }}
+      env:
+        GITHUB_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
 
     - name: terraform validate
       run: |

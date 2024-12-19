@@ -1,4 +1,5 @@
 import * as checkTerraformSkip from "./check-terraform-skip";
+import * as conftest from "./conftest";
 import * as exportAWSSecretsManager from "./export-aws-secrets-manager";
 import * as exportSecrets from "./export-secrets";
 import * as getGlobalConfig from "./get-global-config";
@@ -18,6 +19,7 @@ interface API {
 export const main = async (inputs: Inputs) => {
   const actions = new Map<string, API>([
     ["check-terraform-skip", checkTerraformSkip],
+    ["conftest", conftest],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["export-secrets", exportSecrets],
     ["get-global-config", getGlobalConfig],

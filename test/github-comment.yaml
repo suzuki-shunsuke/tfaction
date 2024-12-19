@@ -20,3 +20,14 @@ exec:
         {{template "join_command" .}}
 
         {{template "hidden_combined_output" .}}
+
+  conftest:
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Violate Conftest Policy
+
+        {{template "link" .}} 
+
+        {{template "join_command" .}}
+
+        {{.CombinedOutput | AvoidHTMLEscape}}

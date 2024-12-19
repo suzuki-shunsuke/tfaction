@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import * as lib from "lib";
+import * as lib from "../lib";
 import * as path from "path";
 import fs from "fs";
 import tmp from "tmp";
@@ -9,20 +9,15 @@ import { globSync } from "glob";
 type Inputs = {
   workingDir?: string;
   target?: string;
-  githubCommentConfig: string;
   rootDir: string;
   plan: boolean;
 };
 
-export const main = () => {
+export const main = async () => {
   run(
     {
       workingDir: process.env.TFACTION_WORKING_DIR,
       target: process.env.TFACTION_TARGET,
-      githubCommentConfig: path.join(
-        process.env.GITHUB_ACTION_PATH ?? "",
-        "github-comment.yaml",
-      ),
       rootDir: process.env.ROOT_DIR ?? "",
       plan: process.env.PLAN !== "false",
     },
@@ -30,7 +25,7 @@ export const main = () => {
   );
 };
 
-export const run = async (inputs: Inputs, config: lib.Config) => {
+const run = async (inputs: Inputs, config: lib.Config) => {
   const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
@@ -98,16 +93,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
   if (policies.length !== 0) {
     await exec.exec(
       "github-comment",
-      [
-        "exec",
-        "-config",
-        inputs.githubCommentConfig,
-        "-var",
-        `tfaction_target:${t.target}`,
-        "--",
-        "conftest",
-        "-v",
-      ],
+      ["exec", "-var", `tfaction_target:${t.target}`, "--", "conftest", "-v"],
       {
         cwd: t.workingDir,
       },
@@ -143,8 +129,6 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     }
     const args = [
       "exec",
-      "-config",
-      inputs.githubCommentConfig,
       "-var",
       `tfaction_target:${t.target}`,
       "-k",

@@ -15,9 +15,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: node "$GITHUB_ACTION_PATH/dist/index.js"
+    - run: |
+        echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
       shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        ROOT_DIR: ${{ github.workspace }}
-        PLAN: ${{ inputs.plan }}
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: main
+      with:
+        action: conftest
+        plan: ${{inputs.plan}}
+        github_token: ${{inputs.github_token}}
