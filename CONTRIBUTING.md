@@ -41,18 +41,6 @@ These versions must be same.
 
 We manage Node.js packages using npm, not [yarn](https://yarnpkg.com/) and [pnpm](https://pnpm.io/).
 
-## `lib` directory
-
-[lib](lib) is a shared JavaScript library.
-tfaction's JavaScript actions depend on this.
-
-If you update `lib`, you have to build it before testing actions depending on `lib`.
-
-```sh
-cd lib
-npm run build
-```
-
 ## `dist` directories aren't committed
 
 [#1913](https://github.com/suzuki-shunsuke/tfaction/pull/1913)
