@@ -131,12 +131,12 @@ jobs:
         id: js-list-targets-with-changed-files
         with:
           action: list-targets-with-changed-files
-          labels: ${{inputs.labels}}
-          config_files: ${{inputs.config_files}}
-          module_files: ${{inputs.module_files}}
-          pull_request: ${{inputs.pull_request}}
-          module_callers: ${{inputs.module_callers}}
-          config: ${{inputs.config}}
+          changed_files: js/test/changed_files.txt
+          labels: js/test/labels.txt
+          module_files: js/test/list-module-callers/module_files.txt
+          config_files: js/test/list-module-callers/config_files.txt
+          pull_request: "" # A path to ci-info's pr.json
+          module_callers: ""
       - name: Test list-targets-with-changed-files
         uses: ./list-targets-with-changed-files
         id: list-targets-with-changed-files
@@ -147,7 +147,6 @@ jobs:
           config_files: js/test/list-module-callers/config_files.txt
           pull_request: "" # A path to ci-info's pr.json
           module_callers: ""
-          config: ${{inputs.config}}
 
       - run: "true"
         env:
