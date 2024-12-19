@@ -27,6 +27,8 @@ https://suzuki-shunsuke.github.io/tfaction/docs/
 - [Wantedly, Inc.](https://wantedlyinc.com/)
 - [newmo, Inc.](https://newmo.me/)
   - [tfactionを使ったGitHub Actions Workflowの構築](https://tech.newmo.me/entry/tfaction-github-terraform-workflow)
+- [tacoms Inc.](https://www.tacoms-inc.com/)
+  - [tfactionを使ってTerraformの実行を自動化した！！](https://zenn.dev/tacoms/articles/988e4c7efc8cf3)
 
 ## LICENSE
 
