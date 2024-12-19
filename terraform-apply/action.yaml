@@ -21,13 +21,18 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: target-config
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      with:
+        action: get-target-config
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
-    - uses: suzuki-shunsuke/tfaction/check-terraform-skip@main
+      with:
+        action: get-global-config
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: check-terraform-skip
       with:
+        action: check-terraform-skip
         labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}

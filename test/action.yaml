@@ -11,16 +11,21 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: target-config
-    - uses: suzuki-shunsuke/tfaction/get-global-config@main
+      with:
+        action: get-target-config
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
+      with:
+        action: get-global-config
 
     - shell: bash
       id: action_path
       run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
-    - uses: suzuki-shunsuke/tfaction/conftest@main
+    - uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: conftest
         github_token: ${{ inputs.github_token }}
       env:
         GH_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml

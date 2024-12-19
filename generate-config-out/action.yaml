@@ -16,8 +16,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/get-target-config@main
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: target-config
+      with:
+        action: get-target-config
 
     - name: Run terraform plan -generate-config-out
       shell: bash
