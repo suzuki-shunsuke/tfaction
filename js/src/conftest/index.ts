@@ -99,7 +99,8 @@ const run = async (inputs: Inputs, config: lib.Config) => {
       {
         cwd: t.workingDir,
         env: {
-          GITHUB_TOKEN: inputs.githubToken,
+          ...process.env,
+          "GITHUB_TOKEN": inputs.githubToken,
         },
       },
     );
@@ -233,7 +234,8 @@ const run = async (inputs: Inputs, config: lib.Config) => {
     await exec.exec("github-comment", args, {
       cwd: t.workingDir,
       env: {
-        GITHUB_TOKEN: inputs.githubToken,
+        ...process.env,
+        "GITHUB_TOKEN": inputs.githubToken,
       },
     });
   }
