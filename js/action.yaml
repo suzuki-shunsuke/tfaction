@@ -31,6 +31,14 @@ inputs:
     description: "module file paths"
     required: false
 
+  # list-targets-with-changed-files
+  pull_request:
+    description: "pull request file"
+    required: false
+  module_callers:
+    description: "A json that describes module's direct and transitive callers"
+    required: false
+
 outputs:
   # get-target-config
   working_directory:
@@ -115,6 +123,10 @@ outputs:
       {
         "module1": ["caller1", "caller2"],
       }
+
+  # list-targets-with-changed-files
+  targets:
+    description: list of targets
 runs:
   using: node20
   main: dist/index.js

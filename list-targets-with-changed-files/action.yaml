@@ -26,6 +26,18 @@ inputs:
 outputs:
   targets:
     description: list of targets
+    value: ${{steps.main.outputs.targets}}
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: main
+      with:
+        action: list-targets-with-changed-files
+        changed_files: ${{inputs.changed_files}}
+        labels: ${{inputs.labels}}
+        config_files: ${{inputs.config_files}}
+        module_files: ${{inputs.module_files}}
+        pull_request: ${{inputs.pull_request}}
+        module_callers: ${{inputs.module_callers}}
+        config: ${{inputs.config}}

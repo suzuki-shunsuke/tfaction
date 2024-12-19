@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
-import * as lib from "lib";
+import * as lib from "../lib";
 
 type TargetConfig = {
   target: string;
@@ -70,7 +70,7 @@ type Result = {
   modules: string[];
 };
 
-export const run = (input: Input): Result => {
+const run = (input: Input): Result => {
   const config = input.config;
   const isApply = input.isApply;
 
@@ -314,7 +314,7 @@ const handleLabels = (
   }
 };
 
-export const main = () => {
+export const main = async () => {
   // The path to ci-info's pr.json.
   const prPath = core.getInput("pull_request");
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
