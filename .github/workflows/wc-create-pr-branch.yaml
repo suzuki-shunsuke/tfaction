@@ -152,7 +152,8 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
 
-      - run: "true"
+      - name: Outputs actions' outputs
+        run: "true"
         env:
           GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
