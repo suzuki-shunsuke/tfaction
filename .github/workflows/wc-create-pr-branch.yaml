@@ -161,13 +161,20 @@ jobs:
 
       - name: Test setup
         uses: ./setup
-        id: conftest
+        id: setup
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
           TFACTION_CONFIG: setup/test/tfaction-root.yaml
           TFACTION_TARGET: setup/test/foo
           TFACTION_WORKING_DIR: setup/test/foo
+
+      - name: Outputs actions' outputs (Not Fork)
+        run: "true"
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          SETUP: ${{ toJSON(steps.setup.outputs) }}
 
       - name: Outputs actions' outputs
         run: "true"
