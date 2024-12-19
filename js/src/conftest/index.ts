@@ -10,6 +10,7 @@ type Inputs = {
   workingDir?: string;
   target?: string;
   rootDir: string;
+  githubToken: string;
   plan: boolean;
 };
 
@@ -18,8 +19,9 @@ export const main = async () => {
     {
       workingDir: process.env.TFACTION_WORKING_DIR,
       target: process.env.TFACTION_TARGET,
-      rootDir: process.env.ROOT_DIR ?? "",
-      plan: process.env.PLAN !== "false",
+      rootDir: process.env.GITHUB_WORKSPACE ?? "",
+      plan: core.getBooleanInput("plan", { required: true }),
+      githubToken: core.getInput("github_token", { required: true }),
     },
     lib.getConfig(),
   );
@@ -96,6 +98,9 @@ const run = async (inputs: Inputs, config: lib.Config) => {
       ["exec", "-var", `tfaction_target:${t.target}`, "--", "conftest", "-v"],
       {
         cwd: t.workingDir,
+        env: {
+          GITHUB_TOKEN: inputs.githubToken,
+        },
       },
     );
   }
@@ -227,6 +232,9 @@ const run = async (inputs: Inputs, config: lib.Config) => {
     core.info("github-comment " + args.join(" "));
     await exec.exec("github-comment", args, {
       cwd: t.workingDir,
+      env: {
+        GITHUB_TOKEN: inputs.githubToken,
+      },
     });
   }
 };
