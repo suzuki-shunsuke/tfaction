@@ -41,6 +41,9 @@ jobs:
           version: pr/${{inputs.pr}}
           is_comment: ${{inputs.is_comment}}
 
+      - name: Install dependencies
+        uses: ./install
+
       - name: Test js/get-target-config
         uses: ./js
         id: js-target-config
