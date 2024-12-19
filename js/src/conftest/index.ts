@@ -100,7 +100,7 @@ const run = async (inputs: Inputs, config: lib.Config) => {
         cwd: t.workingDir,
         env: {
           ...process.env,
-          "GITHUB_TOKEN": inputs.githubToken,
+          GITHUB_TOKEN: inputs.githubToken,
         },
       },
     );
@@ -235,7 +235,7 @@ const run = async (inputs: Inputs, config: lib.Config) => {
       cwd: t.workingDir,
       env: {
         ...process.env,
-        "GITHUB_TOKEN": inputs.githubToken,
+        GITHUB_TOKEN: inputs.githubToken,
       },
     });
   }
