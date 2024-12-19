@@ -23,7 +23,7 @@ runs:
       with:
         github_token: ${{ inputs.github_token }}
       env:
-        GITHUB_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
+        GH_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
 
     - name: terraform validate
       run: |

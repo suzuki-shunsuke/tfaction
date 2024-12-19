@@ -160,12 +160,14 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_TARGET: js/test/aws/foo/dev
+          GH_COMMENT_CONFIG: test/github-comment.yaml
       - name: Test conftest
         uses: ./conftest
         id: conftest
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_TARGET: js/test/aws/foo/dev
+          GH_COMMENT_CONFIG: test/github-comment.yaml
 
       - name: Outputs actions' outputs
         run: "true"
