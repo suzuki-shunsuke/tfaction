@@ -1,4 +1,4 @@
-import { getSkipTerraform } from "./lib";
+import { getSkipTerraform } from "./index";
 
 test("normal", () => {
   expect(

@@ -1,4 +1,4 @@
-import { resolveRelativeCallTree, buildModuleToCallers } from "../src/lib";
+import { resolveRelativeCallTree, buildModuleToCallers } from "./lib";
 
 describe("resolveRelativeCallTree", () => {
   it("resolves relative paths in terraform-config-inspect", () => {

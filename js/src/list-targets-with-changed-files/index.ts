@@ -70,7 +70,7 @@ type Result = {
   modules: string[];
 };
 
-const run = (input: Input): Result => {
+export const run = (input: Input): Result => {
   const config = input.config;
   const isApply = input.isApply;
 

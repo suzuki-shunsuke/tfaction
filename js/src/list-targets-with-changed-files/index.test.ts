@@ -1,4 +1,4 @@
-import { run } from "./run";
+import { run } from "./index";
 
 test("normal", () => {
   expect(
@@ -22,7 +22,8 @@ test("normal", () => {
           body: "hello",
         },
       },
-      module_callers: {},
+      moduleCallers: {},
+      moduleFiles: [],
     }),
   ).toStrictEqual([
     {
@@ -66,7 +67,8 @@ test("job config", () => {
           body: "hello",
         },
       },
-      module_callers: {},
+      moduleCallers: {},
+      moduleFiles: [],
     }),
   ).toStrictEqual([
     {
@@ -150,7 +152,8 @@ test("pr comment", () => {
           body: "<!-- tfaction follow up pr target=yoo/dev -->",
         },
       },
-      module_callers: {},
+      moduleCallers: {},
+      moduleFiles: [],
     }),
   ).toStrictEqual(prCommnetExpected);
 });
@@ -171,7 +174,8 @@ test("pr comment with updated body", () => {
 -->`,
         },
       },
-      module_callers: {},
+      moduleCallers: {},
+      moduleFiles: [],
     }),
   ).toStrictEqual(prCommnetExpected);
 });
@@ -202,10 +206,11 @@ test("module callers", () => {
           body: "hello",
         },
       },
-      module_callers: {
+      moduleCallers: {
         // dev calls bar and baz
         "foo/dev": ["foo/bar", "foo/baz"],
       },
+      moduleFiles: [],
     }),
   ).toStrictEqual([
     {
@@ -257,7 +262,8 @@ test("nest", () => {
           body: "hello",
         },
       },
-      module_callers: {},
+      moduleCallers: {},
+      moduleFiles: [],
     }),
   ).toStrictEqual([
     {

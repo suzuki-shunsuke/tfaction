@@ -1,4 +1,4 @@
-import { main, Result } from "./run";
+import { main_, Result } from "./index";
 
 test("default", () => {
   const result: Result = {
@@ -33,7 +33,7 @@ test("default", () => {
     },
   };
   expect(
-    main(
+    main_(
       {
         label_prefixes: {
           skip: "skip:",
@@ -51,7 +51,7 @@ test("default", () => {
 
 test("plan_workflow_name is required", () => {
   expect(() => {
-    main(
+    main_(
       {
         plan_workflow_name: "",
         label_prefixes: {
@@ -101,7 +101,7 @@ test("customize", () => {
   };
 
   expect(
-    main(
+    main_(
       {
         label_prefixes: {
           skip: "skip:",

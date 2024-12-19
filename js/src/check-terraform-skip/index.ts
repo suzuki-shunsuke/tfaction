@@ -25,7 +25,7 @@ export const main = async () => {
   core.setOutput("skip_terraform", isSkip);
 };
 
-const getSkipTerraform = (
+export const getSkipTerraform = (
   inputs: Inputs,
   config: lib.Config,
   labels: string[],
