@@ -168,6 +168,7 @@ jobs:
           TFACTION_CONFIG: setup/test/tfaction-root.yaml
           TFACTION_TARGET: setup/test/foo
           TFACTION_WORKING_DIR: setup/test/foo
+          TFACTION_JOB_TYPE: terraform
 
       - name: Outputs actions' outputs (Not Fork)
         run: "true"
