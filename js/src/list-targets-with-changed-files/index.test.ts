@@ -25,16 +25,19 @@ test("normal", () => {
       moduleCallers: {},
       moduleFiles: [],
     }),
-  ).toStrictEqual([
-    {
-      environment: undefined,
-      job_type: "terraform",
-      runs_on: "ubuntu-latest",
-      secrets: undefined,
-      target: "foo/dev",
-      working_directory: "foo/dev",
-    },
-  ]);
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ]
+  });
 });
 
 test("job config", () => {
@@ -70,21 +73,24 @@ test("job config", () => {
       moduleCallers: {},
       moduleFiles: [],
     }),
-  ).toStrictEqual([
-    {
-      environment: "dev",
-      job_type: "terraform",
-      runs_on: "macos-latest",
-      secrets: [
-        {
-          env_name: "GH_TOKEN",
-          secret_name: "GH_TOKEN",
-        },
-      ],
-      target: "foo/dev",
-      working_directory: "foo/dev",
-    },
-  ]);
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: "dev",
+        job_type: "terraform",
+        runs_on: "macos-latest",
+        secrets: [
+          {
+            env_name: "GH_TOKEN",
+            secret_name: "GH_TOKEN",
+          },
+        ],
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ]
+  });
 });
 
 const prCommentConfig = {
@@ -114,29 +120,32 @@ const prCommentConfig = {
     },
   ],
 };
-const prCommnetExpected = [
-  {
-    environment: "dev",
-    job_type: "terraform",
-    runs_on: "macos-latest",
-    secrets: [
-      {
-        env_name: "GH_TOKEN",
-        secret_name: "GH_TOKEN",
-      },
-    ],
-    target: "foo/dev",
-    working_directory: "foo/dev",
-  },
-  {
-    environment: "yoo",
-    job_type: "terraform",
-    runs_on: "ubuntu-latest",
-    secrets: undefined,
-    target: "yoo/dev",
-    working_directory: "yoo/services/dev",
-  },
-];
+const prCommnetExpected = {
+  modules: [],
+  targetConfigs: [
+    {
+      environment: "dev",
+      job_type: "terraform",
+      runs_on: "macos-latest",
+      secrets: [
+        {
+          env_name: "GH_TOKEN",
+          secret_name: "GH_TOKEN",
+        },
+      ],
+      target: "foo/dev",
+      working_directory: "foo/dev",
+    },
+    {
+      environment: "yoo",
+      job_type: "terraform",
+      runs_on: "ubuntu-latest",
+      secrets: undefined,
+      target: "yoo/dev",
+      working_directory: "yoo/services/dev",
+    },
+  ]
+};
 
 test("pr comment", () => {
   expect(
@@ -212,32 +221,35 @@ test("module callers", () => {
       },
       moduleFiles: [],
     }),
-  ).toStrictEqual([
-    {
-      environment: undefined,
-      job_type: "terraform",
-      runs_on: "ubuntu-latest",
-      secrets: undefined,
-      target: "foo/bar",
-      working_directory: "foo/bar",
-    },
-    {
-      environment: undefined,
-      job_type: "terraform",
-      runs_on: "ubuntu-latest",
-      secrets: undefined,
-      target: "foo/baz",
-      working_directory: "foo/baz",
-    },
-    {
-      environment: undefined,
-      job_type: "terraform",
-      runs_on: "ubuntu-latest",
-      secrets: undefined,
-      target: "foo/dev",
-      working_directory: "foo/dev",
-    },
-  ]);
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/bar",
+        working_directory: "foo/bar",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/baz",
+        working_directory: "foo/baz",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ]
+  });
 });
 
 test("nest", () => {
@@ -265,14 +277,17 @@ test("nest", () => {
       moduleCallers: {},
       moduleFiles: [],
     }),
-  ).toStrictEqual([
-    {
-      environment: undefined,
-      job_type: "terraform",
-      runs_on: "ubuntu-latest",
-      secrets: undefined,
-      target: "foo/dev",
-      working_directory: "foo/dev",
-    },
-  ]);
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ]
+  });
 });
