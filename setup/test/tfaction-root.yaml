@@ -31,12 +31,12 @@ tflint:
 scaffold_working_directory:
   skip_adding_aqua_packages: true
 
-aqua:
-  update_checksum:
-    # Update aqua-checksums.json in `setup` action
-    enabled: true # default is false
-    skip_push: false # default is false
-    prune: true # default is false
+# aqua:
+#   update_checksum:
+#     # Update aqua-checksums.json in `setup` action
+#     enabled: true # default is false
+#     skip_push: false # default is false
+#     prune: true # default is false
 
 update_related_pull_requests:
   enabled: true
