@@ -21,7 +21,7 @@ inputs:
     required: false
 
   config:
-    description: "config file path"
+    description: "Deprecated: This input is ignored"
     required: false
 outputs:
   targets:
@@ -40,4 +40,3 @@ runs:
         module_files: ${{inputs.module_files}}
         pull_request: ${{inputs.pull_request}}
         module_callers: ${{inputs.module_callers}}
-        config: ${{inputs.config}}
