@@ -15,6 +15,7 @@ tfcmt_plan_patch: true
 conftest:
   policies:
     - policy: js/test/conftest/policy
+      tf: true
 
 update_local_path_module_caller:
   enabled: true
