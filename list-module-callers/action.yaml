@@ -21,6 +21,6 @@ runs:
     - uses: suzuki-shunsuke/tfaction/js@main
       id: main
       with:
-        action: export-secrets
+        action: list-module-callers
         config_files: ${{inputs.config_files}}
         module_files: ${{inputs.module_files}}
