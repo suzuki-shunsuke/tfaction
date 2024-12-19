@@ -36,7 +36,7 @@ test("normal", () => {
         target: "foo/dev",
         working_directory: "foo/dev",
       },
-    ]
+    ],
   });
 });
 
@@ -89,7 +89,7 @@ test("job config", () => {
         target: "foo/dev",
         working_directory: "foo/dev",
       },
-    ]
+    ],
   });
 });
 
@@ -144,7 +144,7 @@ const prCommnetExpected = {
       target: "yoo/dev",
       working_directory: "yoo/services/dev",
     },
-  ]
+  ],
 };
 
 test("pr comment", () => {
@@ -248,7 +248,7 @@ test("module callers", () => {
         target: "foo/dev",
         working_directory: "foo/dev",
       },
-    ]
+    ],
   });
 });
 
@@ -288,6 +288,6 @@ test("nest", () => {
         target: "foo/dev",
         working_directory: "foo/dev",
       },
-    ]
+    ],
   });
 });
