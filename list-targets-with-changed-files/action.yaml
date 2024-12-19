@@ -27,6 +27,9 @@ outputs:
   targets:
     description: list of targets
     value: ${{steps.main.outputs.targets}}
+  modules:
+    description: list of modules
+    value: ${{steps.main.outputs.modules}}
 runs:
   using: composite
   steps:
