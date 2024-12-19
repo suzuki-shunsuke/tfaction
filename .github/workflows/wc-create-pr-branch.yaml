@@ -152,6 +152,21 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
 
+      - name: Test js/conftest
+        uses: ./js
+        id: js-conftest
+        with:
+          action: conftest
+        env:
+          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_TARGET: js/test/aws/foo/dev
+      - name: Test conftest
+        uses: ./conftest
+        id: conftest
+        env:
+          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_TARGET: js/test/aws/foo/dev
+
       - name: Outputs actions' outputs
         run: "true"
         env:

@@ -14,8 +14,7 @@ tfcmt_plan_patch: true
 
 conftest:
   policies:
-    - policy: policy/terraform
-      plan: true
+    - policy: js/test/conftest/policy
 
 update_local_path_module_caller:
   enabled: true
