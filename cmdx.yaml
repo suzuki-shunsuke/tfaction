@@ -29,24 +29,10 @@ tasks:
       - bash
       - -c
     script: |
-      set -euo pipefail
-      pushd lib
-      npm i
+      set -eu
+
+      cd js
       npm run build
-      popd
-
-      cnt=$(git ls-files |
-        grep package.json |
-        grep -v -E '^package\.json' |
-        grep -v lib/package.json |
-        wc -l)
-
-      git ls-files |
-        grep package.json |
-        grep -v -E '^package\.json' |
-        grep -v lib/package.json |
-        xargs -n 1 dirname |
-        xargs -n 1 -P "$cnt" bash scripts/build.sh
   - name: test
     short: t
     description: Test
@@ -55,17 +41,10 @@ tasks:
       - bash
       - -c
     script: |
-      set -euo pipefail
-      pushd lib
+      set -eu
+      cd js
       npm i
-      npm run build
-      popd
-      for dir in $(git ls-files | grep package.json | grep -v -E '^package\.json' | xargs -n 1 dirname); do
-        pushd "$dir"
-        npm i
-        npm t
-        popd
-      done
+      npm t
   - name: update
     short: u
     description: Update
@@ -74,19 +53,11 @@ tasks:
       - bash
       - -c
     script: |
-      set -euo pipefail
-      pushd lib
+      set -eu
+      cd js
       npm i
       npm update
       npm run build
-      popd
-      for dir in $(git ls-files | grep package.json | grep -v -E '^package\.json' | xargs -n 1 dirname); do
-        pushd "$dir"
-        npm i
-        npm update
-        npm run build
-        popd
-      done
 
   - name: fmt
     description: Format with prettier
