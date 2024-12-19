@@ -32,6 +32,7 @@ tasks:
       set -eu
 
       cd js
+      npm ci
       npm run build
   - name: test
     short: t
@@ -43,7 +44,7 @@ tasks:
     script: |
       set -eu
       cd js
-      npm i
+      npm ci
       npm t
   - name: update
     short: u
@@ -55,7 +56,7 @@ tasks:
     script: |
       set -eu
       cd js
-      npm i
+      npm ci
       npm update
       npm run build
 
