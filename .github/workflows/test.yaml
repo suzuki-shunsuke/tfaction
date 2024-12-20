@@ -123,6 +123,9 @@ jobs:
       pull-requests: write
     with:
       pr: ${{github.event.pull_request.number}}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
   format:
     uses: ./.github/workflows/wc-format.yaml
