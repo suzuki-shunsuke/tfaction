@@ -234,6 +234,23 @@ jobs:
         env:
           SETUP: ${{ toJSON(steps.setup.outputs) }}
 
+      - name: Test actions' outputs
+        uses: ./js
+        env:
+          TFACTION_TEST_ACTION: "true"
+          GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
+          JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
+          GET_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
+          JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
+          CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
+          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
+          LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
+          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
+          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
+          JS_LIST_MODULE_CALLERS: ${{ toJSON(steps.js-list-module-callers.outputs) }}
+          LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
+          JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.js-list-targets-with-changed-files.outputs) }}
+
       - name: Outputs actions' outputs
         run: "true"
         env:
