@@ -1,0 +1,37 @@
+---
+name: Hide comments
+on:
+  workflow_call:
+    secrets:
+      gh_app_id:
+        required: true
+      gh_app_private_key:
+        required: true
+jobs:
+  hide-comments:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - id: token
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        with:
+          app_id: ${{secrets.gh_app_id}}
+          private_key: ${{secrets.gh_app_private_key}}
+          # pull_requests:write - Post and hide comments
+          permissions: >-
+            {"pull_requests": "write"}
+          repositories: >-
+            ["${{github.event.repository.name}}"]
+
+      - uses: aquaproj/aqua-installer@f13c5d2f0357708d85477aabe50fd3f725528745 # v3.1.0
+        with:
+          aqua_version: v2.40.0
+        env:
+          AQUA_GITHUB_TOKEN: ${{github.token}}
+
+      - run: github-comment exec -- github-comment hide
+        env:
+          GITHUB_TOKEN: ${{steps.token.outputs.token}}

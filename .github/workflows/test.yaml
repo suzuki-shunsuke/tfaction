@@ -1,11 +1,14 @@
 name: test
 
 on: pull_request
+concurrency:
+  group: ${{ github.workflow }}--${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   path-filter:
     # Get changed files to filter jobs
-    timeout-minutes: 30
+    timeout-minutes: 10
     outputs:
       update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
       update-aqua-checksums-install: ${{steps.changes.outputs.update-aqua-checksums-install}}
@@ -51,7 +54,7 @@ jobs:
   status-check:
     # This job is used for main branch's branch protection rule's status check.
     # If all dependent jobs succeed or are skipped this job succeeds.
-    timeout-minutes: 30
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     needs:
       - update-aqua-checksums
@@ -62,6 +65,7 @@ jobs:
       - create-pr-branch
       - format
       - test
+      - hide-comment
     permissions: {}
     if: failure()
     steps:
@@ -123,6 +127,18 @@ jobs:
       pull-requests: write
     with:
       pr: ${{github.event.pull_request.number}}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+
+  hide-comment:
+    uses: ./.github/workflows/wc-hide-comment.yaml
+    if: |
+      ! github.event.pull_request.head.repo.fork
+    permissions: {}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
   format:
     uses: ./.github/workflows/wc-format.yaml
