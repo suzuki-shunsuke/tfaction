@@ -217,6 +217,16 @@ jobs:
           TFACTION_WORKING_DIR: setup/test/foo
           TFACTION_JOB_TYPE: terraform
 
+      - name: Test test-module
+        uses: ./test-module
+        with:
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_TARGET: js/test/modules/foo
+
       - name: Outputs actions' outputs (Not Fork)
         run: "true"
         if: |
