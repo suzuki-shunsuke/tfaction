@@ -13,7 +13,7 @@ export const main = async () => {
         aws_assume_role_arn:
           "arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan",
         aws_region: "ap-northeast-1",
-        aws_role_session_name: "tfaction-plan-js_test_aws_foo_dev-12425638978",
+        // aws_role_session_name: "tfaction-plan-js_test_aws_foo_dev-12425638978",
         gcp_service_account: "",
         gcp_workload_identity_provider: "",
         gcp_access_token_scopes: "",
@@ -30,6 +30,10 @@ export const main = async () => {
         destroy: "false",
         terraform_command: "terraform",
         tflint_fix: "true",
+      },
+      convert: (data: any): any => {
+        data.aws_role_session_name = "";
+        return data;
       },
       actual: process.env.GET_TARGET_CONFIG,
     },
@@ -50,9 +54,13 @@ export const main = async () => {
         aws_region: "ap-northeast-1",
         aws_assume_role_arn:
           "arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan",
-        aws_role_session_name: "tfaction-plan-js_test_aws_foo_dev-12425638978",
+        // aws_role_session_name: "tfaction-plan-js_test_aws_foo_dev-12425638978",
         destroy: "false",
         enable_terraform_docs: "false",
+      },
+      convert: (data: any): any => {
+        data.aws_role_session_name = "";
+        return data;
       },
       actual: process.env.JS_TARGET_CONFIG,
     },
@@ -171,10 +179,14 @@ export const main = async () => {
   ];
   let failed = false;
   testdata.forEach((data) => {
-    const a = diffString(data.expected, JSON.parse(data.actual || "{}"));
-    if (a !== "") {
+    let a = JSON.parse(data.actual || "{}");
+    if (data.convert) {
+      a = data.convert(a);
+    }
+    const b = diffString(data.expected, a);
+    if (b !== "") {
       console.log(`Test failed: ${data.name}`);
-      console.log(a);
+      console.log(b);
       failed = true;
     }
   });
