@@ -20,3 +20,6 @@ jobs:
     with:
       pr: ${{fromJSON(inputs.pr)}}
       is_comment: ${{inputs.is_comment}}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
