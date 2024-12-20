@@ -14,6 +14,7 @@ export const main = async () => {
           "arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan",
         aws_region: "ap-northeast-1",
         // aws_role_session_name: "tfaction-plan-js_test_aws_foo_dev-12425638978",
+        aws_role_session_name: "",
         gcp_service_account: "",
         gcp_workload_identity_provider: "",
         gcp_access_token_scopes: "",
@@ -55,6 +56,7 @@ export const main = async () => {
         aws_assume_role_arn:
           "arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan",
         // aws_role_session_name: "tfaction-plan-js_test_aws_foo_dev-12425638978",
+        aws_role_session_name: "",
         destroy: "false",
         enable_terraform_docs: "false",
       },
