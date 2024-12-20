@@ -8,6 +8,7 @@
     "@actions/exec": "^1.1.1",
     "@actions/github": "6.0.0",
     "@aws-sdk/client-secrets-manager": "3.716.0",
+    "@types/json-diff": "^1.0.3",
     "glob": "11.0.0",
     "js-yaml": "4.1.0",
     "json-diff": "^1.0.6",

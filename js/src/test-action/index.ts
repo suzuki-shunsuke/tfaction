@@ -171,7 +171,7 @@ export const main = async () => {
   ];
   let failed = false;
   testdata.forEach((data) => {
-    const a = diffString(data.expected, data.actual);
+    const a = diffString(data.expected, JSON.parse(data.actual || "{}"));
     if (a !== "") {
       console.log(`Test failed: ${data.name}`);
       console.log(a);
