@@ -191,6 +191,18 @@ jobs:
           TFACTION_WORKING_DIR: setup/test/foo
           TFACTION_JOB_TYPE: terraform
 
+      - name: Test OpenTofu (setup)
+        uses: ./setup
+        with:
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          TFACTION_CONFIG: setup/test/opentofu/tfaction-root.yaml
+          TFACTION_TARGET: setup/test/opentofu/foo
+          TFACTION_WORKING_DIR: setup/test/opentofu/foo
+          TFACTION_JOB_TYPE: terraform
+
       - name: Test test
         uses: ./test
         with:
