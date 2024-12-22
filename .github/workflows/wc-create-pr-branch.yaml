@@ -196,7 +196,6 @@ jobs:
           TFACTION_WORKING_DIR: setup/test/foo
           TFACTION_JOB_TYPE: terraform
 
-
       - name: Test Terragrunt (setup)
         uses: ./setup
         with:
