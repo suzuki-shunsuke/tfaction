@@ -59,7 +59,7 @@ runs:
         ignore_hcl_errors: "true"
 
     # deep check requires AWS credentials
-    - uses: suzuki-shunsuke/github-action-tflint@6039e959cc626f0fd8b8bd3cae61c54283f23540 # v1.2.0
+    - uses: suzuki-shunsuke/github-action-tflint@fix-commit-only-wd
       if: fromJSON(steps.target-config.outputs.enable_tflint) && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
