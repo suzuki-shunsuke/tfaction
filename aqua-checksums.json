@@ -61,6 +61,31 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_darwin_amd64.zip",
+      "checksum": "7FF1307EC5DD14B2660EC91B39354CEC24AA492A03338D8A37FB542FB0B031F7",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_darwin_arm64.zip",
+      "checksum": "FEC8D934B9F69E033154265B60677604777505D3634945B3043C46E0030B5E5D",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_linux_amd64.zip",
+      "checksum": "6935F082EF120FDB05F608DDE61ACE6B82D134496634586F42C8E38856B3E411",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_linux_arm64.zip",
+      "checksum": "5CE3686C20C9D639E99A064AF5CF0D781361B0874426B2343A9AB4E33D25DB4F",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_windows_amd64.zip",
+      "checksum": "C63B55B322CA292491D8151CF24F43BA64F3522F896F13B16A49477A362580DF",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/reviewdog/reviewdog/v0.20.3/reviewdog_0.20.3_Darwin_arm64.tar.gz",
       "checksum": "A7FBF41913CE5B6F1872D10C136139B7A849190F4F1F0DC1ED4BF74C636F22A2",
       "algorithm": "sha256"
@@ -291,8 +316,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.280.0/registry.yaml",
-      "checksum": "6B5BB3DBC8AE412B5EF31232D06FBD81215E6431270FA7BAD4AAF0BC167C0A82",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.282.0/registry.yaml",
+      "checksum": "58657FD69E9B7557F828DC0DF30134AE2D8E2111D3FA9347A376E14B9A7DE463",
       "algorithm": "sha256"
     }
   ]
