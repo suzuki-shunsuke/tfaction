@@ -195,7 +195,6 @@ jobs:
         uses: ./setup
         with:
           github_token: ${{steps.token.outputs.token}}
-        id: setup
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
