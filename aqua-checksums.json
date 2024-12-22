@@ -21,6 +21,31 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.71.1/terragrunt_darwin_amd64",
+      "checksum": "71F0DBBDD1C503CE495CCE4CE36716B35ED8EFA087AAC681A82BA00B1AF57153",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.71.1/terragrunt_darwin_arm64",
+      "checksum": "33FDDDC4FC2A093B20470425A794503293885887041416E88167D370EBE9344E",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.71.1/terragrunt_linux_amd64",
+      "checksum": "8FC451E6C7D87D0E1ADC7297959A72AAB28F034C7AB8E684AD0ED5F5F4D9B12C",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.71.1/terragrunt_linux_arm64",
+      "checksum": "23E905A021B8132C8CA0BF221375AAF4AE31642CB9293A8AA12BE7086756F9AA",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.71.1/terragrunt_windows_amd64.exe",
+      "checksum": "5BA21911DC80D9921507450FFA1B997A4889D6DFFA2BBE5692643FF28D9E5D0C",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/int128/ghcp/v1.13.5/ghcp_darwin_amd64.zip",
       "checksum": "6728BD668888A64C71BF01D9AFBA373F38D353B79D181B1401A4E5E4B329289D",
       "algorithm": "sha256"

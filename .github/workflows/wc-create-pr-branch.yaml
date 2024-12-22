@@ -203,6 +203,18 @@ jobs:
           TFACTION_WORKING_DIR: setup/test/opentofu/foo
           TFACTION_JOB_TYPE: terraform
 
+      - name: Test Terragrunt (setup)
+        uses: ./setup
+        with:
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
+          TFACTION_TARGET: setup/test/terragrunt/foo
+          TFACTION_WORKING_DIR: setup/test/terragrunt/foo
+          TFACTION_JOB_TYPE: terraform
+
       - name: Test test (OpenTofu)
         uses: ./test
         with:
@@ -213,6 +225,18 @@ jobs:
           TFACTION_CONFIG: setup/test/opentofu/tfaction-root.yaml
           TFACTION_TARGET: setup/test/opentofu/foo
           TFACTION_WORKING_DIR: setup/test/opentofu/foo
+          TFACTION_JOB_TYPE: terraform
+
+      - name: Test test (Terragrunt)
+        uses: ./test
+        with:
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
+          TFACTION_TARGET: setup/test/terragrunt/foo
+          TFACTION_WORKING_DIR: setup/test/terragrunt/foo
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test
@@ -251,6 +275,18 @@ jobs:
           TFACTION_CONFIG: setup/test/opentofu/tfaction-root.yaml
           TFACTION_TARGET: setup/test/opentofu/foo
           TFACTION_WORKING_DIR: setup/test/opentofu/foo
+          TFACTION_JOB_TYPE: terraform
+
+      - name: Test plan (Terragrunt)
+        uses: ./plan
+        with:
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
+          TFACTION_TARGET: setup/test/terragrunt/foo
+          TFACTION_WORKING_DIR: setup/test/terragrunt/foo
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test-module
