@@ -1,23 +1,23 @@
 {
   "checksums": [
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.58.0/trivy_0.58.0_Linux-64bit.tar.gz",
-      "checksum": "EB79A4DA633BE9C22CE8E9C73A78C0F57FFB077FB92CB1968AAF9C686A20C549",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_Linux-64bit.tar.gz",
+      "checksum": "21A5EEA31D072B34A6284855249F4074FF43C618D398F9EC328BEF4FF7C2FA0D",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.58.0/trivy_0.58.0_Linux-ARM64.tar.gz",
-      "checksum": "647257A12A5B6DDB8F78851DB40A97799D31CD1F8000B545DC9D028D6930E1FA",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_Linux-ARM64.tar.gz",
+      "checksum": "29EC9C3AF77A00234860F4A9C48E2DD7691E939924DA5D76C259E46C614E2545",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.58.0/trivy_0.58.0_macOS-64bit.tar.gz",
-      "checksum": "164ABCFBC24A7BAF862DD57344818635A4A9581C855530E05B5455FA26D833DD",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_macOS-64bit.tar.gz",
+      "checksum": "4F939F363D23EEB4D6181B2C38C518DB38D94987565A8FA5EC9E037972E4B811",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.58.0/trivy_0.58.0_macOS-ARM64.tar.gz",
-      "checksum": "5569A12BF3CEB9E73548FAE237BC53239D3FB2E6FE08D7334220CEC831E464BC",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_macOS-ARM64.tar.gz",
+      "checksum": "499A64A911A1AC80FCC26D619CDC1BDB05528D8B1BD0490F01A8324AA6EC6E13",
       "algorithm": "sha256"
     },
     {
@@ -341,8 +341,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.282.0/registry.yaml",
-      "checksum": "58657FD69E9B7557F828DC0DF30134AE2D8E2111D3FA9347A376E14B9A7DE463",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.283.0/registry.yaml",
+      "checksum": "A8B21B85B70D9CCE6F96F96B902E4B061510A08235CC587B827CE8AA0EABF08A",
       "algorithm": "sha256"
     }
   ]
