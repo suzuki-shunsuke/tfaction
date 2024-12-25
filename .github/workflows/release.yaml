@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          persist-credentials: false
+          persist-credentials: true # This is required to push a commit
       - run: gh pr checkout "$PR"
         if: inputs.pr != ''
         env:
