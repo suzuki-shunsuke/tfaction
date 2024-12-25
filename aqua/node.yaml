@@ -1,2 +1,3 @@
 packages:
-  - name: nodejs/node@v20.18.1
+  - name: nodejs/node
+    version: v20.18.1
