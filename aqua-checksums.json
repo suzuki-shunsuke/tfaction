@@ -96,28 +96,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_darwin_amd64.zip",
-      "checksum": "7FF1307EC5DD14B2660EC91B39354CEC24AA492A03338D8A37FB542FB0B031F7",
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.8/tofu_1.8.8_darwin_amd64.zip",
+      "checksum": "5E4F5ADF761D41655107E0633B627C08E825CD8CA6DC22E69279D18E97458903",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_darwin_arm64.zip",
-      "checksum": "FEC8D934B9F69E033154265B60677604777505D3634945B3043C46E0030B5E5D",
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.8/tofu_1.8.8_darwin_arm64.zip",
+      "checksum": "B21E7A5D7DE20265AA6A47C5D3BAF9EE8E131AF9C852CD47574E53ECAFDD4118",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_linux_amd64.zip",
-      "checksum": "6935F082EF120FDB05F608DDE61ACE6B82D134496634586F42C8E38856B3E411",
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.8/tofu_1.8.8_linux_amd64.zip",
+      "checksum": "9E889633BC177B1D266552658020FE8CEB839445FCAC82AAA7622952FD9C81BB",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_linux_arm64.zip",
-      "checksum": "5CE3686C20C9D639E99A064AF5CF0D781361B0874426B2343A9AB4E33D25DB4F",
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.8/tofu_1.8.8_linux_arm64.zip",
+      "checksum": "9559DF2E37F6C8D49120C6FC038933E4B8AD3927014445EA67F81AE8C0271E70",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.8.7/tofu_1.8.7_windows_amd64.zip",
-      "checksum": "C63B55B322CA292491D8151CF24F43BA64F3522F896F13B16A49477A362580DF",
+      "id": "github_release/github.com/opentofu/opentofu/v1.8.8/tofu_1.8.8_windows_amd64.zip",
+      "checksum": "AEB9831B08C001B6E1CE581E5D59AF14F7B3323677E89F47CF22E42A40517AD7",
       "algorithm": "sha256"
     },
     {
