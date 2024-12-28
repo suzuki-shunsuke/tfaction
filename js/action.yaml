@@ -52,6 +52,11 @@ inputs:
     required: false
     default: ${{ github.token }}
 
+  # export-secrets
+  secrets:
+    description: "A JSON representing a map whose keys are secret names and values are secret values"
+    required: false
+
 outputs:
   # get-target-config
   working_directory:
