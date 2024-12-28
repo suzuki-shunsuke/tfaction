@@ -1,6 +1,11 @@
 {
   "checksums": [
     {
+      "id": "github_content/github.com/suzuki-shunsuke/rjsa/v0.1.0/rjsa",
+      "checksum": "6C015E625B5D65C4D96A239625F8024F1D9D472E4C9E2C591A7C8128199286EC",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_Linux-64bit.tar.gz",
       "checksum": "21A5EEA31D072B34A6284855249F4074FF43C618D398F9EC328BEF4FF7C2FA0D",
       "algorithm": "sha256"
@@ -351,8 +356,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.284.2/registry.yaml",
-      "checksum": "FBDEB5B80D7F030A255705BB4B25D144BD65BC958351B0CC3DC56035BC795DA2",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.285.0/registry.yaml",
+      "checksum": "CEE1F2F39D3F062BF3E8F8E7296F4AB7D9F4D8B28BADEF483F85498802574EC3",
       "algorithm": "sha256"
     }
   ]

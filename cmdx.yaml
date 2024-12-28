@@ -6,12 +6,25 @@ tasks:
     short: r
     description: release the new version
     usage: release the new version
-    script: gh workflow run release.yaml -f tag={{.version}}
+    script: rjsa "$VERSION" "$PR"
     args:
       - name: version
         required: true
         validate:
           - regexp: "^v\\d+\\.\\d+.\\d+(-\\d+)?$"
+        script_envs:
+          - version
+      - name: pr
+        required: false
+        validate:
+          - regexp: "^\\d+$"
+        script_envs:
+          - pr
+    flags:
+      - name: ref
+        required: false
+        script_envs:
+          - REF
   - name: schema
     description: build JSON Schema
     usage: build JSON Schema
