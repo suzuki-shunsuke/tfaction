@@ -18,7 +18,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@v1.13.4
       id: install
     - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
@@ -41,20 +41,20 @@ runs:
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
-    - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
+    - uses: suzuki-shunsuke/tfaction/list-working-dirs@v1.13.4
       id: list-working-directory-configs
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.13.4
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.13.4
       id: list-module-callers
       if: steps.global-config.outputs.update_local_path_module_caller == 'true'
       with:
         action: list-module-callers
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
         module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.13.4
       id: list-targets
       with:
         action: list-targets-with-changed-files
