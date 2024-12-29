@@ -7,6 +7,7 @@ import * as getTargetConfig from "./get-target-config";
 import * as listChangeModules from "./list-changed-modules";
 import * as listModuleCallers from "./list-module-callers";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
+import * as createDriftIssues from "./create-drift-issues";
 
 type Inputs = {
   action: string;
@@ -20,6 +21,7 @@ export const main = async (inputs: Inputs) => {
   const actions = new Map<string, API>([
     ["check-terraform-skip", checkTerraformSkip],
     ["conftest", conftest],
+    ["create-drift-issues", createDriftIssues],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["export-secrets", exportSecrets],
     ["get-global-config", getGlobalConfig],
