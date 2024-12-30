@@ -49,6 +49,7 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: "true"
+        fix: ${{ steps.global-config.outputs.tflint_fix == 'true' }}
 
     # Remove .terraform.lock.hcl created by `terraform init` before running terraform-docs
     - run: "! test -f .terraform.lock.hcl || rm .terraform.lock.hcl"

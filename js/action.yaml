@@ -83,6 +83,8 @@ outputs:
     description: If true, tfsec is enabled in test action
   enable_tflint:
     description: If true, tflint is enabled in test action
+  tflint_fix:
+    description: If true, tflint --fix is enabled in test action
   enable_trivy:
     description: If true, trivy is enabled in test action
   enable_terraform_docs:

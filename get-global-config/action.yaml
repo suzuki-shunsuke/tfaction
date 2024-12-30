@@ -44,6 +44,9 @@ outputs:
   enable_trivy:
     description: If true, trivy is enabled in test action
     value: ${{steps.global-config.outputs.enable_trivy}}
+  tflint_fix:
+    description: If true, tflint's fix is enabled in test action
+    value: ${{steps.global-config.outputs.tflint_fix}}
 
   update_local_path_module_caller:
     description: If true, local-path module caller is updated when any of local-path modules is updated. Golang is needed to use this feature.
