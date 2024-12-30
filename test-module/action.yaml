@@ -56,7 +56,6 @@ runs:
       working-directory: ${{ env.TFACTION_TARGET }}
 
     - uses: suzuki-shunsuke/tfaction/terraform-docs@main
-      if: steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
