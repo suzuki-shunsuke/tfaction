@@ -115,6 +115,7 @@ export const main = async () => {
         enable_tfsec: "false",
         enable_tflint: "true",
         enable_trivy: "true",
+        tflint_fix: "true",
         terraform_command: "terraform",
         drift_issue_repo_owner: "suzuki-shunsuke",
         drift_issue_repo_name: "tfaction",
