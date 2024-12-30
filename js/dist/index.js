@@ -66177,6 +66177,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 enable_tfsec: "false",
                 enable_tflint: "true",
                 enable_trivy: "true",
+                tflint_fix: "true",
                 update_local_path_module_caller: "true",
                 aqua_update_checksum_enabled: "true",
                 aqua_update_checksum_skip_push: "false",
