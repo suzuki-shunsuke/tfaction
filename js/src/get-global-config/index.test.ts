@@ -29,6 +29,7 @@ test("default", () => {
       enable_tfsec: false,
       enable_tflint: true,
       enable_trivy: true,
+      tflint_fix: false,
       terraform_command: "terraform",
     },
   };
@@ -96,6 +97,7 @@ test("customize", () => {
       enable_tfsec: false,
       enable_tflint: true,
       enable_trivy: true,
+      tflint_fix: false,
       terraform_command: "tofu",
     },
   };
