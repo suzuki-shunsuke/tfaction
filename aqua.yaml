@@ -4,5 +4,8 @@
 registries:
   - type: standard
     ref: v4.286.0 # renovate: depName=aquaproj/aqua-registry
+checksum:
+  enabled: true
+  require_checksum: true
 packages:
   - import: aqua/*.yaml
