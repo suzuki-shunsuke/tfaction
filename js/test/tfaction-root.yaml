@@ -42,7 +42,7 @@ update_related_pull_requests:
   enabled: true
 
 drift_detection:
-  enabled: false
+  enabled: true
   issue_repo_owner: suzuki-shunsuke
   issue_repo_name: tfaction
   minimum_detection_interval: 1
