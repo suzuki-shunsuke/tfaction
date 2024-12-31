@@ -365,7 +365,7 @@ jobs:
           action: get-or-create-drift-issue
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev-${GITHUB_RUN_ID}
+          TFACTION_TARGET: js/test/aws/foo/dev-${{github.run_id}}
       - name: Remove a dummy working directory
         run: rm -R "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Test create-drift-issues
