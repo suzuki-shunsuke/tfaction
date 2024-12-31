@@ -354,13 +354,6 @@ jobs:
       - name: Install dependencies
         uses: ./install
 
-      - name: Test create-drift-issues
-        uses: ./js
-        id: create-drift-issues
-        with:
-          action: create-drift-issues
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
       - name: Test get-or-create-drift-issue
         uses: ./js
         id: get-or-create-drift-issue
@@ -368,7 +361,14 @@ jobs:
           action: get-or-create-drift-issue
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev
+          TFACTION_TARGET: js/test/aws/foo/dev-${GITHUB_RUN_ID}
+      - name: Test create-drift-issues
+        uses: ./js
+        id: create-drift-issues
+        with:
+          action: create-drift-issues
+        env:
+          TFACTION_CONFIG: js/test/tfaction-root.yaml
 
       - name: Test env
         run: |

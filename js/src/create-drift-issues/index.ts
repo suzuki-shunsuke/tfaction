@@ -103,6 +103,7 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
       repoOwner,
       repoName,
     );
+    core.info(`Created an issue for ${target}: ${issue.url}`);
     await closeIssue(inputs.ghToken, repoOwner, repoName, issue.number);
     issueMap.set(target, issue);
   }
@@ -111,6 +112,7 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
     if (targetWDMap.has(target)) {
       continue;
     }
+    core.info(`Archiving an issue for ${target}`);
     await archiveIssue(
       inputs.ghToken,
       repoOwner,
