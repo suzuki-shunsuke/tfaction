@@ -184,7 +184,7 @@ const listIssues = async (repo: string, ghToken: string): Promise<Issue[]> => {
   const issues: Issue[] = [];
   for await (const response of pageIterator) {
     core.debug("response: " + JSON.stringify(response));
-    for (const issue of response.nodes) {
+    for (const issue of response.search.nodes) {
       // extract target from the title
       const found = issue.title.match(titlePattern);
       if (found === null) {
