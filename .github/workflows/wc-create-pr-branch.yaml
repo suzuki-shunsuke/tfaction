@@ -358,7 +358,7 @@ jobs:
         run: mkdir -p "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Create a dummy tfaction.yaml
         run: echo '{}' > "js/test/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
-      - run: git add "js/test/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
+      - run: git add "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Test get-or-create-drift-issue
         uses: ./js
         id: get-or-create-drift-issue
@@ -367,8 +367,10 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_TARGET: js/test/aws/foo/dev-${{github.run_id}}
+      - run: git reset HEAD "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Remove a dummy working directory
         run: rm -R "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+      - run: sleep 5
       - name: Test create-drift-issues
         uses: ./js
         id: create-drift-issues
