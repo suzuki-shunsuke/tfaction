@@ -108,6 +108,14 @@ jobs:
           action: create-drift-issues
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
+      - name: Test get-or-create-drift-issue
+        uses: ./js
+        id: get-or-create-drift-issue
+        with:
+          action: get-or-create-drift-issue
+        env:
+          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_TARGET: js/test/aws/foo/dev
 
       - name: Test js/get-target-config
         uses: ./js
