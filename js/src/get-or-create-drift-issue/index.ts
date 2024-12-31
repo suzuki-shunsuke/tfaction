@@ -7,114 +7,114 @@ import * as lib from "../lib";
 import * as path from "path";
 
 type Inputs = {
-    target?: string;
-    workingDir?: string;
-    ghToken: string;
-    repo?: string;
+  target?: string;
+  workingDir?: string;
+  ghToken: string;
+  repo?: string;
 };
 
 type Result = {
-    number: number;
-    state: string;
-    url: string;
+  number: number;
+  state: string;
+  url: string;
 };
 
 type Issue = {
-    url: string;
-    number: number;
-    state: string;
+  url: string;
+  number: number;
+  state: string;
 };
 
 export const main = async () => {
-    const cfg = lib.getConfig();
-    if (!cfg.drift_detection) {
-        // dirft detection is disabled
-        return;
-    }
+  const cfg = lib.getConfig();
+  if (!cfg.drift_detection) {
+    // dirft detection is disabled
+    return;
+  }
 
-    const result = await run({
-        target: process.env.TFACTION_TARGET,
-        workingDir: process.env.TFACTION_WORKING_DIR,
-        ghToken: core.getInput("github_token", { required: true }),
-        repo: process.env.GITHUB_REPOSITORY,
-    });
+  const result = await run({
+    target: process.env.TFACTION_TARGET,
+    workingDir: process.env.TFACTION_WORKING_DIR,
+    ghToken: core.getInput("github_token", { required: true }),
+    repo: process.env.GITHUB_REPOSITORY,
+  });
 
-    if (result === undefined) {
-        return;
-    }
+  if (result === undefined) {
+    return;
+  }
 
-    core.exportVariable("TFACTION_DRIFT_ISSUE_NUMBER", result.number);
-    core.exportVariable("TFACTION_DRIFT_ISSUE_STATE", result.state);
-    core.info(result.url);
-    core.summary.addRaw(`Drift Issue: ${result.url}`, true);
+  core.exportVariable("TFACTION_DRIFT_ISSUE_NUMBER", result.number);
+  core.exportVariable("TFACTION_DRIFT_ISSUE_STATE", result.state);
+  core.info(result.url);
+  core.summary.addRaw(`Drift Issue: ${result.url}`, true);
 };
 
 const run = async (inputs: Inputs): Promise<Result | undefined> => {
-    const cfg = lib.getConfig();
-    if (!cfg.drift_detection) {
-        core.info("drift detection is disabled");
-        return undefined;
-    }
+  const cfg = lib.getConfig();
+  if (!cfg.drift_detection) {
+    core.info("drift detection is disabled");
+    return undefined;
+  }
 
-    const repoOwner =
-        cfg.drift_detection.issue_repo_owner ?? (inputs.repo ?? "").split("/")[0];
-    const repoName =
-        cfg.drift_detection.issue_repo_name ?? (inputs.repo ?? "").split("/")[1];
-    if (!repoOwner || !repoName) {
-        throw new Error("repo_owner and repo_name are required");
-    }
-    const tg = await lib.getTargetGroup(cfg, inputs.target, inputs.workingDir);
-    const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
+  const repoOwner =
+    cfg.drift_detection.issue_repo_owner ?? (inputs.repo ?? "").split("/")[0];
+  const repoName =
+    cfg.drift_detection.issue_repo_name ?? (inputs.repo ?? "").split("/")[1];
+  if (!repoOwner || !repoName) {
+    throw new Error("repo_owner and repo_name are required");
+  }
+  const tg = await lib.getTargetGroup(cfg, inputs.target, inputs.workingDir);
+  const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
 
-    const wdConfig = lib.readTargetConfig(
-        path.join(tg.workingDir, workingDirectoryFile),
+  const wdConfig = lib.readTargetConfig(
+    path.join(tg.workingDir, workingDirectoryFile),
+  );
+
+  if (!lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
+    core.info("drift detection is disabled");
+    return;
+  }
+  core.info("drift detection is enabled");
+
+  if (!inputs.ghToken) {
+    throw new Error("GITHUB_TOKEN is required");
+  }
+
+  const MyOctokit = Octokit.plugin(paginateGraphQL);
+  const octokit = new MyOctokit({ auth: inputs.ghToken });
+
+  let issue = await getIssue(
+    tg.target,
+    inputs.ghToken,
+    `${repoOwner}/${repoName}`,
+  );
+  if (issue === undefined) {
+    core.info("creating a drift issue");
+    issue = await lib.createIssue(
+      tg.target,
+      inputs.ghToken,
+      repoOwner,
+      repoName,
     );
+  }
 
-    if (!lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
-        core.info("drift detection is disabled");
-        return;
-    }
-    core.info("drift detection is enabled");
-
-    if (!inputs.ghToken) {
-        throw new Error("GITHUB_TOKEN is required");
-    }
-
-    const MyOctokit = Octokit.plugin(paginateGraphQL);
-    const octokit = new MyOctokit({ auth: inputs.ghToken });
-
-    let issue = await getIssue(
-        tg.target,
-        inputs.ghToken,
-        `${repoOwner}/${repoName}`,
-    );
-    if (issue === undefined) {
-        core.info("creating a drift issue");
-        issue = await lib.createIssue(
-            tg.target,
-            inputs.ghToken,
-            repoOwner,
-            repoName,
-        );
-    }
-
-    return {
-        number: issue.number,
-        state: issue.state,
-        url: issue.url,
-    };
+  return {
+    number: issue.number,
+    state: issue.state,
+    url: issue.url,
+  };
 };
 
 const getIssue = async (
-    target: string,
-    ghToken: string,
-    repo: string,
+  target: string,
+  ghToken: string,
+  repo: string,
 ): Promise<Issue | undefined> => {
-    const MyOctokit = Octokit.plugin(paginateGraphQL);
-    const octokit = new MyOctokit({ auth: ghToken });
+  const MyOctokit = Octokit.plugin(paginateGraphQL);
+  const octokit = new MyOctokit({ auth: ghToken });
 
-    const title = `Terraform Drift (${target})`;
-    const query = `query($cursor: String, $searchQuery: String!) {
+  const title = `Terraform Drift (${target})`;
+  const query = `query($cursor: String, $searchQuery: String!) {
   search(first: 100, after: $cursor, query: $searchQuery, type: ISSUE) {
     nodes {
     	... on Issue {
@@ -131,18 +131,18 @@ const getIssue = async (
   }
 }`;
 
-    const pageIterator = await octokit.graphql.paginate.iterator(query, {
-        issuesCursor: null,
-        searchQuery: `repo:${repo} "${title}" in:title`,
-    });
+  const pageIterator = await octokit.graphql.paginate.iterator(query, {
+    issuesCursor: null,
+    searchQuery: `repo:${repo} "${title}" in:title`,
+  });
 
-    for await (const response of pageIterator) {
-        for (const issue of response.search.nodes) {
-            if (issue.title !== title) {
-                continue;
-            }
-            return issue;
-        }
+  for await (const response of pageIterator) {
+    for (const issue of response.search.nodes) {
+      if (issue.title !== title) {
+        continue;
+      }
+      return issue;
     }
-    return undefined;
+  }
+  return undefined;
 };
