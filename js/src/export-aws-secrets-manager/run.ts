@@ -78,6 +78,9 @@ export const run = async (): Promise<void> => {
   const t = await lib.getTargetGroup(config, targetS, wd);
   const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
   let awsClient = null;
+  if (t.group === undefined) {
+    return;
+  }
   if (t.group.aws_secrets_manager) {
     awsClient = new SecretsManagerClient({
       region: t.group.aws_region,

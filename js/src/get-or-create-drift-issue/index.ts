@@ -70,7 +70,7 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
     path.join(tg.workingDir, workingDirectoryFile),
   );
 
-  if (!checkEnabled(cfg, tg.group, wdConfig)) {
+  if (!lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
     core.info("drift detection is disabled");
     return;
   }
@@ -145,18 +145,4 @@ const getIssue = async (
     }
   }
   return undefined;
-};
-
-const checkEnabled = (
-  cfg: lib.Config,
-  targetGroup: lib.TargetGroup,
-  wdCfg: lib.TargetConfig,
-): boolean => {
-  if (wdCfg.drift_detection) {
-    return wdCfg.drift_detection.enabled ?? true;
-  }
-  if (targetGroup.drift_detection) {
-    return targetGroup.drift_detection.enabled ?? true;
-  }
-  return cfg.drift_detection?.enabled ?? false;
 };
