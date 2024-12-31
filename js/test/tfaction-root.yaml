@@ -44,7 +44,7 @@ update_related_pull_requests:
 drift_detection:
   enabled: true
   issue_repo_owner: suzuki-shunsuke
-  issue_repo_name: tfaction
+  issue_repo_name: test-tfaction
   minimum_detection_interval: 1
   num_of_issues: 3
 
