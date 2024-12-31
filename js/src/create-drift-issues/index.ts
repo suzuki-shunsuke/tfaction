@@ -9,7 +9,7 @@ import * as path from "path";
 type Inputs = {
   target?: string;
   workingDir?: string;
-  ghToken?: string;
+  ghToken: string;
   repo?: string;
 };
 
@@ -37,7 +37,7 @@ export const main = async () => {
   const result = await run({
     target: process.env.TFACTION_TARGET,
     workingDir: process.env.TFACTION_WORKING_DIR,
-    ghToken: process.env.GITHUB_TOKEN,
+    ghToken: core.getInput("github_token", { required: true }),
     repo: process.env.GITHUB_REPOSITORY,
   });
 
@@ -52,7 +52,7 @@ export const main = async () => {
 };
 
 const run = async (inputs: Inputs): Promise<Result | undefined> => {
-  if (inputs.ghToken === undefined) {
+  if (inputs.ghToken === "") {
     throw new Error("GITHUB_TOKEN is required");
   }
   const cfg = lib.getConfig();
