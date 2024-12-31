@@ -38,7 +38,7 @@ jobs:
 
       - uses: aquaproj/aqua-installer@f13c5d2f0357708d85477aabe50fd3f725528745 # v3.1.0
         with:
-          aqua_version: v2.40.0
+          aqua_version: v2.41.0
         env:
           GITHUB_TOKEN: ${{github.token}}
       - run: cmdx build
@@ -72,7 +72,7 @@ jobs:
           PR: ${{inputs.pr}}
       - uses: aquaproj/aqua-installer@f13c5d2f0357708d85477aabe50fd3f725528745 # v3.1.0
         with:
-          aqua_version: v2.40.0
+          aqua_version: v2.41.0
         env:
           GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
@@ -324,7 +324,7 @@ jobs:
           PR: ${{inputs.pr}}
       - uses: aquaproj/aqua-installer@f13c5d2f0357708d85477aabe50fd3f725528745 # v3.1.0
         with:
-          aqua_version: v2.40.0
+          aqua_version: v2.41.0
         env:
           GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
@@ -403,7 +403,7 @@ jobs:
           PR: ${{inputs.pr}}
       - uses: aquaproj/aqua-installer@f13c5d2f0357708d85477aabe50fd3f725528745 # v3.1.0
         with:
-          aqua_version: v2.40.0
+          aqua_version: v2.41.0
         env:
           GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
