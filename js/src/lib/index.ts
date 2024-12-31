@@ -424,7 +424,9 @@ export const getTargetGroup = async (
       workingDir,
     );
     if (!targetConfig) {
-      throw new Error("target config is not found in target_groups");
+      throw new Error(
+        `target config is not found in target_groups: ${workingDir}`,
+      );
     }
     target = workingDir;
     for (const pattern of config.replace?.patterns ?? []) {
@@ -474,7 +476,9 @@ export const getTargetGroup = async (
     workingDir,
   );
   if (!targetConfig) {
-    throw new Error("target config is not found in target_groups");
+    throw new Error(
+      `target config is not found in target_groups: ${workingDir}`,
+    );
   }
   return {
     target: target,
