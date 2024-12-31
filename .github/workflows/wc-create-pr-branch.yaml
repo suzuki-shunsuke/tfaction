@@ -347,7 +347,7 @@ jobs:
               "issues": "write"
             }
           repositories: >-
-            ["${{github.event.repository.name}}"]
+            ["test-tfaction"]
 
       - name: Install dependencies
         uses: ./install
@@ -431,7 +431,7 @@ jobs:
               "contents": "write"
             }
           repositories: >-
-            ["test-tfaction"]
+            ["${{github.event.repository.name}}"]
 
       - name: Test setup
         uses: ./setup
