@@ -358,6 +358,7 @@ jobs:
         run: mkdir -p "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Create a dummy tfaction.yaml
         run: echo '{}' > "js/test/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
+      - run: git add "js/test/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
       - name: Test get-or-create-drift-issue
         uses: ./js
         id: get-or-create-drift-issue
