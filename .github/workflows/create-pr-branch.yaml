@@ -17,6 +17,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write
     with:
       pr: ${{fromJSON(inputs.pr)}}
       is_comment: ${{inputs.is_comment}}

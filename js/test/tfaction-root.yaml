@@ -46,7 +46,7 @@ drift_detection:
   issue_repo_owner: suzuki-shunsuke
   issue_repo_name: tfaction
   minimum_detection_interval: 1
-  num_of_issues: 1
+  num_of_issues: 3
 
 replace:
   patterns:

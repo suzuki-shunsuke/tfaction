@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
+import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
 
@@ -161,6 +162,11 @@ const TargetGroup = z.object({
   aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
   terraform_command: z.optional(z.string()),
   conftest: z.optional(ConftestConfig),
+  drift_detection: z.optional(
+    z.object({
+      enabled: z.optional(z.boolean()),
+    }),
+  ),
 });
 
 export type TargetGroup = z.infer<typeof TargetGroup>;
@@ -226,6 +232,7 @@ const Config = z.object({
       issue_repo_name: z.optional(z.string()),
       num_of_issues: z.optional(z.number()),
       minimum_detection_interval: z.optional(z.number()),
+      enabled: z.optional(z.boolean()),
     }),
   ),
   env: z.optional(z.record(z.string())),
@@ -446,10 +453,11 @@ export const getTargetGroup = async (
     silent: true,
   });
   const wds: string[] = [];
-  for (const line of out.stdout.split("\n")) {
-    if (line.endsWith(config.working_directory_file ?? "tfaction.yaml")) {
-      wds.push(path.dirname(line));
-    }
+  const files = await listWorkingDirFiles(
+    config.working_directory_file ?? "tfaction.yaml",
+  );
+  for (const file of files) {
+    wds.push(path.dirname(file));
   }
   const m = createWDTargetMap(wds, config);
   for (const [wd, t] of m) {
@@ -472,5 +480,54 @@ export const getTargetGroup = async (
     target: target,
     workingDir: workingDir,
     group: targetConfig,
+  };
+};
+
+export const listWorkingDirFiles = async (file: string): Promise<string[]> => {
+  const out = await exec.getExecOutput("git", ["ls-files"], {
+    silent: true,
+  });
+  const files: string[] = [];
+  for (const line of out.stdout.split("\n")) {
+    if (line.endsWith(file)) {
+      files.push(line);
+    }
+  }
+  return files;
+};
+
+type Issue = {
+  url: string;
+  number: number;
+  state: string;
+  title: string;
+  target: string;
+};
+
+export const createIssue = async (
+  target: string,
+  ghToken: string,
+  repoOwner: string,
+  repoName: string,
+): Promise<Issue> => {
+  const octokit = github.getOctokit(ghToken);
+  const body = `
+  This issus was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
+  
+  About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
+  `;
+
+  const issue = await octokit.rest.issues.create({
+    owner: repoOwner,
+    repo: repoName,
+    title: `Terraform Drift (${target})`,
+    body: body,
+  });
+  return {
+    url: issue.data.html_url,
+    number: issue.data.number,
+    title: issue.data.title,
+    target: target,
+    state: issue.data.state,
   };
 };
