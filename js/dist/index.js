@@ -64802,6 +64802,9 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     const t = yield lib.getTargetGroup(config, targetS, wd);
     const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
     let awsClient = null;
+    if (t.group === undefined) {
+        return;
+    }
     if (t.group.aws_secrets_manager) {
         awsClient = new client_secrets_manager_1.SecretsManagerClient({
             region: t.group.aws_region,
@@ -64918,6 +64921,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const isApply = lib.getIsApply();
     const t = yield lib.getTargetGroup(config, targetS, workingDir);
     const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
+    if (t.group === undefined) {
+        return;
+    }
     for (const [envName, secretName] of getSecrets(t.group, jobConfig)) {
         if (!secrets.has(secretName)) {
             throw new Error(`secret is not found: ${secretName}`);
@@ -65822,14 +65828,11 @@ const getTargetGroup = (config, target, workingDir) => __awaiter(void 0, void 0,
     var _a, _b, _c;
     if (workingDir) {
         const targetConfig = (0, exports.getTargetFromTargetGroupsByWorkingDir)(config.target_groups, workingDir);
-        if (!targetConfig) {
-            throw new Error(`target config is not found in target_groups: ${workingDir}`);
-        }
         target = workingDir;
         for (const pattern of (_b = (_a = config.replace) === null || _a === void 0 ? void 0 : _a.patterns) !== null && _b !== void 0 ? _b : []) {
             target = target.replace(new RegExp(pattern.regexp), pattern.replace);
         }
-        if (targetConfig.target !== undefined) {
+        if ((targetConfig === null || targetConfig === void 0 ? void 0 : targetConfig.target) !== undefined) {
             target = workingDir.replace(targetConfig.working_directory, targetConfig.target);
         }
         return {
@@ -65857,12 +65860,9 @@ const getTargetGroup = (config, target, workingDir) => __awaiter(void 0, void 0,
         }
     }
     if (workingDir === undefined) {
-        throw new Error(`No working directory is found for the target ${target}`);
+        workingDir = target;
     }
     const targetConfig = (0, exports.getTargetFromTargetGroupsByWorkingDir)(config.target_groups, workingDir);
-    if (!targetConfig) {
-        throw new Error(`target config is not found in target_groups: ${workingDir}`);
-    }
     return {
         target: target,
         workingDir: workingDir,
@@ -65910,7 +65910,7 @@ const checkDriftDetectionEnabled = (cfg, targetGroup, wdCfg) => {
     if (wdCfg.drift_detection) {
         return (_a = wdCfg.drift_detection.enabled) !== null && _a !== void 0 ? _a : true;
     }
-    if (targetGroup.drift_detection) {
+    if (targetGroup === null || targetGroup === void 0 ? void 0 : targetGroup.drift_detection) {
         return (_b = targetGroup.drift_detection.enabled) !== null && _b !== void 0 ? _b : true;
     }
     return (_d = (_c = cfg.drift_detection) === null || _c === void 0 ? void 0 : _c.enabled) !== null && _d !== void 0 ? _d : false;
