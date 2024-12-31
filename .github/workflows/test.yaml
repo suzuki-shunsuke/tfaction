@@ -125,6 +125,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write
     with:
       pr: ${{github.event.pull_request.number}}
     secrets:
