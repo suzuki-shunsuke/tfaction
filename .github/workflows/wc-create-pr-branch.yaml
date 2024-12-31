@@ -354,6 +354,10 @@ jobs:
       - name: Install dependencies
         uses: ./install
 
+      - name: Create a dummy working directory
+        run: mkdir -p "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+      - name: Create a dummy tfaction.yaml
+        run: echo '{}' > "js/test/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
       - name: Test get-or-create-drift-issue
         uses: ./js
         id: get-or-create-drift-issue
@@ -362,6 +366,8 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_TARGET: js/test/aws/foo/dev-${GITHUB_RUN_ID}
+      - name: Remove a dummy working directory
+        run: rm -R "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Test create-drift-issues
         uses: ./js
         id: create-drift-issues
