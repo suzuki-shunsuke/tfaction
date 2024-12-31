@@ -64,6 +64,9 @@ export const main = async () => {
   const t = await lib.getTargetGroup(config, targetS, workingDir);
 
   const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
+  if (t.group === undefined) {
+    return;
+  }
   for (const [envName, secretName] of getSecrets(t.group, jobConfig)) {
     if (!secrets.has(secretName)) {
       throw new Error(`secret is not found: ${secretName}`);

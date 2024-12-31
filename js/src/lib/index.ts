@@ -410,7 +410,7 @@ export const setEnvs = (
 export type Target = {
   target: string;
   workingDir: string;
-  group: TargetGroup;
+  group?: TargetGroup;
 };
 
 export const getTargetGroup = async (
@@ -423,16 +423,11 @@ export const getTargetGroup = async (
       config.target_groups,
       workingDir,
     );
-    if (!targetConfig) {
-      throw new Error(
-        `target config is not found in target_groups: ${workingDir}`,
-      );
-    }
     target = workingDir;
     for (const pattern of config.replace?.patterns ?? []) {
       target = target.replace(new RegExp(pattern.regexp), pattern.replace);
     }
-    if (targetConfig.target !== undefined) {
+    if (targetConfig?.target !== undefined) {
       target = workingDir.replace(
         targetConfig.working_directory,
         targetConfig.target,
@@ -469,17 +464,12 @@ export const getTargetGroup = async (
     }
   }
   if (workingDir === undefined) {
-    throw new Error(`No working directory is found for the target ${target}`);
+    workingDir = target;
   }
   const targetConfig = getTargetFromTargetGroupsByWorkingDir(
     config.target_groups,
     workingDir,
   );
-  if (!targetConfig) {
-    throw new Error(
-      `target config is not found in target_groups: ${workingDir}`,
-    );
-  }
   return {
     target: target,
     workingDir: workingDir,
@@ -538,13 +528,13 @@ export const createIssue = async (
 
 export const checkDriftDetectionEnabled = (
   cfg: Config,
-  targetGroup: TargetGroup,
+  targetGroup: TargetGroup | undefined,
   wdCfg: TargetConfig,
 ): boolean => {
   if (wdCfg.drift_detection) {
     return wdCfg.drift_detection.enabled ?? true;
   }
-  if (targetGroup.drift_detection) {
+  if (targetGroup?.drift_detection) {
     return targetGroup.drift_detection.enabled ?? true;
   }
   return cfg.drift_detection?.enabled ?? false;
