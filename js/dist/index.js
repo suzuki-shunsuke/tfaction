@@ -64634,7 +64634,7 @@ const listIssues = (repo, ghToken) => __awaiter(void 0, void 0, void 0, function
             _d = false;
             const response = _c;
             core.debug("response: " + JSON.stringify(response));
-            for (const issue of response.nodes) {
+            for (const issue of response.search.nodes) {
                 // extract target from the title
                 const found = issue.title.match(titlePattern);
                 if (found === null) {
