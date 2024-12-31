@@ -363,6 +363,7 @@ jobs:
         uses: ./js
         id: get-or-create-drift-issue
         with:
+          github_token: ${{steps.token.outputs.token}}
           action: get-or-create-drift-issue
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
@@ -375,6 +376,7 @@ jobs:
         uses: ./js
         id: create-drift-issues
         with:
+          github_token: ${{steps.token.outputs.token}}
           action: create-drift-issues
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
