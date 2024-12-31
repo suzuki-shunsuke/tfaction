@@ -65823,7 +65823,7 @@ const getTargetGroup = (config, target, workingDir) => __awaiter(void 0, void 0,
     if (workingDir) {
         const targetConfig = (0, exports.getTargetFromTargetGroupsByWorkingDir)(config.target_groups, workingDir);
         if (!targetConfig) {
-            throw new Error("target config is not found in target_groups");
+            throw new Error(`target config is not found in target_groups: ${workingDir}`);
         }
         target = workingDir;
         for (const pattern of (_b = (_a = config.replace) === null || _a === void 0 ? void 0 : _a.patterns) !== null && _b !== void 0 ? _b : []) {
@@ -65861,7 +65861,7 @@ const getTargetGroup = (config, target, workingDir) => __awaiter(void 0, void 0,
     }
     const targetConfig = (0, exports.getTargetFromTargetGroupsByWorkingDir)(config.target_groups, workingDir);
     if (!targetConfig) {
-        throw new Error("target config is not found in target_groups");
+        throw new Error(`target config is not found in target_groups: ${workingDir}`);
     }
     return {
         target: target,
