@@ -531,3 +531,17 @@ export const createIssue = async (
     state: issue.data.state,
   };
 };
+
+export const checkDriftDetectionEnabled = (
+  cfg: Config,
+  targetGroup: TargetGroup,
+  wdCfg: TargetConfig,
+): boolean => {
+  if (wdCfg.drift_detection) {
+    return wdCfg.drift_detection.enabled ?? true;
+  }
+  if (targetGroup.drift_detection) {
+    return targetGroup.drift_detection.enabled ?? true;
+  }
+  return cfg.drift_detection?.enabled ?? false;
+};
