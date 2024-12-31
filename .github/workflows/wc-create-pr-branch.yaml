@@ -100,6 +100,14 @@ jobs:
       - name: Install dependencies
         uses: ./install
 
+      - name: Test create-drift-issues
+        uses: ./js
+        id: create-drift-issues
+        with:
+          action: create-drift-issues
+        env:
+          TFACTION_CONFIG: js/test/tfaction-root.yaml
+
       - name: Test js/get-target-config
         uses: ./js
         id: js-target-config
