@@ -64519,7 +64519,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield run({
         target: process.env.TFACTION_TARGET,
         workingDir: process.env.TFACTION_WORKING_DIR,
-        ghToken: process.env.GITHUB_TOKEN,
+        ghToken: core.getInput("github_token", { required: true }),
         repo: process.env.GITHUB_REPOSITORY,
     });
     if (result === undefined) {
@@ -64533,7 +64533,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
 exports.main = main;
 const run = (inputs) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e;
-    if (inputs.ghToken === undefined) {
+    if (inputs.ghToken === "") {
         throw new Error("GITHUB_TOKEN is required");
     }
     const cfg = lib.getConfig();
