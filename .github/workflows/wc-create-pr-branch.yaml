@@ -516,8 +516,8 @@ jobs:
         uses: ./list-module-callers
         id: list-module-callers
         with:
-          module_files: js/test/list-module-callers/module_files.txt
-          config_files: js/test/list-module-callers/config_files.txt
+          module_files: js/test/list-module-callers/terragrunt/module_files.txt
+          config_files: js/test/list-module-callers/terragrunt/config_files.txt
 
       - name: Test actions' outputs
         uses: ./js
