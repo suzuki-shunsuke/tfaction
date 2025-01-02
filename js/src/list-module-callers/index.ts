@@ -17,6 +17,30 @@ export const main = async () => {
   const rawModuleCalls: Record<string, Array<string>> = {};
 
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
+
+  for (const tfFile of configFiles) {
+    const tfDir = path.dirname(tfFile);
+    if (!fs.existsSync(path.join(tfDir, "terragrunt.hcl"))) {
+      continue;
+    }
+    const tmpobj = tmp.fileSync();
+    await exec.exec("terragrunt", [
+      "render-json",
+      "--terragrunt-json-out",
+      tmpobj.name,
+      "--terragrunt-working-dir",
+      tfDir,
+    ]);
+    const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
+      ?.source;
+    if (
+      source.startsWith("." + path.sep) ||
+      source.startsWith(".." + path.sep)
+    ) {
+      rawModuleCalls[tfDir].push(path.normalize(source));
+    }
+  }
+
   for (const tfFile of allTerraformFiles) {
     if (tfFile == "") {
       continue;
@@ -44,25 +68,6 @@ export const main = async () => {
         }
       },
     );
-
-    if (fs.existsSync(path.join(tfDir, "terragrunt.hcl"))) {
-      const tmpobj = tmp.fileSync();
-      await exec.exec("terragrunt", [
-        "render-json",
-        "--terragrunt-json-out",
-        tmpobj.name,
-        "--terragrunt-working-dir",
-        tfDir,
-      ]);
-      const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
-        ?.source;
-      if (
-        source.startsWith("." + path.sep) ||
-        source.startsWith(".." + path.sep)
-      ) {
-        rawModuleCalls[tfDir].push(path.normalize(source));
-      }
-    }
   }
 
   const moduleCallers = buildModuleToCallers(
