@@ -41,15 +41,19 @@ export const main = async () => {
     );
 
     if (fs.existsSync(tfDir + "/terragrunt.hcl")) {
-      child_process.execSync(`terragrunt render-json --terragrunt-working-dir ${tfDir}`);
-      const tgInspection = JSON.parse(fs.readFileSync(tfDir + "/terragrunt_rendered.json", "utf8"));
+      child_process.execSync(
+        `terragrunt render-json --terragrunt-working-dir ${tfDir}`,
+      );
+      const tgInspection = JSON.parse(
+        fs.readFileSync(tfDir + "/terragrunt_rendered.json", "utf8"),
+      );
       const source = tgInspection.terraform?.source;
       if (source.startsWith("./") || source.startsWith("../")) {
-        rawModuleCalls[tfDir].push(source.replace("//", "/"))
+        rawModuleCalls[tfDir].push(source.replace("//", "/"));
       } else {
         return;
       }
-    };
+    }
   });
 
   const moduleCallers = buildModuleToCallers(
