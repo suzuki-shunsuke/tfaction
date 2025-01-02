@@ -512,6 +512,21 @@ jobs:
           repositories: >-
             ["${{github.event.repository.name}}"]
 
+      - name: Test list-module-callers
+        uses: ./list-module-callers
+        id: list-module-callers
+        with:
+          module_files: js/test/list-module-callers/terragrunt/module_files.txt
+          config_files: js/test/list-module-callers/terragrunt/config_files.txt
+
+      - name: Test actions' outputs
+        uses: ./js
+        with:
+          action: test-action
+        env:
+          TFACTION_TEST_ACTION_TERRAGRUNT: "true"
+          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
+
       - name: Test setup
         uses: ./setup
         with:
