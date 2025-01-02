@@ -13,7 +13,7 @@ export const main = async () => {
     .readFileSync(core.getInput("module_files"), "utf8")
     .split("\n");
 
-  // directory where uses modules => modules which are used
+  // directory where uses modules => used modules
   const rawModuleCalls: Record<string, Array<string>> = {};
 
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
@@ -37,7 +37,12 @@ export const main = async () => {
       source.startsWith("." + path.sep) ||
       source.startsWith(".." + path.sep)
     ) {
-      rawModuleCalls[tfDir].push(path.normalize(source));
+      const normalizedSource = path.normalize(source);
+      if (rawModuleCalls[tfDir] === undefined) {
+        rawModuleCalls[tfDir] = [normalizedSource];
+      } else {
+        rawModuleCalls[tfDir].push(normalizedSource);
+      }
     }
   }
 
@@ -55,7 +60,7 @@ export const main = async () => {
     const inspection = JSON.parse(outInspect.stdout);
 
     // List keys of Local Path modules (source starts with ./ or ../) in module_calls
-    rawModuleCalls[tfDir] = Object.values(inspection["module_calls"]).flatMap(
+    const arr = Object.values(inspection["module_calls"]).flatMap(
       (module: any) => {
         const source = module.source;
         if (
@@ -68,6 +73,11 @@ export const main = async () => {
         }
       },
     );
+    if (rawModuleCalls[tfDir] === undefined) {
+      rawModuleCalls[tfDir] = arr;
+    } else {
+      rawModuleCalls[tfDir].push(...arr);
+    }
   }
 
   const moduleCallers = buildModuleToCallers(
