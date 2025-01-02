@@ -1,7 +1,8 @@
-import * as core from "@actions/core";
 import * as fs from "fs";
 import * as path from "path";
-import * as child_process from "child_process";
+import * as tmp from "tmp";
+import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import { buildModuleToCallers, resolveRelativeCallTree } from "./lib";
 
 export const main = async () => {
@@ -12,49 +13,72 @@ export const main = async () => {
     .readFileSync(core.getInput("module_files"), "utf8")
     .split("\n");
 
-  // directory where uses modules => modules which are used
+  // directory where uses modules => used modules
   const rawModuleCalls: Record<string, Array<string>> = {};
 
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
-  allTerraformFiles.forEach((tfFile) => {
+
+  for (const tfFile of configFiles) {
+    const tfDir = path.dirname(tfFile);
+    if (!fs.existsSync(path.join(tfDir, "terragrunt.hcl"))) {
+      continue;
+    }
+    const tmpobj = tmp.fileSync();
+    await exec.exec("terragrunt", [
+      "render-json",
+      "--terragrunt-json-out",
+      tmpobj.name,
+      "--terragrunt-working-dir",
+      tfDir,
+    ]);
+    const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
+      ?.source;
+    if (
+      source.startsWith("." + path.sep) ||
+      source.startsWith(".." + path.sep)
+    ) {
+      const normalizedSource = path.normalize(source);
+      if (rawModuleCalls[tfDir] === undefined) {
+        rawModuleCalls[tfDir] = [normalizedSource];
+      } else {
+        rawModuleCalls[tfDir].push(normalizedSource);
+      }
+    }
+  }
+
+  for (const tfFile of allTerraformFiles) {
     if (tfFile == "") {
-      return;
+      continue;
     }
 
     const tfDir = path.dirname(tfFile);
-    const inspection = JSON.parse(
-      child_process
-        .execSync(`terraform-config-inspect --json ${tfDir}`)
-        .toString("utf-8"),
-    );
+
+    const outInspect = await exec.getExecOutput("terraform-config-inspect", [
+      "--json",
+      tfDir,
+    ]);
+    const inspection = JSON.parse(outInspect.stdout);
 
     // List keys of Local Path modules (source starts with ./ or ../) in module_calls
-    rawModuleCalls[tfDir] = Object.values(inspection["module_calls"]).flatMap(
+    const arr = Object.values(inspection["module_calls"]).flatMap(
       (module: any) => {
         const source = module.source;
-        if (source.startsWith("./") || source.startsWith("../")) {
+        if (
+          source.startsWith("." + path.sep) ||
+          source.startsWith(".." + path.sep)
+        ) {
           return [source];
         } else {
           return [];
         }
       },
     );
-
-    if (fs.existsSync(tfDir + "/terragrunt.hcl")) {
-      child_process.execSync(
-        `terragrunt render-json --terragrunt-working-dir ${tfDir}`,
-      );
-      const tgInspection = JSON.parse(
-        fs.readFileSync(tfDir + "/terragrunt_rendered.json", "utf8"),
-      );
-      const source = tgInspection.terraform?.source;
-      if (source.startsWith("./") || source.startsWith("../")) {
-        rawModuleCalls[tfDir].push(source.replace("//", "/"));
-      } else {
-        return;
-      }
+    if (rawModuleCalls[tfDir] === undefined) {
+      rawModuleCalls[tfDir] = arr;
+    } else {
+      rawModuleCalls[tfDir].push(...arr);
     }
-  });
+  }
 
   const moduleCallers = buildModuleToCallers(
     resolveRelativeCallTree(rawModuleCalls),

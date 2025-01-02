@@ -513,9 +513,10 @@ jobs:
             ["${{github.event.repository.name}}"]
 
       - name: Test list-module-callers
-        uses: ./list-module-callers
+        uses: ./js
         id: list-module-callers
         with:
+          action: list-module-callers
           module_files: js/test/list-module-callers/terragrunt/module_files.txt
           config_files: js/test/list-module-callers/terragrunt/config_files.txt
 
