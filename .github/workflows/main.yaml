@@ -22,6 +22,6 @@ jobs:
       - run: cmdx build
         shell: bash
 
-      - uses: suzuki-shunsuke/release-js-action@d824154e854ff4bfd1f87dc70f01ca3a50009ad1 # v0.1.3
+      - uses: suzuki-shunsuke/release-js-action@0696e3fc3386d4f3d2dfd9e194e8e14052cea99d # v0.1.4
         with:
           version: latest
