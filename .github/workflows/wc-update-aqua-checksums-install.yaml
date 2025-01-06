@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: read
     with:
-      aqua_version: v2.41.0
+      aqua_version: v2.42.1
       prune: true
       working_directory: install
     secrets:
