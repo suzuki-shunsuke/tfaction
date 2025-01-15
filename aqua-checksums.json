@@ -26,28 +26,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.0/terragrunt_darwin_amd64",
-      "checksum": "4DE7DB461CBE5BE3A33BB12E5378F457AD770D1C95988880EC813F10602CF6FB",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.1/terragrunt_darwin_amd64",
+      "checksum": "34224949994C639620F278E08E4380E002FBCA58ED8990A42F2DA9541AF14813",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.0/terragrunt_darwin_arm64",
-      "checksum": "EA43DF9755DD7935A8816E990B7B456C45F8CDBCC13378289BD0764786C42661",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.1/terragrunt_darwin_arm64",
+      "checksum": "E3A41B0C06CE89C207FE4EF28312D04014AA4E951695D7892F8FD4CB6A89F283",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.0/terragrunt_linux_amd64",
-      "checksum": "64C636B27F64FB6BD2DCF4BBD1C441EA199EE6F11726E70EAA521AA59C0E7BEA",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.1/terragrunt_linux_amd64",
+      "checksum": "870FE8DE2F05579836AB411890130D848BF4E0D58D45B7128842FB3F77567C9A",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.0/terragrunt_linux_arm64",
-      "checksum": "3DDA1C29E46D2B3EFC44F0A3241569C0F373DE4E90F6631CCCBD02CA64143955",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.1/terragrunt_linux_arm64",
+      "checksum": "195D810DC6D38857DA8AABF5828D98128D070CA38D7004B0BDEB42A7B4BF1CEE",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.0/terragrunt_windows_amd64.exe",
-      "checksum": "983C9D588BE2F208C8C7CEFCE2207C2914E646C050CCFEDAF446B7C468E85CB2",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.1/terragrunt_windows_amd64.exe",
+      "checksum": "DD7A1D0511897226B13BDB018760E73226B58A718CC6F71038FDBA60F0CA81E0",
       "algorithm": "sha256"
     },
     {
@@ -354,11 +354,6 @@
       "id": "http/nodejs.org/dist/v20.18.1/node-v20.18.1-win-x64.zip",
       "checksum": "56E5AACDEEE7168871721B75819CCACF2367DE8761B78EACEACDECD41E04CA03",
       "algorithm": "sha256"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.295.0/registry.yaml",
-      "checksum": "1C0CA8D957B6E6758CE158AB14C6A0A88DDF734D8F454B79118A1E007EA5354F71C0E172A7E0050526727720354DF628631CD71EB9526AB8EAE2C25178AB620A",
-      "algorithm": "sha512"
     },
     {
       "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.296.0/registry.yaml",
