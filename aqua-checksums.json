@@ -6,23 +6,23 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_Linux-64bit.tar.gz",
-      "checksum": "21A5EEA31D072B34A6284855249F4074FF43C618D398F9EC328BEF4FF7C2FA0D",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.58.2/trivy_0.58.2_Linux-64bit.tar.gz",
+      "checksum": "AA2C0ED6932AE70171B4F0F3FDB0403E29D9CE7E6FDDAD0EA08D440FDD695742",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_Linux-ARM64.tar.gz",
-      "checksum": "29EC9C3AF77A00234860F4A9C48E2DD7691E939924DA5D76C259E46C614E2545",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.58.2/trivy_0.58.2_Linux-ARM64.tar.gz",
+      "checksum": "2786772DAEEBF64C88CCDBB72BAD7D4F260F44D403B04EC8C1B713D029072674",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_macOS-64bit.tar.gz",
-      "checksum": "4F939F363D23EEB4D6181B2C38C518DB38D94987565A8FA5EC9E037972E4B811",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.58.2/trivy_0.58.2_macOS-64bit.tar.gz",
+      "checksum": "B0B5D63708BEC5695EECEB77884709156C5D0449D7B455910A6D02E46B902AB9",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.58.1/trivy_0.58.1_macOS-ARM64.tar.gz",
-      "checksum": "499A64A911A1AC80FCC26D619CDC1BDB05528D8B1BD0490F01A8324AA6EC6E13",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.58.2/trivy_0.58.2_macOS-ARM64.tar.gz",
+      "checksum": "8DCCFB898A6F10B3CBE3F49A97CDE6AB9EBF160D16055CE0375899F4040BDC5B",
       "algorithm": "sha256"
     },
     {
