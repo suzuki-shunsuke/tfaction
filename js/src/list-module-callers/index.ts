@@ -28,11 +28,14 @@ export const main = async () => {
       "render-json",
       "--terragrunt-json-out",
       tmpobj.name,
-      "--terragrunt-working-dir",
-      tfDir,
-    ]);
-    const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
+    ], {
+      cwd: tfDir,
+    });
+    let source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
       ?.source;
+    if (source) {
+      source = path.join(tfDir, source);
+    }
     if (
       source.startsWith("." + path.sep) ||
       source.startsWith(".." + path.sep)
