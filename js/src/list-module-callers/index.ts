@@ -24,16 +24,12 @@ export const main = async () => {
       continue;
     }
     const tmpobj = tmp.fileSync();
+    await exec.exec("aqua", ["i", "-l", "-a"], {
+      cwd: tfDir,
+    });
     await exec.exec(
-      "aqua",
-      [
-        "exec",
-        "--",
-        "terragrunt",
-        "render-json",
-        "--terragrunt-json-out",
-        tmpobj.name,
-      ],
+      "terragrunt",
+      ["render-json", "--terragrunt-json-out", tmpobj.name],
       {
         cwd: tfDir,
       },
