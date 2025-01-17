@@ -31,11 +31,8 @@ export const main = async () => {
         cwd: tfDir,
       },
     );
-    let source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
+    const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
       ?.source;
-    if (source) {
-      source = path.join(tfDir, source);
-    }
     if (
       source.startsWith("." + path.sep) ||
       source.startsWith(".." + path.sep)
