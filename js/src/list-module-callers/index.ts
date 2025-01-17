@@ -24,13 +24,13 @@ export const main = async () => {
       continue;
     }
     const tmpobj = tmp.fileSync();
-    await exec.exec("terragrunt", [
-      "render-json",
-      "--terragrunt-json-out",
-      tmpobj.name,
-    ], {
-      cwd: tfDir,
-    });
+    await exec.exec(
+      "terragrunt",
+      ["render-json", "--terragrunt-json-out", tmpobj.name],
+      {
+        cwd: tfDir,
+      },
+    );
     let source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
       ?.source;
     if (source) {
