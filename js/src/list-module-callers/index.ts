@@ -25,8 +25,15 @@ export const main = async () => {
     }
     const tmpobj = tmp.fileSync();
     await exec.exec(
-      "terragrunt",
-      ["render-json", "--terragrunt-json-out", tmpobj.name],
+      "aqua",
+      [
+        "exec",
+        "--",
+        "terragrunt",
+        "render-json",
+        "--terragrunt-json-out",
+        tmpobj.name,
+      ],
       {
         cwd: tfDir,
       },
