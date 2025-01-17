@@ -8,9 +8,11 @@ import { buildModuleToCallers, resolveRelativeCallTree } from "./lib";
 export const main = async () => {
   const configFiles = fs
     .readFileSync(core.getInput("config_files"), "utf8")
+    .trim()
     .split("\n");
   const moduleFiles = fs
     .readFileSync(core.getInput("module_files"), "utf8")
+    .trim()
     .split("\n");
 
   // directory where uses modules => used modules
