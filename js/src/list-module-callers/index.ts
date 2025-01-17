@@ -36,6 +36,9 @@ export const main = async () => {
     );
     const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
       ?.source;
+    if (!source) {
+      continue;
+    }
     if (
       source.startsWith("." + path.sep) ||
       source.startsWith(".." + path.sep)
