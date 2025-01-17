@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ "${TFACTION_DEBUG:-}" = true ]; then
+	set -x
+fi
+
 if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	export TFCMT_CONFIG=$GITHUB_ACTION_PATH/tfcmt-drift.yaml
 fi
