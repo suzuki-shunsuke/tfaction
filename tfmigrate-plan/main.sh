@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ "${TFACTION_DEBUG:-}" = true ]; then
+	set -x
+fi
+
 if [ -z "${TFMIGRATE_EXEC_PATH:-}" ] && [ "$TF_COMMAND" != terraform ]; then
 	TFMIGRATE_EXEC_PATH=$TF_COMMAND
 fi

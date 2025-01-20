@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ "${TFACTION_DEBUG:-}" = true ]; then
+	set -x
+fi
+
 # In the pull request created by Renovate, the result of `terraform plan` must be `No change` to enable automerge safely.
 # If you allow changes, please set the pull request label `renovate-change`.
 if [ "$CI_INFO_PR_AUTHOR" = "$RENOVATE_LOGIN" ]; then

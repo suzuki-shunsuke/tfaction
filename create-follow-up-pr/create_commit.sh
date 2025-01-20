@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ "${TFACTION_DEBUG:-}" = true ]; then
+	set -x
+fi
+
 follow_up_pr_file="$WORKING_DIR/.tfaction/failed-prs"
 if [ ! -f "$follow_up_pr_file" ]; then
 	mkdir -p "$WORKING_DIR/.tfaction"
