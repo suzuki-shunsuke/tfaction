@@ -140,3 +140,10 @@ runs:
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
         terraform_command: ${{ steps.target-config.outputs.terraform_command }}
+
+    - run: |
+        "$TF" providers
+      shell: bash
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      env:
+        TF: ${{ steps.target-config.outputs.terraform_command }}
