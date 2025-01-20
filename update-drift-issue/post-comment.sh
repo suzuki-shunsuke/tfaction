@@ -5,6 +5,10 @@
 
 set -euo pipefail
 
+if [ "${TFACTION_DEBUG:-}" = true ]; then
+	set -x
+fi
+
 # shellcheck disable=SC2016
 body=$(gh api graphql -q '.data.repository.issue.comments.nodes[0].body' -F owner="$TFACTION_DRIFT_ISSUE_REPO_OWNER" -F name="$TFACTION_DRIFT_ISSUE_REPO_NAME" -F issueNumber="$TFACTION_DRIFT_ISSUE_NUMBER" -f query='
 	query($name: String!, $owner: String!, $issueNumber: Int!) {

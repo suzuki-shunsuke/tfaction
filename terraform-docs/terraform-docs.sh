@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ "${TFACTION_DEBUG:-}" = true ]; then
+	set -x
+fi
+
 pwd=$PWD
 
 created=false

@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ "${TFACTION_DEBUG:-}" = true ]; then
+	set -x
+fi
+
 # create a pull request with empty commit
 # 1. create a remote branch
 # 2. open pull request
