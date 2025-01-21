@@ -23,7 +23,7 @@ jobs:
           cache: npm
       - run: npm i
 
-      - uses: aquaproj/aqua-installer@f13c5d2f0357708d85477aabe50fd3f725528745 # v3.1.0
+      - uses: aquaproj/aqua-installer@e2d0136abcf70b7a2f6f505720640750557c4b33 # v3.1.1
         if: |
           github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork
         with:
