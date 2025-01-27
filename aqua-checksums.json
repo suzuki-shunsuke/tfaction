@@ -26,28 +26,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.4/terragrunt_darwin_amd64",
-      "checksum": "094A14A034E3EB1B01EAC1C856595619D7140884E4E3FB0C48AF38DC458D037D",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.5/terragrunt_darwin_amd64",
+      "checksum": "ED2062A70F6930CFB922C1A0A0CBE490C0E73CC660E7FC0CB91926B1E2DB04CC",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.4/terragrunt_darwin_arm64",
-      "checksum": "9AEB31E18D620DC363E6EC14DC3D57E0979FC01FBF4467D4B155A7A425604FEB",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.5/terragrunt_darwin_arm64",
+      "checksum": "C361EBA65A1F451601E03995B5C09AF6D5F33F262DDEF585B98DEC58C34485B7",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.4/terragrunt_linux_amd64",
-      "checksum": "B32D0B48B0C27F301DABE16CBADC074088F78FFC6F84F98AA99A6D4F9293C53A",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.5/terragrunt_linux_amd64",
+      "checksum": "4A3222F6CECA05BCB27F62A9ABA5167D0E2CB4224467715FE3247A95AA9E7067",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.4/terragrunt_linux_arm64",
-      "checksum": "A9C76BACED6C54EAE8C097988B81AD5A858AEFDF21F19871362C0B7D74EE3F2C",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.5/terragrunt_linux_arm64",
+      "checksum": "742171C4244BF79B5A311B8C01B1D491424285632C2E1E588875ED0A9079FBED",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.4/terragrunt_windows_amd64.exe",
-      "checksum": "9138F06D7EDB2A497809175D7689FD8D352D3E2B9BC9D3AA34AB8BCF8068714C",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.72.5/terragrunt_windows_amd64.exe",
+      "checksum": "E8DB283EBFF42F2BAEF8ECF30D27D36EFED61657EAEFF34EEAE05CD2B8E57DAF",
       "algorithm": "sha256"
     },
     {
@@ -379,11 +379,6 @@
       "id": "http/releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_windows_amd64.zip",
       "checksum": "4E2C6B7232AA30026BAF9FE575F1BF4006C2A0CBBCDCBD244573DC188B439239",
       "algorithm": "sha256"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.300.1/registry.yaml",
-      "checksum": "17C68295340B8D5A5E10200D59EA490B027F8D45713CB973BCD8731F77BF56B86DA5832622842914A1235FE858FCB9BB512095E88F17C9EAA6B3FC8E8241BF52",
-      "algorithm": "sha512"
     },
     {
       "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.300.2/registry.yaml",
