@@ -1,6 +1,11 @@
 {
   "checksums": [
     {
+      "id": "github_content/github.com/suzuki-shunsuke/rjsa/v0.1.0/rjsa",
+      "checksum": "6C015E625B5D65C4D96A239625F8024F1D9D472E4C9E2C591A7C8128199286EC",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/aquasecurity/trivy/v0.59.0/trivy_0.59.0_Linux-64bit.tar.gz",
       "checksum": "F9A7829AABFD116E79D3B05FA6EC30E2F1D767DA6F7FED184905FA7D9125954B",
       "algorithm": "sha256"
@@ -374,11 +379,6 @@
       "id": "http/releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_windows_amd64.zip",
       "checksum": "4E2C6B7232AA30026BAF9FE575F1BF4006C2A0CBBCDCBD244573DC188B439239",
       "algorithm": "sha256"
-    },
-    {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.302.1/registry.yaml",
-      "checksum": "908B44E94A3583AA2D6F0B17F53E49D01ACD57E4ECDFEDB29EB082D335D9445478426E591AB57D37BAA02A2EF9581A71A3AA66C825CC787323D65A1D89B53072",
-      "algorithm": "sha512"
     },
     {
       "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.303.0/registry.yaml",
