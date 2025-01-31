@@ -1,11 +1,6 @@
 {
   "checksums": [
     {
-      "id": "github_content/github.com/suzuki-shunsuke/rjsa/v0.1.0/rjsa",
-      "checksum": "6C015E625B5D65C4D96A239625F8024F1D9D472E4C9E2C591A7C8128199286EC",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/aquasecurity/trivy/v0.59.0/trivy_0.59.0_Linux-64bit.tar.gz",
       "checksum": "F9A7829AABFD116E79D3B05FA6EC30E2F1D767DA6F7FED184905FA7D9125954B",
       "algorithm": "sha256"
