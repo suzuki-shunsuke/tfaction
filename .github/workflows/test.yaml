@@ -10,8 +10,6 @@ jobs:
     # Get changed files to filter jobs
     timeout-minutes: 10
     outputs:
-      update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
-      update-aqua-checksums-install: ${{steps.changes.outputs.update-aqua-checksums-install}}
       renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
       ghalint: ${{steps.changes.outputs.ghalint}}
       shellcheck: ${{steps.changes.outputs.shellcheck}}
@@ -22,18 +20,6 @@ jobs:
         id: changes
         with:
           filters: |
-            update-aqua-checksums:
-              - aqua/aqua.yaml
-              - aqua/*.yaml
-              - aqua/aqua-checksums.json
-              - .github/workflows/test.yaml
-              - .github/workflows/wc-update-aqua-checksums.yaml
-            update-aqua-checksums-install:
-              - install/aqua.yaml
-              - install/aqua/*.yaml
-              - install/aqua-checksums.json
-              - .github/workflows/test.yaml
-              - .github/workflows/wc-update-aqua-checksums-install.yaml
             renovate-config-validator:
               - renovate.json5
               - .github/workflows/test.yaml
@@ -57,39 +43,16 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     needs:
-      - update-aqua-checksums
-      - update-aqua-checksums-install
       - renovate-config-validator
       - ghalint
       - build-schema
       - create-pr-branch
-      - format
       - test
       - hide-comment
     permissions: {}
     if: failure()
     steps:
       - run: exit 1
-
-  update-aqua-checksums:
-    needs: path-filter
-    if: needs.path-filter.outputs.update-aqua-checksums == 'true'
-    uses: ./.github/workflows/wc-update-aqua-checksums.yaml
-    permissions:
-      contents: read
-    secrets:
-      gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
-
-  update-aqua-checksums-install:
-    needs: path-filter
-    if: needs.path-filter.outputs.update-aqua-checksums-install == 'true'
-    uses: ./.github/workflows/wc-update-aqua-checksums-install.yaml
-    permissions:
-      contents: read
-    secrets:
-      gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
   renovate-config-validator:
     uses: ./.github/workflows/wc-renovate-config-validator.yaml
@@ -136,13 +99,6 @@ jobs:
     uses: ./.github/workflows/wc-hide-comment.yaml
     if: |
       ! github.event.pull_request.head.repo.fork
-    permissions: {}
-    secrets:
-      gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
-
-  format:
-    uses: ./.github/workflows/wc-format.yaml
     permissions: {}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
