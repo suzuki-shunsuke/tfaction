@@ -7,6 +7,8 @@ post:
 
       {{template "link" .}}
 
+      {{.Vars.mentions}}
+
       Apply failed. Please handle the problem. **:warning: Don't rerun GitHub Actions Workflow**
 
       1. Check the error message
