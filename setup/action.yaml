@@ -23,7 +23,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@v1.15.3
       id: install
     - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
@@ -46,7 +46,7 @@ runs:
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.15.3
       id: target-config
       with:
         action: get-target-config
@@ -62,7 +62,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.15.3
       id: global-config
       with:
         action: get-global-config
@@ -99,7 +99,7 @@ runs:
         role-session-name: ${{ steps.target-config.outputs.aws_role_session_name }}
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.15.3
       with:
         action: export-aws-secrets-manager
 
@@ -127,7 +127,7 @@ runs:
     - uses: google-github-actions/setup-gcloud@77e7a554d41e2ee56fc945c52dfd3f33d12def9a # v2.1.4
       if: steps.target-config.outputs.gcp_service_account != ''
 
-    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
+    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@v1.15.3
       if: inputs.ssh_key != ''
       with:
         ssh_key: ${{ inputs.ssh_key }}
