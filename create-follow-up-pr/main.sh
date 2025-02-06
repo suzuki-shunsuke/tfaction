@@ -31,9 +31,7 @@ if [ "$TFACTION_DRAFT_PR" = "true" ]; then
 	create_opts+=(-d)
 fi
 
-pr_body="$mention
-
-This pull request was created automatically to follow up the failure of apply.
+pr_body="This pull request was created automatically to follow up the failure of apply.
 
 Follow up #$CI_INFO_PR_NUMBER ([failed workflow]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))
 
@@ -50,5 +48,6 @@ echo "::notice:: The follow up pull request: $follow_up_pr_url"
 github-comment post \
 	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-var "tfaction_target:$TFACTION_TARGET" \
+	-var "mentions:${mention}" \
 	-var "follow_up_pr_url:$follow_up_pr_url" \
 	-k create-follow-up-pr
