@@ -124,9 +124,6 @@ runs:
         access_token_scopes: ${{ steps.target-config.outputs.gcp_access_token_scopes }}
         token_format: ${{ steps.target-config.outputs.gcp_access_token_scopes != '' && 'access_token' || '' }}
 
-    - uses: google-github-actions/setup-gcloud@77e7a554d41e2ee56fc945c52dfd3f33d12def9a # v2.1.4
-      if: steps.target-config.outputs.gcp_service_account != ''
-
     - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
       if: inputs.ssh_key != ''
       with:
