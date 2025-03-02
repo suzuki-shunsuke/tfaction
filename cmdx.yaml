@@ -60,6 +60,8 @@ tasks:
       cd js
       npm ci
       npm run build
+      cmdx schema
+      cmdx fmt
   - name: test
     short: t
     description: Test

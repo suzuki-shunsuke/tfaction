@@ -1,6 +1,7 @@
 node_modules
 *.log
 .DS_Store
-./build
+build
 dist
 .terraform
+schema
