@@ -280,10 +280,16 @@ export type Config = z.infer<typeof Config>;
 
 export const generateJSONSchema = (dir: string) => {
   const configJSONSchema = zodToJsonSchema(Config, "config");
-  fs.writeFileSync(path.join(dir, "tfaction-root.json"), JSON.stringify(configJSONSchema, null, 2));
+  fs.writeFileSync(
+    path.join(dir, "tfaction-root.json"),
+    JSON.stringify(configJSONSchema, null, 2),
+  );
 
   const targetConfigJSONSchema = zodToJsonSchema(TargetConfig, "config");
-  fs.writeFileSync(path.join(dir, "tfaction.json"), JSON.stringify(targetConfigJSONSchema, null, 2));
+  fs.writeFileSync(
+    path.join(dir, "tfaction.json"),
+    JSON.stringify(targetConfigJSONSchema, null, 2),
+  );
 };
 
 export const getConfig = (): Config => {
