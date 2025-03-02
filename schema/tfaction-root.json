@@ -144,9 +144,7 @@
                     }
                   }
                 },
-                "required": [
-                  "policy"
-                ],
+                "required": ["policy"],
                 "additionalProperties": false
               }
             }
@@ -269,10 +267,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "name",
-                      "url"
-                    ],
+                    "required": ["name", "url"],
                     "additionalProperties": false
                   }
                 ]
@@ -317,10 +312,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "env_name",
-                    "secret_name"
-                  ],
+                  "required": ["env_name", "secret_name"],
                   "additionalProperties": false
                 }
               },
@@ -399,9 +391,7 @@
                                 "type": "string"
                               }
                             },
-                            "required": [
-                              "env_name"
-                            ],
+                            "required": ["env_name"],
                             "additionalProperties": false
                           }
                         },
@@ -418,10 +408,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "envs",
-                        "secret_id"
-                      ],
+                      "required": ["envs", "secret_id"],
                       "additionalProperties": false
                     }
                   }
@@ -462,9 +449,7 @@
                 "additionalProperties": false
               }
             },
-            "required": [
-              "working_directory"
-            ],
+            "required": ["working_directory"],
             "additionalProperties": false
           }
         },
@@ -549,24 +534,16 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "regexp",
-                  "replace"
-                ],
+                "required": ["regexp", "replace"],
                 "additionalProperties": false
               }
             }
           },
-          "required": [
-            "patterns"
-          ],
+          "required": ["patterns"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "plan_workflow_name",
-        "target_groups"
-      ],
+      "required": ["plan_workflow_name", "target_groups"],
       "additionalProperties": false
     }
   },
