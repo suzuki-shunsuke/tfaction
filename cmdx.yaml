@@ -36,6 +36,7 @@ tasks:
       npm ci
       npm run build
       cd ..
+      mkdir -p schema
       env TFACTION_GERENATE_JSON_SCHEMA=1 node js/dist/index.js
 
   - name: schema-doc
