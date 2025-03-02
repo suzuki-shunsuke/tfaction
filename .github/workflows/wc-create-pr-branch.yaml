@@ -46,7 +46,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
-      - run: npm i
+      - run: npm ci
 
       - run: cmdx build
       - run: git add -f schema
