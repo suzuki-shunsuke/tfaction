@@ -11,11 +11,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.15.5-1
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.15.5-1
       id: target-config
       with:
         action: get-target-config
@@ -31,7 +31,7 @@ runs:
         GCS_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}
         CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
         TF_COMMAND: ${{ steps.global-config.outputs.terraform_command }}
-    - uses: suzuki-shunsuke/tfaction/conftest@main
+    - uses: suzuki-shunsuke/tfaction/conftest@v1.15.5-1
       with:
         plan: "true"
         github_token: ${{inputs.github_token}}
