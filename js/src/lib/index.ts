@@ -5,6 +5,7 @@ import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
 const GitHubEnvironment = z.union([
   z.string(),
@@ -276,6 +277,14 @@ const Config = z.object({
 });
 
 export type Config = z.infer<typeof Config>;
+
+export const generateJSONSchema = (dir: string) => {
+  const configJSONSchema = zodToJsonSchema(Config, "config");
+  fs.writeFileSync(path.join(dir, "tfaction-root.json"), JSON.stringify(configJSONSchema, null, 2));
+
+  const targetConfigJSONSchema = zodToJsonSchema(TargetConfig, "config");
+  fs.writeFileSync(path.join(dir, "tfaction.json"), JSON.stringify(targetConfigJSONSchema, null, 2));
+};
 
 export const getConfig = (): Config => {
   let configFilePath = process.env.TFACTION_CONFIG;

@@ -26,5 +26,6 @@ jobs:
       - run: aqua upc -prune
         working-directory: install
       - run: cmdx fmt
+      - run: cmdx schema
 
       - uses: autofix-ci/action@2891949f3779a1cafafae1523058501de3d4e944 # v1.3.1
