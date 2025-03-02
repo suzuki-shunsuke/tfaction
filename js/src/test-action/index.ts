@@ -23,7 +23,7 @@ export const main = async () => {
         gcs_bucket_name_tfmigrate_history: "",
         template_dir: "js/test/templates/aws",
         providers_lock_opts:
-          "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+          "-platform=linux_amd64 -platform=darwin_amd64",
         enable_tfsec: "false",
         enable_tflint: "true",
         enable_trivy: "true",
@@ -43,7 +43,7 @@ export const main = async () => {
       expected: {
         working_directory: "js/test/aws/foo/dev",
         providers_lock_opts:
-          "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+          "-platform=linux_amd64 -platform=darwin_amd64",
         template_dir: "js/test/templates/aws",
         enable_tfsec: "false",
         enable_tflint: "true",
