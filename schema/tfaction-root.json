@@ -541,6 +541,9 @@
           },
           "required": ["patterns"],
           "additionalProperties": false
+        },
+        "providers_lock_opts": {
+          "type": "string"
         }
       },
       "required": ["plan_workflow_name", "target_groups"],
