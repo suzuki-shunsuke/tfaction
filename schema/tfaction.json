@@ -1,203 +1,315 @@
 {
-  "$id": "https://github.com/suzuki-shunsuke/tfaction/blob/main/schema/tfaction.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "tfaction.yaml",
-  "type": "object",
-  "description": "tfaction.yaml",
-  "required": [],
-  "properties": {
-    "aws_assume_role_arn": {
-      "$ref": "#/$defs/AWSAssumeRoleARN"
-    },
-    "aws_region": {
-      "$ref": "#/$defs/AWSRegion"
-    },
-    "aws_secrets_manager": {
-      "$ref": "#/$defs/AWSSecretsManager"
-    },
-    "drift_detection": {
+  "$ref": "#/definitions/config",
+  "definitions": {
+    "config": {
       "type": "object",
-      "required": [],
       "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "If true, drift detection is enabled in the working directory",
-          "default": "false"
-        }
-      }
-    },
-    "envs": {
-      "$ref": "#/$defs/Envs"
-    },
-    "gcp_workload_identity_provider": {
-      "$ref": "#/$defs/GCPWorkloadIdentityProvider"
-    },
-    "gcp_access_token_scopes": {
-      "$ref": "#/$defs/GCPAccessTokenScopes"
-    },
-    "gcs_bucket_name_tfmigrate_history": {
-      "$ref": "#/$defs/GCSBucketNameTfmigrateHistory"
-    },
-    "providers_lock_opts": {
-      "$ref": "#/$defs/TerraformProvidersLockOptions"
-    },
-    "s3_bucket_name_tfmigrate_history": {
-      "$ref": "#/$defs/S3BucketNameTfmigrateHistory"
-    },
-    "secrets": {
-      "$ref": "#/$defs/Secrets"
-    },
-    "terraform_plan_config": {
-      "$ref": "#/$defs/JobConfig",
-      "description": "configuration which is used in the job for 'terraform plan'"
-    },
-    "terraform_apply_config": {
-      "$ref": "#/$defs/JobConfig",
-      "description": "configuration which is used in the job for 'terraform apply'"
-    },
-    "tfmigrate_plan_config": {
-      "$ref": "#/$defs/JobConfig",
-      "description": "configuration which is used in the job for 'tfmigrate plan'"
-    },
-    "tfmigrate_apply_config": {
-      "$ref": "#/$defs/JobConfig",
-      "description": "configuration which is used in the job for 'tfmigrate apply'"
-    }
-  },
-  "$defs": {
-    "AWSRegion": {
-      "type": "string",
-      "description": "AWS Region. This is used for AWS OIDC Authentication, Getting Secrets from AWS Secrets Manager, and so on"
-    },
-    "TerraformProvidersLockOptions": {
-      "type": "string",
-      "description": "terraform providers lock command's option",
-      "default": "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64"
-    },
-    "AWSAssumeRoleARN": {
-      "type": "string",
-      "description": "AWS Assume Role ARN"
-    },
-    "GCPServiceAccount": {
-      "type": "string",
-      "description": "GCP Service Account"
-    },
-    "GCPWorkloadIdentityProvider": {
-      "type": "string",
-      "description": "GCP Workload Identity Provider"
-    },
-    "GCPAccessTokenScopes": {
-      "type": "string",
-      "description": "List of OAuth 2.0 access scopes to be included in the generated token for authenticating to Google Cloud"
-    },
-    "GCSBucketNamePlanFile": {
-      "type": "string",
-      "description": "GCS Bucket Name to store Terraform Plan files"
-    },
-    "GCSBucketNameTfmigrateHistory": {
-      "type": "string",
-      "description": "GCS Bucket name to store tfmigrate History files"
-    },
-    "TemplateDir": {
-      "type": "string",
-      "description": "the template directory path to scaffold a working directory"
-    },
-    "S3BucketNamePlanFile": {
-      "type": "string",
-      "description": "S3 Bucket name to store Terraform Plan files"
-    },
-    "S3BucketNameTfmigrateHistory": {
-      "type": "string",
-      "description": "S3 Bucket name to store tfmigrate History files"
-    },
-    "Secrets": {
-      "type": "array",
-      "description": "list of exported GitHub Secrets",
-      "items": {
-        "type": "object",
-        "description": "exported GitHub Secret",
-        "properties": {
-          "env_name": {
-            "type": "string",
-            "description": "exported environment variable",
-            "default": "the value of 'secret_name'"
-          },
-          "secret_name": {
-            "type": "string",
-            "description": "exported GitHub Secret name",
-            "default": "the value of 'env_name'"
-          }
-        }
-      }
-    },
-    "AWSSecretsManager": {
-      "type": "array",
-      "description": "list of AWS Secrets Manager's secret and exported environment variables",
-      "items": {
-        "type": "object",
-        "description": "target group configuration",
-        "required": ["secret_id", "envs"],
-        "properties": {
-          "secret_id": {
-            "type": "string",
-            "description": "AWS Secrets Manager's secret id"
-          },
-          "envs": {
-            "type": "array",
-            "description": "exported environment variables",
-            "items": {
-              "type": "object",
-              "description": "exported environment variable",
-              "required": ["env_name"],
-              "properties": {
-                "env_name": {
-                  "type": "string",
-                  "description": "exported environment variable"
-                },
-                "secret_key": {
-                  "type": "string",
-                  "description": "AWS Secrets Manager's secret key"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "JobConfig": {
-      "type": "object",
-      "description": "job configuration",
-      "required": [],
-      "properties": {
-        "aws_region": {
-          "$ref": "#/$defs/AWSRegion"
-        },
         "aws_assume_role_arn": {
-          "$ref": "#/$defs/AWSAssumeRoleARN"
+          "type": "string"
+        },
+        "aws_region": {
+          "type": "string"
+        },
+        "destroy": {
+          "type": "boolean"
+        },
+        "drift_detection": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "gcs_bucket_name_tfmigrate_history": {
+          "type": "string"
         },
         "gcp_service_account": {
-          "$ref": "#/$defs/GCPServiceAccount"
+          "type": "string"
         },
         "gcp_workload_identity_provider": {
-          "$ref": "#/$defs/GCPWorkloadIdentityProvider"
+          "type": "string"
         },
-        "gcp_access_token_scopes": {
-          "$ref": "#/$defs/GCPAccessTokenScopes"
+        "providers_lock_opts": {
+          "type": "string"
+        },
+        "s3_bucket_name_tfmigrate_history": {
+          "type": "string"
         },
         "secrets": {
-          "$ref": "#/$defs/Secrets"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "env_name": {
+                "type": "string"
+              },
+              "secret_name": {
+                "type": "string"
+              }
+            },
+            "required": ["env_name", "secret_name"],
+            "additionalProperties": false
+          }
         },
-        "aws_secrets_manager": {
-          "$ref": "#/$defs/AWSSecretsManager"
+        "terraform_apply_config": {
+          "type": "object",
+          "properties": {
+            "aws_assume_role_arn": {
+              "type": "string"
+            },
+            "aws_role_session_name": {
+              "type": "string"
+            },
+            "gcp_service_account": {
+              "type": "string"
+            },
+            "gcp_workload_identity_provider": {
+              "type": "string"
+            },
+            "gcp_access_token_scopes": {
+              "type": "string"
+            },
+            "gcp_remote_backend_service_account": {
+              "type": "string"
+            },
+            "gcp_remote_backend_workload_identity_provider": {
+              "type": "string"
+            },
+            "environment": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["name", "url"],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "secrets": {
+              "$ref": "#/definitions/config/properties/secrets"
+            },
+            "runs_on": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
+            "env": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "aws_secrets_manager": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "envs": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "env_name": {
+                          "type": "string"
+                        },
+                        "secret_key": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["env_name"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "secret_id": {
+                    "type": "string"
+                  },
+                  "version_id": {
+                    "type": "string"
+                  },
+                  "version_stage": {
+                    "type": "string"
+                  },
+                  "aws_region": {
+                    "type": "string"
+                  }
+                },
+                "required": ["envs", "secret_id"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
         },
-        "envs": {
-          "$ref": "#/$defs/Envs"
+        "terraform_plan_config": {
+          "$ref": "#/definitions/config/properties/terraform_apply_config"
+        },
+        "tfmigrate_apply_config": {
+          "$ref": "#/definitions/config/properties/terraform_apply_config"
+        },
+        "tfmigrate_plan_config": {
+          "$ref": "#/definitions/config/properties/terraform_apply_config"
+        },
+        "terraform_command": {
+          "type": "string"
+        },
+        "terraform_docs": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "conftest": {
+          "type": "object",
+          "properties": {
+            "disable_all": {
+              "type": "boolean"
+            },
+            "policies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "tf": {
+                    "type": "boolean"
+                  },
+                  "plan": {
+                    "type": "boolean"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "policy": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  },
+                  "data": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    ]
+                  },
+                  "fail_on_warn": {
+                    "type": "boolean"
+                  },
+                  "no_fail": {
+                    "type": "boolean"
+                  },
+                  "all_namespaces": {
+                    "type": "boolean"
+                  },
+                  "quiet": {
+                    "type": "boolean"
+                  },
+                  "trace": {
+                    "type": "boolean"
+                  },
+                  "strict": {
+                    "type": "boolean"
+                  },
+                  "show_builtin_errors": {
+                    "type": "boolean"
+                  },
+                  "junit_hide_message": {
+                    "type": "boolean"
+                  },
+                  "suppress_exceptions": {
+                    "type": "boolean"
+                  },
+                  "combine": {
+                    "type": "boolean"
+                  },
+                  "tls": {
+                    "type": "boolean"
+                  },
+                  "ignore": {
+                    "type": "string"
+                  },
+                  "parser": {
+                    "type": "string"
+                  },
+                  "capabilities": {
+                    "type": "string"
+                  },
+                  "output": {
+                    "type": "string"
+                  },
+                  "namespaces": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "proto_file_dirs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "paths": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["policy"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
         }
-      }
-    },
-    "Envs": {
-      "type": "object",
-      "description": "environment variables"
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
 }

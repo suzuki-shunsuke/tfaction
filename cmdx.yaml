@@ -25,9 +25,22 @@ tasks:
         required: false
         script_envs:
           - REF
+
   - name: schema
     description: build JSON Schema
     usage: build JSON Schema
+    script: |
+      set -eu
+
+      cd js
+      npm ci
+      npm run build
+      cd ..
+      env TFACTION_GERENATE_JSON_SCHEMA=1 node js/dist/index.js
+
+  - name: schema-doc
+    description: build the document from JSON Schema
+    usage: build the document from JSON Schema
     require:
       exec:
         - generate-schema-doc
