@@ -50,6 +50,7 @@ jobs:
 
       - run: cmdx build
         shell: bash
+      - run: git add -f schema
 
       - uses: suzuki-shunsuke/release-js-action@8a88dffbd0aa8fc1d301d3d5773f99efd181410b # v0.1.5
         with:
