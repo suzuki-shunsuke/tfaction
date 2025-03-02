@@ -41,8 +41,15 @@ jobs:
           aqua_version: v2.45.0
         env:
           GITHUB_TOKEN: ${{github.token}}
+
+      - uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm i
+
       - run: cmdx build
-        shell: bash
+      - run: git add -f schema
 
       - uses: suzuki-shunsuke/release-js-action@8a88dffbd0aa8fc1d301d3d5773f99efd181410b # v0.1.5
         with:
