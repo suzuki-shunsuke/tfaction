@@ -274,6 +274,7 @@ const Config = z.object({
   ),
   working_directory_file: z.optional(z.string()),
   replace: z.optional(Replace),
+  providers_lock_opts: z.optional(z.string()),
 });
 
 export type Config = z.infer<typeof Config>;
