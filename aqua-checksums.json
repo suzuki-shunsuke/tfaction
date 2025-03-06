@@ -76,28 +76,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/mvdan/sh/v3.10.0/shfmt_v3.10.0_darwin_amd64",
-      "checksum": "EF8D970B3F695A7E8E7D40730EEDD2D935AB9599F78A365F319C515BC59D4C83",
+      "id": "github_release/github.com/mvdan/sh/v3.11.0/shfmt_v3.11.0_darwin_amd64",
+      "checksum": "810A76CB7C78351E021C8025F344B12149D8426CE51609A179AF68109ED5698E",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/mvdan/sh/v3.10.0/shfmt_v3.10.0_darwin_arm64",
-      "checksum": "86030533A823C0A7CD92DEE0F74094E5B901C3277B43DEF6337D5E19E56FE553",
+      "id": "github_release/github.com/mvdan/sh/v3.11.0/shfmt_v3.11.0_darwin_arm64",
+      "checksum": "AF206D234DFF5D05D9AC355529B2B33A7A78E13FAB9B59DB777746AAB3E72530",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/mvdan/sh/v3.10.0/shfmt_v3.10.0_linux_amd64",
-      "checksum": "1F57A384D59542F8FAC5F503DA1F3EA44242F46DFF969569E80B524D64B71DBC",
+      "id": "github_release/github.com/mvdan/sh/v3.11.0/shfmt_v3.11.0_linux_amd64",
+      "checksum": "1904EC6BAC715C1D05CD7F6612EEC8F67A625C3749CB327E5BFB4127D09035FF",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/mvdan/sh/v3.10.0/shfmt_v3.10.0_linux_arm64",
-      "checksum": "9D23013D56640E228732FD2A04A9EDE0AB46BC2D764BF22A4A35FB1B14D707A8",
+      "id": "github_release/github.com/mvdan/sh/v3.11.0/shfmt_v3.11.0_linux_arm64",
+      "checksum": "B3976121710FD4B12BF641B0A7FB2686DA598FB0DA9F148C641B61B54CFA3407",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/mvdan/sh/v3.10.0/shfmt_v3.10.0_windows_amd64.exe",
-      "checksum": "6E4C6ACD38DE7B4B1BA8F8082B9E688DF8C9B861D3F8B2E7BB1B7270201A3587",
+      "id": "github_release/github.com/mvdan/sh/v3.11.0/shfmt_v3.11.0_windows_amd64.exe",
+      "checksum": "D11A0880588304496065110CB67CE2375CFCD5433E76DEC505CE1FA21ADF47CC",
       "algorithm": "sha256"
     },
     {
