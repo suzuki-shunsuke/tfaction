@@ -26,28 +26,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.4/terragrunt_darwin_amd64",
-      "checksum": "0D9E74871D280BD88B4E2C63680E8BE5894E4443692C46598B91BDE3BDE04940",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.5/terragrunt_darwin_amd64",
+      "checksum": "0B68864163D865076825C1809C38E66F7A7A9A325CEB07F716198773EFAB6030",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.4/terragrunt_darwin_arm64",
-      "checksum": "C8DB117F85D475E17F81CD03302F91E775941ECA012278958E1A063A35F3C48B",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.5/terragrunt_darwin_arm64",
+      "checksum": "21F5BCE93842ECB0F82669D04E20E544312639F8E9F4738B8CD6831CEC3A0645",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.4/terragrunt_linux_amd64",
-      "checksum": "45EA4722FC9BBC668A8DC651FA0CEE32DF28053482638A32EEDB4B073E4E4E8A",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.5/terragrunt_linux_amd64",
+      "checksum": "FEF61330C28F09C4B3EC3CFEEA7B8D8A2E5CAD5A34CC2FA668E9824EC3A721AE",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.4/terragrunt_linux_arm64",
-      "checksum": "992940FABFB890AD9034103740DC9B87524BCB2A09A84765B4F72E76D761F521",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.5/terragrunt_linux_arm64",
+      "checksum": "9B9CD302B717C7457D7005D4EDAFC1239E1A5E82D9A9C4E6BACF8373A5A82DC5",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.4/terragrunt_windows_amd64.exe",
-      "checksum": "E53E373EC4490DF1EAACFEFE254AE41DFAB939DDBDC84B5B5330317556A85A5E",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.75.5/terragrunt_windows_amd64.exe",
+      "checksum": "9CCEAA9136A67338DA272C6EADA2692C6396F763B5057C65528218E49A17BC9C",
       "algorithm": "sha256"
     },
     {
