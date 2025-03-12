@@ -6,9 +6,14 @@ if [ "${TFACTION_DEBUG:-}" = true ]; then
 	set -x
 fi
 
-# create a pull request with empty commit
+# create a pull request
 # 1. create a remote branch
 # 2. open pull request
+
+if ! group_label=$(grep -E "tfaction:pr/\d+" "$CI_INFO_TEMP_DIR/labels.txt"); then
+	group_label="tfaction:pr/$CI_INFO_PR_NUMBER"
+	gh label create "$gruop_label" || :
+fi
 
 FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
 export FOLLOW_UP_BRANCH
@@ -17,7 +22,7 @@ bash "$GITHUB_ACTION_PATH/create_commit.sh"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
-create_opts=(-H "$FOLLOW_UP_BRANCH" -t "$pr_title")
+create_opts=(-H "$FOLLOW_UP_BRANCH" -t "$pr_title" -l "$group_label")
 mention=""
 if ! [[ $CI_INFO_PR_AUTHOR =~ \[bot\] ]]; then
 	create_opts+=(-a "$CI_INFO_PR_AUTHOR")
