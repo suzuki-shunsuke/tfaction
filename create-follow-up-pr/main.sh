@@ -12,7 +12,7 @@ fi
 
 if ! group_label=$(grep -E "tfaction:pr/\d+" "$CI_INFO_TEMP_DIR/labels.txt"); then
 	group_label="tfaction:pr/$CI_INFO_PR_NUMBER"
-	gh label create "$gruop_label" || :
+	gh label create "$group_label" || :
 fi
 
 FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
