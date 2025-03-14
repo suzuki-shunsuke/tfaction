@@ -55,3 +55,7 @@ github-comment post \
 	-var "mentions:${mention}" \
 	-var "follow_up_pr_url:$follow_up_pr_url" \
 	-k create-follow-up-pr
+
+if ! grep -q -F "$group_label" "$CI_INFO_TEMP_DIR/labels.txt"; then
+	gh pr edit "$CI_INFO_PR_NUMBER" --add-label "$group_label"
+fi
