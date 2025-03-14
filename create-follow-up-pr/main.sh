@@ -9,7 +9,7 @@ fi
 # create a pull request
 # 1. create a remote branch
 # 2. open pull request
-if [ "$FOLLOW_UP_PR_GROUP_LABEL_PREFIX" = true ]; then
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ]; then
 	if ! group_label=$(grep -E "${FOLLOW_UP_PR_GROUP_LABEL_PREFIX}[0-9]+" "$CI_INFO_TEMP_DIR/labels.txt"); then
 		group_label="${FOLLOW_UP_PR_GROUP_LABEL_PREFIX}$CI_INFO_PR_NUMBER"
 		gh label create "$group_label" || :
@@ -25,7 +25,7 @@ pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
 create_opts=(-H "$FOLLOW_UP_BRANCH" -t "$pr_title")
 
-if [ "$FOLLOW_UP_PR_GROUP_LABEL_PREFIX" = true ]; then
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ]; then
 	create_opts+=(-l "$group_label")
 fi
 
@@ -63,7 +63,7 @@ github-comment post \
 	-var "follow_up_pr_url:$follow_up_pr_url" \
 	-k create-follow-up-pr
 
-if [ "$FOLLOW_UP_PR_GROUP_LABEL_PREFIX" = true ]; then
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ]; then
 	if ! grep -q -F "$group_label" "$CI_INFO_TEMP_DIR/labels.txt"; then
 		gh pr edit "$CI_INFO_PR_NUMBER" --add-label "$group_label"
 	fi
