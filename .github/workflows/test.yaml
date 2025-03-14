@@ -15,6 +15,9 @@ jobs:
       - run: exit 1
   test:
     uses: ./.github/workflows/workflow_call_test.yaml
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
     permissions:
       contents: write
       pull-requests: write

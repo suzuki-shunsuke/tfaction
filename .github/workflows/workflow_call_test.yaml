@@ -1,5 +1,11 @@
 name: test (workflow_call)
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      gh_app_id:
+        required: false
+      gh_app_private_key:
+        required: false
 jobs:
   path-filter:
     # Get changed files to filter jobs
@@ -70,8 +76,8 @@ jobs:
     with:
       pr: ${{github.event.pull_request.number}}
     secrets:
-      gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+      gh_app_id: ${{secrets.gh_app_id}}
+      gh_app_private_key: ${{secrets.gh_app_private_key}}
 
   hide-comment:
     uses: ./.github/workflows/wc-hide-comment.yaml
@@ -79,5 +85,5 @@ jobs:
       ! github.event.pull_request.head.repo.fork
     permissions: {}
     secrets:
-      gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+      gh_app_id: ${{secrets.gh_app_id}}
+      gh_app_private_key: ${{secrets.gh_app_private_key}}
