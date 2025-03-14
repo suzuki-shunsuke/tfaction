@@ -1,0 +1,89 @@
+name: test (workflow_call)
+on:
+  workflow_call:
+    secrets:
+      gh_app_id:
+        required: false
+      gh_app_private_key:
+        required: false
+jobs:
+  path-filter:
+    # Get changed files to filter jobs
+    timeout-minutes: 10
+    outputs:
+      renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
+      ghalint: ${{steps.changes.outputs.ghalint}}
+      shellcheck: ${{steps.changes.outputs.shellcheck}}
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: changes
+        with:
+          filters: |
+            renovate-config-validator:
+              - renovate.json5
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-renovate-config-validator.yaml
+            ghalint:
+              - .github/workflows/*.yaml
+              - aqua/ghalint.yaml
+            build-schema:
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-deploy-schema.yaml
+              - "schema/**"
+            shellcheck:
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-shellcheck.yaml
+              - aqua/shellcheck.yaml
+              - "**/*.sh"
+
+  renovate-config-validator:
+    uses: ./.github/workflows/wc-renovate-config-validator.yaml
+    needs: path-filter
+    if: needs.path-filter.outputs.renovate-config-validator == 'true'
+    permissions:
+      contents: read
+
+  ghalint:
+    needs: path-filter
+    if: needs.path-filter.outputs.ghalint == 'true'
+    uses: ./.github/workflows/wc-ghalint.yaml
+    permissions: {}
+
+  shellcheck:
+    needs: path-filter
+    if: needs.path-filter.outputs.shellcheck == 'true'
+    uses: ./.github/workflows/wc-shellcheck.yaml
+    permissions: {}
+
+  build-schema:
+    uses: ./.github/workflows/wc-deploy-schema.yaml
+    permissions:
+      contents: write
+
+  test:
+    uses: ./.github/workflows/wc-test.yaml
+    permissions: {}
+
+  create-pr-branch:
+    uses: ./.github/workflows/wc-create-pr-branch.yaml
+    if: github.event.pull_request.user.login == 'suzuki-shunsuke'
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    with:
+      pr: ${{github.event.pull_request.number}}
+    secrets:
+      gh_app_id: ${{secrets.gh_app_id}}
+      gh_app_private_key: ${{secrets.gh_app_private_key}}
+
+  hide-comment:
+    uses: ./.github/workflows/wc-hide-comment.yaml
+    if: |
+      ! github.event.pull_request.head.repo.fork
+    permissions: {}
+    secrets:
+      gh_app_id: ${{secrets.gh_app_id}}
+      gh_app_private_key: ${{secrets.gh_app_private_key}}
