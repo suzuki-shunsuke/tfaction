@@ -9,7 +9,7 @@ fi
 # create a pull request
 # 1. create a remote branch
 # 2. open pull request
-if ! group_label=$(grep -E "tfaction:follow-up-pr-group/\d+" "$CI_INFO_TEMP_DIR/labels.txt"); then
+if ! group_label=$(grep -E 'tfaction:follow-up-pr-group/[0-9]+' "$CI_INFO_TEMP_DIR/labels.txt"); then
 	group_label="tfaction:follow-up-pr-group/$CI_INFO_PR_NUMBER"
 	gh label create "$group_label" || :
 fi
