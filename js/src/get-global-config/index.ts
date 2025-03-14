@@ -52,6 +52,9 @@ interface Outputs {
   tflint_fix: boolean;
 
   terraform_command: string;
+
+  follow_up_pr_group_label_prefix: string;
+  follow_up_pr_group_label_enabled: boolean;
 }
 
 interface Envs {
@@ -96,6 +99,9 @@ export const main_ = (config: lib.Config, input: Input): Result => {
 
     drift_issue_repo_owner: "",
     drift_issue_repo_name: "",
+
+    follow_up_pr_group_label_prefix: config?.follow_up_pr_group_label?.prefix || "tfaction:follow-up-pr-group/",
+    follow_up_pr_group_label_enabled: config?.follow_up_pr_group_label?.enabled ?? false,
   };
   const envs: Envs = {
     TFACTION_SKIP_ADDING_AQUA_PACKAGES:

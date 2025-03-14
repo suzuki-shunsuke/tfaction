@@ -9,9 +9,11 @@ fi
 # create a pull request
 # 1. create a remote branch
 # 2. open pull request
-if ! group_label=$(grep -E 'tfaction:follow-up-pr-group/[0-9]+' "$CI_INFO_TEMP_DIR/labels.txt"); then
-	group_label="tfaction:follow-up-pr-group/$CI_INFO_PR_NUMBER"
-	gh label create "$group_label" || :
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_PREFIX" = true ]; then
+	if ! group_label=$(grep -E "${FOLLOW_UP_PR_GROUP_LABEL_PREFIX}[0-9]+" "$CI_INFO_TEMP_DIR/labels.txt"); then
+		group_label="${FOLLOW_UP_PR_GROUP_LABEL_PREFIX}$CI_INFO_PR_NUMBER"
+		gh label create "$group_label" || :
+	fi
 fi
 
 FOLLOW_UP_BRANCH="follow-up-$CI_INFO_PR_NUMBER-$TFACTION_TARGET-$(date +%Y%m%dT%H%M%S)"
@@ -21,7 +23,12 @@ bash "$GITHUB_ACTION_PATH/create_commit.sh"
 
 pr_title="chore($TFACTION_TARGET): follow up #$CI_INFO_PR_NUMBER"
 
-create_opts=(-H "$FOLLOW_UP_BRANCH" -t "$pr_title" -l "$group_label")
+create_opts=(-H "$FOLLOW_UP_BRANCH" -t "$pr_title")
+
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_PREFIX" = true ]; then
+	create_opts+=(-l "$group_label")
+fi
+
 mention=""
 if ! [[ $CI_INFO_PR_AUTHOR =~ \[bot\] ]]; then
 	create_opts+=(-a "$CI_INFO_PR_AUTHOR")
@@ -56,6 +63,8 @@ github-comment post \
 	-var "follow_up_pr_url:$follow_up_pr_url" \
 	-k create-follow-up-pr
 
-if ! grep -q -F "$group_label" "$CI_INFO_TEMP_DIR/labels.txt"; then
-	gh pr edit "$CI_INFO_PR_NUMBER" --add-label "$group_label"
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_PREFIX" = true ]; then
+	if ! grep -q -F "$group_label" "$CI_INFO_TEMP_DIR/labels.txt"; then
+		gh pr edit "$CI_INFO_PR_NUMBER" --add-label "$group_label"
+	fi
 fi
