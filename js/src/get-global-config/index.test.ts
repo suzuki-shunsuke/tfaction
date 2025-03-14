@@ -31,6 +31,8 @@ test("default", () => {
       enable_trivy: true,
       tflint_fix: false,
       terraform_command: "terraform",
+      follow_up_pr_group_label_prefix: "tfaction:follow-up-pr-group/",
+      follow_up_pr_group_label_enabled: false,
     },
   };
   expect(
@@ -99,6 +101,8 @@ test("customize", () => {
       enable_trivy: true,
       tflint_fix: false,
       terraform_command: "tofu",
+      follow_up_pr_group_label_prefix: "tfaction:follow-up-pr-group/",
+      follow_up_pr_group_label_enabled: false,
     },
   };
 
