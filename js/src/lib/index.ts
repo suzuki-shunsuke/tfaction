@@ -211,6 +211,13 @@ const Replace = z.object({
 
 export type Replace = z.infer<typeof Replace>;
 
+const FollowUpPRGroupLabel = z.object({
+  enabled: z.optional(z.boolean()),
+  prefix: z.optional(z.string()),
+});
+
+export type FollowUpPRGroupLabel = z.infer<typeof FollowUpPRGroupLabel>;
+
 const Config = z.object({
   aqua: z.optional(
     z.object({
@@ -275,6 +282,7 @@ const Config = z.object({
   working_directory_file: z.optional(z.string()),
   replace: z.optional(Replace),
   providers_lock_opts: z.optional(z.string()),
+  follow_up_pr_group_label: z.optional(FollowUpPRGroupLabel),
 });
 
 export type Config = z.infer<typeof Config>;
