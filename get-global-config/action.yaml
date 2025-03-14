@@ -69,6 +69,13 @@ outputs:
   terraform_command:
     description: Terraform command. By default, the value is "terraform". If you use OpenTofu, the value is "tofu"
     value: ${{steps.global-config.outputs.terraform_command}}
+
+  follow_up_pr_group_label_prefix:
+    description: The prefix of the label to group follow-up pull requests
+    value: ${{steps.global-config.outputs.follow_up_pr_group_label_prefix}}
+  follow_up_pr_group_label_enabled:
+    description: Either true or false. If true, follow-up pull requests are grouped by label
+    value: ${{steps.global-config.outputs.follow_up_pr_group_label_enabled}}
 runs:
   using: composite
   steps:
