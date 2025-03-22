@@ -24,7 +24,6 @@ runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction/install@main
-      id: install
     - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
       if: |
