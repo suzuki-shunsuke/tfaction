@@ -22,6 +22,7 @@ runs:
       env:
         TFACTION_IS_APPLY: "false"
         TFACTION_JOB_TYPE: scaffold_working_dir
+    - uses: suzuki-shunsuke/tfaction/install@main
 
     - run: git add .
       shell: bash
