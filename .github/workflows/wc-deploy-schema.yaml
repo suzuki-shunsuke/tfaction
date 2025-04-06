@@ -21,9 +21,8 @@ jobs:
       - run: cmdx schema
       - run: cmdx schema-doc
 
-      - uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+      - uses: suzuki-shunsuke/gh-pages-action@6229a3f8d89389da5c234aab3b37ba51a7fee3f6 # v0.0.1
         if: github.event_name != 'pull_request'
         with:
-          github_token: ${{ github.token }}
-          publish_dir: ./build
-          destination_dir: ./config
+          publish_dir: build
+          destination_dir: config
