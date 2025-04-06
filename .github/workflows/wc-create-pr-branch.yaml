@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
 
-      - uses: aquaproj/aqua-installer@e2d0136abcf70b7a2f6f505720640750557c4b33 # v3.1.1
+      - uses: aquaproj/aqua-installer@5e54e5cee8a95ee2ce7c04cb993da6dfad13e59c # v3.1.2
         with:
           aqua_version: v2.48.1
         env:
@@ -78,7 +78,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@e2d0136abcf70b7a2f6f505720640750557c4b33 # v3.1.1
+      - uses: aquaproj/aqua-installer@5e54e5cee8a95ee2ce7c04cb993da6dfad13e59c # v3.1.2
         with:
           aqua_version: v2.48.1
         env:
@@ -328,7 +328,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@e2d0136abcf70b7a2f6f505720640750557c4b33 # v3.1.1
+      - uses: aquaproj/aqua-installer@5e54e5cee8a95ee2ce7c04cb993da6dfad13e59c # v3.1.2
         with:
           aqua_version: v2.48.1
         env:
@@ -413,7 +413,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@e2d0136abcf70b7a2f6f505720640750557c4b33 # v3.1.1
+      - uses: aquaproj/aqua-installer@5e54e5cee8a95ee2ce7c04cb993da6dfad13e59c # v3.1.2
         with:
           aqua_version: v2.48.1
         env:
@@ -492,7 +492,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@e2d0136abcf70b7a2f6f505720640750557c4b33 # v3.1.1
+      - uses: aquaproj/aqua-installer@5e54e5cee8a95ee2ce7c04cb993da6dfad13e59c # v3.1.2
         with:
           aqua_version: v2.48.1
         env:
