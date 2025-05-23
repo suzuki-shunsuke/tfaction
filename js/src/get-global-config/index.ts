@@ -106,7 +106,8 @@ export const main_ = (config: lib.Config, input: Input): Result => {
       "tfaction:follow-up-pr-group/",
     follow_up_pr_group_label_enabled:
       config?.follow_up_pr_group_label?.enabled ?? false,
-    securefix_action_server_repository: config?.securefix_action?.server_repository || "",
+    securefix_action_server_repository:
+      config?.securefix_action?.server_repository || "",
   };
   const envs: Envs = {
     TFACTION_SKIP_ADDING_AQUA_PACKAGES:
