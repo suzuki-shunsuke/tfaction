@@ -76,6 +76,10 @@ outputs:
   follow_up_pr_group_label_enabled:
     description: Either true or false. If true, follow-up pull requests are grouped by label
     value: ${{steps.global-config.outputs.follow_up_pr_group_label_enabled}}
+
+  securefix_action_server_repository:
+    description: Securefix Action Server Repository
+    value: ${{steps.global-config.outputs.securefix_action_server_repository}}
 runs:
   using: composite
   steps:

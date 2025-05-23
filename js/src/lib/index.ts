@@ -283,6 +283,11 @@ const Config = z.object({
   replace: z.optional(Replace),
   providers_lock_opts: z.optional(z.string()),
   follow_up_pr_group_label: z.optional(FollowUpPRGroupLabel),
+  securefix_action: z.optional(
+    z.object({
+      server_repository: z.string(),
+    }),
+  ),
 });
 
 export type Config = z.infer<typeof Config>;
