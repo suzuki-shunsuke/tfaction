@@ -31,28 +31,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.1/terragrunt_darwin_amd64",
-      "checksum": "F5E0E75C42C3C42E2B9B36400F1EE918093E5C9A035CE4EACC0937D93480A0CA",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.2/terragrunt_darwin_amd64",
+      "checksum": "364348FA2E6D0C8E3453C99F74CA39477F9F7B92B2B743FE839819D649A2155F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.1/terragrunt_darwin_arm64",
-      "checksum": "17B9B1BD2BAF8661BBFD104116B28AD4D2931893646D497664F08B9E1341B02B",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.2/terragrunt_darwin_arm64",
+      "checksum": "57A24B52A464ED28C4D786A238EE7BA3A470B26F4DE9216D3C8CDB2A934C3350",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.1/terragrunt_linux_amd64",
-      "checksum": "84122A48347982009164C12AD343111B647BC736C9DF0FAB0C9DAEA6653C484B",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.2/terragrunt_linux_amd64",
+      "checksum": "53E8883387CAB941D4D7352DD34AC05E97355BD0CBB1898786B8374BFD1B1304",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.1/terragrunt_linux_arm64",
-      "checksum": "FD7666934EC3C2F01F2772338D5C5045F051889CFE4D38D6CDB719F427AC3CA6",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.2/terragrunt_linux_arm64",
+      "checksum": "2A93844AAD3F4102482CFBF5C1335DEECC71EBED5DB79D08907C4E93F6718681",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.1/terragrunt_windows_amd64.exe",
-      "checksum": "B11FF12101E99ADB9D1C5D039171DFD94CCF6B9C92FE3B188D80F51FCE4F5BB1",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.80.2/terragrunt_windows_amd64.exe",
+      "checksum": "EC7F27230C9A5BBC15FFFD534F10FFF33522E3C092609E9531AEC16E11A9AF3B",
       "algorithm": "sha256"
     },
     {
