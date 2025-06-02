@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.9",
-    "@types/node": "20.17.55",
+    "@types/node": "20.17.56",
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.3",
     "typescript": "5.8.3",
