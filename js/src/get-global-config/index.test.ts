@@ -34,7 +34,7 @@ test("default", () => {
       follow_up_pr_group_label_prefix: "tfaction:follow-up-pr-group/",
       follow_up_pr_group_label_enabled: false,
       max_changed_modules: 0,
-      max_changed_working_directories: 0,
+      max_changed_working_dirs: 0,
     },
   };
   expect(
@@ -106,7 +106,7 @@ test("customize", () => {
       follow_up_pr_group_label_prefix: "tfaction:follow-up-pr-group/",
       follow_up_pr_group_label_enabled: false,
       max_changed_modules: 0,
-      max_changed_working_directories: 0,
+      max_changed_working_dirs: 0,
     },
   };
 

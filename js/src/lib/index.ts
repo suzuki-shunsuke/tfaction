@@ -285,7 +285,7 @@ const Config = z.object({
   follow_up_pr_group_label: z.optional(FollowUpPRGroupLabel),
   limit_changed_dirs: z.optional(
     z.object({
-      working_directories: z.optional(z.number()),
+      working_dirs: z.optional(z.number()),
       modules: z.optional(z.number()),
     }),
   ),
