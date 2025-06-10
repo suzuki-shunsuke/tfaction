@@ -76,6 +76,13 @@ outputs:
   follow_up_pr_group_label_enabled:
     description: Either true or false. If true, follow-up pull requests are grouped by label
     value: ${{steps.global-config.outputs.follow_up_pr_group_label_enabled}}
+
+  max_changed_working_dirs:
+    description: Maximum number of changed working directories in one pull request
+    value: ${{steps.global-config.outputs.max_changed_working_dirs}}
+  max_changed_modules:
+    description: Maximum number of changed modules in one pull request
+    value: ${{steps.global-config.outputs.max_changed_modules}}
 runs:
   using: composite
   steps:

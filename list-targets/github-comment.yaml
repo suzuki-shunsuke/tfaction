@@ -1,0 +1,21 @@
+# https://github.com/suzuki-shunsuke/github-comment
+post:
+  too-many-changed-dirs:
+    template: |
+      ## :x: Too many working directories are changed
+
+      {{template "link" .}}
+
+      Too many working directories are changed in one pull request.
+      You can change up to {{.Vars.max_changed_dirs}} working directories.
+      This is configured in tfaction-root.yaml.
+
+  too-many-changed-modules:
+    template: |
+      ## :x: Too many modules are changed
+
+      {{template "link" .}}
+
+      Too many modules are changed in one pull request.
+      You can change up to {{.Vars.max_changed_modules}} modules.
+      This is configured in tfaction-root.yaml.

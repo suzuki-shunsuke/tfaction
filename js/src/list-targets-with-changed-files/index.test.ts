@@ -1,8 +1,8 @@
 import { run } from "./index";
 
-test("normal", () => {
+test("normal", async () => {
   expect(
-    run({
+    await run({
       config: {
         plan_workflow_name: "plan",
         target_groups: [
@@ -24,6 +24,9 @@ test("normal", () => {
       },
       moduleCallers: {},
       moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
     }),
   ).toStrictEqual({
     modules: [],
@@ -40,9 +43,9 @@ test("normal", () => {
   });
 });
 
-test("job config", () => {
+test("job config", async () => {
   expect(
-    run({
+    await run({
       config: {
         plan_workflow_name: "plan",
         target_groups: [
@@ -72,6 +75,9 @@ test("job config", () => {
       },
       moduleCallers: {},
       moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
     }),
   ).toStrictEqual({
     modules: [],
@@ -147,9 +153,9 @@ const prCommnetExpected = {
   ],
 };
 
-test("pr comment", () => {
+test("pr comment", async () => {
   expect(
-    run({
+    await run({
       config: prCommentConfig,
       isApply: false,
       labels: [],
@@ -163,13 +169,16 @@ test("pr comment", () => {
       },
       moduleCallers: {},
       moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
     }),
   ).toStrictEqual(prCommnetExpected);
 });
 
-test("pr comment with updated body", () => {
+test("pr comment with updated body", async () => {
   expect(
-    run({
+    await run({
       config: prCommentConfig,
       isApply: false,
       labels: [],
@@ -185,13 +194,16 @@ test("pr comment with updated body", () => {
       },
       moduleCallers: {},
       moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
     }),
   ).toStrictEqual(prCommnetExpected);
 });
 
-test("module callers", () => {
+test("module callers", async () => {
   expect(
-    run({
+    await run({
       config: {
         plan_workflow_name: "plan",
         target_groups: [
@@ -220,6 +232,9 @@ test("module callers", () => {
         "foo/dev": ["foo/bar", "foo/baz"],
       },
       moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
     }),
   ).toStrictEqual({
     modules: [],
@@ -252,9 +267,9 @@ test("module callers", () => {
   });
 });
 
-test("nest", () => {
+test("nest", async () => {
   expect(
-    run({
+    await run({
       config: {
         plan_workflow_name: "plan",
         target_groups: [
@@ -276,6 +291,9 @@ test("nest", () => {
       },
       moduleCallers: {},
       moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
     }),
   ).toStrictEqual({
     modules: [],

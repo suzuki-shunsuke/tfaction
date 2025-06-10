@@ -38,6 +38,14 @@ inputs:
   module_callers:
     description: "A json that describes module's direct and transitive callers"
     required: false
+  max_changed_working_dirs:
+    description: Maximum number of changed working directories
+    required: false
+    default: "0"
+  max_changed_modules:
+    description: Maximum number of changed modules
+    required: false
+    default: "0"
 
   # conftest
   plan:
