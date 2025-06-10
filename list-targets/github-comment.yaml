@@ -7,7 +7,7 @@ post:
       {{template "link" .}}
 
       Too many working directories are changed in one pull request.
-      Only {{.Vars.max_changed_dirs}} working directories are allowed to be changed.
+      You can change up to {{.Vars.max_changed_dirs}} working directories.
       This is configured in tfaction-root.yaml.
 
   too-many-changed-modules:
@@ -17,5 +17,5 @@ post:
       {{template "link" .}}
 
       Too many modules are changed in one pull request.
-      Only {{.Vars.max_changed_modules}} modules are allowed to be changed.
+      You can change up to {{.Vars.max_changed_modules}} modules.
       This is configured in tfaction-root.yaml.
