@@ -42,7 +42,7 @@ runs:
         fi
       shell: bash
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@v1.17.0
       id: global-config
       with:
         action: get-global-config
