@@ -23,7 +23,7 @@ runs:
       shell: bash
       if: env.TFACTION_MODULE_PATH == ''
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@pr/2744
       id: global-config
       with:
         action: get-global-config
