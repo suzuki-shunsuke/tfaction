@@ -244,7 +244,9 @@ export const run = async (input: Input): Promise<Result> => {
         },
       },
     );
-    throw new Error(`Too many modules are changed ()`);
+    throw new Error(
+      `Too many modules are changed (${ret.modules.length}). Max is ${input.maxChangedModules}.`,
+    );
   }
 
   return ret;
