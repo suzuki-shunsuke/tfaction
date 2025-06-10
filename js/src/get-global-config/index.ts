@@ -109,7 +109,8 @@ export const main_ = (config: lib.Config, input: Input): Result => {
     follow_up_pr_group_label_enabled:
       config?.follow_up_pr_group_label?.enabled ?? false,
 
-    max_changed_working_directories: config?.limit_changed_dirs?.working_directories ?? 0,
+    max_changed_working_directories:
+      config?.limit_changed_dirs?.working_directories ?? 0,
     max_changed_modules: config?.limit_changed_dirs?.modules ?? 0,
   };
   const envs: Envs = {
