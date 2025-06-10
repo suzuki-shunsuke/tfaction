@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as exec from '@actions/exec';
+import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../lib";
@@ -200,28 +200,50 @@ export const run = async (input: Input): Promise<Result> => {
     modules: Array.from(changedModules),
   };
 
-  if (input.maxChangedWorkingDirectories > 0 && ret.targetConfigs.length > input.maxChangedWorkingDirectories) {
-    await exec.exec('github-comment', [
-      'post', '-k', 'too-many-changed-dirs',
-      '-var', `max_changed_dirs:${input.maxChangedWorkingDirectories}`,
-    ], {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: input.githubToken,
+  if (
+    input.maxChangedWorkingDirectories > 0 &&
+    ret.targetConfigs.length > input.maxChangedWorkingDirectories
+  ) {
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-k",
+        "too-many-changed-dirs",
+        "-var",
+        `max_changed_dirs:${input.maxChangedWorkingDirectories}`,
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: input.githubToken,
+        },
       },
-    });
-    throw new Error(`Too many working directories are changed (${ret.targetConfigs.length}). Max is ${input.maxChangedWorkingDirectories}.`);
+    );
+    throw new Error(
+      `Too many working directories are changed (${ret.targetConfigs.length}). Max is ${input.maxChangedWorkingDirectories}.`,
+    );
   }
-  if (input.maxChangedModules > 0 && ret.modules.length > input.maxChangedModules) {
-    await exec.exec('github-comment', [
-      'post', '-k', 'too-many-changed-modules',
-      '-var', `max_changed_modules:${input.maxChangedModules}`,
-    ], {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: input.githubToken,
+  if (
+    input.maxChangedModules > 0 &&
+    ret.modules.length > input.maxChangedModules
+  ) {
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-k",
+        "too-many-changed-modules",
+        "-var",
+        `max_changed_modules:${input.maxChangedModules}`,
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: input.githubToken,
+        },
       },
-    });
+    );
     throw new Error(`Too many modules are changed ()`);
   }
 
@@ -364,9 +386,9 @@ export const main = async () => {
       .readFileSync(core.getInput("module_files"), "utf8")
       .split("\n"),
     maxChangedWorkingDirectories: parseInt(
-      core.getInput("max_changed_working_dirs")),
-    maxChangedModules: parseInt(
-      core.getInput("max_changed_modules")),
+      core.getInput("max_changed_working_dirs"),
+    ),
+    maxChangedModules: parseInt(core.getInput("max_changed_modules")),
     pr,
     payload: github.context.payload,
     /*
