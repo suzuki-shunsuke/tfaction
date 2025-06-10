@@ -1,6 +1,6 @@
 package main
 
-deny_hello[msg] {
+deny contains msg if {
     true == false
 	msg = "always succeed"
 }
