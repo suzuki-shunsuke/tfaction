@@ -391,6 +391,7 @@ export const main = async () => {
     maxChangedModules: parseInt(core.getInput("max_changed_modules")),
     pr,
     payload: github.context.payload,
+    githubToken: core.getInput("github_token", { required: true }),
     /*
     {
       // caller is a directory where uses the module
