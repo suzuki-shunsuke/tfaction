@@ -10,6 +10,8 @@ post:
       You can change up to {{.Vars.max_changed_dirs}} working directories.
       This is configured in tfaction-root.yaml.
 
+      [For more details, please see the document](https://suzuki-shunsuke.github.io/tfaction/docs/codes/001).
+
   too-many-changed-modules:
     template: |
       ## :x: Too many modules are changed
@@ -19,3 +21,5 @@ post:
       Too many modules are changed in one pull request.
       You can change up to {{.Vars.max_changed_modules}} modules.
       This is configured in tfaction-root.yaml.
+
+      [For more details, please see the document](https://suzuki-shunsuke.github.io/tfaction/docs/codes/001).
