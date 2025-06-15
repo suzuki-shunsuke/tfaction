@@ -10,3 +10,5 @@ jobs:
       pull-requests: write
     steps:
       - uses: suzuki-shunsuke/actionlint-action@c8d3c0dcc9152f1d1c7d4a38cbf4953c3a55953d # v0.1.0
+        with:
+          actionlint_options: -ignore dist/index.js
