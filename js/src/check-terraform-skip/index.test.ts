@@ -1,5 +1,5 @@
 import { getSkipTerraform } from "./index";
-import { expect, test } from 'vitest';
+import { expect, test } from "vitest";
 
 test("normal", () => {
   expect(
