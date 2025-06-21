@@ -8,14 +8,23 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: ./js
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: ./js
       id: global-config
       with:
         action: get-global-config
@@ -23,7 +32,7 @@ runs:
     - shell: bash
       id: action_path
       run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
-    - uses: suzuki-shunsuke/tfaction/conftest@main
+    - uses: ./conftest
       with:
         github_token: ${{ inputs.github_token }}
       env:
@@ -67,15 +76,14 @@ runs:
         github_comment: "true"
         fix: ${{ steps.target-config.outputs.tflint_fix == 'true' }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@bdc85c3536e31ae189339cc09c5a0f9768d0ffa7 # v0.2.2
+    - uses: ./terraform-fmt
       if: steps.target-config.outputs.destroy != 'true'
       with:
-        working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
-        skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
-        terraform_command: ${{ steps.target-config.outputs.terraform_command }}
+        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
+        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: ./terraform-docs
       if: fromJSON(steps.target-config.outputs.enable_terraform_docs) && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}

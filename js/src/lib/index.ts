@@ -283,6 +283,12 @@ const Config = z.object({
   replace: z.optional(Replace),
   providers_lock_opts: z.optional(z.string()),
   follow_up_pr_group_label: z.optional(FollowUpPRGroupLabel),
+  securefix_action: z.optional(
+    z.object({
+      server_repository: z.string(),
+    }),
+  ),
+
   limit_changed_dirs: z.optional(
     z.object({
       working_dirs: z.optional(z.number()),

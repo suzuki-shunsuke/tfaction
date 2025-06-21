@@ -135,6 +135,8 @@ outputs:
     description: aqua update-checksum's `prune`
   plan_workflow_name:
     description: GitHub Actions Workflow name running tfaction/terraform-plan action
+  securefix_action_server_repository:
+    description: Securefix Action Server Repository
 
   # check-terraform-skip
   skip_terraform:

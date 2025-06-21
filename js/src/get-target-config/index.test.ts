@@ -1,4 +1,5 @@
 import { run, Result } from "./index";
+import { expect, test } from "vitest";
 
 test("default", async () => {
   const runID = process.env.GITHUB_RUN_ID ?? "";
