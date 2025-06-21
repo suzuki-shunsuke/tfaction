@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../lib";
@@ -70,7 +71,7 @@ type Result = {
   modules: string[];
 };
 
-export const run = (input: Input): Result => {
+export const run = async (input: Input): Promise<Result> => {
   const config = input.config;
   const isApply = input.isApply;
 
@@ -194,10 +195,61 @@ export const run = (input: Input): Result => {
     }
   }
 
-  return {
+  const ret = {
     targetConfigs: terraformTargetObjs.concat(tfmigrateObjs),
     modules: Array.from(changedModules),
   };
+
+  if (
+    input.maxChangedWorkingDirectories > 0 &&
+    ret.targetConfigs.length > input.maxChangedWorkingDirectories
+  ) {
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-k",
+        "too-many-changed-dirs",
+        "-var",
+        `max_changed_dirs:${input.maxChangedWorkingDirectories}`,
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: input.githubToken,
+        },
+      },
+    );
+    throw new Error(
+      `Too many working directories are changed (${ret.targetConfigs.length}). Max is ${input.maxChangedWorkingDirectories}.`,
+    );
+  }
+  if (
+    input.maxChangedModules > 0 &&
+    ret.modules.length > input.maxChangedModules
+  ) {
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-k",
+        "too-many-changed-modules",
+        "-var",
+        `max_changed_modules:${input.maxChangedModules}`,
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: input.githubToken,
+        },
+      },
+    );
+    throw new Error(
+      `Too many modules are changed (${ret.modules.length}). Max is ${input.maxChangedModules}.`,
+    );
+  }
+
+  return ret;
 };
 
 type Input = {
@@ -210,6 +262,9 @@ type Input = {
   pr: string;
   payload: Payload;
   moduleCallers: any;
+  maxChangedWorkingDirectories: number;
+  maxChangedModules: number;
+  githubToken: string;
 };
 
 const listWD = (configFiles: string[]): string[] => {
@@ -319,7 +374,7 @@ export const main = async () => {
   const prPath = core.getInput("pull_request");
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
 
-  const result = run({
+  const result = await run({
     labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
     config: lib.getConfig(),
     isApply: lib.getIsApply(),
@@ -332,8 +387,13 @@ export const main = async () => {
     moduleFiles: fs
       .readFileSync(core.getInput("module_files"), "utf8")
       .split("\n"),
+    maxChangedWorkingDirectories: parseInt(
+      core.getInput("max_changed_working_dirs"),
+    ),
+    maxChangedModules: parseInt(core.getInput("max_changed_modules")),
     pr,
     payload: github.context.payload,
+    githubToken: core.getInput("github_token", { required: true }),
     /*
     {
       // caller is a directory where uses the module

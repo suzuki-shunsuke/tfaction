@@ -56,6 +56,9 @@ interface Outputs {
   follow_up_pr_group_label_prefix: string;
   follow_up_pr_group_label_enabled: boolean;
   securefix_action_server_repository: string;
+
+  max_changed_working_dirs?: number;
+  max_changed_modules?: number;
 }
 
 interface Envs {
@@ -106,8 +109,12 @@ export const main_ = (config: lib.Config, input: Input): Result => {
       "tfaction:follow-up-pr-group/",
     follow_up_pr_group_label_enabled:
       config?.follow_up_pr_group_label?.enabled ?? false,
+
     securefix_action_server_repository:
       config?.securefix_action?.server_repository || "",
+
+    max_changed_working_dirs: config?.limit_changed_dirs?.working_dirs ?? 0,
+    max_changed_modules: config?.limit_changed_dirs?.modules ?? 0,
   };
   const envs: Envs = {
     TFACTION_SKIP_ADDING_AQUA_PACKAGES:

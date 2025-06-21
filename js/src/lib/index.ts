@@ -288,6 +288,13 @@ const Config = z.object({
       server_repository: z.string(),
     }),
   ),
+
+  limit_changed_dirs: z.optional(
+    z.object({
+      working_dirs: z.optional(z.number()),
+      modules: z.optional(z.number()),
+    }),
+  ),
 });
 
 export type Config = z.infer<typeof Config>;
