@@ -1,4 +1,5 @@
 import { run } from "./index";
+import { expect, test } from 'vitest';
 
 test("normal", async () => {
   expect(
