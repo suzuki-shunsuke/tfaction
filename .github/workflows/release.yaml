@@ -42,7 +42,7 @@ jobs:
       - run: cmdx build
       - run: git add -f schema
 
-      - uses: suzuki-shunsuke/release-js-action@646138a816d700c2aff05214746708b94b21e6cc # v0.1.6
+      - uses: suzuki-shunsuke/release-js-action@0c8995bef6136b89f294badd3f6b1f2615f7ba56 # v0.1.7
         with:
           version: ${{inputs.tag}}
           pr: ${{inputs.pr}}
