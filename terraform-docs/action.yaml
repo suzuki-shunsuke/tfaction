@@ -8,6 +8,15 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
   working_directory:
     description: working directory
     required: false

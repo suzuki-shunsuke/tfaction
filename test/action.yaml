@@ -87,4 +87,6 @@ runs:
       if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
+        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
+        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
