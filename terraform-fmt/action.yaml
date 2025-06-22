@@ -48,7 +48,7 @@ runs:
         files: ${{ steps.files.outputs.value }}
 
     - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.files.outputs.value != ''
-      uses: csm-actions/securefix-action@c5696e3325f3906c5054ad80f3b9cdd92d65173b # v0.1.0
+      uses: csm-actions/securefix-action@pr/123
       with:
         app_id: ${{inputs.github_app_id_for_securefix_action}}
         app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
