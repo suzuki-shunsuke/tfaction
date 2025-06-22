@@ -36,7 +36,7 @@ runs:
         "$TF_COMMAND" fmt -recursive
 
     - if: steps.global-config.outputs.securefix_action_server_repository == ''
-      uses: suzuki-shunsuke/commit-action@v0.0.8
+      uses: suzuki-shunsuke/commit-action@e3299afe2e5ffb76f1987743e3dbc0f00ece72d8 # v0.0.8
       with:
         commit_message: "style: ${{steps.target-config.outputs.terraform_command}} fmt -recursive"
         github_token: ${{ inputs.github_token }}
