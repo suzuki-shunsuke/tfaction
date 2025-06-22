@@ -1,0 +1,56 @@
+name: terraform fmt
+description: terraform fmt
+inputs:
+  github_token:
+    description: |
+      GitHub Access Token
+      contents:write - Push commits
+    required: false
+    default: ${{ github.token }}
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
+runs:
+  using: composite
+  steps:
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: target-config
+      with:
+        action: get-target-config
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: global-config
+      with:
+        action: get-global-config
+
+    - shell: bash
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      id: files
+      env:
+        TF_COMMAND: ${{steps.target-config.outputs.terraform_command}}
+      run: |
+        {
+          echo 'value<<EOF'
+          "$TF_COMMAND" fmt -recursive
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
+    - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.files.outputs.value != ''
+      uses: suzuki-shunsuke/commit-action@e3299afe2e5ffb76f1987743e3dbc0f00ece72d8 # v0.0.8
+      with:
+        commit_message: "style: ${{steps.target-config.outputs.terraform_command}} fmt -recursive"
+        github_token: ${{ inputs.github_token }}
+        files: ${{ steps.files.outputs.value }}
+
+    - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.files.outputs.value != ''
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "style: ${{steps.target-config.outputs.terraform_command}} fmt -recursive"

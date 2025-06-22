@@ -1,4 +1,5 @@
 import { main_, Result } from "./index";
+import { expect, test } from "vitest";
 
 test("default", () => {
   const result: Result = {
@@ -35,6 +36,7 @@ test("default", () => {
       follow_up_pr_group_label_enabled: false,
       max_changed_modules: 0,
       max_changed_working_dirs: 0,
+      securefix_action_server_repository: "",
     },
   };
   expect(
@@ -107,6 +109,7 @@ test("customize", () => {
       follow_up_pr_group_label_enabled: false,
       max_changed_modules: 0,
       max_changed_working_dirs: 0,
+      securefix_action_server_repository: "",
     },
   };
 

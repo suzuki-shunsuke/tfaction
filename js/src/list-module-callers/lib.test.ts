@@ -1,4 +1,5 @@
 import { resolveRelativeCallTree, buildModuleToCallers } from "./lib";
+import { expect, test, describe, it } from "vitest";
 
 describe("resolveRelativeCallTree", () => {
   it("resolves relative paths in terraform-config-inspect", () => {

@@ -1,30 +1,4 @@
+version: 3
 ignore_actions:
-  - name: suzuki-shunsuke/tfaction/setup
-  - name: suzuki-shunsuke/tfaction/test-module
-  - name: suzuki-shunsuke/tfaction/plan
-  - name: suzuki-shunsuke/tfaction/apply
-  - name: suzuki-shunsuke/tfaction/list-targets
-  - name: suzuki-shunsuke/tfaction/export-secrets
-  - name: suzuki-shunsuke/tfaction/get-target-config
-  - name: suzuki-shunsuke/tfaction/test
-  - name: suzuki-shunsuke/tfaction/set-drift-env
-  - name: suzuki-shunsuke/tfaction/scaffold-working-dir
-  - name: suzuki-shunsuke/tfaction/update-drift-issue
-  - name: suzuki-shunsuke/tfaction/create-follow-up-pr
-  - name: suzuki-shunsuke/tfaction/release-module
-  - name: suzuki-shunsuke/tfaction/scaffold-module
-  - name: suzuki-shunsuke/tfaction/create-scaffold-module-pr
-  - name: suzuki-shunsuke/tfaction/create-scaffold-pr
-  - name: suzuki-shunsuke/tfaction/scaffold-tfmigrate
-  - name: suzuki-shunsuke/tfaction/terraform-plan
-  - name: suzuki-shunsuke/tfaction/sync-drift-issue-description
-  - name: suzuki-shunsuke/tfaction/terraform-apply
-  - name: suzuki-shunsuke/tfaction/tfmigrate-apply
-  - name: suzuki-shunsuke/tfaction/get-global-config
-  - name: suzuki-shunsuke/tfaction/list-working-dirs
-  - name: suzuki-shunsuke/tfaction/list-targets-with-changed-files
-  - name: suzuki-shunsuke/tfaction/list-changed-modules
-  - name: suzuki-shunsuke/tfaction/tfmigrate-plan
-  - name: suzuki-shunsuke/tfaction/export-aws-secrets-manager
-  - name: suzuki-shunsuke/tfaction/deploy-ssh-key
-  - name: suzuki-shunsuke/tfaction/check-terraform-skip
+  - name: suzuki-shunsuke/tfaction/.*
+    ref: .*
