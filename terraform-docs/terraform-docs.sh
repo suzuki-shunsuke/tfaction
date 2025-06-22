@@ -79,5 +79,5 @@ if [ "$created" = "true" ] || ! git diff --quiet README.md; then
 		echo "::error ::Please generate Module's README.md with terraform-docs."
 		exit 1
 	fi
-	echo "changed=true" >> "$GITHUB_OUTPUT"
+	echo "changed=true" >>"$GITHUB_OUTPUT"
 fi
