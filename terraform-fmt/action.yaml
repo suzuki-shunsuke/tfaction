@@ -40,14 +40,14 @@ runs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
 
-    - if: steps.global-config.outputs.securefix_action_server_repository == ''
+    - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.files.outputs.value != ''
       uses: suzuki-shunsuke/commit-action@e3299afe2e5ffb76f1987743e3dbc0f00ece72d8 # v0.0.8
       with:
         commit_message: "style: ${{steps.target-config.outputs.terraform_command}} fmt -recursive"
         github_token: ${{ inputs.github_token }}
         files: ${{ steps.files.outputs.value }}
 
-    - if: steps.global-config.outputs.securefix_action_server_repository != ''
+    - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.files.outputs.value != ''
       uses: csm-actions/securefix-action@c5696e3325f3906c5054ad80f3b9cdd92d65173b # v0.1.0
       with:
         app_id: ${{inputs.github_app_id_for_securefix_action}}
