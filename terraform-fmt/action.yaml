@@ -30,16 +30,22 @@ runs:
 
     - shell: bash
       working-directory: ${{ steps.target-config.outputs.working_directory }}
+      id: files
       env:
         TF_COMMAND: ${{steps.target-config.outputs.terraform_command}}
       run: |
-        "$TF_COMMAND" fmt -recursive
+        {
+          echo 'value<<EOF'
+          "$TF_COMMAND" fmt -recursive
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
 
     - if: steps.global-config.outputs.securefix_action_server_repository == ''
       uses: suzuki-shunsuke/commit-action@e3299afe2e5ffb76f1987743e3dbc0f00ece72d8 # v0.0.8
       with:
         commit_message: "style: ${{steps.target-config.outputs.terraform_command}} fmt -recursive"
         github_token: ${{ inputs.github_token }}
+        files: ${{ steps.files.outputs.value }}
 
     - if: steps.global-config.outputs.securefix_action_server_repository != ''
       uses: csm-actions/securefix-action@c5696e3325f3906c5054ad80f3b9cdd92d65173b # v0.1.0
