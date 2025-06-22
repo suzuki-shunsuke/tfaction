@@ -53,14 +53,14 @@ runs:
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
     - uses: suzuki-shunsuke/trivy-config-action@6c7c845cbf76e5745c4d772719de7a34453ae81d # v0.2.2
-      if: fromJSON(steps.target-config.outputs.enable_trivy) && steps.target-config.outputs.destroy != 'true'
+      if: steps.target-config.outputs.enable_trivy == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
 
     - uses: suzuki-shunsuke/github-action-tfsec@6b4afce3060c0d8865d269de0c5fabc90e1b20f7 # v1.0.0
-      if: fromJSON(steps.target-config.outputs.enable_tfsec) && steps.target-config.outputs.destroy != 'true'
+      if: steps.target-config.outputs.enable_tfsec == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
@@ -69,7 +69,7 @@ runs:
 
     # deep check requires AWS credentials
     - uses: suzuki-shunsuke/github-action-tflint@a9d1f3376c8bbd6aadf4891dfe32f5e246c9c52f # v1.2.1
-      if: fromJSON(steps.target-config.outputs.enable_tflint) && steps.target-config.outputs.destroy != 'true'
+      if: steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
@@ -84,7 +84,9 @@ runs:
         github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
 
     - uses: suzuki-shunsuke/tfaction/terraform-docs@main
-      if: fromJSON(steps.target-config.outputs.enable_terraform_docs) && steps.target-config.outputs.destroy != 'true'
+      if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
+        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
+        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
