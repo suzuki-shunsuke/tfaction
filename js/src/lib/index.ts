@@ -98,9 +98,7 @@ const AWSSecretsManagerSecretEnv = z.object({
   env_name: z.string(),
   secret_key: z.optional(z.string()),
 });
-type AWSSecretsManagerSecretEnv = z.infer<
-  typeof AWSSecretsManagerSecretEnv
->;
+type AWSSecretsManagerSecretEnv = z.infer<typeof AWSSecretsManagerSecretEnv>;
 
 const AWSSecretsManagerSecret = z.object({
   envs: z.array(AWSSecretsManagerSecretEnv),
