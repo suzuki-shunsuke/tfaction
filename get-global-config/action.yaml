@@ -80,6 +80,9 @@ outputs:
   securefix_action_server_repository:
     description: Securefix Action Server Repository
     value: ${{steps.global-config.outputs.securefix_action_server_repository}}
+  securefix_action_pull_request_base_branch:
+    description: Securefix Action Pull Request Base Branch
+    value: ${{steps.global-config.outputs.securefix_action_pull_request_base_branch}}
 
   max_changed_working_dirs:
     description: Maximum number of changed working directories in one pull request
