@@ -14,14 +14,14 @@ const GitHubEnvironment = z.union([
     url: z.string(),
   }),
 ]);
-type GitHubEnvironment = z.infer<typeof GitHubEnvironment>;
+export type GitHubEnvironment = z.infer<typeof GitHubEnvironment>;
 
 const JobType = z.union([
   z.literal("terraform"),
   z.literal("tfmigrate"),
   z.literal("scaffold_working_dir"),
 ]);
-type JobType = z.infer<typeof JobType>;
+export type JobType = z.infer<typeof JobType>;
 
 export const getJobType = (): JobType => {
   if (process.env.TFACTION_JOB_TYPE === undefined) {
@@ -78,7 +78,7 @@ const ConftestPolicyConfig = z.object({
   proto_file_dirs: z.optional(z.array(z.string())),
   paths: z.optional(z.array(z.string())),
 });
-type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;
+export type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;
 
 const ConftestConfig = z.object({
   disable_all: z.optional(z.boolean()),
@@ -92,7 +92,7 @@ const GitHubSecrets = z.array(
     secret_name: z.string(),
   }),
 );
-type GitHubSecrets = z.infer<typeof GitHubSecrets>;
+export type GitHubSecrets = z.infer<typeof GitHubSecrets>;
 
 const AWSSecretsManagerSecretEnv = z.object({
   env_name: z.string(),
@@ -107,7 +107,7 @@ const AWSSecretsManagerSecret = z.object({
   version_stage: z.optional(z.string()),
   aws_region: z.optional(z.string()),
 });
-type AWSSecretsManagerSecret = z.infer<typeof AWSSecretsManagerSecret>;
+export type AWSSecretsManagerSecret = z.infer<typeof AWSSecretsManagerSecret>;
 
 const JobConfig = z.object({
   aws_assume_role_arn: z.optional(z.string()),
@@ -123,7 +123,7 @@ const JobConfig = z.object({
   env: z.optional(z.record(z.string())),
   aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
 });
-type JobConfig = z.infer<typeof JobConfig>;
+export type JobConfig = z.infer<typeof JobConfig>;
 
 const TargetGroup = z.object({
   aws_region: z.optional(z.string()),
@@ -156,7 +156,7 @@ const TargetGroup = z.object({
     }),
   ),
 });
-type TargetGroup = z.infer<typeof TargetGroup>;
+export type TargetGroup = z.infer<typeof TargetGroup>;
 
 const TargetConfig = z.object({
   aws_assume_role_arn: z.optional(z.string()),
@@ -182,7 +182,7 @@ const TargetConfig = z.object({
   terraform_docs: z.optional(TerraformDocsConfig),
   conftest: z.optional(ConftestConfig),
 });
-type TargetConfig = z.infer<typeof TargetConfig>;
+export type TargetConfig = z.infer<typeof TargetConfig>;
 
 const Replace = z.object({
   patterns: z.array(
