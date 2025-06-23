@@ -37,6 +37,7 @@ test("default", () => {
       max_changed_modules: 0,
       max_changed_working_dirs: 0,
       securefix_action_server_repository: "",
+      securefix_action_pull_request_base_branch: "",
     },
   };
   expect(
@@ -110,6 +111,7 @@ test("customize", () => {
       max_changed_modules: 0,
       max_changed_working_dirs: 0,
       securefix_action_server_repository: "",
+      securefix_action_pull_request_base_branch: "",
     },
   };
 

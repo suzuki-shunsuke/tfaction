@@ -269,6 +269,9 @@ const Config = z.object({
   securefix_action: z.optional(
     z.object({
       server_repository: z.string(),
+      pull_request: z.object({
+        base_branch: z.string(),
+      }),
     }),
   ),
 
