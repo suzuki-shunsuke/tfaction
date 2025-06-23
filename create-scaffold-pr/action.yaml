@@ -33,9 +33,6 @@ runs:
         TFACTION_JOB_TYPE: scaffold_working_dir
     - uses: suzuki-shunsuke/tfaction/install@main
 
-    - run: git add .
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
     - run: |
         echo "branch=scaffold-working-directory-${TFACTION_TARGET}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
       id: branch
@@ -48,7 +45,7 @@ runs:
       run: |
         {
           echo 'value<<EOF'
-          git diff --cached --name-only "$WORKING_DIR"
+          git ls-files --modified --others --exclude-standard "$WORKING_DIR"
           echo EOF
         } >> "$GITHUB_OUTPUT"
 
@@ -81,8 +78,10 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
+        FILES: ${{steps.files.outputs.value}}
       run: |
-        git diff --cached --name-only "${{steps.target-config.outputs.working_directory}}" |
+        echo "$FILES" |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "${{steps.branch.outputs.branch}}" \
             -m "scaffold a working directory (${TFACTION_TARGET})"
