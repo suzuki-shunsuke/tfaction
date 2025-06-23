@@ -26,15 +26,22 @@ runs:
       env:
         TFACTION_JOB_TYPE: scaffold_working_dir
 
-    - run: mkdir -p "$(dirname "${{steps.target-config.outputs.working_directory}}")"
+    - run: mkdir -p "$(dirname "$WORKING_DIR")"
       shell: bash
+      env:
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
 
-    - run: cp -R "${{steps.target-config.outputs.template_dir}}" "${{steps.target-config.outputs.working_directory}}"
+    - run: cp -R "$TEMP_DIR" "$WORKING_DIR"
       shell: bash
+      env:
+        TEMP_DIR: ${{steps.target-config.outputs.template_dir}}
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
 
-    - run: echo '{}' > '${{steps.global-config.outputs.working_directory_file}}'
+    - run: echo '{}' > "$FILE"
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
+      env:
+        FILE: ${{steps.global-config.outputs.working_directory_file}}
 
     - run: cp "$GITHUB_ACTION_PATH/tfmigrate.hcl" .tfmigrate.hcl
       if: steps.target-config.outputs.s3_bucket_name_tfmigrate_history != ''
@@ -80,19 +87,21 @@ runs:
       env:
         AQUA_GITHUB_TOKEN: ${{inputs.github_token}}
 
-    - run: git add .
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-
-    - run: git ls-files | xargs -n 1 sed -i 's|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}|g'
+    - run: git ls-files --modified --others --exclude-standard | xargs -n 1 sed -i "s|%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%|${BUCKET}|g"
       if: steps.target-config.outputs.s3_bucket_name_tfmigrate_history != ''
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-    - run: git ls-files | xargs -n 1 sed -i 's|%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%|${{steps.target-config.outputs.gcs_bucket_name_tfmigrate_history}}|g'
+      env:
+        BUCKET: ${{steps.target-config.outputs.s3_bucket_name_tfmigrate_history}}
+    - run: git ls-files --modified --others --exclude-standard | xargs -n 1 sed -i "s|%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%|${GCS_BUCKET}|g"
       if: steps.target-config.outputs.gcs_bucket_name_tfmigrate_history != ''
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
+      env:
+        GCS_BUCKET: ${{steps.target-config.outputs.gcs_bucket_name_tfmigrate_history}}
 
-    - run: git ls-files | xargs -n 1 sed -i "s|%%TARGET%%|${TFACTION_TARGET}|g"
+    - run: git ls-files --modified --others --exclude-standard | xargs -n 1 sed -i "s|%%TARGET%%|${TFACTION_TARGET}|g"
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
+      env:
+        TFACTION_TARGET: ${{steps.target-config.outputs.target}}
