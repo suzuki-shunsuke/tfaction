@@ -16,7 +16,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@pr/2785
       id: target-config
       with:
         action: get-target-config
