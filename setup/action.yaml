@@ -140,7 +140,7 @@ runs:
       with:
         ssh_key: ${{ inputs.ssh_key }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@a0f2e069f49737ab11fbd9b00b2149019703ba99 # v1.1.1
+    - uses: suzuki-shunsuke/github-action-terraform-init@feat-securefix-action
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
@@ -148,6 +148,9 @@ runs:
         providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
         terraform_command: ${{ steps.target-config.outputs.terraform_command }}
+        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        securefix_action_app_id: ${{ inputs.github_app_id_for_securefix_action }}
+        securefix_action_app_private_key: ${{ inputs.github_app_private_key_for_securefix_action }}
 
     - run: |
         "$TF" providers
