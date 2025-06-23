@@ -8,6 +8,15 @@ inputs:
       If skip_create_pr is false
       pull-requests:write - Create pull requests
     required: true
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 runs:
   using: composite
   steps:
@@ -32,16 +41,57 @@ runs:
       id: branch
       shell: bash
 
-    - run: |
+    - shell: bash
+      id: files
+      env:
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
+      run: |
+        {
+          echo 'value<<EOF'
+          git diff --cached --name-only "$WORKING_DIR"
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
+    - if: steps.global-config.outputs.skip_create_pr == 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        branch: ${{steps.branch.outputs.branch}}
+        commit_message: "scaffold a working directory (${{env.TFACTION_TARGET}})"
+
+    - if: steps.global-config.outputs.skip_create_pr != 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "scaffold a working directory (${{env.TFACTION_TARGET}})"
+        branch: ${{steps.branch.outputs.branch}}
+        pull_request_title: "Scaffold a working directory (${{env.TFACTION_TARGET}})"
+        pull_request_base_branch: ${{steps.target-config.outputs.securefix_action_pull_request_base_branch}}
+        pull_request_draft: ${{steps.global-config.outputs.draft_pr}}
+        pull_request_body: |-
+          This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
+        pull_request_assignees: |
+          ${{github.actor}}
+
+    - if: steps.global-config.outputs.securefix_action_server_repository == ''
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
         git diff --cached --name-only "${{steps.target-config.outputs.working_directory}}" |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "${{steps.branch.outputs.branch}}" \
             -m "scaffold a working directory (${TFACTION_TARGET})"
+
+    - if: steps.global-config.outputs.skip_create_pr == 'true' && steps.global-config.outputs.securefix_action_server_repository == ''
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-
-    - run: |
+        CODE_BLOCK: "```"
+      run: |
         draft_pr=""
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           draft_pr="-d "
@@ -61,18 +111,14 @@ runs:
 
         [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
         EOS
-      if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
+
+    - if: steps.global-config.outputs.skip_create_pr != 'true' && steps.global-config.outputs.securefix_action_server_repository == ''
       shell: bash
       env:
-        CODE_BLOCK: "```"
-
-    - run: |
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
         opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a working directory (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by GitHub Actions workflow_dispatch event $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
         gh pr create "${opts[@]}"
-      shell: bash
-      if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}

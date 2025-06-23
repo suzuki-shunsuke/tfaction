@@ -56,6 +56,7 @@ interface Outputs {
   follow_up_pr_group_label_prefix: string;
   follow_up_pr_group_label_enabled: boolean;
   securefix_action_server_repository: string;
+  securefix_action_pull_request_base_branch: string;
 
   max_changed_working_dirs?: number;
   max_changed_modules?: number;
@@ -112,6 +113,8 @@ export const main_ = (config: lib.Config, input: Input): Result => {
 
     securefix_action_server_repository:
       config?.securefix_action?.server_repository || "",
+    securefix_action_pull_request_base_branch:
+      config?.securefix_action?.pull_request?.base_branch || "",
 
     max_changed_working_dirs: config?.limit_changed_dirs?.working_dirs ?? 0,
     max_changed_modules: config?.limit_changed_dirs?.modules ?? 0,
