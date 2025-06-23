@@ -13,6 +13,15 @@ inputs:
   ssh_key:
     description: "SSH Key for Terraform Private Module"
     required: false
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 outputs:
   working_directory:
     description: working directory
@@ -76,12 +85,15 @@ runs:
       env:
         TARGET_CONFIG: ${{toJSON(steps.target-config.outputs)}}
 
-    - uses: aquaproj/update-checksum-action@fe0daf077d2972d06f07c2debb8ed640b64fa09d # v0.2.6
+    - uses: aquaproj/update-checksum-action@feat-support-securefix-action
       if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'
       with:
         skip_push: ${{ steps.global-config.outputs.aqua_update_checksum_skip_push }}
         prune: ${{ steps.global-config.outputs.aqua_update_checksum_prune }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
+        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        securefix_action_app_id: ${{ inputs.github_app_id_for_securefix_action }}
+        securefix_action_app_private_key: ${{ inputs.github_app_private_key_for_securefix_action }}
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
 
