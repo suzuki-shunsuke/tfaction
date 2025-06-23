@@ -67,7 +67,7 @@ runs:
         commit_message: "scaffold a working directory (${{env.TFACTION_TARGET}})"
         branch: ${{steps.branch.outputs.branch}}
         pull_request_title: "Scaffold a working directory (${{env.TFACTION_TARGET}})"
-        pull_request_base_branch: ${{steps.target-config.outputs.securefix_action_pull_request_base_branch}}
+        pull_request_base_branch: ${{steps.global-config.outputs.securefix_action_pull_request_base_branch}}
         pull_request_draft: ${{steps.global-config.outputs.draft_pr}}
         pull_request_body: |-
           This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
