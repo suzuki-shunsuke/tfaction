@@ -37,21 +37,25 @@ runs:
       id: branch
       shell: bash
 
-    - run: git add "$TFACTION_MODULE_PATH"
-      shell: bash
-
-    - run: |
-        git diff --cached --name-only |
-          xargs ghcp commit -r "$GITHUB_REPOSITORY" \
-            -b "${{steps.branch.outputs.branch}}" \
-            -m "chore($TFACTION_MODULE_PATH): scaffold a Terraform Module"
-      shell: bash
+    - shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        BRANCH: ${{ steps.branch.outputs.branch }}
+      run: |
+        git ls-files --modified --others --exclude-standard "$TFACTION_MODULE_PATH" |
+          xargs ghcp commit -r "$GITHUB_REPOSITORY" \
+            -b "$BRANCH" \
+            -m "chore($TFACTION_MODULE_PATH): scaffold a Terraform Module"
 
-    - run: |
+    - if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
+      shell: bash
+      env:
+        CODE_BLOCK: "```"
+        DRAFT_PR: "${{steps.global-config.outputs.draft_pr}}"
+        BRANCH: ${{ steps.branch.outputs.branch }}
+      run: |
         draft_pr=""
-        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+        if [ "$DRAFT_PR" = "true" ]; then
           draft_pr="-d "
         fi
         cat << EOS >> "$GITHUB_STEP_SUMMARY"
@@ -62,21 +66,17 @@ runs:
 
         $CODE_BLOCK
         gh pr create -R "$GITHUB_REPOSITORY" $draft_pr\\
-          -H "${{steps.branch.outputs.branch}}" \\
+          -H "$BRANCH" \\
           -t "Scaffold a Terraform Module (${TFACTION_MODULE_PATH})" \\
           -b "This pull request was created by [GitHub Actions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"
         $CODE_BLOCK
 
         [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
         EOS
-      if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
-      shell: bash
-      env:
-        CODE_BLOCK: "```"
 
     - run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${TFACTION_MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
-        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+        opts=(-H "$BRANCH" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${TFACTION_MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
+        if [ "$DRAFT_PR" = "true" ]; then
           opts+=( -d )
         fi
         gh pr create "${opts[@]}"
@@ -84,3 +84,5 @@ runs:
       if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        BRANCH: ${{ steps.branch.outputs.branch }}
+        DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
