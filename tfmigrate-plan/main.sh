@@ -25,7 +25,7 @@ if [ ! -f .tfmigrate.hcl ]; then
 			-k tfmigrate-hcl-not-found -var "tfaction_target:$TFACTION_TARGET"
 		exit 1
 	fi
-	echo "changed=true" >> "$GITHUB_OUTPUT"
+	echo "changed=true" >>"$GITHUB_OUTPUT"
 fi
 
 github-comment exec \
