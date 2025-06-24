@@ -193,7 +193,8 @@ runs:
     - name: Create a pull request
       shell: bash
       if: |
-        (steps.global-config.outputs.skip_create_pr != 'true' && !inputs.pr_number
+        steps.global-config.outputs.skip_create_pr != 'true' &&
+        !inputs.pr_number &&
         steps.global-config.outputs.securefix_action_server_repository == ''
       id: create_pr
       env:
