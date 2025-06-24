@@ -42,6 +42,8 @@ runs:
         fi
       shell: bash
 
+    - uses: suzuki-shunsuke/tfaction/install@main
+
     - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
       with:
