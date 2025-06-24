@@ -57,10 +57,6 @@ runs:
     - run: echo "{}" > "$TFACTION_MODULE_PATH/tfaction_module.yaml"
       shell: bash
 
-    - run: git add .
-      shell: bash
-      working-directory: ${{env.TFACTION_MODULE_PATH}}
-
     - run: |
         git ls-files --modified --others --exclude-standard . |
           xargs -n 1 sed -i "s|%%MODULE_NAME%%|$(basename "$TFACTION_MODULE_PATH")|g"
