@@ -62,22 +62,26 @@ runs:
       working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: |
-        git ls-files | xargs -n 1 sed -i "s|%%MODULE_NAME%%|$(basename "$TFACTION_MODULE_PATH")|g"
+        git ls-files --modified --others --exclude-standard . |
+          xargs -n 1 sed -i "s|%%MODULE_NAME%%|$(basename "$TFACTION_MODULE_PATH")|g"
       shell: bash
       working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: |
-        git ls-files | xargs -n 1 sed -i "s|%%MODULE_PATH%%|$MODULE_PATH|g"
+        git ls-files --modified --others --exclude-standard . |
+          xargs -n 1 sed -i "s|%%MODULE_PATH%%|$MODULE_PATH|g"
       shell: bash
       working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: |
-        git ls-files | xargs -n 1 sed -i "s|%%GITHUB_REPOSITORY%%|$GITHUB_REPOSITORY|g"
+        git ls-files --modified --others --exclude-standard . |
+          xargs -n 1 sed -i "s|%%GITHUB_REPOSITORY%%|$GITHUB_REPOSITORY|g"
       shell: bash
       working-directory: ${{env.TFACTION_MODULE_PATH}}
 
     - run: |
-        git ls-files | xargs -n 1 sed -i "s|%%REF%%|module_${MODULE_PATH/\//_}_v0.1.0|g"
+        git ls-files --modified --others --exclude-standard . |
+          xargs -n 1 sed -i "s|%%REF%%|module_${MODULE_PATH/\//_}_v0.1.0|g"
       shell: bash
       working-directory: ${{env.TFACTION_MODULE_PATH}}
 
