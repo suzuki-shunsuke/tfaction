@@ -39,6 +39,7 @@ outputs:
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/install@main
     - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
       with:
@@ -146,7 +147,7 @@ runs:
     - name: Push a commit
       if: steps.global-config.outputs.securefix_action_server_repository == ''
       run: |
-        git ls-files --modified --others --exclude-standard |
+        git ls-files --modified --others --exclude-standard "$WORKING_DIR" |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "$BRANCH" \
             -m "chore: scaffold a tfmigrate migration (${TFACTION_TARGET})"
@@ -154,6 +155,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
         BRANCH: ${{steps.branch.outputs.branch}}
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
 
     - name: Create a label to the repository and output the guide to GitHub Step Summary
       if: |
