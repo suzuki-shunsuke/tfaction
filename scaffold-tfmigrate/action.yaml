@@ -21,6 +21,16 @@ inputs:
   pr_number:
     description: Pull Request Number
     required: false
+
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 outputs:
   working_directory:
     description: Working Directory
@@ -29,6 +39,7 @@ outputs:
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/install@main
     - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
       with:
@@ -101,9 +112,42 @@ runs:
       env:
         PR_NUMBER: ${{inputs.pr_number}}
 
+    - if: |
+        steps.global-config.outputs.securefix_action_server_repository != '' &&
+        steps.global-config.outputs.skip_create_pr != 'true' && !inputs.pr_number
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{steps.global-config.outputs.securefix_action_server_repository}}
+        branch: ${{steps.branch.outputs.branch}}
+        commit_message: "chore: scaffold a tfmigrate migration (${{env.TFACTION_TARGET}})"
+        pull_request_title: "Scaffold a tfmigrate migration (${{env.TFACTION_TARGET}})"
+        pull_request_base_branch: ${{steps.global-config.outputs.securefix_action_pull_request_base_branch}}
+        pull_request_draft: ${{steps.global-config.outputs.draft_pr}}
+        pull_request_labels: |
+          ${{steps.global-config.outputs.label_prefix_tfmigrate}}${{env.TFACTION_TARGET}}
+        pull_request_body: |-
+          This pull request was created by [GitHub Actions workflow_dispatch event](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
+          About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
+          [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
+          Please fix the generated migration file.
+
+    - if: |
+        steps.global-config.outputs.securefix_action_server_repository != '' &&
+        (steps.global-config.outputs.skip_create_pr == 'true' || inputs.pr_number)
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{steps.global-config.outputs.securefix_action_server_repository}}
+        branch: ${{steps.branch.outputs.branch}}
+        commit_message: "chore: scaffold a tfmigrate migration (${{env.TFACTION_TARGET}})"
+
     - name: Push a commit
+      if: steps.global-config.outputs.securefix_action_server_repository == ''
       run: |
-        git ls-files --modified --others --exclude-standard |
+        git ls-files --modified --others --exclude-standard "$WORKING_DIR" |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "$BRANCH" \
             -m "chore: scaffold a tfmigrate migration (${TFACTION_TARGET})"
@@ -111,6 +155,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
         BRANCH: ${{steps.branch.outputs.branch}}
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
 
     - name: Create a label to the repository and output the guide to GitHub Step Summary
       if: |
@@ -150,7 +195,9 @@ runs:
     - name: Create a pull request
       shell: bash
       if: |
-        steps.global-config.outputs.skip_create_pr != 'true' && !inputs.pr_number
+        steps.global-config.outputs.skip_create_pr != 'true' &&
+        !inputs.pr_number &&
+        steps.global-config.outputs.securefix_action_server_repository == ''
       id: create_pr
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
@@ -171,7 +218,7 @@ runs:
 
     - name: Add a label to the pull request
       shell: bash
-      if: inputs.pr_number
+      if: inputs.pr_number && steps.global-config.outputs.securefix_action_server_repository == ''
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
         PR_NUMBER: ${{inputs.pr_number}}
@@ -186,7 +233,9 @@ runs:
     - name: Add a label to the pull request
       shell: bash
       if: |
-        steps.global-config.outputs.skip_create_pr != 'true' && !inputs.pr_number
+        steps.global-config.outputs.skip_create_pr != 'true' &&
+        !inputs.pr_number &&
+        steps.global-config.outputs.securefix_action_server_repository == ''
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
         PR_NUMBER: ${{steps.create_pr.outputs.pr_number}}
