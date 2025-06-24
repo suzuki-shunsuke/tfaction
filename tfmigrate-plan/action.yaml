@@ -8,6 +8,16 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
+
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 runs:
   using: composite
   steps:
@@ -20,6 +30,7 @@ runs:
       with:
         action: get-target-config
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
+      id: migrate
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
@@ -31,7 +42,24 @@ runs:
         GCS_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}
         CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
         TF_COMMAND: ${{ steps.global-config.outputs.terraform_command }}
-    - uses: suzuki-shunsuke/tfaction/conftest@main
+
+    - if: steps.migrate.outputs.changed == 'true' && steps.global-config.outputs.securefix_action_server_repository == ''
+      uses: suzuki-shunsuke/commit-action@e3299afe2e5ffb76f1987743e3dbc0f00ece72d8 # v0.0.8
+      with:
+        commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
+        github_token: ${{ inputs.github_token }}
+        files: ${{ steps.target-config.outputs.working_directory }}/.tfmigrate.hcl
+
+    - if: steps.migrate.outputs.changed == 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
+
+    - if: steps.migrate.outputs.changed != 'true'
+      uses: suzuki-shunsuke/tfaction/conftest@main
       with:
         plan: "true"
         github_token: ${{inputs.github_token}}
