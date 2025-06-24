@@ -13,9 +13,25 @@ inputs:
   file:
     description: "file name to be updated"
     required: true
+
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 runs:
   using: composite
   steps:
+    - uses: suzuki-shunsuke/tfaction/install@main
+
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: global-config
+      with:
+        action: get-global-config
     - uses: suzuki-shunsuke/tfaction/js@main
       id: target-config
       with:
@@ -38,12 +54,23 @@ runs:
         grep -v -E "^#|^$" "$tempfile" >> "$FILE"
         rm "$tempfile"
 
-    - name: Push a commit
+    - if: steps.global-config.outputs.securefix_action_server_repository != ''
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "chore: import resources"
+        files: ${{steps.target-config.outputs.working_directory}}/${{inputs.file}}
+        branch: ${{inputs.branch}}
+
+    - if: steps.global-config.outputs.securefix_action_server_repository == ''
       shell: bash
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
         FILE: ${{inputs.file}}
         DIR: ${{steps.target-config.outputs.working_directory}}
+        BRANCH: ${{inputs.branch}}
       run: |
         export AQUA_CONFIG="$GITHUB_ACTION_PATH/aqua.yaml"
         github-comment exec -out "file:$GITHUB_STEP_SUMMARY" -- ghcp -v
