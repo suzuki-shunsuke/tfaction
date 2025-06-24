@@ -25,13 +25,8 @@ if [ ! -f .tfmigrate.hcl ]; then
 			-k tfmigrate-hcl-not-found -var "tfaction_target:$TFACTION_TARGET"
 		exit 1
 	fi
-	github-comment exec \
-		--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-		-- \
-		ghcp commit -r "$GITHUB_REPOSITORY" -b "$GITHUB_HEAD_REF" \
-		-m "chore(tfmigrate): add .tfmigrate.hcl" \
-		-C "$ROOT_DIR" "$WORKING_DIR/.tfmigrate.hcl"
-	exit 1
+	echo "changed=true" >>"$GITHUB_OUTPUT"
+	exit 0
 fi
 
 github-comment exec \
