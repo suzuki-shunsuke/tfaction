@@ -87,10 +87,6 @@ runs:
       env:
         MIGRATION_NAME: ${{inputs.migration_name}}
 
-    - run: git add .tfmigrate.hcl tfmigrate
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-
     - name: Get a branch name
       run: |
         set -euo pipefail
@@ -107,26 +103,29 @@ runs:
 
     - name: Push a commit
       run: |
-        git diff --cached --name-only |
+        git ls-files --modified --others --exclude-standard |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
-            -b "${{steps.branch.outputs.branch}}" \
+            -b "$BRANCH" \
             -m "chore: scaffold a tfmigrate migration (${TFACTION_TARGET})"
       shell: bash
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
+        BRANCH: ${{steps.branch.outputs.branch}}
 
     - name: Create a label to the repository and output the guide to GitHub Step Summary
       if: |
-        fromJSON(steps.global-config.outputs.skip_create_pr) && !inputs.pr_number
+        steps.global-config.outputs.skip_create_pr == 'true' && !inputs.pr_number
       shell: bash
       env:
         CODE_BLOCK: "```"
+        LABEL_PREFIX: ${{steps.global-config.outputs.label_prefix_tfmigrate}}
+        DRAFT_PR: ${{steps.global-config.outputs.draft_pr}}
       run: |
-        label=${{steps.global-config.outputs.label_prefix_tfmigrate}}$TFACTION_TARGET
+        label=${LABEL_PREFIX}$TFACTION_TARGET
         gh api "repos/{owner}/{repo}/labels" -f name="${label}" || :
 
         draft_pr=""
-        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+        if [ "$DRAFT_PR" = "true" ]; then
           draft_pr="-d "
         fi
         cat << EOS >> "$GITHUB_STEP_SUMMARY"
@@ -138,7 +137,7 @@ runs:
         $CODE_BLOCK
         gh pr create -R "$GITHUB_REPOSITORY" $draft_pr\\
           -l "$label" \\
-          -H "${{steps.branch.outputs.branch}}" \\
+          -H "$BRANCH" \\
           -t "Scaffold tfmigrate migration (${TFACTION_TARGET})" \\
           -b "This pull request was created by [GitHub Actions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
         $CODE_BLOCK
@@ -151,16 +150,18 @@ runs:
     - name: Create a pull request
       shell: bash
       if: |
-        !fromJSON(steps.global-config.outputs.skip_create_pr) && !inputs.pr_number
+        steps.global-config.outputs.skip_create_pr != 'true' && !inputs.pr_number
       id: create_pr
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
+        BRANCH: ${{steps.branch.outputs.branch}}
+        DRAFT_PR: ${{steps.global-config.outputs.draft_pr}}
       run: |
-        opts=( -H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
+        opts=( -H "$BRANCH" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
         About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
         [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
         Please fix the generated migration file." )
-        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
+        if [ "$DRAFT_PR" = "true" ]; then
           opts+=( -d )
         fi
         tempfile=$(mktemp)
@@ -185,7 +186,7 @@ runs:
     - name: Add a label to the pull request
       shell: bash
       if: |
-        !fromJSON(steps.global-config.outputs.skip_create_pr) && !inputs.pr_number
+        steps.global-config.outputs.skip_create_pr != 'true' && !inputs.pr_number
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
         PR_NUMBER: ${{steps.create_pr.outputs.pr_number}}
