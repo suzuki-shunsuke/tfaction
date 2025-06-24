@@ -59,6 +59,7 @@ runs:
       with:
         app_id: ${{inputs.github_app_id_for_securefix_action}}
         app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: "chore: import resources"
         files: ${{steps.target-config.outputs.working_directory}}/${{inputs.file}}
         branch: ${{inputs.branch}}
