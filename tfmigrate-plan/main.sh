@@ -26,6 +26,7 @@ if [ ! -f .tfmigrate.hcl ]; then
 		exit 1
 	fi
 	echo "changed=true" >>"$GITHUB_OUTPUT"
+	exit 0
 fi
 
 github-comment exec \
