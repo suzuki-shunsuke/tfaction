@@ -9,19 +9,30 @@ inputs:
       pull-requests:write - Create pull requests
     required: true
 
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 runs:
   using: composite
   steps:
-    - run: |
-        echo "::error ::github_token is required"
-        exit 1
+    - if: |
+        inputs.github_token == '' &&
+        (inputs.github_app_id_for_securefix_action == '' || inputs.github_app_private_key_for_securefix_action == '')
       shell: bash
-      if: inputs.github_token == ''
-    - run: |
+      run: |
+        echo "::error ::github_token or a pair of github_app_id_for_securefix_action and github_app_private_key_for_securefix_action is required"
+        exit 1
+    - if: env.TFACTION_MODULE_PATH == ''
+      shell: bash
+      run: |
         echo "::error ::env.TFACTION_MODULE_PATH is required"
         exit 1
-      shell: bash
-      if: env.TFACTION_MODULE_PATH == ''
 
     - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
@@ -32,12 +43,37 @@ runs:
       shell: bash
       working-directory: ${{env.TFACTION_MODULE_PATH}}
 
-    - run: |
-        echo "branch=scaffold-module-${TFACTION_MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
-      id: branch
+    - id: branch
       shell: bash
+      run: |
+        echo "branch=scaffold-module-${TFACTION_MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
 
-    - shell: bash
+    - if: steps.global-config.outputs.skip_create_pr != 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        branch: ${{steps.branch.outputs.branch}}
+        commit_message: "chore(${{env.TFACTION_MODULE_PATH}}): scaffold a Terraform Module"
+        pull_request_title: "Scaffold a Terraform Module (${{env.TFACTION_MODULE_PATH}})"
+        pull_request_base_branch: ${{ steps.global-config.outputs.securefix_action_pull_request_base_branch }}
+        pull_request_body: |
+          This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
+        pull_request_draft: ${{ steps.global-config.outputs.draft_pr }}
+        pull_request_assignees: ${{ github.actor }}
+
+    - if: steps.global-config.outputs.skip_create_pr == 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
+      uses: csm-actions/securefix-action@pr/123
+      with:
+        app_id: ${{inputs.github_app_id_for_securefix_action}}
+        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        branch: ${{steps.branch.outputs.branch}}
+        commit_message: "chore(${{env.TFACTION_MODULE_PATH}}): scaffold a Terraform Module"
+
+    - if: steps.global-config.outputs.securefix_action_server_repository == ''
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         BRANCH: ${{ steps.branch.outputs.branch }}
@@ -74,15 +110,17 @@ runs:
         [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
         EOS
 
-    - run: |
+    - if: |
+        steps.global-config.outputs.securefix_action_server_repository == '' &&
+        steps.global-config.outputs.skip_create_pr != 'true'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        BRANCH: ${{ steps.branch.outputs.branch }}
+        DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
+      run: |
         opts=(-H "$BRANCH" -a "$GITHUB_ACTOR" -t "Scaffold a Terraform Module (${TFACTION_MODULE_PATH})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)")
         if [ "$DRAFT_PR" = "true" ]; then
           opts+=( -d )
         fi
         gh pr create "${opts[@]}"
-      shell: bash
-      if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        BRANCH: ${{ steps.branch.outputs.branch }}
-        DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
