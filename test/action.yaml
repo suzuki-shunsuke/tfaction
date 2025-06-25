@@ -20,11 +20,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@pr/2796
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@pr/2796
       id: global-config
       with:
         action: get-global-config
@@ -32,7 +32,7 @@ runs:
     - shell: bash
       id: action_path
       run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
-    - uses: suzuki-shunsuke/tfaction/conftest@main
+    - uses: suzuki-shunsuke/tfaction/conftest@pr/2796
       with:
         github_token: ${{ inputs.github_token }}
       env:
@@ -79,14 +79,14 @@ runs:
         github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
+    - uses: suzuki-shunsuke/tfaction/terraform-fmt@pr/2796
       if: steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
         github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
         github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/terraform-docs@pr/2796
       if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
