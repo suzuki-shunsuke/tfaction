@@ -16,15 +16,27 @@ inputs:
       GitHub App Private Key for Securefix Action
     required: false
 outputs:
-  plan_binary:
+  plan_binary_path:
     description: "Path to the plan binary file"
-    value: ${{ steps.output.outputs.plan_binary }}
-  plan_json:
+    value: ${{ steps.terraform.outputs.plan_binary_path }}
+  plan_json_path:
     description: "Path to the plan json file"
-    value: ${{ steps.output.outputs.plan_json }}
+    value: ${{ steps.terraform.outputs.plan_json_path }}
   detailed_exitcode:
     description: Detailed exit code of `terraform plan`
-    value: ${{ steps.output.outputs.detailed_exitcode }}
+    value: ${{ steps.terraform.outputs.detailed_exitcode }}
+  plan_binary_artifact_name:
+    description: GitHub Artifact name for the plan file
+    value: ${{steps.terraform.outputs.plan_binary_artifact_name}}
+  plan_binary_artifact_path:
+    description: GitHub Artifact path for the plan file
+    value: ${{steps.terraform.outputs.plan_binary_artifact_path}}
+  plan_json_artifact_name:
+    description: GitHub Artifact name for the plan json
+    value: ${{ steps.terraform.outputs.plan_json_artifact_name }}
+  plan_json_artifact_path:
+    description: GitHub Artifact path for the plan json
+    value: ${{ steps.terraform.outputs.plan_json_artifact_path }}
 runs:
   using: composite
   steps:
@@ -41,22 +53,3 @@ runs:
         github_token: ${{inputs.github_token}}
         github_app_id_for_securefix_action: ${{inputs.github_app_id_for_securefix_action}}
         github_app_private_key_for_securefix_action: ${{inputs.github_app_private_key_for_securefix_action}}
-
-    - shell: bash
-      id: output
-      env:
-        TERRAFORM_PLAN_BINARY: ${{ steps.terraform.outputs.plan_binary }}
-        TERRAFORM_PLAN_JSON: ${{ steps.terraform.outputs.plan_json }}
-        TERRAFORM_PLAN_DETAILED_EXITCODE: ${{ steps.terraform.outputs.detailed_exitcode }}
-        TFMIGRATE_PLAN_BINARY: ${{ steps.tfmigrate.outputs.plan_binary }}
-        TFMIGRATE_PLAN_JSON: ${{ steps.tfmigrate.outputs.plan_json }}
-      run: |
-        if [ "$TFACTION_JOB_TYPE" = "tfmigrate" ]; then
-          echo "plan_binary=$TFMIGRATE_PLAN_BINARY" >> "$GITHUB_OUTPUT"
-          echo "plan_json=$TFMIGRATE_PLAN_JSON" >> "$GITHUB_OUTPUT"
-          echo "detailed_exitcode=0" >> "$GITHUB_OUTPUT"
-          exit 0
-        fi
-        echo "plan_binary=$TERRAFORM_PLAN_BINARY" >> "$GITHUB_OUTPUT"
-        echo "plan_json=$TERRAFORM_PLAN_JSON" >> "$GITHUB_OUTPUT"
-        echo "detailed_exitcode=$TERRAFORM_PLAN_DETAILED_EXITCODE" >> "$GITHUB_OUTPUT"
