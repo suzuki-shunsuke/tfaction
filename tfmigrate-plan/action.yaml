@@ -18,6 +18,13 @@ inputs:
     description: |
       GitHub App Private Key for Securefix Action
     required: false
+outputs:
+  plan_binary:
+    description: "Path to the plan binary file"
+    value: ${{ steps.migrate.outputs.plan_binary }}
+  plan_json:
+    description: "Path to the plan json file"
+    value: ${{ steps.migrate.outputs.plan_json }}
 runs:
   using: composite
   steps:

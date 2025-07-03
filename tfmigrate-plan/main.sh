@@ -36,3 +36,9 @@ github-comment exec \
 	-- tfmigrate plan --out tfplan.binary
 
 github-comment exec -- "$TF_COMMAND" show -json tfplan.binary >tfplan.json
+
+tempdir=$(mktemp -d)
+cp tfplan.binary "$tempdir/tfplan.binary"
+cp tfplan.json "$tempdir/tfplan.json"
+echo "plan_json=${tempdir}/tfplan.json" >>"$GITHUB_OUTPUT"
+echo "plan_binary=${tempdir}/tfplan.binary" >>"$GITHUB_OUTPUT"

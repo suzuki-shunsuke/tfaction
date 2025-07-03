@@ -8,6 +8,16 @@ inputs:
       issues:write - Create labels
     required: false
     default: ${{ github.token }}
+outputs:
+  plan_binary:
+    description: "Path to the plan binary file"
+    value: ${{ steps.main.outputs.plan_binary }}
+  plan_json:
+    description: "Path to the plan json file"
+    value: ${{ steps.main.outputs.plan_json }}
+  detailed_exitcode:
+    description: Detailed exit code of `terraform plan`
+    value: ${{ steps.main.outputs.detailed_exitcode }}
 runs:
   using: composite
   steps:
@@ -30,6 +40,7 @@ runs:
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
       working-directory: ${{ steps.target-config.outputs.working_directory }}
+      id: main
       shell: bash
       if: |
         env.TFACTION_DRIFT_ISSUE_NUMBER || !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
@@ -61,4 +72,4 @@ runs:
         ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       with:
         name: ${{ steps.artifact_name.outputs.value }}
-        path: ${{ steps.target-config.outputs.working_directory }}/tfplan.binary
+        path: ${{ steps.main.outputs.plan_binary }}
