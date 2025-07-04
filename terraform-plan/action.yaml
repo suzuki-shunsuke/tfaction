@@ -9,15 +9,27 @@ inputs:
     required: false
     default: ${{ github.token }}
 outputs:
-  plan_binary:
+  plan_binary_path:
     description: "Path to the plan binary file"
     value: ${{ steps.main.outputs.plan_binary }}
-  plan_json:
+  plan_json_path:
     description: "Path to the plan json file"
     value: ${{ steps.main.outputs.plan_json }}
   detailed_exitcode:
     description: Detailed exit code of `terraform plan`
     value: ${{ steps.main.outputs.detailed_exitcode }}
+  plan_binary_artifact_name:
+    description: GitHub Artifact name for the plan file
+    value: ${{ steps.artifact_name.outputs.plan_file }}
+  plan_binary_artifact_path:
+    description: GitHub Artifact path for the plan file
+    value: ${{ steps.main.outputs.plan_binary }}
+  plan_json_artifact_name:
+    description: GitHub Artifact name for the plan json
+    value: ${{ steps.artifact_name.outputs.plan_json }}
+  plan_json_artifact_path:
+    description: GitHub Artifact path for the plan json
+    value: ${{ steps.main.outputs.plan_json }}
 runs:
   using: composite
   steps:
@@ -61,7 +73,9 @@ runs:
         plan: "true"
         github_token: ${{inputs.github_token}}
 
-    - run: echo "value=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
+    - run: |
+        echo "plan_file=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
+        echo "plan_json=terraform_plan_json_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
       id: artifact_name
       shell: bash
       if: |
@@ -71,5 +85,12 @@ runs:
       if: |
         ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       with:
-        name: ${{ steps.artifact_name.outputs.value }}
+        name: ${{ steps.artifact_name.outputs.plan_file }}
         path: ${{ steps.main.outputs.plan_binary }}
+
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      if: |
+        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
+      with:
+        name: ${{ steps.artifact_name.outputs.plan_json }}
+        path: ${{ steps.main.outputs.plan_json }}
