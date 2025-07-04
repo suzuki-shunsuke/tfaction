@@ -28,11 +28,11 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@pr/2821
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@pr/2821
       id: target-config
       with:
         action: get-target-config
@@ -66,7 +66,7 @@ runs:
         commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
 
     - if: steps.migrate.outputs.changed != 'true'
-      uses: suzuki-shunsuke/tfaction/conftest@main
+      uses: suzuki-shunsuke/tfaction/conftest@pr/2821
       with:
         plan: "true"
         github_token: ${{inputs.github_token}}
