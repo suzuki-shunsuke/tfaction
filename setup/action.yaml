@@ -140,7 +140,7 @@ runs:
       with:
         ssh_key: ${{ inputs.ssh_key }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@feat-securefix-action
+    - uses: suzuki-shunsuke/github-action-terraform-init@488fc446128615bcd10f08c99f767396bea73903 # v1.2.0-0
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
