@@ -6,28 +6,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.63.0/trivy_0.63.0_Linux-64bit.tar.gz",
-      "checksum": "EA91FA393CFCB802DA22832C96E99A4C8A295A8BA8FAEFD824C7168B7F0A741E",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.64.0/trivy_0.64.0_Linux-64bit.tar.gz",
+      "checksum": "E50755B3BE29AE515091A45C96A2BC126846334210C30202331B797B9AE6E366",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.63.0/trivy_0.63.0_Linux-ARM64.tar.gz",
-      "checksum": "9AEECF81E8A1DC5625DD96A1A6FBEA92A1F8E51C4160CFC0E412EF5F641EA1AC",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.64.0/trivy_0.64.0_Linux-ARM64.tar.gz",
+      "checksum": "C7E78D67AF98DAD178F18B4B8D20929B7F9D267E9C556F8AD815F8997035BCD9",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.63.0/trivy_0.63.0_macOS-64bit.tar.gz",
-      "checksum": "01659B540A885EE9BD1273C8C75ADE1CE046FC9D6E5933D5978D9125A6A1CF6C",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.64.0/trivy_0.64.0_macOS-64bit.tar.gz",
+      "checksum": "F7C649C3E9598FDE7074BB34B024D11F5B836D230C391A0CDDE319DB73E0FEDC",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.63.0/trivy_0.63.0_macOS-ARM64.tar.gz",
-      "checksum": "784F687759C647FFAD54E4D7F55ED953647E4FFF5EA1E38DBAF877A135254972",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.64.0/trivy_0.64.0_macOS-ARM64.tar.gz",
+      "checksum": "77E70DD2FDBAC5986CC02A8DEF382BDAF78777F0050FC37AF72916CC47B56A20",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.63.0/trivy_0.63.0_windows-64bit.zip",
-      "checksum": "33BA726EC9C37F15490EFA1D51044C21F0DB6ACB9BE56492D5E1429F404B602F",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.64.0/trivy_0.64.0_windows-64bit.zip",
+      "checksum": "7F34D0CD2813CF7F89064FFBC04AF891F7839F673E9A0A0505CF91391D07826E",
       "algorithm": "sha256"
     },
     {
