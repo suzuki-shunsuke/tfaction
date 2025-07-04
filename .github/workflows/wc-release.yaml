@@ -49,7 +49,7 @@ jobs:
 
       - run: cmdx build
 
-      - uses: suzuki-shunsuke/release-js-action@0c442458eff2605bc4529a8050955d1fecbdd6e8 # v0.1.8-1
+      - uses: suzuki-shunsuke/release-js-action@pr/299
         with:
           version: ${{inputs.version}}
           is_comment: ${{inputs.is_comment}}
