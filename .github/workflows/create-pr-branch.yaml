@@ -24,3 +24,11 @@ jobs:
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
       gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+  release:
+    uses: ./.github/workflows/wc-release.yaml
+    with:
+      version: latest
+      pr: ${{fromJSON(inputs.pr)}}
+    permissions:
+      contents: write
+      pull-requests: write

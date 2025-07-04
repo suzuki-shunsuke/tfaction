@@ -4,31 +4,10 @@ on:
     branches:
       - main
 jobs:
-  build:
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
+  release:
+    uses: ./.github/workflows/wc-release.yaml
+    with:
+      version: latest
     permissions:
       contents: write
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
-
-      - uses: aquaproj/aqua-installer@d1fe50798dbadd4eb5b98957290ca175f6b4870f # v4.0.2
-        with:
-          aqua_version: v2.53.3
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-
-      - run: cmdx build
-      - run: git add -f schema
-
-      - uses: suzuki-shunsuke/release-js-action@0c8995bef6136b89f294badd3f6b1f2615f7ba56 # v0.1.7
-        with:
-          version: latest
+      pull-requests: write

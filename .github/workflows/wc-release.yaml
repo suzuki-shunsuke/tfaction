@@ -1,0 +1,63 @@
+---
+name: wc-release
+run-name: wc-release (${{inputs.pr}})
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version"
+        required: true
+        type: string
+      pr:
+        description: "Pull Request Number"
+        required: false
+        type: number
+      is_comment:
+        description: If the comment is posted
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  release:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - run: gh pr checkout "$PR"
+        if: inputs.pr != ''
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+          PR: ${{inputs.pr}}
+
+      - uses: aquaproj/aqua-installer@d1fe50798dbadd4eb5b98957290ca175f6b4870f # v4.0.2
+        with:
+          aqua_version: v2.53.3
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+
+      - run: cmdx build
+
+      - uses: suzuki-shunsuke/release-js-action@0c442458eff2605bc4529a8050955d1fecbdd6e8 # v0.1.8-1
+        with:
+          version: ${{inputs.version}}
+          is_comment: ${{inputs.is_comment}}
+          files: |
+            schema/tfaction.json
+            schema/tfaction-root.json
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          path: js/dist
+          name: js
