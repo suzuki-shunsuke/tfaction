@@ -15,12 +15,12 @@ inputs:
     required: false
   securefix_action_app_id:
     required: false
-    default: ''
+    default: ""
     description: |
       The GitHub App ID for the Securefix Action client.
   securefix_action_app_private_key:
     required: false
-    default: ''
+    default: ""
     description: |
       The GitHub App private key for the Securefix Action client.
 outputs:
