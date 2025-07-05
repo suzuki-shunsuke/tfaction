@@ -31,12 +31,17 @@ runs:
     #   with:
     #     github_token: ${{ inputs.github_token }}
 
-    - run: github-comment exec -- terraform init
+    - shell: bash
+      id: action-path
+      run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
+
+    - run: github-comment exec -var "tfaction_target:$TFACTION_TARGET" -- terraform init
       # https://github.com/suzuki-shunsuke/tfaction/issues/1576
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        GH_COMMENT_CONFIG: ${{steps.action-path.outputs.value}}/github-comment.yaml
 
     - uses: suzuki-shunsuke/trivy-config-action@6c7c845cbf76e5745c4d772719de7a34453ae81d # v0.2.2
       if: fromJSON(steps.global-config.outputs.enable_trivy)
