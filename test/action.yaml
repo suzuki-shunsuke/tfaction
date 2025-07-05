@@ -32,7 +32,7 @@ runs:
     - shell: bash
       id: action_path
       run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
-    - uses: suzuki-shunsuke/tfaction/conftest@main
+    - uses: suzuki-shunsuke/tfaction/conftest@bd4767e1ad4489605b678204ce012fa94b922d8c
       with:
         github_token: ${{ inputs.github_token }}
       env:
@@ -79,7 +79,7 @@ runs:
         github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
+    - uses: suzuki-shunsuke/tfaction/terraform-fmt@bd4767e1ad4489605b678204ce012fa94b922d8c
       if: steps.target-config.outputs.destroy != 'true'
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
@@ -88,7 +88,7 @@ runs:
         github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
         github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/terraform-docs@bd4767e1ad4489605b678204ce012fa94b922d8c
       if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
