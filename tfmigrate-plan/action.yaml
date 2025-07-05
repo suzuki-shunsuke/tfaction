@@ -66,7 +66,7 @@ runs:
         commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
 
     - if: steps.migrate.outputs.changed != 'true'
-      uses: suzuki-shunsuke/tfaction/conftest@main
+      uses: suzuki-shunsuke/tfaction/conftest@685bfecf4f98c099dcd7661636949a701777b7f3
       with:
         plan: "true"
         github_token: ${{inputs.github_token}}
