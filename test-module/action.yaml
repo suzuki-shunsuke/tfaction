@@ -81,12 +81,12 @@ runs:
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/terraform-docs@e77dcb578123bae451fcce657855ee294bf3e0d8
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
+    - uses: suzuki-shunsuke/tfaction/terraform-fmt@e77dcb578123bae451fcce657855ee294bf3e0d8
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
         terraform_command: ${{ steps.global-config.outputs.terraform_command }}
