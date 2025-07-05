@@ -13,15 +13,16 @@ inputs:
   ssh_key:
     description: "SSH Key for Terraform Private Module"
     required: false
-  github_app_id_for_securefix_action:
-    description: |
-      GitHub App ID for Securefix Action
-      issues:write
+  securefix_action_app_id:
     required: false
-  github_app_private_key_for_securefix_action:
+    default: ""
     description: |
-      GitHub App Private Key for Securefix Action
+      The GitHub App ID for the Securefix Action client.
+  securefix_action_app_private_key:
     required: false
+    default: ""
+    description: |
+      The GitHub App private key for the Securefix Action client.
 outputs:
   working_directory:
     description: working directory
@@ -92,8 +93,8 @@ runs:
         prune: ${{ steps.global-config.outputs.aqua_update_checksum_prune }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        securefix_action_app_id: ${{ inputs.github_app_id_for_securefix_action }}
-        securefix_action_app_private_key: ${{ inputs.github_app_private_key_for_securefix_action }}
+        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
+        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
       env:
         GITHUB_TOKEN: ${{inputs.github_token}}
 
@@ -149,8 +150,8 @@ runs:
         skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
         terraform_command: ${{ steps.target-config.outputs.terraform_command }}
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        securefix_action_app_id: ${{ inputs.github_app_id_for_securefix_action }}
-        securefix_action_app_private_key: ${{ inputs.github_app_private_key_for_securefix_action }}
+        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
+        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
 
     - run: |
         "$TF" providers

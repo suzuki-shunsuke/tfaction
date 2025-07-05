@@ -6,12 +6,12 @@ inputs:
     required: false
     default: ${{ github.token }}
 
-  github_app_id_for_securefix_action:
+  securefix_action_app_id:
     description: |
       GitHub App ID for Securefix Action
       issues:write
     required: false
-  github_app_private_key_for_securefix_action:
+  securefix_action_app_private_key:
     description: |
       GitHub App Private Key for Securefix Action
     required: false
@@ -51,5 +51,5 @@ runs:
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
       with:
         github_token: ${{inputs.github_token}}
-        github_app_id_for_securefix_action: ${{inputs.github_app_id_for_securefix_action}}
-        github_app_private_key_for_securefix_action: ${{inputs.github_app_private_key_for_securefix_action}}
+        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
+        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}

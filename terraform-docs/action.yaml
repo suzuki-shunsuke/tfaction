@@ -8,12 +8,12 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
-  github_app_id_for_securefix_action:
+  securefix_action_app_id:
     description: |
       GitHub App ID for Securefix Action
       issues:write
     required: false
-  github_app_private_key_for_securefix_action:
+  securefix_action_app_private_key:
     description: |
       GitHub App Private Key for Securefix Action
     required: false
@@ -46,7 +46,7 @@ runs:
     - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.fix.outputs.changed == 'true'
       uses: csm-actions/securefix-action@93104f33820be53834509335ed722a209d3714f3 # v0.1.1-0
       with:
-        app_id: ${{inputs.github_app_id_for_securefix_action}}
-        app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: "docs: generate document by terraform-docs"
