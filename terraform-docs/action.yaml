@@ -44,7 +44,7 @@ runs:
         files: ${{ inputs.working_directory }}/README.md
 
     - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.fix.outputs.changed == 'true'
-      uses: csm-actions/securefix-action@pr/123
+      uses: csm-actions/securefix-action@93104f33820be53834509335ed722a209d3714f3 # v0.1.1-0
       with:
         app_id: ${{inputs.github_app_id_for_securefix_action}}
         app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
