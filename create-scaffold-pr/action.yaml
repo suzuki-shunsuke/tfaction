@@ -70,9 +70,13 @@ runs:
         pull_request_base_branch: ${{steps.global-config.outputs.securefix_action_pull_request_base_branch}}
         pull_request_draft: ${{steps.global-config.outputs.draft_pr}}
         pull_request_body: |-
-          This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
+          This pull request scaffolds a working directory `${{steps.target-config.outputs.working_directory}}`.
+          [@${{github.actor}} created this pull request by GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}).
         pull_request_assignees: |
           ${{github.actor}}
+        pull_request_comment: |
+          @${{github.actor}} This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}) you run.
+          Please handle this pull request.
 
     - if: steps.global-config.outputs.securefix_action_server_repository == ''
       shell: bash
@@ -115,8 +119,12 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
       run: |
-        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a working directory (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by GitHub Actions workflow_dispatch event $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")
+        body="This pull request scaffolds a working directory ${WORKING_DIRECTORY}.
+        [@$GITHUB_ACTOR created this pull request by GitHub Actions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID).
+        "
+        opts=(-H "${{steps.branch.outputs.branch}}" -a "$GITHUB_ACTOR" -t "Scaffold a working directory (${TFACTION_TARGET})" -b "$body")
         if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
           opts+=( -d )
         fi
