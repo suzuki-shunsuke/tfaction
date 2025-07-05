@@ -8,12 +8,12 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
-  github_app_id_for_securefix_action:
+  securefix_action_app_id:
     description: |
       GitHub App ID for Securefix Action
       issues:write
     required: false
-  github_app_private_key_for_securefix_action:
+  securefix_action_app_private_key:
     description: |
       GitHub App Private Key for Securefix Action
     required: false
@@ -59,8 +59,8 @@ runs:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: "true"
         fix: ${{ steps.global-config.outputs.tflint_fix == 'true' }}
-        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
-        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
+        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
+        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
     # Remove .terraform.lock.hcl created by `terraform init` before running terraform-docs
@@ -78,5 +78,5 @@ runs:
         working_directory: ${{ env.TFACTION_TARGET }}
         terraform_command: ${{ steps.global-config.outputs.terraform_command }}
         github_token: ${{ inputs.github_token }}
-        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
-        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
+        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
+        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}

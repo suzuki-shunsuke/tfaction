@@ -8,12 +8,12 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
-  github_app_id_for_securefix_action:
+  securefix_action_app_id:
     description: |
       GitHub App ID for Securefix Action
       issues:write
     required: false
-  github_app_private_key_for_securefix_action:
+  securefix_action_app_private_key:
     description: |
       GitHub App Private Key for Securefix Action
     required: false
@@ -75,8 +75,8 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
         fix: ${{ steps.target-config.outputs.tflint_fix == 'true' }}
-        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
-        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
+        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
+        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
     - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
@@ -85,13 +85,13 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         terraform_command: ${{ steps.target-config.outputs.terraform_command }}
         github_token: ${{ inputs.github_token }}
-        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
-        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
+        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
+        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
 
     - uses: suzuki-shunsuke/tfaction/terraform-docs@main
       if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
-        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
-        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
+        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
+        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
