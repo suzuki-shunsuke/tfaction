@@ -86,7 +86,7 @@ runs:
       env:
         TARGET_CONFIG: ${{toJSON(steps.target-config.outputs)}}
 
-    - uses: aquaproj/update-checksum-action@c22eb86f5543eac2e440039fbcd3f2ea8b3fbff0 # v0.2.7-1
+    - uses: aquaproj/update-checksum-action@8fe0e047614b41a009ed2ed3fddbb0d7bbf20916 # v0.2.7-2
       if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'
       with:
         skip_push: ${{ steps.global-config.outputs.aqua_update_checksum_skip_push }}
@@ -95,8 +95,7 @@ runs:
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
         securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
+        github_token: ${{ inputs.github_token }}
 
     - run: aqua i -l -a
       shell: bash
