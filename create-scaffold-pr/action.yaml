@@ -75,7 +75,7 @@ runs:
         pull_request_assignees: |
           ${{github.actor}}
         pull_request_comment: |
-          @${{github.actor}} This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}) you run.
+          @${{github.actor}} This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}) you ran.
           Please handle this pull request.
 
     - if: steps.global-config.outputs.securefix_action_server_repository == ''
