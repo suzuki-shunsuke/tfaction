@@ -73,8 +73,10 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@bdc85c3536e31ae189339cc09c5a0f9768d0ffa7 # v0.2.2
+    - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_token: ${{ inputs.github_token }}
         terraform_command: ${{ steps.global-config.outputs.terraform_command }}
+        github_token: ${{ inputs.github_token }}
+        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
+        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}

@@ -82,6 +82,8 @@ runs:
     - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
       if: steps.target-config.outputs.destroy != 'true'
       with:
+        working_directory: ${{ steps.target-config.outputs.working_directory }}
+        terraform_command: ${{ steps.target-config.outputs.terraform_command }}
         github_token: ${{ inputs.github_token }}
         github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
         github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}

@@ -16,41 +16,45 @@ inputs:
     description: |
       GitHub App Private Key for Securefix Action
     required: false
+  terraform_command:
+    description: terraform command
+    required: false
+    default: terraform
+  working_directory:
+    description: working directory
+    required: false
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
-      id: target-config
-      with:
-        action: get-target-config
     - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
       with:
         action: get-global-config
 
     - shell: bash
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      working-directory: ${{ inputs.working_directory }}
       id: files
       env:
-        TF_COMMAND: ${{steps.target-config.outputs.terraform_command}}
+        TF_COMMAND: ${{inputs.terraform_command}}
+        DIR: ${{ inputs.working_directory }}
       run: |
         {
           echo 'value<<EOF'
-          "$TF_COMMAND" fmt -recursive
+          "$TF_COMMAND" fmt -recursive | sed "s|^|${WORKING_DIR}/|"
           echo EOF
         } >> "$GITHUB_OUTPUT"
 
     - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.files.outputs.value != ''
       uses: suzuki-shunsuke/commit-action@e3299afe2e5ffb76f1987743e3dbc0f00ece72d8 # v0.0.8
       with:
-        commit_message: "style: ${{steps.target-config.outputs.terraform_command}} fmt -recursive"
+        commit_message: "style: ${{inputs.terraform_command}} fmt -recursive"
         github_token: ${{ inputs.github_token }}
         files: ${{ steps.files.outputs.value }}
 
     - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.files.outputs.value != ''
-      uses: csm-actions/securefix-action@pr/123
+      uses: csm-actions/securefix-action@93104f33820be53834509335ed722a209d3714f3 # v0.1.1-0
       with:
         app_id: ${{inputs.github_app_id_for_securefix_action}}
         app_private_key: ${{inputs.github_app_private_key_for_securefix_action}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        commit_message: "style: ${{steps.target-config.outputs.terraform_command}} fmt -recursive"
+        commit_message: "style: ${{inputs.terraform_command}} fmt -recursive"
