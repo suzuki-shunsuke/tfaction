@@ -8,6 +8,15 @@ inputs:
       contents:write - Push commits
     required: false
     default: ${{ github.token }}
+  github_app_id_for_securefix_action:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  github_app_private_key_for_securefix_action:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 runs:
   using: composite
   steps:
@@ -43,13 +52,16 @@ runs:
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: "true"
 
-    - uses: suzuki-shunsuke/github-action-tflint@a9d1f3376c8bbd6aadf4891dfe32f5e246c9c52f # v1.2.1
+    - uses: suzuki-shunsuke/github-action-tflint@c268eb6b71c45d3e6d620d5bd8b38db0c8628a08 # v1.3.0-0
       if: fromJSON(steps.global-config.outputs.enable_tflint)
       with:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
         github_comment: "true"
         fix: ${{ steps.global-config.outputs.tflint_fix == 'true' }}
+        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
+        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
+        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
     # Remove .terraform.lock.hcl created by `terraform init` before running terraform-docs
     - run: "! test -f .terraform.lock.hcl || rm .terraform.lock.hcl"
@@ -61,8 +73,10 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-fmt@bdc85c3536e31ae189339cc09c5a0f9768d0ffa7 # v0.2.2
+    - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_token: ${{ inputs.github_token }}
         terraform_command: ${{ steps.global-config.outputs.terraform_command }}
+        github_token: ${{ inputs.github_token }}
+        github_app_id_for_securefix_action: ${{ inputs.github_app_id_for_securefix_action }}
+        github_app_private_key_for_securefix_action: ${{ inputs.github_app_private_key_for_securefix_action }}
