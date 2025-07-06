@@ -13,7 +13,7 @@ create_opts=(-R "$GITHUB_REPOSITORY" -H "$BRANCH" -t "\"$PR_TITLE\"" -b "\"Follo
 if [ "$TFACTION_DRAFT_PR" = "true" ]; then
 	create_opts+=(-d)
 fi
-if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ] && [ -n "${GROUP_lABEL:-}" ]; then
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ] && [ -n "${GROUP_LABEL:-}" ]; then
 	create_opts+=(-l "$GROUP_LABEL")
 fi
 
