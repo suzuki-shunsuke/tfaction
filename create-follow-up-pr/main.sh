@@ -14,7 +14,7 @@ bash "$GITHUB_ACTION_PATH/create_commit.sh"
 
 create_opts=(-H "$BRANCH" -t "$PR_TITLE")
 
-if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ] && [ -n "${GROUP_lABEL:-}" ]; then
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ] && [ -n "${GROUP_LABEL:-}" ]; then
 	create_opts+=(-l "$GROUP_LABEL")
 fi
 
