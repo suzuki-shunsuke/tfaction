@@ -103,3 +103,4 @@ runs:
         branch: ${{ steps.follow-up-pr-param.outputs.branch }}
         pull_request_draft: ${{steps.global-config.outputs.draft_pr}}
         pull_request_assignees: ${{ steps.follow-up-pr-param.outputs.assignees_txt }}
+        pull_request_labels: ${{ steps.group-label.outputs.label }}
