@@ -36,9 +36,3 @@ github-comment post \
 	-var "mentions:${MENTIONS}" \
 	-var "follow_up_pr_url:$follow_up_pr_url" \
 	-k create-follow-up-pr
-
-if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ]; then
-	if ! grep -q -F "$GROUP_LABEL" "$CI_INFO_TEMP_DIR/labels.txt"; then
-		gh pr edit "$CI_INFO_PR_NUMBER" --add-label "$GROUP_LABEL"
-	fi
-fi

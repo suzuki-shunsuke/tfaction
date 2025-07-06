@@ -12,4 +12,7 @@ if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ]; then
 		gh label create "$group_label" || :
 		echo "label=$group_label" >>"$GITHUB_OUTPUT"
 	fi
+	if ! grep -q -F "$group_label" "$CI_INFO_TEMP_DIR/labels.txt"; then
+		gh pr edit "$CI_INFO_PR_NUMBER" --add-label "$group_label"
+	fi
 fi
