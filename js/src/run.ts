@@ -9,6 +9,7 @@ import * as listModuleCallers from "./list-module-callers";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 import * as createDriftIssues from "./create-drift-issues";
 import * as getOrCreateDriftIssue from "./get-or-create-drift-issue";
+import * as getFollowupPRParam from "./get-follow-up-pr-param";
 
 type Inputs = {
   action: string;
@@ -25,6 +26,7 @@ export const main = async (inputs: Inputs) => {
     ["create-drift-issues", createDriftIssues],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["export-secrets", exportSecrets],
+    ["get-follow-up-pr-param", getFollowupPRParam],
     ["get-global-config", getGlobalConfig],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
     ["get-target-config", getTargetConfig],
