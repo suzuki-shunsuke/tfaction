@@ -50,11 +50,13 @@ Follow up #${prNumber} ([failed workflow](${runURL}))
     fs.writeFileSync(
       `${dir}/.tfaction/failed-prs`,
       `# This file is created and updated by tfaction for follow up pull requests.
-# You can remove this file safely.`,
+# You can remove this file safely.
+`,
     );
   }
   fs.appendFileSync(
     `${dir}/.tfaction/failed-prs`,
-    `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/pull/${process.env.CI_INFO_PR_NUMBER}`,
+    `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/pull/${process.env.CI_INFO_PR_NUMBER}
+`,
   );
 };
