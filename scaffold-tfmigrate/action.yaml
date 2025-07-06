@@ -132,6 +132,10 @@ runs:
           About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
           [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
           Please fix the generated migration file.
+        pull_request_comment: |
+          @${{github.actor}} This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}) you ran.
+          Please handle this pull request.
+        pull_request_assignees: ${{github.actor}}
 
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
@@ -164,13 +168,16 @@ runs:
       env:
         CODE_BLOCK: "```"
         LABEL_PREFIX: ${{steps.global-config.outputs.label_prefix_tfmigrate}}
-        DRAFT_PR: ${{steps.global-config.outputs.draft_pr}}
+        DRAFT: ${{steps.global-config.outputs.draft_pr}}
+        BRANCH: ${{steps.branch.outputs.branch}}
       run: |
+        set -euo pipefail
+
         label=${LABEL_PREFIX}$TFACTION_TARGET
         gh api "repos/{owner}/{repo}/labels" -f name="${label}" || :
 
         draft_pr=""
-        if [ "$DRAFT_PR" = "true" ]; then
+        if [ "$DRAFT" = "true" ]; then
           draft_pr="-d "
         fi
         cat << EOS >> "$GITHUB_STEP_SUMMARY"
@@ -204,6 +211,8 @@ runs:
         BRANCH: ${{steps.branch.outputs.branch}}
         DRAFT_PR: ${{steps.global-config.outputs.draft_pr}}
       run: |
+        set -euo pipefail
+
         opts=( -H "$BRANCH" -a "$GITHUB_ACTOR" -t "Scaffold a tfmigrate migration (${TFACTION_TARGET})" -b "@$GITHUB_ACTOR This pull request was created by [GitHub Actions workflow_dispatch event]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)
         About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
         [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
@@ -224,6 +233,8 @@ runs:
         PR_NUMBER: ${{inputs.pr_number}}
         LABEL_PREFIX: ${{steps.global-config.outputs.label_prefix_tfmigrate}}
       run: |
+        set -euo pipefail
+
         curl -X POST "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Accept: application/json" \
@@ -241,6 +252,8 @@ runs:
         PR_NUMBER: ${{steps.create_pr.outputs.pr_number}}
         LABEL_PREFIX: ${{steps.global-config.outputs.label_prefix_tfmigrate}}
       run: |
+        set -euo pipefail
+
         curl -X POST "${GITHUB_API_URL}/repos/$GITHUB_REPOSITORY/issues/${PR_NUMBER}/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Accept: application/json" \

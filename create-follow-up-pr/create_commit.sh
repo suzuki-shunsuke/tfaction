@@ -14,9 +14,7 @@ if [ ! -f "$follow_up_pr_file" ]; then
 fi
 echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$CI_INFO_PR_NUMBER" >>"$follow_up_pr_file"
 ghcp commit \
-	-r "$GITHUB_REPOSITORY" -b "$FOLLOW_UP_BRANCH" \
-	-m "chore: create a commit to open follow up pull request
-Follow up #$CI_INFO_PR_NUMBER
-$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+	-r "$GITHUB_REPOSITORY" -b "$BRANCH" \
+	-m "$COMMIT_MESSAGE" \
 	-C "$GITHUB_WORKSPACE" \
 	"$follow_up_pr_file"

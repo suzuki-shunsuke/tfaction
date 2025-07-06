@@ -90,14 +90,15 @@ runs:
             -b "${{steps.branch.outputs.branch}}" \
             -m "scaffold a working directory (${TFACTION_TARGET})"
 
-    - if: steps.global-config.outputs.skip_create_pr == 'true' && steps.global-config.outputs.securefix_action_server_repository == ''
+    - if: steps.global-config.outputs.skip_create_pr == 'true'
       shell: bash
       env:
         CODE_BLOCK: "```"
+        DRAFT_PR: ${{steps.global-config.outputs.draft_pr}}
       run: |
-        draft_pr=""
-        if [ "${{steps.global-config.outputs.draft_pr}}" = "true" ]; then
-          draft_pr="-d "
+        draft=""
+        if [ "$DRAFT_PR" = "true" ]; then
+          draft="-d "
         fi
         cat << EOS >> "$GITHUB_STEP_SUMMARY"
 
@@ -106,7 +107,7 @@ runs:
         Please run the following command in your terminal.
 
         $CODE_BLOCK
-        gh pr create -R "$GITHUB_REPOSITORY" $draft_pr\\
+        gh pr create -R "$GITHUB_REPOSITORY" $draft\\
           -H "${{steps.branch.outputs.branch}}" \\
           -t "Scaffold a working directory (${TFACTION_TARGET})" \\
           -b "This pull request was created by [GitHub Actions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"

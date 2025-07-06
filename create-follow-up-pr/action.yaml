@@ -10,6 +10,15 @@ inputs:
       pull-requests:write - Create pull request comments
       If skip_create_pr is true
       issues:write - Create labels
+  securefix_action_app_id:
+    description: |
+      GitHub App ID for Securefix Action
+      issues:write
+    required: false
+  securefix_action_app_private_key:
+    description: |
+      GitHub App Private Key for Securefix Action
+    required: false
 runs:
   using: composite
   steps:
@@ -22,21 +31,99 @@ runs:
       with:
         action: get-target-config
 
+    - run: bash "$GITHUB_ACTION_PATH/create_group_label.sh"
+      shell: bash
+      id: group-label
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        FOLLOW_UP_PR_GROUP_LABEL_PREFIX: ${{ steps.global-config.outputs.follow_up_pr_group_label_prefix }}
+        FOLLOW_UP_PR_GROUP_LABEL_ENABLED: ${{ steps.global-config.outputs.follow_up_pr_group_label_enabled }}
+
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: follow-up-pr-param
+      with:
+        action: get-follow-up-pr-param
+      env:
+        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
+
+    - run: bash "$GITHUB_ACTION_PATH/create_commit.sh"
+      shell: bash
+      if: |
+        steps.global-config.outputs.securefix_action_server_repository == '' &&
+        fromJSON(steps.global-config.outputs.skip_create_pr)
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
+        BRANCH: ${{ steps.follow-up-pr-param.outputs.branch }}
+        COMMIT_MESSAGE: ${{ steps.follow-up-pr-param.outputs.commit_message }}
+
+    - run: bash "$GITHUB_ACTION_PATH/main.sh"
+      shell: bash
+      if: |
+        steps.global-config.outputs.securefix_action_server_repository == '' &&
+        !fromJSON(steps.global-config.outputs.skip_create_pr)
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
+        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
+        BRANCH: ${{ steps.follow-up-pr-param.outputs.branch }}
+        PR_TITLE: ${{ steps.follow-up-pr-param.outputs.pr_title }}
+        PR_BODY: ${{ steps.follow-up-pr-param.outputs.pr_body }}
+        ASSIGNEES: ${{ steps.follow-up-pr-param.outputs.assignees_sh }}
+        MENTIONS: ${{ steps.follow-up-pr-param.outputs.mentions }}
+        COMMIT_MESSAGE: ${{ steps.follow-up-pr-param.outputs.commit_message }}
+        GROUP_LABEL: ${{ steps.group-label.outputs.label }}
+        FOLLOW_UP_PR_GROUP_LABEL_PREFIX: ${{ steps.global-config.outputs.follow_up_pr_group_label_prefix }}
+        FOLLOW_UP_PR_GROUP_LABEL_ENABLED: ${{ steps.global-config.outputs.follow_up_pr_group_label_enabled }}
+
+    - if: |
+        steps.global-config.outputs.securefix_action_server_repository != '' &&
+        fromJSON(steps.global-config.outputs.skip_create_pr)
+      uses: csm-actions/securefix-action@93104f33820be53834509335ed722a209d3714f3 # v0.1.1-0
+      with:
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: ${{ steps.follow-up-pr-param.outputs.commit_message }}
+        branch: ${{ steps.follow-up-pr-param.outputs.branch }}
+
+    - if: |
+        steps.global-config.outputs.securefix_action_server_repository != '' &&
+        !fromJSON(steps.global-config.outputs.skip_create_pr)
+      uses: csm-actions/securefix-action@93104f33820be53834509335ed722a209d3714f3 # v0.1.1-0
+      with:
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: ${{ steps.follow-up-pr-param.outputs.commit_message }}
+        pull_request_title: ${{ steps.follow-up-pr-param.outputs.pr_title }}
+        pull_request_base_branch: ${{steps.global-config.outputs.securefix_action_pull_request_base_branch}}
+        pull_request_body: ${{ steps.follow-up-pr-param.outputs.pr_body }}
+        branch: ${{ steps.follow-up-pr-param.outputs.branch }}
+        pull_request_draft: ${{steps.global-config.outputs.draft_pr}}
+        pull_request_assignees: ${{ steps.follow-up-pr-param.outputs.assignees_txt }}
+        pull_request_labels: ${{ steps.group-label.outputs.label }}
+        pull_request_comment: |
+          ${{ steps.follow-up-pr-param.outputs.mentions }}
+          This pull request was created because `terraform apply` failed.
+
+          - #${{env.CI_INFO_PR_NUMBER}}
+
+          Please handle this pull request.
+
     - run: bash "$GITHUB_ACTION_PATH/skip_create_pr.sh"
       shell: bash
-      if: "fromJSON(steps.global-config.outputs.skip_create_pr)"
+      if: |
+        fromJSON(steps.global-config.outputs.skip_create_pr)
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
         TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
         WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
-
-    - run: bash "$GITHUB_ACTION_PATH/main.sh"
-      shell: bash
-      if: "!fromJSON(steps.global-config.outputs.skip_create_pr)"
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
-        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
+        BRANCH: ${{ steps.follow-up-pr-param.outputs.branch }}
+        PR_TITLE: ${{ steps.follow-up-pr-param.outputs.pr_title }}
+        ASSIGNEES: ${{ steps.follow-up-pr-param.outputs.assignees_sh }}
+        MENTIONS: ${{ steps.follow-up-pr-param.outputs.mentions }}
+        GROUP_LABEL: ${{ steps.group-label.outputs.label }}
         FOLLOW_UP_PR_GROUP_LABEL_PREFIX: ${{ steps.global-config.outputs.follow_up_pr_group_label_prefix }}
         FOLLOW_UP_PR_GROUP_LABEL_ENABLED: ${{ steps.global-config.outputs.follow_up_pr_group_label_enabled }}
