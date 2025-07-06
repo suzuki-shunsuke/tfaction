@@ -108,5 +108,8 @@ runs:
         pull_request_labels: ${{ steps.group-label.outputs.label }}
         pull_request_comment: |
           ${{ steps.follow-up-pr-param.outputs.mentions }}
-          This pull request was created because `terraform apply` failed #${{env.CI_INFO_PR_NUMBER}}.
+          This pull request was created because `terraform apply` failed.
+
+          - #${{env.CI_INFO_PR_NUMBER}}
+
           Please handle this pull request.
