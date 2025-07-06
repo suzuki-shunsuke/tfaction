@@ -1,2 +1,2 @@
 packages:
-  - name: aquasecurity/trivy@v0.64.0
+  - name: aquasecurity/trivy@v0.64.1
