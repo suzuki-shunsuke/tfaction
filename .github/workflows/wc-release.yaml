@@ -11,7 +11,7 @@ on:
       pr:
         description: "Pull Request Number"
         required: false
-        type: number
+        type: string
       is_comment:
         description: If the comment is posted
         required: false
