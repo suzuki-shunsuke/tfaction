@@ -19,6 +19,7 @@ if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ] && [ -n "${GROUP_lABEL:-}" ]; 
 fi
 
 if [ -n "${ASSIGNEES:-}" ]; then
+	# shellcheck disable=SC2206
 	create_opts+=($ASSIGNEES)
 fi
 if [ "$TFACTION_DRAFT_PR" = "true" ]; then
