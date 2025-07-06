@@ -43,7 +43,9 @@ Follow up #${prNumber} ([failed workflow](${runURL}))
   );
   core.setOutput("mentions", [...assignees].map((a) => `@${a}`).join(" "));
 
-  fs.mkdirSync(`${dir}/.tfaction`);
+  if (!fs.existsSync(`${dir}/.tfaction`)) {
+    fs.mkdirSync(`${dir}/.tfaction`);
+  }
   if (!fs.existsSync(`${dir}/.tfaction/failed-prs`)) {
     fs.writeFileSync(
       `${dir}/.tfaction/failed-prs`,
