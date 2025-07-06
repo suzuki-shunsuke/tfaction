@@ -62,6 +62,9 @@ runs:
           This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
         pull_request_draft: ${{ steps.global-config.outputs.draft_pr }}
         pull_request_assignees: ${{ github.actor }}
+        pull_request_comment: |
+          @${{github.actor}} This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}) you ran.
+          Please handle this pull request.
 
     - if: steps.global-config.outputs.skip_create_pr == 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
       uses: csm-actions/securefix-action@93104f33820be53834509335ed722a209d3714f3 # v0.1.1-0

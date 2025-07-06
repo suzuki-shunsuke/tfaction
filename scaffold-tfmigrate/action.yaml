@@ -132,6 +132,9 @@ runs:
           About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
           [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
           Please fix the generated migration file.
+        pull_request_comment: |
+          @${{github.actor}} This pull request was created by [GitHub Actions](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}) you ran.
+          Please handle this pull request.
 
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
