@@ -61,6 +61,8 @@ runs:
         ASSIGNEES: ${{ steps.follow-up-pr-param.outputs.assignees_sh }}
         MENTIONS: ${{ steps.follow-up-pr-param.outputs.mentions }}
         COMMIT_MESSAGE: ${{ steps.follow-up-pr-param.outputs.commit_message }}
+        FOLLOW_UP_PR_GROUP_LABEL_PREFIX: ${{ steps.global-config.outputs.follow_up_pr_group_label_prefix }}
+        FOLLOW_UP_PR_GROUP_LABEL_ENABLED: ${{ steps.global-config.outputs.follow_up_pr_group_label_enabled }}
 
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
       shell: bash
@@ -78,6 +80,8 @@ runs:
         MENTIONS: ${{ steps.follow-up-pr-param.outputs.mentions }}
         COMMIT_MESSAGE: ${{ steps.follow-up-pr-param.outputs.commit_message }}
         GROUP_LABEL: ${{ steps.group-label.outputs.label }}
+        FOLLOW_UP_PR_GROUP_LABEL_PREFIX: ${{ steps.global-config.outputs.follow_up_pr_group_label_prefix }}
+        FOLLOW_UP_PR_GROUP_LABEL_ENABLED: ${{ steps.global-config.outputs.follow_up_pr_group_label_enabled }}
 
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&

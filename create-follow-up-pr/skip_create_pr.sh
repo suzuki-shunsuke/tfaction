@@ -15,6 +15,9 @@ create_opts=(-R "$GITHUB_REPOSITORY" -H "$BRANCH" -t "\"$PR_TITLE\"" -b "\"Follo
 if [ "$TFACTION_DRAFT_PR" = "true" ]; then
 	create_opts+=(-d)
 fi
+if [ "$FOLLOW_UP_PR_GROUP_LABEL_ENABLED" = true ] && [ -n "${GROUP_lABEL:-}" ]; then
+	create_opts+=(-l "$GROUP_LABEL")
+fi
 
 github-comment post \
 	-config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
