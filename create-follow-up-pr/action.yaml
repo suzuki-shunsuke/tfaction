@@ -43,6 +43,8 @@ runs:
       id: follow-up-pr-param
       with:
         action: get-follow-up-pr-param
+      env:
+        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
 
     - run: bash "$GITHUB_ACTION_PATH/skip_create_pr.sh"
       shell: bash
