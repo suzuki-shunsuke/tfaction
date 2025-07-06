@@ -46,24 +46,16 @@ runs:
       env:
         WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
 
-    - run: bash "$GITHUB_ACTION_PATH/skip_create_pr.sh"
+    - run: bash "$GITHUB_ACTION_PATH/create_commit.sh"
       shell: bash
       if: |
         steps.global-config.outputs.securefix_action_server_repository == '' &&
         fromJSON(steps.global-config.outputs.skip_create_pr)
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
-        TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
         WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
         BRANCH: ${{ steps.follow-up-pr-param.outputs.branch }}
-        PR_TITLE: ${{ steps.follow-up-pr-param.outputs.pr_title }}
-        ASSIGNEES: ${{ steps.follow-up-pr-param.outputs.assignees_sh }}
-        MENTIONS: ${{ steps.follow-up-pr-param.outputs.mentions }}
         COMMIT_MESSAGE: ${{ steps.follow-up-pr-param.outputs.commit_message }}
-        GROUP_LABEL: ${{ steps.group-label.outputs.label }}
-        FOLLOW_UP_PR_GROUP_LABEL_PREFIX: ${{ steps.global-config.outputs.follow_up_pr_group_label_prefix }}
-        FOLLOW_UP_PR_GROUP_LABEL_ENABLED: ${{ steps.global-config.outputs.follow_up_pr_group_label_enabled }}
 
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
       shell: bash
@@ -118,3 +110,20 @@ runs:
           - #${{env.CI_INFO_PR_NUMBER}}
 
           Please handle this pull request.
+
+    - run: bash "$GITHUB_ACTION_PATH/skip_create_pr.sh"
+      shell: bash
+      if: |
+        fromJSON(steps.global-config.outputs.skip_create_pr)
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        TFACTION_TARGET_LABEL_PREFIX: ${{ steps.global-config.outputs.label_prefix_target }}
+        TFACTION_DRAFT_PR: ${{ steps.global-config.outputs.draft_pr }}
+        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
+        BRANCH: ${{ steps.follow-up-pr-param.outputs.branch }}
+        PR_TITLE: ${{ steps.follow-up-pr-param.outputs.pr_title }}
+        ASSIGNEES: ${{ steps.follow-up-pr-param.outputs.assignees_sh }}
+        MENTIONS: ${{ steps.follow-up-pr-param.outputs.mentions }}
+        GROUP_LABEL: ${{ steps.group-label.outputs.label }}
+        FOLLOW_UP_PR_GROUP_LABEL_PREFIX: ${{ steps.global-config.outputs.follow_up_pr_group_label_prefix }}
+        FOLLOW_UP_PR_GROUP_LABEL_ENABLED: ${{ steps.global-config.outputs.follow_up_pr_group_label_enabled }}
