@@ -9,8 +9,6 @@ fi
 # create a branch with empty commit
 # 1. create a remote branch
 
-bash "$GITHUB_ACTION_PATH/create_commit.sh"
-
 create_opts=(-R "$GITHUB_REPOSITORY" -H "$BRANCH" -t "\"$PR_TITLE\"" -b "\"Follow up #$CI_INFO_PR_NUMBER\"")
 if [ "$TFACTION_DRAFT_PR" = "true" ]; then
 	create_opts+=(-d)
