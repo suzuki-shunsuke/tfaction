@@ -22,11 +22,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@f253afebf7b9180e4811b877058ba5dfd7fe7a5b
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@f253afebf7b9180e4811b877058ba5dfd7fe7a5b
       id: target-config
       with:
         action: get-target-config
@@ -39,7 +39,7 @@ runs:
         FOLLOW_UP_PR_GROUP_LABEL_PREFIX: ${{ steps.global-config.outputs.follow_up_pr_group_label_prefix }}
         FOLLOW_UP_PR_GROUP_LABEL_ENABLED: ${{ steps.global-config.outputs.follow_up_pr_group_label_enabled }}
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@f253afebf7b9180e4811b877058ba5dfd7fe7a5b
       id: follow-up-pr-param
       with:
         action: get-follow-up-pr-param
