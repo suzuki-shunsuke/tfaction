@@ -49,3 +49,4 @@ runs:
         DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}
         PLAN_WORKFLOW_NAME: ${{ steps.global-config.outputs.plan_workflow_name }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+        PLAN_EVENT: ${{ steps.global-config.outputs.plan_event }}
