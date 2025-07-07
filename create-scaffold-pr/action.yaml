@@ -57,6 +57,7 @@ runs:
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         branch: ${{steps.branch.outputs.branch}}
         commit_message: "scaffold a working directory (${{env.TFACTION_TARGET}})"
+        files: ${{steps.files.outputs.value}}
 
     - if: steps.global-config.outputs.skip_create_pr != 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
       uses: csm-actions/securefix-action@93104f33820be53834509335ed722a209d3714f3 # v0.1.1-0
@@ -66,6 +67,7 @@ runs:
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: "scaffold a working directory (${{env.TFACTION_TARGET}})"
         branch: ${{steps.branch.outputs.branch}}
+        files: ${{steps.files.outputs.value}}
         pull_request_title: "Scaffold a working directory (${{env.TFACTION_TARGET}})"
         pull_request_base_branch: ${{steps.global-config.outputs.securefix_action_pull_request_base_branch}}
         pull_request_draft: ${{steps.global-config.outputs.draft_pr}}

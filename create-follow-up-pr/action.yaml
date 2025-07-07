@@ -86,6 +86,7 @@ runs:
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: ${{ steps.follow-up-pr-param.outputs.commit_message }}
         branch: ${{ steps.follow-up-pr-param.outputs.branch }}
+        files: ${{steps.target-config.outputs.working_directory}}/.tfaction/failed-prs"
 
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
@@ -96,6 +97,7 @@ runs:
         app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: ${{ steps.follow-up-pr-param.outputs.commit_message }}
+        files: ${{steps.target-config.outputs.working_directory}}/.tfaction/failed-prs"
         pull_request_title: ${{ steps.follow-up-pr-param.outputs.pr_title }}
         pull_request_base_branch: ${{steps.global-config.outputs.securefix_action_pull_request_base_branch}}
         pull_request_body: ${{ steps.follow-up-pr-param.outputs.pr_body }}

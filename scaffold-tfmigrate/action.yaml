@@ -112,6 +112,17 @@ runs:
       env:
         PR_NUMBER: ${{inputs.pr_number}}
 
+    - id: files
+      shell: bash
+      env:
+        WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
+      run: |
+        {
+          echo "value<<EOF"
+          git ls-files --modified --others --exclude-standard "$WORKING_DIR"
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
         steps.global-config.outputs.skip_create_pr != 'true' && !inputs.pr_number
@@ -122,6 +133,7 @@ runs:
         server_repository: ${{steps.global-config.outputs.securefix_action_server_repository}}
         branch: ${{steps.branch.outputs.branch}}
         commit_message: "chore: scaffold a tfmigrate migration (${{env.TFACTION_TARGET}})"
+        files: ${{steps.files.outputs.value}}
         pull_request_title: "Scaffold a tfmigrate migration (${{env.TFACTION_TARGET}})"
         pull_request_base_branch: ${{steps.global-config.outputs.securefix_action_pull_request_base_branch}}
         pull_request_draft: ${{steps.global-config.outputs.draft_pr}}
@@ -147,11 +159,12 @@ runs:
         server_repository: ${{steps.global-config.outputs.securefix_action_server_repository}}
         branch: ${{steps.branch.outputs.branch}}
         commit_message: "chore: scaffold a tfmigrate migration (${{env.TFACTION_TARGET}})"
+        files: ${{steps.files.outputs.value}}
 
     - name: Push a commit
       if: steps.global-config.outputs.securefix_action_server_repository == ''
       run: |
-        git ls-files --modified --others --exclude-standard "$WORKING_DIR" |
+        echo "$FILES" |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "$BRANCH" \
             -m "chore: scaffold a tfmigrate migration (${TFACTION_TARGET})"
@@ -160,6 +173,7 @@ runs:
         GITHUB_TOKEN: ${{inputs.github_token}}
         BRANCH: ${{steps.branch.outputs.branch}}
         WORKING_DIR: ${{steps.target-config.outputs.working_directory}}
+        FILES: ${{steps.files.outputs.value}}
 
     - name: Create a label to the repository and output the guide to GitHub Step Summary
       if: |

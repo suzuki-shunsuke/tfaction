@@ -64,6 +64,7 @@ runs:
         app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
+        files: ${{ steps.target-config.outputs.working_directory }}/.tfmigrate.hcl
 
     - if: steps.migrate.outputs.changed != 'true'
       uses: suzuki-shunsuke/tfaction/conftest@main

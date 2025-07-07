@@ -66,3 +66,4 @@ runs:
         app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: "style: ${{inputs.terraform_command}} fmt -recursive"
+        files: ${{ steps.files.outputs.value }}
