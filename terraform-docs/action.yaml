@@ -50,3 +50,4 @@ runs:
         app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: "docs: generate document by terraform-docs"
+        files: ${{ inputs.working_directory }}/README.md

@@ -48,6 +48,15 @@ runs:
       run: |
         echo "branch=scaffold-module-${TFACTION_MODULE_PATH/\//_}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"
 
+    - id: files
+      shell: bash
+      run: |
+        {
+          echo "value<<EOF"
+          git ls-files --modified --others --exclude-standard "$TFACTION_MODULE_PATH"
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
     - if: steps.global-config.outputs.skip_create_pr != 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
       uses: csm-actions/securefix-action@93104f33820be53834509335ed722a209d3714f3 # v0.1.1-0
       with:
@@ -55,6 +64,7 @@ runs:
         app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         branch: ${{steps.branch.outputs.branch}}
+        files: ${{steps.files.outputs.value}}
         commit_message: "chore(${{env.TFACTION_MODULE_PATH}}): scaffold a Terraform Module"
         pull_request_title: "Scaffold a Terraform Module (${{env.TFACTION_MODULE_PATH}})"
         pull_request_base_branch: ${{ steps.global-config.outputs.securefix_action_pull_request_base_branch }}
@@ -74,14 +84,16 @@ runs:
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         branch: ${{steps.branch.outputs.branch}}
         commit_message: "chore(${{env.TFACTION_MODULE_PATH}}): scaffold a Terraform Module"
+        files: ${{steps.files.outputs.value}}
 
     - if: steps.global-config.outputs.securefix_action_server_repository == ''
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         BRANCH: ${{ steps.branch.outputs.branch }}
+        FILES: ${{steps.files.outputs.value}}
       run: |
-        git ls-files --modified --others --exclude-standard "$TFACTION_MODULE_PATH" |
+        echo "$FILES" |
           xargs ghcp commit -r "$GITHUB_REPOSITORY" \
             -b "$BRANCH" \
             -m "chore($TFACTION_MODULE_PATH): scaffold a Terraform Module"
