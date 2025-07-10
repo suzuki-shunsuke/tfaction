@@ -53,7 +53,7 @@ runs:
         } >> "$GITHUB_OUTPUT"
 
     - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.files.outputs.value != ''
-      uses: suzuki-shunsuke/commit-action@e3299afe2e5ffb76f1987743e3dbc0f00ece72d8 # v0.0.8
+      uses: suzuki-shunsuke/commit-action@eba143cd31bc6b7f7844c4a2672ad321e91061f1 # v0.0.9
       with:
         commit_message: "style: ${{inputs.terraform_command}} fmt -recursive"
         github_token: ${{ inputs.github_token }}
