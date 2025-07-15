@@ -6,5 +6,5 @@ registries:
   - type: standard
     ref: v4.386.0 # renovate: depName=aquaproj/aqua-registry
 packages:
-  - name: suzuki-shunsuke/github-comment@v6.3.2
+  - name: suzuki-shunsuke/github-comment@v6.3.3
   - name: int128/ghcp@v1.15.0
