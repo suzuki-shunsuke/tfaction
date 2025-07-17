@@ -106,28 +106,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_darwin_amd64.zip",
-      "checksum": "7800C0A86FA716609D77DDFBFA31FE428F409D400CE0D989DECED21684E61677",
+      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_darwin_amd64.tar.gz",
+      "checksum": "C3E7270E27D1F94CCDD5A7A4FDBBB1AF2F86BF78162C4A982C560228CF20FC7F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_darwin_arm64.zip",
-      "checksum": "82B63DECCC1A82550389DC9A516A068D69F9E0CF6F1B68768AD6DB3728412E2A",
+      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_darwin_arm64.tar.gz",
+      "checksum": "C5F2750BD3AB2727448336A407C59C29B5DEFD2E67F4B39F30A0AA7F4C14DDC8",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_linux_amd64.zip",
-      "checksum": "CB5FAD28FC5E66C3AE8F443CB3902E7ED6657DC96D076572AC6609AC4DB7B5E3",
+      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_linux_amd64.tar.gz",
+      "checksum": "4D00A35452E7A2C17D7C46BAD44142FB393FAD39C84427A26433F29C9B0174A4",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_linux_arm64.zip",
-      "checksum": "F6E063FE2112D6C121F690C396D63949BEF37142BA8B4C1F29B812771A7A7EE7",
+      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_linux_arm64.tar.gz",
+      "checksum": "71A42AE4EAD817D0234EA3611361E4B17690AFC3EA30AD12A270973223DEDCCC",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_windows_amd64.zip",
-      "checksum": "B278DACF20263200FBC038971C7CD88065BDA757567F359D81B8828B860311AC",
+      "id": "github_release/github.com/opentofu/opentofu/v1.10.2/tofu_1.10.2_windows_amd64.tar.gz",
+      "checksum": "FD25A96008F62FFFF9A8450FB6D9F958E76A106A36C3F45A75FC9B20D8035CBF",
       "algorithm": "sha256"
     },
     {
@@ -386,8 +386,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.386.0/registry.yaml",
-      "checksum": "297DCBFBAC90D85B1C44F1C0E1EC9622A666B2FAEF5979BB553A761A28AA3E87C631E83E623B77EBF64B18D864DEDC7B90D7E646146AA91CBCE59509A0447386",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.387.0/registry.yaml",
+      "checksum": "2B7DA3B8F725EA567B9A00AE56C14566C6D112273488455D6A7C62BCB981EC8AD68DE8A63A824D669058F3BA7554C99918965E829DC24128C1C57DD039C6C63E",
       "algorithm": "sha512"
     }
   ]
