@@ -17,6 +17,6 @@
   "author": "",
   "license": "MIT",
   "volta": {
-    "node": "20.19.3"
+    "node": "20.19.4"
   }
 }
