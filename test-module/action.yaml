@@ -81,14 +81,14 @@ runs:
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/terraform-docs@19f9e3dfd8f707ee90b2b3013ba3ae61b40bc7ea
       with:
         github_token: ${{ inputs.github_token }}
         securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
         securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
         working_directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
+    - uses: suzuki-shunsuke/tfaction/terraform-fmt@19f9e3dfd8f707ee90b2b3013ba3ae61b40bc7ea
       with:
         working_directory: ${{ env.TFACTION_TARGET }}
         terraform_command: ${{ steps.global-config.outputs.terraform_command }}
