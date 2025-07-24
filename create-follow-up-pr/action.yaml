@@ -86,7 +86,7 @@ runs:
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         commit_message: ${{ steps.follow-up-pr-param.outputs.commit_message }}
         branch: ${{ steps.follow-up-pr-param.outputs.branch }}
-        files: ${{steps.target-config.outputs.working_directory}}/.tfaction/failed-prs"
+        files: ${{steps.target-config.outputs.working_directory}}/.tfaction/failed-prs
 
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
