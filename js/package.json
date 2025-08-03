@@ -22,7 +22,7 @@
     "@types/node": "20.19.9",
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.3",
-    "typescript": "5.8.3",
+    "typescript": "5.9.2",
     "vitest": "3.2.4",
     "zod-to-json-schema": "3.24.6"
   }
