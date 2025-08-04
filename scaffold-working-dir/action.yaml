@@ -103,5 +103,3 @@ runs:
     - run: git ls-files --modified --others --exclude-standard | xargs -n 1 sed -i "s|%%TARGET%%|${TFACTION_TARGET}|g"
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
-      env:
-        TFACTION_TARGET: ${{steps.target-config.outputs.target}}
