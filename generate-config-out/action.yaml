@@ -41,7 +41,6 @@ runs:
       shell: bash
       working-directory: ${{steps.target-config.outputs.working_directory}}
       env:
-        TFACTION_TARGET: ${{steps.target-config.outputs.target}}
         FILE: ${{inputs.file}}
       run: |
         tempfile=generated_${GITHUB_RUN_ID}_$(date +%Y%m%d%H%M%S).tf
