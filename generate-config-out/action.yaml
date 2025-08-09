@@ -54,7 +54,7 @@ runs:
         rm "$tempfile"
 
     - if: steps.global-config.outputs.securefix_action_server_repository != ''
-      uses: csm-actions/securefix-action@758a17e6f52a70ab0d8102ef1cd13cd0107206e6 # v0.2.0
+      uses: csm-actions/securefix-action@88b0ac73776233f648080baf9e8e103377db2fb2 # v0.2.1
       with:
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
