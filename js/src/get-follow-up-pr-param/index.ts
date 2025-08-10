@@ -3,11 +3,13 @@ import * as fs from "fs";
 import { z } from "zod";
 
 const PRData = z.object({
-  assignees: z.array(
-    z.object({
-      login: z.string(),
-    })
-  ).optional(),
+  assignees: z
+    .array(
+      z.object({
+        login: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export const main = async () => {
