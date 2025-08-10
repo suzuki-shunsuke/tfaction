@@ -1,5 +1,16 @@
 import * as core from "@actions/core";
 import * as fs from "fs";
+import { z } from "zod";
+
+const PRData = z.object({
+  assignees: z
+    .array(
+      z.object({
+        login: z.string(),
+      }),
+    )
+    .optional(),
+});
 
 export const main = async () => {
   const prNumber = process.env.CI_INFO_PR_NUMBER;
@@ -35,6 +46,25 @@ Follow up #${prNumber} ([failed workflow](${runURL}))
   }
   if (actor && !actor.endsWith("[bot]") && actor !== prAuthor) {
     assignees.add(actor);
+  }
+
+  // Add assignees from the original PR
+  const ciInfoTempDir = process.env.CI_INFO_TEMP_DIR;
+  if (ciInfoTempDir) {
+    const prJsonPath = `${ciInfoTempDir}/pr.json`;
+    if (fs.existsSync(prJsonPath)) {
+      try {
+        const prDataRaw = JSON.parse(fs.readFileSync(prJsonPath, "utf8"));
+        const prData = PRData.parse(prDataRaw);
+        if (prData.assignees) {
+          for (const assignee of prData.assignees) {
+            assignees.add(assignee.login);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to read or parse pr.json:", error);
+      }
+    }
   }
   core.setOutput("assignees_txt", [...assignees].join("\n"));
   core.setOutput(
