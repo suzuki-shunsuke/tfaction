@@ -47,8 +47,12 @@ export const run = async (
   const target = t.target;
   const targetConfig = t.group;
 
-  envs.set("TFACTION_WORKING_DIR", workingDir);
-  envs.set("TFACTION_TARGET", target);
+  if (!process.env.TFACTION_WORKING_DIR) {
+    envs.set("TFACTION_WORKING_DIR", workingDir);
+  }
+  if (!process.env.TFACTION_TARGET) {
+    envs.set("TFACTION_TARGET", target);
+  }
   outputs.set("working_directory", workingDir);
   outputs.set(
     "providers_lock_opts",
