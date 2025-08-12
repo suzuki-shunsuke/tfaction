@@ -444,15 +444,22 @@ export const getTargetGroup = async (
       config.target_groups,
       workingDir,
     );
-    target = workingDir;
-    for (const pattern of config.replace?.patterns ?? []) {
-      target = target.replace(new RegExp(pattern.regexp), pattern.replace);
+    if (target) {
+      return {
+        target: target,
+        workingDir: workingDir,
+        group: targetConfig,
+      };
     }
+    target = workingDir;
     if (targetConfig?.target !== undefined) {
       target = workingDir.replace(
         targetConfig.working_directory,
         targetConfig.target,
       );
+    }
+    for (const pattern of config.replace?.patterns ?? []) {
+      target = target.replace(new RegExp(pattern.regexp), pattern.replace);
     }
     return {
       target: target,
