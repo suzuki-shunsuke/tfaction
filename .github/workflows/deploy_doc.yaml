@@ -13,7 +13,7 @@ jobs:
       contents: write
       issues: write
     steps:
-      - uses: suzuki-shunsuke/release-doc-action@d0a80c8ada60c282df9664a7f6d2e016034ad353 # v0.0.5
+      - uses: suzuki-shunsuke/release-doc-action@94de66f739174d7c4ff94db68831b2672a4e4519 # v0.0.6
         with:
           repository: suzuki-shunsuke/tfaction-docs
           issue_number: 2533
