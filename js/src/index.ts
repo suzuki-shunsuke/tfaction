@@ -9,7 +9,7 @@ try {
     testAction.main();
   } else if (process.env.TFACTION_TEST_ACTION_TERRAGRUNT) {
     testActionTerragrunt.main();
-  } else if (process.env.TFACTION_GERENATE_JSON_SCHEMA) {
+  } else if (process.env.TFACTION_GENERATE_JSON_SCHEMA) {
     generateJSONSchema("schema");
   } else {
     main({
