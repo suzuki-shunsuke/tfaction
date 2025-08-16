@@ -24,5 +24,5 @@ If the apply workflow fails again when a follow-up pull request is merged, a fol
 For instance, let's say a pull request #100 fails, and a follow-up PR #110 is created.
 And a follow-up PR #110 fails, and a follow-up PR #120 is created.
 In this case, a follow-up PR group label `tfaction:follow-up-pr-group/100` is added to pull requests #100, #110, and #120.
-These pull requests are grouped by a label `tfaction:follow-up-pr-group/100`. 
+These pull requests are grouped by a label `tfaction:follow-up-pr-group/100`.
 You can search pull requests by label.

@@ -25,12 +25,12 @@ e.g.
 
 ```yaml
 target_groups:
-- working_directory: atlas/staging/
-  # ...
-  secrets:
-  # export the secret `ATLAS_API_KEY_STAGING` as the environment variable `ATLAS_API_KEY`
-  - env_name: ATLAS_API_KEY
-    secret_name: ATLAS_API_KEY_STAGING
+  - working_directory: atlas/staging/
+    # ...
+    secrets:
+      # export the secret `ATLAS_API_KEY_STAGING` as the environment variable `ATLAS_API_KEY`
+      - env_name: ATLAS_API_KEY
+        secret_name: ATLAS_API_KEY_STAGING
 ```
 
 Job Configuration
@@ -39,13 +39,13 @@ e.g.
 
 ```yaml
 target_groups:
-- working_directory: atlas/staging/
-  # ...
-  terraform_plan_config:
+  - working_directory: atlas/staging/
     # ...
-    secrets:
-    - env_name: ATLAS_API_KEY
-      secret_name: ATLAS_API_KEY_STAGING_READ_ONLY
+    terraform_plan_config:
+      # ...
+      secrets:
+        - env_name: ATLAS_API_KEY
+          secret_name: ATLAS_API_KEY_STAGING_READ_ONLY
 ```
 
 :::caution
@@ -66,6 +66,7 @@ Run suzuki-shunsuke/tfaction/export-secrets@v1.3.1
 The list of secret names passed to the action: gh_app_id, gh_app_private_Key, github_token
 Error: "secret is not found: FASTLY_API_KEY"
 ```
+
 :::
 
 ### AWS Secrets Manager
@@ -79,42 +80,42 @@ e.g.
 
 ```yaml
 target_groups:
-- working_directory: foo/
-  # ...
-  aws_secrets_manager:
-  - secret_id: foo
-    envs:
-    - env_name: FOO_API_KEY
-    # if `secret_key` isn't specified, the whole secret value is exported
+  - working_directory: foo/
+    # ...
+    aws_secrets_manager:
+      - secret_id: foo
+        envs:
+          - env_name: FOO_API_KEY
+        # if `secret_key` isn't specified, the whole secret value is exported
 ```
 
 ```yaml
 target_groups:
-- working_directory: atlas/
-  # ...
-  aws_secrets_manager:
-  - secret_id: atlas
-    envs:
-    - env_name: ATLAS_API_PUBLIC_KEY
-      secret_key: public_key
-    - env_name: ATLAS_API_PRIVATE_KEY
-      secret_key: private_key
-      # if `secret_key` is specified, the secret value is treated as JSON and the specified key is exported
+  - working_directory: atlas/
+    # ...
+    aws_secrets_manager:
+      - secret_id: atlas
+        envs:
+          - env_name: ATLAS_API_PUBLIC_KEY
+            secret_key: public_key
+          - env_name: ATLAS_API_PRIVATE_KEY
+            secret_key: private_key
+            # if `secret_key` is specified, the secret value is treated as JSON and the specified key is exported
 ```
 
 Job Configuration
 
 ```yaml
 target_groups:
-- working_directory: atlas/
-  # ...
-  terraform_plan_config:
+  - working_directory: atlas/
     # ...
-    aws_secrets_manager:
-    - secret_id: atlas
-      envs:
-      - env_name: ATLAS_API_PUBLIC_KEY
-        secret_key: public_key
-      - env_name: ATLAS_API_PRIVATE_KEY
-        secret_key: private_key
+    terraform_plan_config:
+      # ...
+      aws_secrets_manager:
+        - secret_id: atlas
+          envs:
+            - env_name: ATLAS_API_PUBLIC_KEY
+              secret_key: public_key
+            - env_name: ATLAS_API_PRIVATE_KEY
+              secret_key: private_key
 ```

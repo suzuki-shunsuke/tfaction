@@ -15,9 +15,9 @@ On the other hand, when Terraform and Terraform Providers are updated, you have 
 
 By skipping `terraform plan` and `terraform apply`, you can efficiently update dependencies.
 
-* You can prevent unexpected changes from being applied
-* [You can prevent CI failure due to `terraform plan`'s unexpected changes](renovate.md)
-* You can prevent API rate exceeded by `terraform plan` and `terraform apply`
+- You can prevent unexpected changes from being applied
+- [You can prevent CI failure due to `terraform plan`'s unexpected changes](renovate.md)
+- You can prevent API rate exceeded by `terraform plan` and `terraform apply`
 
 ## How to use
 
@@ -38,7 +38,7 @@ e.g.
 
 ```yaml
 renovate_terraform_labels:
-- terraform
+  - terraform
 ```
 
 ```json

@@ -92,7 +92,7 @@ Upgrading modules...
 Downloading git::https://github.com/***/***.git?ref=*** for ***...
 ╷
 │ Error: Failed to download module
-│ 
+│
 │ Could not download module "***" (main.tf:1) source code
 │ from
 │ "git::https://github.com/***/***.git?ref=***":
@@ -102,7 +102,7 @@ Downloading git::https://github.com/***/***.git?ref=*** for ***...
 │ '.terraform/modules/***'...
 │ fatal: could not read Username for 'https://github.com': No such device or
 │ address
-│ 
+│
 ╵
 ```
 

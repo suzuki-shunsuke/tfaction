@@ -71,12 +71,12 @@ The order of `target_groups` is important.
 
 ```yaml
 target_groups:
-- working_directory: aws/
-  target: aws/
-  # ...
-- working_directory: aws/foo/ # This configuration is never used.
-  target: aws/foo/
-  # ...
+  - working_directory: aws/
+    target: aws/
+    # ...
+  - working_directory: aws/foo/ # This configuration is never used.
+    target: aws/foo/
+    # ...
 ```
 
 ## Example

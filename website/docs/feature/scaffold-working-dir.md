@@ -36,10 +36,10 @@ Then a pull request would be created.
 
 Compared with executing commands at the localhost, GitHub Actions has the following merits.
 
-* GitHub Actions doesn't depend on you local environment
-  * You don't have to install tools at local
-  * You can avoid the trouble due to the difference of local environment
-  * GitHub Actions log is useful for trouble shooting
+- GitHub Actions doesn't depend on you local environment
+  - You don't have to install tools at local
+  - You can avoid the trouble due to the difference of local environment
+  - GitHub Actions log is useful for trouble shooting
 
 ## Placeholders
 

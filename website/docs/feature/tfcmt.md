@@ -8,5 +8,5 @@ sidebar_position: 70
 
 tfaction notifies the result of terraform plan and apply with tfcmt.
 
-* https://github.com/suzuki-shunsuke/tfcmt
-* https://dev.to/suzukishunsuke/tfcmt-improve-terraform-workflow-with-pr-comment-and-label-1kh7
+- https://github.com/suzuki-shunsuke/tfcmt
+- https://dev.to/suzukishunsuke/tfcmt-improve-terraform-workflow-with-pr-comment-and-label-1kh7

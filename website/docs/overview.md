@@ -128,6 +128,7 @@ So you can't specify `main` and feature branches as versions.
 # This never works as setup/dist/index.js doesn't exist.
 uses: suzuki-shunsuke/tfaction/setup@main
 ```
+
 :::
 
 The following versions are available.

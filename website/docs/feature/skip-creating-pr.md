@@ -8,10 +8,10 @@ sidebar_position: 1000
 
 tfaction supports creating some types of pull requests.
 
-* [Follow up Pull Request](follow-up-pr.md)
-* [Scaffold working directory Pull Request](scaffold-working-dir.md)
-* [Scaffold tfmigrate migration Pull Request](tfmigrate.md#scaffold-migration-pull-request)
-* [Scaffold Terraform Module Pull Request](module.md)
+- [Follow up Pull Request](follow-up-pr.md)
+- [Scaffold working directory Pull Request](scaffold-working-dir.md)
+- [Scaffold tfmigrate migration Pull Request](tfmigrate.md#scaffold-migration-pull-request)
+- [Scaffold Terraform Module Pull Request](module.md)
 
 They are really useful, but these pull requests are created by GitHub App so you can pass [1 approval Required](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches#require-pull-request-reviews-before-merging) by approving your changes by yourself.
 To solve the problem, tfaction provides the setting `skip_create_pr` in `tfaction-root.yaml`.

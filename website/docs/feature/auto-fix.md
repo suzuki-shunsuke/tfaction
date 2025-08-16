@@ -4,8 +4,8 @@ sidebar_position: 800
 
 # Auto Fix
 
-* [suzuki-shunsuke/github-action-terraform-init](https://github.com/suzuki-shunsuke/github-action-terraform-init)
-* [suzuki-shunsuke/github-action-terraform-fmt](https://github.com/suzuki-shunsuke/github-action-terraform-fmt)
+- [suzuki-shunsuke/github-action-terraform-init](https://github.com/suzuki-shunsuke/github-action-terraform-init)
+- [suzuki-shunsuke/github-action-terraform-fmt](https://github.com/suzuki-shunsuke/github-action-terraform-fmt)
 
 ## Auto Fix .terraform.lock.hcl
 

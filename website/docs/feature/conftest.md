@@ -108,7 +108,7 @@ Using `id` field, you can also overwrite the existing policy.
 - tfaction specific options:
   - `id`: unique id of policy. This is optional. This is used to overwrite the setting
   - `plan`: boolean. Whether this policy is for plan files. The default is false
-  - `tf`: boolean. Whether this policy is for *.tf and *.tf.json. The default is false
+  - `tf`: boolean. Whether this policy is for _.tf and _.tf.json. The default is false
   - `enabled`: boolean. Whether this policy is enabled. The default is true
 - conftest options:
   - `policy`: A list or a string of relative paths to a policy directory from the repository root directory

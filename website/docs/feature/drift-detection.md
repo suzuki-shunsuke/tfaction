@@ -219,10 +219,10 @@ drift_detection:
   enabled: false
 
 target_groups:
-- working_directory: aws/
-  # ...
-  drift_detection:
-    enabled: true
+  - working_directory: aws/
+    # ...
+    drift_detection:
+      enabled: true
 ```
 
 tfaction.yaml
@@ -257,11 +257,11 @@ This depends on the number of working directories. Please pay attention to the c
 
 The following table shows the example.
 
-No. | the number of working directory | frequency of workflow | `num_of_issues` | frequency per working directory (/ 1 times)
---- | --- | --- | --- | ---
-1 | 10 | 1 / hour | 1 | 10 hour
-2 | 7 | 1 / day | 1 | 1 week
-3 | 1000 | 1 / 30 min | 3 | 1 week
+| No. | the number of working directory | frequency of workflow | `num_of_issues` | frequency per working directory (/ 1 times) |
+| --- | ------------------------------- | --------------------- | --------------- | ------------------------------------------- |
+| 1   | 10                              | 1 / hour              | 1               | 10 hour                                     |
+| 2   | 7                               | 1 / day               | 1               | 1 week                                      |
+| 3   | 1000                            | 1 / 30 min            | 3               | 1 week                                      |
 
 ## How to handle issues
 
@@ -270,12 +270,12 @@ there is no meaning if you don't resolve them.
 
 How to use this feature is completely up to you, but we have some advice.
 
-* Don't handle all issues by only you. Handle issues by teams
-* Create a strategy to handle issues continuously
-* Create rules to handle issues and write a guide so that everyone can handle issues properly
-* Rotate person in charge of handling issues
-* Leave the issue handling to each working directory's owners
-* Review and improve the issue handling periodically
+- Don't handle all issues by only you. Handle issues by teams
+- Create a strategy to handle issues continuously
+- Create rules to handle issues and write a guide so that everyone can handle issues properly
+- Rotate person in charge of handling issues
+- Leave the issue handling to each working directory's owners
+- Review and improve the issue handling periodically
 
 The real time notification to the chat tool may be noisy and exhaust you, so we recommend making the time to check issues periodically (e.g. daily or weekly) rather than the real time notification.
 

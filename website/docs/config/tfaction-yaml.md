@@ -6,8 +6,8 @@ sidebar_position: 200
 
 ## JSON Schema
 
-* [JSON Schema](https://github.com/suzuki-shunsuke/tfaction/blob/main/schema/tfaction.json)
-* [Generated document from JSON Schema](https://suzuki-shunsuke.github.io/tfaction/config/tfaction.html)
+- [JSON Schema](https://github.com/suzuki-shunsuke/tfaction/blob/main/schema/tfaction.json)
+- [Generated document from JSON Schema](https://suzuki-shunsuke.github.io/tfaction/config/tfaction.html)
 
 ### 💡 Input Complementation by YAML Language Server
 
@@ -62,7 +62,7 @@ gcp_workload_identity_provider:
 # Google Cloud Service Account for Terraform Backend.
 # By default, gcp_service_account and gcp_workload_identity_provider are used.
 gcp_remote_backend_service_account: terraform@my-project.iam.gserviceaccount.com
-gcp_remote_backend_workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+gcp_remote_backend_workload_identity_provider: "projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider"
 
 terraform_command: terraform
 env:

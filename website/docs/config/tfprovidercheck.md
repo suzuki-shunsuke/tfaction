@@ -49,13 +49,13 @@ hide:
     Comment.HasMeta && Comment.Meta.SHA1 != Commit.SHA1 && ! (Comment.Meta.Program == "tfcmt" && Comment.Meta.Command == "apply")
 exec:
   default:
-  - when: ExitCode != 0
-    template: |
-      ## :x: Failed {{if .Vars.tfaction_target}}({{.Vars.tfaction_target}}){{end}}
+    - when: ExitCode != 0
+      template: |
+        ## :x: Failed {{if .Vars.tfaction_target}}({{.Vars.tfaction_target}}){{end}}
 
-      {{template "link" .}}
+        {{template "link" .}}
 
-      {{template "join_command" .}}
+        {{template "join_command" .}}
 
-      {{template "hidden_combined_output" .}}
+        {{template "hidden_combined_output" .}}
 ```
