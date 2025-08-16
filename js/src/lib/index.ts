@@ -534,7 +534,7 @@ export const createIssue = async (
 ): Promise<Issue> => {
   const octokit = github.getOctokit(ghToken);
   const body = `
-  This issus was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
+  This issues was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
   
   About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
   `;

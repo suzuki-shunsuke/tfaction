@@ -127,7 +127,7 @@ const prCommentConfig = {
     },
   ],
 };
-const prCommnetExpected = {
+const prCommentExpected = {
   modules: [],
   targetConfigs: [
     {
@@ -174,7 +174,7 @@ test("pr comment", async () => {
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
     }),
-  ).toStrictEqual(prCommnetExpected);
+  ).toStrictEqual(prCommentExpected);
 });
 
 test("pr comment with updated body", async () => {
@@ -199,7 +199,7 @@ test("pr comment with updated body", async () => {
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
     }),
-  ).toStrictEqual(prCommnetExpected);
+  ).toStrictEqual(prCommentExpected);
 });
 
 test("module callers", async () => {
