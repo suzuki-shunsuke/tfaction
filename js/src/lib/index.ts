@@ -281,6 +281,8 @@ const Config = z.object({
       modules: z.optional(z.number()),
     }),
   ),
+
+  plan_event: z.optional(z.string()),
 });
 export type Config = z.infer<typeof Config>;
 

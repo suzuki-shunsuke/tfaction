@@ -23,9 +23,15 @@ pr_head_sha=$(jq -r ".head.sha" "$CI_INFO_TEMP_DIR/pr.json")
 # We don't use gh run list's -c option because
 # 1. this requires GitHub CLI v2.40.0 or newer
 # 2. we should check the latest workflow run
-body=$(github-comment exec \
-	-k list-workflow-runs \
-	-- gh run list -w "$PLAN_WORKFLOW_NAME" -b "$branch" -L 1 --json headSha,databaseId --jq '.[0]')
+if [ -n "${PLAN_EVENT:-}" ]; then
+	body=$(github-comment exec \
+		-k list-workflow-runs \
+		-- gh run list -w "$PLAN_WORKFLOW_NAME" -b "$branch" -L 1 --json headSha,databaseId --jq '.[0]')
+else
+	body=$(github-comment exec \
+		-k list-workflow-runs \
+		-- gh run list -w "$PLAN_WORKFLOW_NAME" -b "$branch" -L 1 --json headSha,databaseId --jq '.[0]' -e "$PLAN_EVENT")
+fi
 
 if [ -z "$body" ]; then
 	echo "::error::body is empty. No workflow run is found"
