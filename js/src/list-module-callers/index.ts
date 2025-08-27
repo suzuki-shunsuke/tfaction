@@ -54,7 +54,7 @@ export const main = async () => {
     if (semver.gte(terragruntVersion, "0.77.17")) {
       // https://github.com/gruntwork-io/terragrunt/releases/tag/v0.77.17
       // render command was added.
-      terragruntArgs.push("render", "--json", "--out", "--write");
+      terragruntArgs.push("render", "--json", "--write", "--out");
     } else if (semver.gte(terragruntVersion, "0.73.0")) {
       // https://github.com/gruntwork-io/terragrunt/releases/tag/v0.73.0
       // --out was added.
