@@ -32,13 +32,19 @@ export const main = async () => {
     });
 
     // Check terragrunt version
-    const terragruntVersionOut = await exec.getExecOutput('terragrunt', ['--version'], {
-      cwd: tfDir,
-      silent: true,
-    });
-    let terragruntVersion = '0.0.0';
+    const terragruntVersionOut = await exec.getExecOutput(
+      "terragrunt",
+      ["--version"],
+      {
+        cwd: tfDir,
+        silent: true,
+      },
+    );
+    let terragruntVersion = "0.0.0";
     if (terragruntVersionOut.stdout.startsWith("terragrunt version ")) {
-      terragruntVersion = terragruntVersionOut.stdout.slice("terragrunt version ".length);
+      terragruntVersion = terragruntVersionOut.stdout.slice(
+        "terragrunt version ".length,
+      );
     }
     const terragruntArgs: string[] = [];
     // https://github.com/gruntwork-io/terragrunt/releases/tag/v0.85.0
@@ -46,22 +52,18 @@ export const main = async () => {
     if (semver.gte(terragruntVersion, "0.77.17")) {
       // https://github.com/gruntwork-io/terragrunt/releases/tag/v0.77.17
       // render command was added.
-      terragruntArgs.push('render', "--json", "--out");
+      terragruntArgs.push("render", "--json", "--out");
     } else if (semver.gte(terragruntVersion, "0.73.0")) {
       // https://github.com/gruntwork-io/terragrunt/releases/tag/v0.73.0
       // --out was added.
-      terragruntArgs.push('render-json', "--json", "--out");
+      terragruntArgs.push("render-json", "--json", "--out");
     } else {
-      terragruntArgs.push('render-json', "--terragrunt-json-out");
+      terragruntArgs.push("render-json", "--terragrunt-json-out");
     }
 
-    await exec.exec(
-      "terragrunt",
-      terragruntArgs.concat(tmpobj.name),
-      {
-        cwd: tfDir,
-      },
-    );
+    await exec.exec("terragrunt", terragruntArgs.concat(tmpobj.name), {
+      cwd: tfDir,
+    });
     const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
       ?.source;
     if (!source) {
