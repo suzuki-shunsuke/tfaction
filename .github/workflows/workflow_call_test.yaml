@@ -68,7 +68,8 @@ jobs:
 
   create-pr-branch:
     uses: ./.github/workflows/wc-create-pr-branch.yaml
-    if: github.event.pull_request.user.login == 'suzuki-shunsuke'
+    if: |
+      ! (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
     permissions:
       contents: write
       pull-requests: write
