@@ -64,17 +64,9 @@ runs:
         branch: ${{inputs.branch}}
 
     - if: steps.global-config.outputs.securefix_action_server_repository == ''
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        FILE: ${{inputs.file}}
-        DIR: ${{steps.target-config.outputs.working_directory}}
-        BRANCH: ${{inputs.branch}}
-      run: |
-        export AQUA_CONFIG="$GITHUB_ACTION_PATH/aqua.yaml"
-        github-comment exec -out "file:$GITHUB_STEP_SUMMARY" -- ghcp -v
-        github-comment exec -out "file:$GITHUB_STEP_SUMMARY" -- ghcp commit \
-          -r "$GITHUB_REPOSITORY" \
-          -m "chore: import resources" \
-          -b "$BRANCH" \
-          "$DIR/$FILE"
+      uses: suzuki-shunsuke/commit-action@ca8e761ccb3533295065c3e90a8555fcdde8b467 # v0.0.10
+      with:
+        commit_message: "chore: import resources"
+        github_token: ${{ inputs.github_token }}
+        files: ${{steps.target-config.outputs.working_directory}}/${{inputs.file}}
+        branch: ${{inputs.branch}}
