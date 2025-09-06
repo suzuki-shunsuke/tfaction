@@ -21,7 +21,7 @@
   "devDependencies": {
     "@types/js-yaml": "4.0.9",
     "@types/node": "20.19.11",
-    "@types/semver": "7.7.0",
+    "@types/semver": "7.7.1",
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.3",
     "typescript": "5.9.2",
