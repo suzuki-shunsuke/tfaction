@@ -67,7 +67,7 @@ runs:
         files: ${{ steps.target-config.outputs.working_directory }}/.tfmigrate.hcl
 
     - if: steps.migrate.outputs.changed != 'true'
-      uses: suzuki-shunsuke/tfaction/conftest@main
+      uses: suzuki-shunsuke/tfaction/conftest@8d0f9cf3300fd5301c5417e43bc3a4cca37a2ef9
       with:
         plan: "true"
         github_token: ${{inputs.github_token}}
