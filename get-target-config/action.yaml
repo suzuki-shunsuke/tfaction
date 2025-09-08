@@ -69,7 +69,7 @@ runs:
     - run: |
         echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
       shell: bash
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@1cbcefa76f6e1f46abfed3b57b20010ccad14979
       id: target-config
       with:
         action: get-target-config
