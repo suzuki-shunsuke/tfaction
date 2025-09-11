@@ -16,7 +16,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/terraform-apply@main
+    - uses: suzuki-shunsuke/tfaction/terraform-apply@2324f29670fcd003ddb019c5355c2297c7852b6c
       if: env.TFACTION_JOB_TYPE == 'terraform'
       with:
         # pull-requests:write - Create pull request comments and labels
@@ -24,7 +24,7 @@ runs:
         # contents:write - Update pull request branches
         github_token: ${{inputs.github_token}}
 
-    - uses: suzuki-shunsuke/tfaction/tfmigrate-apply@main
+    - uses: suzuki-shunsuke/tfaction/tfmigrate-apply@2324f29670fcd003ddb019c5355c2297c7852b6c
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
       with:
         # pull-requests:write - Create pull request comments
