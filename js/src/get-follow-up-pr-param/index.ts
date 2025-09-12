@@ -3,6 +3,7 @@ import * as fs from "fs";
 import { z } from "zod";
 
 const PRData = z.object({
+  body: z.string(),
   assignees: z
     .array(
       z.object({
@@ -26,17 +27,17 @@ Follow up #${prNumber}
 ${runURL}`,
   );
   core.setOutput("pr_title", `chore(${target}): follow up #${prNumber}`);
-  core.setOutput(
-    "pr_body",
-    `This pull request was created automatically to follow up the failure of apply.
+  let prBody = `This pull request was created automatically to follow up the failure of apply.
+- Follow up #${prNumber} ([failed workflow](${runURL}))
 
-Follow up #${prNumber} ([failed workflow](${runURL}))
+Please write the description of this pull request below.
 
-1. Check the error message #${prNumber}
-1. Check the result of \`terraform plan\`
-1. Add commits to this pull request and fix the problem if needed
-1. Review and merge this pull request`,
-  );
+## Why did the terraform apply fail?
+
+## How do you fix the problem?
+
+`;
+  core.setOutput("pr_body", prBody);
 
   const actor = process.env.GITHUB_ACTOR;
   const prAuthor = process.env.CI_INFO_PR_AUTHOR;
@@ -61,6 +62,16 @@ Follow up #${prNumber} ([failed workflow](${runURL}))
             assignees.add(assignee.login);
           }
         }
+        prBody += `
+---
+
+<details>
+<summary>Original PR description</summary>
+
+${prData.body}
+
+</details>
+`;
       } catch (error) {
         console.error("Failed to read or parse pr.json:", error);
       }
