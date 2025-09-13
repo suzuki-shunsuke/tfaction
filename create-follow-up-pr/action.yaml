@@ -113,6 +113,11 @@ runs:
 
           Please handle this pull request.
 
+          1. Check the error message #${{env.CI_INFO_PR_NUMBER}}
+          1. Check the result of `terraform plan`
+          1. Add commits to this pull request and fix the problem if needed
+          1. Review and merge this pull request`,
+
     - run: bash "$GITHUB_ACTION_PATH/skip_create_pr.sh"
       shell: bash
       if: |
