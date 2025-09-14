@@ -114,7 +114,7 @@ runs:
       with:
         action: export-aws-secrets-manager
 
-    - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+    - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       id: google-backend-credentials
       if: steps.target-config.outputs.gcp_remote_backend_service_account != ''
       with:
@@ -127,7 +127,7 @@ runs:
       env:
         GOOGLE_BACKEND_CREDENTIALS: ${{ steps.google-backend-credentials.outputs.credentials_file_path }}
 
-    - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+    - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       if: steps.target-config.outputs.gcp_service_account != ''
       with:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
