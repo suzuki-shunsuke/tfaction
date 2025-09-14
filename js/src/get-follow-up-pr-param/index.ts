@@ -72,6 +72,7 @@ ${prData.body}
 
 </details>
 `;
+        core.setOutput("pr_body", prBody);
       } catch (error) {
         console.error("Failed to read or parse pr.json:", error);
       }
