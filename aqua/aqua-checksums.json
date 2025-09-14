@@ -56,28 +56,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.0/terragrunt_darwin_amd64",
-      "checksum": "6041F01BD10AE57BBA0A5C507D6B57D3D20D88DEF10EE98303C5EB5DC3A10BE0",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.1/terragrunt_darwin_amd64",
+      "checksum": "E5B451BA6F1EA03B6F820C269127DB18B9F8591FB588100FA437D08DB74A8F4A",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.0/terragrunt_darwin_arm64",
-      "checksum": "FD6B5CA18E1A5296F76642BF7A417451BF7ABA2A95592ED8321B8751A2150C3E",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.1/terragrunt_darwin_arm64",
+      "checksum": "69DAEEBB96A9A12020C818B2A362645CE204353482DB2D696817CC6F9F48B73F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.0/terragrunt_linux_amd64",
-      "checksum": "CDA1F8CABD840D45CDFCEEB1E58ED2A153753911279EDB7DFC62051D53875937",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.1/terragrunt_linux_amd64",
+      "checksum": "7B22B88407068619304FED0AF9F1A8EE929771CEDF6387F10AC72FFE8B99E36C",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.0/terragrunt_linux_arm64",
-      "checksum": "033D3204C5EAD10E1F033B2B1429D88AFA8075D4250F8E181092E217F58A0A43",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.1/terragrunt_linux_arm64",
+      "checksum": "0C819346BD6B19BAC2C9F6AD41129CDD7C3318B9BE4AD2E674A739FC16901CF5",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.0/terragrunt_windows_amd64.exe",
-      "checksum": "EF4CC336E81EC642FA7EF1D4FBD7A0BC2AEEB79BD312788346CA57E3D723D894",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.87.1/terragrunt_windows_amd64.exe",
+      "checksum": "EC142F2539E2632AF80441229F560E3264FBAB58A7D959F8318181BBCA7B01B3",
       "algorithm": "sha256"
     },
     {
@@ -386,28 +386,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_darwin_amd64.zip",
-      "checksum": "ABABBFDB3BAB9AC7CA10CB1E71DD5F7FB1AC10B5FAF6D842E84524932D9C5CA4",
+      "id": "http/releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_darwin_amd64.zip",
+      "checksum": "6EAB5472D9AFD510B6F4FB43EBE74E098821DFAAB50CF5FCFB696082F73F5328",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_darwin_arm64.zip",
-      "checksum": "2E067A85882EED25FD966ABFB763AE32075940E7B505EB3CD7E592360615D67D",
+      "id": "http/releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_darwin_arm64.zip",
+      "checksum": "150C55BD7459EE1216D994307B3B84B3E44AD57354F62357D792E4CBB8B2F64B",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_linux_amd64.zip",
-      "checksum": "4449E2DDC0DEE283F0909DD603EAF98EDEEBAA950F4635CEA94F2CAF0FFACC5A",
+      "id": "http/releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_amd64.zip",
+      "checksum": "B7554C87F36DBB2231D54C4277CBBDDF58AE8BA916FA97461564836A2C4954C0",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_linux_arm64.zip",
-      "checksum": "2BB0787C2DA1AD94D6A495A848AAD4E9B572ADB02BFC7361AFEEE80F07FD90AC",
+      "id": "http/releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_linux_arm64.zip",
+      "checksum": "9B3814D36B5B22D9BC7A2856A676770C7B2597B8DF025004054354226865CED6",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.13.1/terraform_1.13.1_windows_amd64.zip",
-      "checksum": "380010E403638CF74BDB6B9846410BDE5721F6651CD6C713C67201E81E2B3C43",
+      "id": "http/releases.hashicorp.com/terraform/1.13.2/terraform_1.13.2_windows_amd64.zip",
+      "checksum": "D4B15DB71C7F597291FBC7C7E61ED213DD6FE34AB8971D12A93BF9BB66B340E9",
       "algorithm": "sha256"
     },
     {
