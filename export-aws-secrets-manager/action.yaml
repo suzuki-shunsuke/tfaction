@@ -6,7 +6,7 @@ runs:
     - run: |
         echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
       shell: bash
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@cf0f6b45d6546bc810916cf9a6bf9adaef7e8fa2
       id: main
       with:
         action: export-aws-secrets-manager
