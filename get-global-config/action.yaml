@@ -90,6 +90,9 @@ outputs:
   max_changed_modules:
     description: Maximum number of changed modules in one pull request
     value: ${{steps.global-config.outputs.max_changed_modules}}
+  plan_event:
+    description: GitHub Actions event name to run terraform plan.
+    value: ${{steps.global-config.outputs.plan_event}}
 runs:
   using: composite
   steps:
