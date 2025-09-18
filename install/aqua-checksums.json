@@ -136,33 +136,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.3.6/ci-info_2.3.6_darwin_amd64.tar.gz",
-      "checksum": "5AA90AE93B7826802EC8AEC6F5574A5DBCD3DBB85832236DBAC8B52D6E279D7E",
+      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.4.0/ci-info_2.4.0_darwin_amd64.tar.gz",
+      "checksum": "1B12B1FFFDAE8BA3A9A79D14CE39BDC3C3B9D1429D08A6029CBB6EE3D1FD4C88",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.3.6/ci-info_2.3.6_darwin_arm64.tar.gz",
-      "checksum": "F61B7755191C2FFC8DD7E0BBE4F35EF88E18C47032C5CA3C75796EC9DB87C631",
+      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.4.0/ci-info_2.4.0_darwin_arm64.tar.gz",
+      "checksum": "F4B9A92F03073256CF4F87B69E657D1F2EC8F38C64A255EFE543E523D995CF77",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.3.6/ci-info_2.3.6_linux_amd64.tar.gz",
-      "checksum": "9B0398E6049DFEFE6A4786207FACC75A01F5BCAEB70570B37DE902F2B6A89EB7",
+      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.4.0/ci-info_2.4.0_linux_amd64.tar.gz",
+      "checksum": "B11776BD556C2BD6C22EC44F0F19B5244ED8F119FF7E89A3B63CF4C30AE6B1B3",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.3.6/ci-info_2.3.6_linux_arm64.tar.gz",
-      "checksum": "8F06375955C17F6F037726D2B3DFE1BE76CEE5996A7F582419FEDC14CC0F395D",
+      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.4.0/ci-info_2.4.0_linux_arm64.tar.gz",
+      "checksum": "AE0952DA8CB2DECFB4D2E9AAAC1EF676E804625212A1E90765FC34F472FC4745",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.3.6/ci-info_2.3.6_windows_amd64.tar.gz",
-      "checksum": "8B40526E3A5D54EDF952F0E4C6121EA432D55DC6C5D4F0C0DBDB61D366B27BFD",
+      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.4.0/ci-info_2.4.0_windows_amd64.tar.gz",
+      "checksum": "C6FA3E028EEE794682497BAC80F1C5DB77CFB94E012A34CA9B1301C6511D0ABB",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.3.6/ci-info_2.3.6_windows_arm64.tar.gz",
-      "checksum": "5AEDCA499B864CD80FA206390A5B00C4ADA0A12922BBACEF26B222D9B81A77A1",
+      "id": "github_release/github.com/suzuki-shunsuke/ci-info/v2.4.0/ci-info_2.4.0_windows_arm64.tar.gz",
+      "checksum": "390D7DF242A9753104EA30683881E1DD5372754F7E98ADFEA65F7F59F2ED2DFE",
       "algorithm": "sha256"
     },
     {
