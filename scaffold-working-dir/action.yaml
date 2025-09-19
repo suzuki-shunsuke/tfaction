@@ -15,11 +15,11 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@ee82bdfe246048c24ade2c8e6512b5c04c59705d
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@ee82bdfe246048c24ade2c8e6512b5c04c59705d
       id: target-config
       with:
         action: get-target-config
