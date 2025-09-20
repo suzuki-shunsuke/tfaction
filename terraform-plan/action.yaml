@@ -33,16 +33,16 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@2c22cc2aa1b5c53e565fdd81fe4c36868e583e47
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@2c22cc2aa1b5c53e565fdd81fe4c36868e583e47
       id: global-config
       with:
         action: get-global-config
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@2c22cc2aa1b5c53e565fdd81fe4c36868e583e47
       id: check-terraform-skip
       if: "! env.TFACTION_DRIFT_ISSUE_NUMBER"
       with:
