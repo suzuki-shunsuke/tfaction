@@ -10,7 +10,7 @@ runs:
     - run: |
         echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
       shell: bash
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@7d3d6717a4b689167400f8178accd27bc7f14c51
       id: main
       with:
         action: export-secrets
