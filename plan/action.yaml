@@ -40,13 +40,13 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/terraform-plan@main
+    - uses: suzuki-shunsuke/tfaction/terraform-plan@be14389d49d5243ef7adf86e908a04089ae530ba
       id: terraform
       if: env.TFACTION_JOB_TYPE == 'terraform'
       with:
         github_token: ${{inputs.github_token}}
 
-    - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@main
+    - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@be14389d49d5243ef7adf86e908a04089ae530ba
       id: tfmigrate
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
       with:
