@@ -20,7 +20,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@ae0ba0724a97364557bddaaf9e062f772a6211ba
       id: global-config
       with:
         action: get-global-config
@@ -31,7 +31,7 @@ runs:
     #   with:
     #     github_token: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@ae0ba0724a97364557bddaaf9e062f772a6211ba
     - uses: aquaproj/aqua-installer@ea518c135a02fc11ff8024364510c181a5c6b342 # v4.0.3
       with:
         aqua_version: v2.54.1
