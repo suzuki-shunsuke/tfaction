@@ -18,7 +18,7 @@ runs:
     - run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
       shell: bash
       id: action_path
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@7b5fc9a234d827d9a1c0c3820ffc63bd5c231d5d
       id: main
       with:
         action: conftest
