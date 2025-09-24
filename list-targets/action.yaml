@@ -59,15 +59,6 @@ runs:
       shell: bash
       run: echo "value=${GITHUB_ACTION_PATH}/github-comment.yaml" >> "$GITHUB_OUTPUT"
 
-    - id: module_callers_file
-      shell: bash
-      run: |
-        tempfile=$(mktemp)
-        echo "${MODULE_CALLERS}" >> "$tempfile"
-        echo "file=$tempfile" >> "$GITHUB_OUTPUT"
-      env:
-        MODULE_CALLERS: ${{ steps.list-module-callers.outputs.file }}
-
     - uses: suzuki-shunsuke/tfaction/js@main
       id: list-targets
       with:
@@ -77,7 +68,7 @@ runs:
         pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
         # module_callers: ${{ steps.list-module-callers.outputs.file }}
-        module_callers_file: ${{ steps.module_callers_file.outputs.file }}
+        module_callers_file: ${{ steps.list-module-callers.outputs.file }}
         module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
         max_changed_working_dirs: ${{ steps.global-config.outputs.max_changed_working_dirs }}
         max_changed_modules: ${{ steps.global-config.outputs.max_changed_modules }}
