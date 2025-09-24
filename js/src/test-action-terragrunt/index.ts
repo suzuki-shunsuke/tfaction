@@ -6,9 +6,9 @@ import { diffString } from "json-diff";
 type TestData = {
   name: string;
   expected: {
-    file: string;
+    file: any;
   };
-  actual: string;
+  actual: any;
 };
 
 export const main = async () => {
@@ -17,9 +17,9 @@ export const main = async () => {
     {
       name: "list-module-callers",
       expected: {
-        file: '{"setup/test/terragrunt/module":["setup/test/terragrunt/foo"]}',
+        file: {"setup/test/terragrunt/module":["setup/test/terragrunt/foo"]},
       },
-      actual: process.env.LIST_MODULE_CALLERS || "",
+      actual: JSON.parse(fs.readFileSync(process.env.LIST_MODULE_CALLERS || "dummy", "utf8")),
     },
   ];
   let failed = false;
