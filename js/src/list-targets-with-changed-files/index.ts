@@ -402,7 +402,7 @@ export const main = async () => {
     */
     // moduleCallers: JSON.parse(core.getInput("module_callers") || "{}"),
     moduleCallers: JSON.parse(
-      fs.readFileSync(core.getInput("module_callers_file"), "utf8") || "{}",
+      fs.readFileSync(core.getInput("module_callers"), "utf8") || "{}",
     ),
   });
 
