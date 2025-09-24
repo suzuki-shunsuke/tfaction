@@ -166,6 +166,10 @@ export const main = async () => {
         file: '{"js/test/modules/foo":["js/test/aws/foo/dev"]}',
       },
       actual: process.env.LIST_MODULE_CALLERS,
+      convert: (data: any): any => {
+        data.file = fs.readFileSync(data.file, "utf8");
+        return data;
+      },
     },
     {
       name: "js/list-module-callers",
@@ -173,6 +177,10 @@ export const main = async () => {
         file: '{"js/test/modules/foo":["js/test/aws/foo/dev"]}',
       },
       actual: process.env.JS_LIST_MODULE_CALLERS,
+      convert: (data: any): any => {
+        data.file = fs.readFileSync(data.file, "utf8");
+        return data;
+      },
     },
     {
       name: "list-targets-with-changed-files",
