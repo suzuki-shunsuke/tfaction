@@ -405,8 +405,9 @@ export const main = async () => {
     }
     */
     // moduleCallers: JSON.parse(core.getInput("module_callers") || "{}"),
-    moduleCallers: moduleCallersPath ? JSON.parse(
-      fs.readFileSync(moduleCallersPath, "utf8")) : {},
+    moduleCallers: moduleCallersPath
+      ? JSON.parse(fs.readFileSync(moduleCallersPath, "utf8"))
+      : {},
   });
 
   core.info(`result: ${JSON.stringify(result)}`);
