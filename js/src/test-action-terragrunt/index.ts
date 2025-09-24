@@ -20,7 +20,10 @@ export const main = async () => {
         file: { "setup/test/terragrunt/module": ["setup/test/terragrunt/foo"] },
       },
       actual: JSON.parse(
-        fs.readFileSync(process.env.LIST_MODULE_CALLERS || "dummy", "utf8"),
+        fs.readFileSync(
+          JSON.parse(process.env.LIST_MODULE_CALLERS || "{}").file || "dummy",
+          "utf8",
+        ),
       ),
     },
   ];
