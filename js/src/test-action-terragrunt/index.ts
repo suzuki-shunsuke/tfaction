@@ -19,11 +19,9 @@ export const main = async () => {
       expected: {
         file: { "setup/test/terragrunt/module": ["setup/test/terragrunt/foo"] },
       },
-      actual: JSON.parse(
-        fs.readFileSync(
-          JSON.parse(process.env.LIST_MODULE_CALLERS || "{}").file || "dummy",
-          "utf8",
-        ),
+      actual: fs.readFileSync(
+        JSON.parse(process.env.LIST_MODULE_CALLERS || "{}").file || "dummy",
+        "utf8",
       ),
     },
   ];
