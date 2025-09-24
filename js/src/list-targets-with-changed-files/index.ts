@@ -401,7 +401,6 @@ export const main = async () => {
       module1: [caller1, caller2],
     }
     */
-    // moduleCallers: JSON.parse(core.getInput("module_callers") || "{}"),
     moduleCallers: moduleCallersPath
       ? JSON.parse(fs.readFileSync(moduleCallersPath, "utf8"))
       : {},
