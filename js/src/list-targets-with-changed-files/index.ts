@@ -374,6 +374,10 @@ export const main = async () => {
   const prPath = core.getInput("pull_request");
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
 
+  const moduleCallersPath = core.getInput("module_callers");
+  if (!moduleCallersPath) {
+  }
+
   const result = await run({
     labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
     config: lib.getConfig(),
@@ -401,9 +405,8 @@ export const main = async () => {
     }
     */
     // moduleCallers: JSON.parse(core.getInput("module_callers") || "{}"),
-    moduleCallers: JSON.parse(
-      fs.readFileSync(core.getInput("module_callers"), "utf8") || "{}",
-    ),
+    moduleCallers: moduleCallersPath ? JSON.parse(
+      fs.readFileSync(moduleCallersPath, "utf8")) : {},
   });
 
   core.info(`result: ${JSON.stringify(result)}`);
