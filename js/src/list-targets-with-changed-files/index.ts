@@ -373,6 +373,7 @@ export const main = async () => {
   // The path to ci-info's pr.json.
   const prPath = core.getInput("pull_request");
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
+  const moduleCallersPath = core.getInput("module_callers");
 
   const result = await run({
     labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
@@ -400,7 +401,9 @@ export const main = async () => {
       module1: [caller1, caller2],
     }
     */
-    moduleCallers: JSON.parse(core.getInput("module_callers") || "{}"),
+    moduleCallers: moduleCallersPath
+      ? JSON.parse(fs.readFileSync(moduleCallersPath, "utf8"))
+      : {},
   });
 
   core.info(`result: ${JSON.stringify(result)}`);

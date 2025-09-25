@@ -123,5 +123,7 @@ export const main = async () => {
   );
   const json = JSON.stringify(moduleCallers);
   core.info(`file: ${json}`);
-  core.setOutput("file", json);
+  const tmpobj = tmp.fileSync();
+  fs.writeFileSync(tmpobj.name, json);
+  core.setOutput("file", tmpobj.name);
 };
