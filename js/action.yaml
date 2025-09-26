@@ -137,6 +137,8 @@ outputs:
     description: GitHub Actions Workflow name running tfaction/terraform-plan action
   securefix_action_server_repository:
     description: Securefix Action Server Repository
+  plan_event:
+    description: GitHub Actions event name to run terraform plan.
 
   # check-terraform-skip
   skip_terraform:
