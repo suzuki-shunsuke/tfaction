@@ -37,7 +37,7 @@ runs:
       run: bash "${GITHUB_ACTION_PATH}/terraform-docs.sh"
 
     - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.fix.outputs.changed == 'true'
-      uses: suzuki-shunsuke/commit-action@ca8e761ccb3533295065c3e90a8555fcdde8b467 # v0.0.10
+      uses: suzuki-shunsuke/commit-action@b4aee3f297a855b761e0db5736a73566a7807fe2 # v0.0.11
       with:
         commit_message: "docs: generate document by terraform-docs"
         github_token: ${{ inputs.github_token }}
