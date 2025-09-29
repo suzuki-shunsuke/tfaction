@@ -1,8 +1,6 @@
 /* NProgress, (c) 2013, 2014 Rico Sta. Cruz - http://ricostacruz.com/nprogress
  * @license MIT */
 
-/*! @docsearch/react 3.9.0 | MIT License | © Algolia, Inc. and contributors | https://docsearch.algolia.com */
-
 /**
  * @license React
  * react-dom-client.production.js
