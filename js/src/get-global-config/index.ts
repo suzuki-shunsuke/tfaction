@@ -60,6 +60,7 @@ interface Outputs {
 
   max_changed_working_dirs?: number;
   max_changed_modules?: number;
+  plan_event: string;
 }
 
 interface Envs {
@@ -118,6 +119,7 @@ export const main_ = (config: lib.Config, input: Input): Result => {
 
     max_changed_working_dirs: config?.limit_changed_dirs?.working_dirs ?? 0,
     max_changed_modules: config?.limit_changed_dirs?.modules ?? 0,
+    plan_event: config?.plan_event || "",
   };
   const envs: Envs = {
     TFACTION_SKIP_ADDING_AQUA_PACKAGES:
