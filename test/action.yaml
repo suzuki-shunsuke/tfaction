@@ -20,11 +20,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@4dd4fbf1501b0a03a384134ac58a5601cdc10ccf
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@4dd4fbf1501b0a03a384134ac58a5601cdc10ccf
       id: global-config
       with:
         action: get-global-config
