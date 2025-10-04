@@ -10,7 +10,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@37dcf8672f37c68cc199d1c5add9b4e34ff43fce
       id: global-config
       with:
         action: get-global-config
