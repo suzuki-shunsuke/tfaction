@@ -76,33 +76,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/open-policy-agent/conftest/v0.62.0/conftest_0.62.0_Darwin_arm64.tar.gz",
-      "checksum": "559B11B5D7F3879B19E4B87801A72E014C28556C1C799864073524022E50EA2D",
+      "id": "github_release/github.com/open-policy-agent/conftest/v0.63.0/conftest_0.63.0_Darwin_arm64.tar.gz",
+      "checksum": "026378585ED42609F23996663C2FEEA9535BC19DC3909A99DABE776B7708B85C",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/open-policy-agent/conftest/v0.62.0/conftest_0.62.0_Darwin_x86_64.tar.gz",
-      "checksum": "2F72025D990A75A5A117644723560A8C2B995489B46886EBDDC7412955F1D3AF",
+      "id": "github_release/github.com/open-policy-agent/conftest/v0.63.0/conftest_0.63.0_Darwin_x86_64.tar.gz",
+      "checksum": "A7DBEC18AF53222590F987B5591EB257822AFE2C7F9E9CE98AB9202CFA9DB19A",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/open-policy-agent/conftest/v0.62.0/conftest_0.62.0_Linux_arm64.tar.gz",
-      "checksum": "2129F630711B8B0FD8D0CEE9092C8015C577C3035A2E393D3B340BB1E4E9B59F",
+      "id": "github_release/github.com/open-policy-agent/conftest/v0.63.0/conftest_0.63.0_Linux_arm64.tar.gz",
+      "checksum": "761FA8A2666E242637665F961884B339D7292126A0CAF362FBC21C44931BCFFC",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/open-policy-agent/conftest/v0.62.0/conftest_0.62.0_Linux_x86_64.tar.gz",
-      "checksum": "284231908E4CF66D156E5577C3EEE2F67D9F2EDF2521FA2309E0DF1969F871E5",
+      "id": "github_release/github.com/open-policy-agent/conftest/v0.63.0/conftest_0.63.0_Linux_x86_64.tar.gz",
+      "checksum": "59B354BEDF0D761FB562404A8AF3015A48415636382F975A2037CA81C0C6202F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/open-policy-agent/conftest/v0.62.0/conftest_0.62.0_Windows_arm64.zip",
-      "checksum": "BE4C383393151F903EC46069225B9BCB9701013730F0CA5DD7B819B7C975DC80",
+      "id": "github_release/github.com/open-policy-agent/conftest/v0.63.0/conftest_0.63.0_Windows_arm64.zip",
+      "checksum": "8C6703DC47F24AB1D6C8AC5F3C2887FFA31A0825465D9354F4A14929A30D805D",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/open-policy-agent/conftest/v0.62.0/conftest_0.62.0_Windows_x86_64.zip",
-      "checksum": "2E0E997D46A7607EACD94527C768AF719D206066AC0C27EDF31CC0337C806C94",
+      "id": "github_release/github.com/open-policy-agent/conftest/v0.63.0/conftest_0.63.0_Windows_x86_64.zip",
+      "checksum": "2594600D808698809DC953E06087B20A804819FB454C41085D73D5E7C5432993",
       "algorithm": "sha256"
     },
     {
