@@ -20,18 +20,18 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@462f47c7c848f0f17b7fc8884e7c7376bd30fdff
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@462f47c7c848f0f17b7fc8884e7c7376bd30fdff
       id: target-config
       with:
         action: get-target-config
       env:
         TFACTION_IS_APPLY: "false"
         TFACTION_JOB_TYPE: scaffold_working_dir
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@462f47c7c848f0f17b7fc8884e7c7376bd30fdff
 
     - run: |
         echo "branch=scaffold-working-directory-${TFACTION_TARGET}-$(date +%Y%m%dT%H%M%S)" >> "$GITHUB_OUTPUT"

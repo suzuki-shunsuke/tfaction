@@ -18,7 +18,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@462f47c7c848f0f17b7fc8884e7c7376bd30fdff
       id: install
     - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
       shell: bash
@@ -43,11 +43,11 @@ runs:
 
     - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
       id: list-working-directory-configs
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@462f47c7c848f0f17b7fc8884e7c7376bd30fdff
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@462f47c7c848f0f17b7fc8884e7c7376bd30fdff
       id: list-module-callers
       if: steps.global-config.outputs.update_local_path_module_caller == 'true'
       with:
@@ -59,7 +59,7 @@ runs:
       shell: bash
       run: echo "value=${GITHUB_ACTION_PATH}/github-comment.yaml" >> "$GITHUB_OUTPUT"
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@462f47c7c848f0f17b7fc8884e7c7376bd30fdff
       id: list-targets
       with:
         action: list-targets-with-changed-files
