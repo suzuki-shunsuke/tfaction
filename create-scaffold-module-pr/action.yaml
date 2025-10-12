@@ -58,7 +58,7 @@ runs:
         } >> "$GITHUB_OUTPUT"
 
     - if: steps.global-config.outputs.skip_create_pr != 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
-      uses: csm-actions/securefix-action@05036cda4e1fcaeba401d23261056048fe20ba27 # v0.2.2
+      uses: csm-actions/securefix-action@873d4cea396431307feaa600ce7a144b3dfc747d # v0.3.0
       with:
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
@@ -77,7 +77,7 @@ runs:
           Please handle this pull request.
 
     - if: steps.global-config.outputs.skip_create_pr == 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
-      uses: csm-actions/securefix-action@05036cda4e1fcaeba401d23261056048fe20ba27 # v0.2.2
+      uses: csm-actions/securefix-action@873d4cea396431307feaa600ce7a144b3dfc747d # v0.3.0
       with:
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
