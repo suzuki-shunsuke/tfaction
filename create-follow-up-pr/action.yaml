@@ -79,7 +79,7 @@ runs:
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
         fromJSON(steps.global-config.outputs.skip_create_pr)
-      uses: csm-actions/securefix-action@873d4cea396431307feaa600ce7a144b3dfc747d # v0.3.0
+      uses: csm-actions/securefix-action@4e27e086ba88a35d19bbae25faeabb769d774653 # v0.3.1
       with:
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
@@ -91,7 +91,7 @@ runs:
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
         !fromJSON(steps.global-config.outputs.skip_create_pr)
-      uses: csm-actions/securefix-action@873d4cea396431307feaa600ce7a144b3dfc747d # v0.3.0
+      uses: csm-actions/securefix-action@4e27e086ba88a35d19bbae25faeabb769d774653 # v0.3.1
       with:
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
