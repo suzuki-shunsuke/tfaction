@@ -50,7 +50,7 @@ runs:
         } >> "$GITHUB_OUTPUT"
 
     - if: steps.global-config.outputs.skip_create_pr == 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
-      uses: csm-actions/securefix-action@7631c011cad178ac45d0580119ab838c97af6908 # v0.3.2
+      uses: csm-actions/securefix-action@f2592f3d2f3e17ef629f1d2f02ae79d04a2579e9 # v0.3.3
       with:
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
@@ -60,7 +60,7 @@ runs:
         files: ${{steps.files.outputs.value}}
 
     - if: steps.global-config.outputs.skip_create_pr != 'true' && steps.global-config.outputs.securefix_action_server_repository != ''
-      uses: csm-actions/securefix-action@7631c011cad178ac45d0580119ab838c97af6908 # v0.3.2
+      uses: csm-actions/securefix-action@f2592f3d2f3e17ef629f1d2f02ae79d04a2579e9 # v0.3.3
       with:
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
