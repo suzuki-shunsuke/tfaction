@@ -24,5 +24,5 @@ By this change you don't have to create and manage S3 or GCS.
 Furthermore, S3 or GCS had security risks that plan files could be tampered.
 GitHub Actions Artifacts can be uploaded files only in the associated workflow run and can't be tampered from outside of the workflow run.
 
-GitHub Actions Artifacts has the retention period so plan files are removed after the retension period.
+GitHub Actions Artifacts has the retention period so plan files are removed after the retention period.
 The default retention period is 90 days, and we think it is enough.
