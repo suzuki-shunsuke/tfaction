@@ -41,7 +41,7 @@ runs:
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
-    - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
+    - uses: suzuki-shunsuke/tfaction/list-working-dirs@63ce5952088a533ffed07ace1eda5faf79ba0934
       id: list-working-directory-configs
     - uses: suzuki-shunsuke/tfaction/js@44dda4a57ed3bb56487818b598b5bae40ca5d09c
       id: global-config
