@@ -37,6 +37,9 @@ outputs:
   plan_json_artifact_path:
     description: GitHub Artifact path for the plan json
     value: ${{ steps.terraform.outputs.plan_json_artifact_path }}
+  skipped:
+    description: Whether the terraform plan was skipped
+    value: ${{ steps.terraform.outputs.skipped }}
 runs:
   using: composite
   steps:
