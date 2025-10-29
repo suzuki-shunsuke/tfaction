@@ -18,10 +18,10 @@ inputs:
 outputs:
   plan_binary_path:
     description: "Path to the plan binary file"
-    value: ${{ steps.terraform.outputs.plan_binary_path }}
+    value: ${{ env.TFACTION_JOB_TYPE == 'terraform' && steps.terraform.outputs.plan_binary_path || steps.tfmigrate.outputs.plan_binary }}
   plan_json_path:
     description: "Path to the plan json file"
-    value: ${{ steps.terraform.outputs.plan_json_path }}
+    value: ${{ env.TFACTION_JOB_TYPE == 'terraform' && steps.terraform.outputs.plan_json_path || steps.tfmigrate.outputs.plan_json }}
   detailed_exitcode:
     description: Detailed exit code of `terraform plan`
     value: ${{ steps.terraform.outputs.detailed_exitcode }}
@@ -37,6 +37,9 @@ outputs:
   plan_json_artifact_path:
     description: GitHub Artifact path for the plan json
     value: ${{ steps.terraform.outputs.plan_json_artifact_path }}
+  skipped:
+    description: Whether the terraform plan was skipped
+    value: ${{ steps.terraform.outputs.skipped }}
 runs:
   using: composite
   steps:
