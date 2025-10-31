@@ -22,7 +22,6 @@ runs:
         action: get-target-config
 
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
-      id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
@@ -31,3 +30,9 @@ runs:
         TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
         DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}
         TF_COMMAND: ${{ steps.global-config.outputs.terraform_command }}
+
+    - if: always() && steps.global-config.outputs.disable_update_related_pull_requests != 'true'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: bash "$GITHUB_ACTION_PATH/update_branches.sh"
