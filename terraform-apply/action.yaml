@@ -38,7 +38,6 @@ runs:
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
     - run: bash "$GITHUB_ACTION_PATH/download_plan_file.sh"
-      id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
@@ -47,7 +46,6 @@ runs:
         PLAN_WORKFLOW_NAME: ${{ steps.global-config.outputs.plan_workflow_name }}
 
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
-      id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"

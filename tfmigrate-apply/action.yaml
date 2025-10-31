@@ -22,7 +22,6 @@ runs:
         action: get-target-config
 
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
-      id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       shell: bash
       env:
