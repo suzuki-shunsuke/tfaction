@@ -140,7 +140,7 @@ runs:
       with:
         ssh_key: ${{ inputs.ssh_key }}
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@4b68f7ef8ee0eaabf76ed0c120019a87004f49b2 # v1.2.0
+    - uses: suzuki-shunsuke/github-action-terraform-init@feat-split-log-group
       with:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
