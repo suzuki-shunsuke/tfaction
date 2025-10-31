@@ -6,14 +6,14 @@ if [ "${TFACTION_DEBUG:-}" = true ]; then
 	set -x
 fi
 
-bash "$GITHUB_ACTION_PATH/download_plan_file.sh"
-
 apply_output=$(mktemp)
 
+echo "::group::$TF_COMMAND apply"
 set +e
 tfcmt -var "target:$TFACTION_TARGET" apply -- "$TF_COMMAND" apply -auto-approve -no-color -input=false tfplan.binary 2>&1 | tee "$apply_output"
 code=$?
 set -e
+echo "::endgroup::"
 
 if [ -n "${TFACTION_DRIFT_ISSUE_NUMBER:-}" ]; then
 	tfcmt \
@@ -30,16 +30,6 @@ rm "$apply_output" || : # Ignore the failure
 
 if [ "$DISABLE_UPDATE_RELATED_PULL_REQUESTS" = true ]; then
 	echo "::notice ::Skip updating related pull requests"
-	exit "$code"
 fi
-
-while read -r pr_number; do
-	if [ "$CI_INFO_PR_NUMBER" = "$pr_number" ]; then
-		# To prevent infinite loop
-		continue
-	fi
-	echo "===> Update PR $pr_number" >&2
-	gh api -X PUT "repos/{owner}/{repo}/pulls/${pr_number}/update-branch" || :
-done < <(github-comment exec -config "${GITHUB_ACTION_PATH}/github-comment.yaml" -var "tfaction_target:$TFACTION_TARGET" -- gh pr list --json number -L 100 -l "$TFACTION_TARGET" -S "-label:tfaction:disable-auto-update" -q ".[].number")
 
 exit "$code"

@@ -37,6 +37,15 @@ runs:
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
+    - run: bash "$GITHUB_ACTION_PATH/download_plan_file.sh"
+      id: apply
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      shell: bash
+      if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        PLAN_WORKFLOW_NAME: ${{ steps.global-config.outputs.plan_workflow_name }}
+
     - run: bash "$GITHUB_ACTION_PATH/main.sh"
       id: apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
@@ -47,5 +56,10 @@ runs:
         TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
         TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
         DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}
-        PLAN_WORKFLOW_NAME: ${{ steps.global-config.outputs.plan_workflow_name }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+
+    - if: always() && steps.global-config.outputs.disable_update_related_pull_requests != 'true'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: bash "$GITHUB_ACTION_PATH/update_branches.sh"

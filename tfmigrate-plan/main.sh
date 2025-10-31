@@ -29,13 +29,17 @@ if [ ! -f .tfmigrate.hcl ]; then
 	exit 0
 fi
 
+echo "::group::tfmigrate plan"
 github-comment exec \
 	--config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
 	-k tfmigrate-plan \
 	-var "tfaction_target:$TFACTION_TARGET" \
 	-- tfmigrate plan --out tfplan.binary
+echo "::endgroup::"
 
+echo "::group::$TF_COMMAND show"
 github-comment exec -- "$TF_COMMAND" show -json tfplan.binary >tfplan.json
+echo "::endgroup::"
 
 tempdir=$(mktemp -d)
 cp tfplan.binary "$tempdir/tfplan.binary"
