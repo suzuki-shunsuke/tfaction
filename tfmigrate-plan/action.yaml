@@ -51,7 +51,7 @@ runs:
         TF_COMMAND: ${{ steps.global-config.outputs.terraform_command }}
 
     - if: steps.migrate.outputs.changed == 'true' && steps.global-config.outputs.securefix_action_server_repository == ''
-      uses: suzuki-shunsuke/commit-action@b4aee3f297a855b761e0db5736a73566a7807fe2 # v0.0.11
+      uses: suzuki-shunsuke/commit-action@75b215c45f1ded3868b7d525e0e40bcb73dc5ccc # v0.0.12
       with:
         commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
         github_token: ${{ inputs.github_token }}
