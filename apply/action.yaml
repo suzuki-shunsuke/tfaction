@@ -13,6 +13,16 @@ inputs:
     description: "GitHub Access Token"
     required: false
     default: ${{ github.token }}
+  securefix_action_app_id:
+    required: false
+    default: ""
+    description: |
+      The GitHub App ID for the Securefix Action client.
+  securefix_action_app_private_key:
+    required: false
+    default: ""
+    description: |
+      The GitHub App private key for the Securefix Action client.
 runs:
   using: composite
   steps:
@@ -23,6 +33,8 @@ runs:
         # actions:read - Download artifacts
         # contents:write - Update pull request branches
         github_token: ${{inputs.github_token}}
+        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
+        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
 
     - uses: suzuki-shunsuke/tfaction/tfmigrate-apply@main
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
@@ -30,3 +42,5 @@ runs:
         # pull-requests:write - Create pull request comments
         # contents:write - Update pull request branches
         github_token: ${{inputs.github_token}}
+        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
+        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}

@@ -9,6 +9,16 @@ inputs:
       contents:write - Update pull request branches
     required: false
     default: ${{ github.token }}
+  securefix_action_app_id:
+    required: false
+    default: ""
+    description: |
+      The GitHub App ID for the Securefix Action client.
+  securefix_action_app_private_key:
+    required: false
+    default: ""
+    description: |
+      The GitHub App private key for the Securefix Action client.
 
 outputs:
   issue_number:
@@ -56,8 +66,45 @@ runs:
         DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
-    - if: always() && steps.global-config.outputs.disable_update_related_pull_requests != 'true'
+    - if: |
+        always() &&
+        steps.global-config.outputs.disable_update_related_pull_requests != 'true'
+      id: update-branches
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
+        {
+          echo "value<<EOF"
+          github-comment exec \
+            -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
+            -var "tfaction_target:$TFACTION_TARGET" -- \
+            gh pr list \
+              --json number \
+              -L 100 \
+              -l "$TFACTION_TARGET" \
+              -S "-label:tfaction:disable-auto-update" \
+              -q ".[].number"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+
+    - if: |
+        always() &&
+        steps.global-config.outputs.disable_update_related_pull_requests != 'true' &&
+        steps.global-config.outputs.securefix_action_server_repository == ''
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        PR_NUMBERS: ${{ steps.update-branches.outputs.value }}
       run: bash "$GITHUB_ACTION_PATH/update_branches.sh"
+
+    - if: |
+        always() &&
+        steps.global-config.outputs.disable_update_related_pull_requests != 'true' &&
+        steps.global-config.outputs.securefix_action_server_repository != ''
+      uses: csm-actions/update-branch-action@a9203c8441eee4b478c8f2cfbe3c2d4bfa193d97 # v0.1.3
+      with:
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository_name: ${{steps.global-config.outputs.securefix_action_server_repository}}
+        pull_request_number: ${{ steps.update-branches.outputs.value }}
