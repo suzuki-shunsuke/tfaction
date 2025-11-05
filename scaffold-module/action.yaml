@@ -42,9 +42,9 @@ runs:
         fi
       shell: bash
 
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@054a424b5bef07d6e4a529f28c56ffd440b87389
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@054a424b5bef07d6e4a529f28c56ffd440b87389
       id: global-config
       with:
         action: get-global-config
