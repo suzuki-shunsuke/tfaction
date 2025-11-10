@@ -39,12 +39,12 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/install@5eb8d56b5428d3af76e54ad239d5efa3c00978c0
+    - uses: suzuki-shunsuke/tfaction/js@5eb8d56b5428d3af76e54ad239d5efa3c00978c0
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@5eb8d56b5428d3af76e54ad239d5efa3c00978c0
       id: target-config
       with:
         action: get-target-config
