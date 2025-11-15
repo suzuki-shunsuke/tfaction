@@ -52,6 +52,11 @@ const config = {
             label: "GitHub",
             position: "right",
           },
+          {
+            href: "https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451",
+            label: "NotebookLM",
+            position: "right",
+          },
         ],
       },
       footer: {
