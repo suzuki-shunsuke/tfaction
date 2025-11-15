@@ -20,7 +20,7 @@ runs:
     - run: |
         echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
       shell: bash
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@9569a0e1dd8fc38048b5f5aac211acdf223c0ff8
       id: main
       with:
         action: check-terraform-skip
