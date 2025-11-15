@@ -10,6 +10,11 @@ slug: /
 tfaction is a framework for a Monorepo to build high-level Terraform workflows using GitHub Actions.
 You don't have to run `terraform apply` in your laptop, and don't have to reinvent the wheel for Terraform Workflows anymore.
 
+## :bulb: NotebookLM for tfaction
+
+[You can ask any questions about tfaction to the notebook!](https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451).
+This notebook is built based on the document.
+
 ## Features
 
 - Run `terraform plan` in pull requests, and run `terraform apply` by merging pull requests into the default branch
