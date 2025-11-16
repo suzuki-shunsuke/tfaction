@@ -69,7 +69,7 @@ runs:
         CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
-    - uses: suzuki-shunsuke/tfaction/conftest@main
+    - uses: suzuki-shunsuke/tfaction/conftest@1b35207c428453028c0fd279d8cc9eb4b30ce50d
       if: |
         env.TFACTION_DRIFT_ISSUE_NUMBER || !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       with:
