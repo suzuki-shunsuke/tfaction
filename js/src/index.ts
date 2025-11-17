@@ -6,13 +6,13 @@ import { generateJSONSchema } from "./lib";
 
 try {
   if (process.env.TFACTION_TEST_ACTION) {
-    testAction.main();
+    await testAction.main();
   } else if (process.env.TFACTION_TEST_ACTION_TERRAGRUNT) {
-    testActionTerragrunt.main();
+    await testActionTerragrunt.main();
   } else if (process.env.TFACTION_GENERATE_JSON_SCHEMA) {
     generateJSONSchema("schema");
   } else {
-    main({
+    await main({
       action: core.getInput("action"),
     });
   }

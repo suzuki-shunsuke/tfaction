@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "scripts": {
     "build": "ncc build src/index.ts --license LICENSE",
     "test": "vitest --run"
