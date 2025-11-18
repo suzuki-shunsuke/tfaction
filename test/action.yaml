@@ -70,16 +70,30 @@ runs:
         ignore_hcl_errors: "true"
 
     # deep check requires AWS credentials
-    - uses: suzuki-shunsuke/github-action-tflint@bd4ef9de624ea35f63b554d4d20a26b6b32d1913 # v1.3.0
-      if: steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true'
+    - if: steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true'
+      id: tflint
+      uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: tflint
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
         fix: ${{ steps.target-config.outputs.tflint_fix == 'true' }}
-        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
-        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
-        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        use_securefix_action: ${{ steps.global-config.outputs.securefix_action_server_repository != '' }}
+        # github_token_for_tflint_init
+        # github_token_for_fix
+
+    - if: |
+        steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true' &&
+        steps.global-config.outputs.securefix_action_server_repository != '' && steps.tflint.outputs.fixed_files != ''
+      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
+      with:
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "fix(tflint): auto fix"
+        files: |
+          ${{ steps.tflint.outputs.fixed_files }}
 
     - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
       if: steps.target-config.outputs.destroy != 'true'

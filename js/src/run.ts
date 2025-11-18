@@ -12,6 +12,7 @@ import * as getOrCreateDriftIssue from "./get-or-create-drift-issue";
 import * as getFollowupPRParam from "./get-follow-up-pr-param";
 import * as tfsec from "./tfsec";
 import * as trivy from "./trivy";
+import * as tflint from "./tflint";
 
 type Inputs = {
   action: string;
@@ -37,6 +38,7 @@ export const main = async (inputs: Inputs) => {
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
     ["tfsec", tfsec],
     ["trivy", trivy],
+    ["tflint", tflint],
   ]);
   const action = actions.get(inputs.action);
   if (action === undefined) {
