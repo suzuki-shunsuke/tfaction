@@ -59,9 +59,10 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
 
-    - uses: suzuki-shunsuke/github-action-tfsec@6b4afce3060c0d8865d269de0c5fabc90e1b20f7 # v1.0.0
+    - uses: suzuki-shunsuke/tfaction/js@main
       if: steps.target-config.outputs.enable_tfsec == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
+        action: tfsec
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
