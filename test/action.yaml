@@ -58,7 +58,6 @@ runs:
         action: trivy
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
-        github_comment: "true"
 
     - uses: suzuki-shunsuke/tfaction/js@main
       if: steps.target-config.outputs.enable_tfsec == 'true' && steps.target-config.outputs.destroy != 'true'
@@ -66,8 +65,6 @@ runs:
         action: tfsec
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
-        github_comment: "true"
-        ignore_hcl_errors: "true"
 
     # deep check requires AWS credentials
     - if: steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true'
@@ -77,8 +74,7 @@ runs:
         action: tflint
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
-        github_comment: "true"
-        fix: ${{ steps.target-config.outputs.tflint_fix == 'true' }}
+        tflint_fix: ${{ steps.target-config.outputs.tflint_fix == 'true' }}
         use_securefix_action: ${{ steps.global-config.outputs.securefix_action_server_repository != '' }}
         # github_token_for_tflint_init
         # github_token_for_fix

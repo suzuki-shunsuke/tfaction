@@ -5,7 +5,7 @@ export const main = async (): Promise<void> => {
   await run({
     workingDirectory: core.getInput("working_directory", { required: false }),
     githubToken: core.getInput("github_token", { required: true }),
-    githubComment: core.getBooleanInput("github_comment", { required: true }),
+    githubComment: true,
     configPath: core.getInput("config_path", { required: false }),
   });
 };
