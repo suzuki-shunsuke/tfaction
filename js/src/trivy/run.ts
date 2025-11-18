@@ -86,7 +86,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const args = inputs.configPath
     ? ["config", "--format", "json", "--config", inputs.configPath, "."]
     : ["config", "--format", "json", "."];
-  core.startGroup('trivy');
+  core.startGroup("trivy");
   const out = await exec.getExecOutput("trivy", args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
@@ -148,7 +148,7 @@ ${table}`;
     github.context.eventName == "pull_request"
       ? "github-pr-review"
       : "github-check";
-  core.startGroup('reviewdog -name trivy');
+  core.startGroup("reviewdog -name trivy");
   await exec.exec(
     "reviewdog",
     [
