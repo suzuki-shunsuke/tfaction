@@ -52,9 +52,10 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
-    - uses: suzuki-shunsuke/trivy-config-action@6c7c845cbf76e5745c4d772719de7a34453ae81d # v0.2.2
+    - uses: suzuki-shunsuke/tfaction/js@main
       if: steps.target-config.outputs.enable_trivy == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
+        action: trivy
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_comment: "true"
