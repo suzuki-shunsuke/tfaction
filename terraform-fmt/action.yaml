@@ -60,8 +60,9 @@ runs:
         files: ${{ steps.files.outputs.value }}
 
     - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.files.outputs.value != ''
-      uses: csm-actions/securefix-action@4f3e711a06d7d5a3f5527cc622f6c75362fec74b # v0.3.6
+      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
       with:
+        action: client
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
