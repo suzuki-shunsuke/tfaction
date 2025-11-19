@@ -62,17 +62,12 @@ jobs:
       - name: Install dependencies
         uses: ./install
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@v2.1.4
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "contents": "write"
-            }
-          repositories: >-
-            ["${{github.event.repository.name}}"]
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
 
       - name: Install dependencies
         uses: ./install
@@ -312,18 +307,14 @@ jobs:
       - name: Install dependencies
         uses: ./install
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@v2.1.4
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "contents": "write",
-              "issues": "write"
-            }
-          repositories: >-
-            ["test-tfaction"]
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
+          permission-issues: write
+          repositories: test-tfaction
 
       - name: Install dependencies
         uses: ./install
@@ -397,17 +388,12 @@ jobs:
       - name: Install dependencies
         uses: ./install
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@v2.1.4
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "contents": "write"
-            }
-          repositories: >-
-            ["${{github.event.repository.name}}"]
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
 
       - name: Test setup
         uses: ./setup
@@ -476,17 +462,12 @@ jobs:
       - name: Install dependencies
         uses: ./install
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@v2.1.4
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "contents": "write"
-            }
-          repositories: >-
-            ["${{github.event.repository.name}}"]
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
 
       - name: Test list-module-callers
         uses: ./js
