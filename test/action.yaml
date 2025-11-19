@@ -29,6 +29,7 @@ runs:
       with:
         action: get-global-config
 
+    # Conftest
     - shell: bash
       id: action_path
       run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
@@ -38,8 +39,8 @@ runs:
       env:
         GH_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
 
-    - name: terraform validate
-      run: |
+    # terraform validate
+    - run: |
         github-comment exec \
           -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
           -k terraform-validate \
@@ -52,6 +53,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
+    # trivy
     - uses: suzuki-shunsuke/tfaction/js@main
       if: steps.target-config.outputs.enable_trivy == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
@@ -59,6 +61,7 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
 
+    # tfsec
     - uses: suzuki-shunsuke/tfaction/js@main
       if: steps.target-config.outputs.enable_tfsec == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
@@ -66,6 +69,7 @@ runs:
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
 
+    # tflint
     # deep check requires AWS credentials
     - if: steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true'
       id: tflint
@@ -79,6 +83,7 @@ runs:
         # github_token_for_tflint_init
         # github_token_for_fix
 
+    # tflint --fix with Securefix Action
     - if: |
         steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true' &&
         steps.global-config.outputs.securefix_action_server_repository != '' && steps.tflint.outputs.fixed_files != ''
@@ -91,6 +96,7 @@ runs:
         files: |
           ${{ steps.tflint.outputs.fixed_files }}
 
+    # terraform fmt
     - if: steps.target-config.outputs.destroy != 'true'
       shell: bash
       working-directory: ${{ steps.target-config.outputs.working_directory }}
@@ -113,6 +119,7 @@ runs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
 
+    # terraform fmt & commit action
     - if: |
         steps.target-config.outputs.destroy != 'true' &&
         steps.global-config.outputs.securefix_action_server_repository == '' && steps.fmt-files.outputs.value != ''
@@ -122,6 +129,7 @@ runs:
         github_token: ${{ inputs.github_token }}
         files: ${{ steps.fmt-files.outputs.value }}
 
+    # terraform fmt & securefix action
     - if: |
         steps.target-config.outputs.destroy != 'true' &&
         steps.global-config.outputs.securefix_action_server_repository != '' && steps.fmt-files.outputs.value != ''
@@ -134,6 +142,7 @@ runs:
         commit_message: "style: ${{ steps.target-config.outputs.terraform_command }} fmt -recursive"
         files: ${{ steps.fmt-files.outputs.value }}
 
+    # terraform-docs
     - uses: suzuki-shunsuke/tfaction/terraform-docs@main
       if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
