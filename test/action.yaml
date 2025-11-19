@@ -20,11 +20,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@c5f9ee0b2b18cb808128ee70c1779b6668951eec
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@c5f9ee0b2b18cb808128ee70c1779b6668951eec
       id: global-config
       with:
         action: get-global-config
@@ -54,7 +54,7 @@ runs:
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
 
     # trivy
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@c5f9ee0b2b18cb808128ee70c1779b6668951eec
       if: steps.target-config.outputs.enable_trivy == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         action: trivy
@@ -62,7 +62,7 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
 
     # tfsec
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@c5f9ee0b2b18cb808128ee70c1779b6668951eec
       if: steps.target-config.outputs.enable_tfsec == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         action: tfsec
@@ -73,7 +73,7 @@ runs:
     # deep check requires AWS credentials
     - if: steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true'
       id: tflint
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@c5f9ee0b2b18cb808128ee70c1779b6668951eec
       with:
         action: tflint
         github_token: ${{ inputs.github_token }}
