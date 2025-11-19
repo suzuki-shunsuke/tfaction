@@ -67,8 +67,16 @@ runs:
         commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
         files: ${{ steps.target-config.outputs.working_directory }}/.tfmigrate.hcl
 
+    # Conftest
     - if: steps.migrate.outputs.changed != 'true'
-      uses: suzuki-shunsuke/tfaction/conftest@main
+      run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
+      shell: bash
+      id: action_path
+    - if: steps.migrate.outputs.changed != 'true'
+      uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: conftest
         plan: "true"
         github_token: ${{inputs.github_token}}
+      env:
+        GH_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
