@@ -36,7 +36,7 @@ runs:
     - run: |
         echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
       shell: bash
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@d70e8b239651ca162fddce814e17b76786d8f99e
       id: main
       with:
         action: list-targets-with-changed-files
