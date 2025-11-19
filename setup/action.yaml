@@ -147,17 +147,64 @@ runs:
       shell: bash
       run: chmod 600 "$HOME/.ssh/id_rsa"
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@5c0cf078b5494b5828dd920139d54c65ba6fea5c # v1.2.1
+    - if: |
+        github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_')
+      shell: bash
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+      run: |
+        github-comment exec -- "$TF_COMMAND" init -input=false
+
+    - if: |
+        github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
+      id: terraform-init
+      shell: bash
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+        PROVIDERS_LOCK_OPTS: ${{ steps.target-config.outputs.providers_lock_opts }}
+        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
+      run: |
+        echo "::group::$TF_COMMAND init"
+        exist_lock_file=false
+        if [ -f .terraform.lock.hcl ]; then
+          exist_lock_file=true
+        fi
+
+        "$TF_COMMAND" init -input=false || github-comment exec -- "$TF_COMMAND" init -input=false -upgrade
+        echo "::endgroup::"
+        echo "::group::$TF_COMMAND providers lock"
+        # shellcheck disable=SC2086
+        github-comment exec -- "$TF_COMMAND" providers lock $PROVIDERS_LOCK_OPTS
+        echo "::endgroup::"
+        if [ "$exist_lock_file" = "false" ] || ! git diff --quiet .terraform.lock.hcl; then
+          if [ -n "$WORKING_DIR" ]; then
+            echo "changed_file=$WORKING_DIR/.terraform.lock.hcl" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "changed_file=.terraform.lock.hcl" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+    - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.terraform-init.outputs.changed_file != ''
+      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
       with:
-        working_directory: ${{ steps.target-config.outputs.working_directory }}
+        commit_message: "chore: update .terraform.lock.hcl"
         github_token: ${{ inputs.github_token }}
-        github_app_token: ${{ inputs.github_token }}
-        providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
-        skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
-        terraform_command: ${{ steps.target-config.outputs.terraform_command }}
-        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
-        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
+        files: ${{ steps.terraform-init.outputs.changed_file }}
+
+    - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.terraform-init.outputs.changed_file != ''
+      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
+      with:
+        action: client
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "chore: update .terraform.lock.hcl"
+        files: ${{ steps.terraform-init.outputs.changed_file }}
 
     - run: |
         "$TF" providers
