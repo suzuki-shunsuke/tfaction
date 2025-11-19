@@ -34,16 +34,19 @@ runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction/install@main
-    - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
-      shell: bash
-      if: |
+    # ci-info
+    - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
 
-    - name: Check if the commit is latest
+    # Check if the commit is latest
+    - if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
       shell: bash
-      if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
+      env:
+        HEAD_SHA: ${{github.event.pull_request.head.sha}}
       run: |
         set -euo pipefail
 
@@ -52,24 +55,23 @@ runs:
           echo "::error::The head sha ($HEAD_SHA) isn't latest ($latest_head_sha)."
           exit 1
         fi
-      env:
-        HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
     - uses: suzuki-shunsuke/tfaction/js@main
       id: target-config
       with:
         action: get-target-config
 
-    - run: |
+    # Add the label to the pull request
+    - if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
         curl -X POST "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$CI_INFO_PR_NUMBER/labels" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H "Accept: application/json" \
           -H "Content-type: application/json" \
           -d "[{\"name\":\"${TFACTION_TARGET}\"}]"
-      shell: bash
-      if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
@@ -114,43 +116,98 @@ runs:
       with:
         action: export-aws-secrets-manager
 
+    # Google Cloud authentication
     - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       id: google-backend-credentials
       if: steps.target-config.outputs.gcp_remote_backend_service_account != ''
       with:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_remote_backend_workload_identity_provider != '' && steps.target-config.outputs.gcp_remote_backend_workload_identity_provider || steps.target-config.outputs.gcp_workload_identity_provider }}
         service_account: ${{ steps.target-config.outputs.gcp_remote_backend_service_account }}
-
-    - shell: bash
-      if: steps.target-config.outputs.gcp_remote_backend_service_account != ''
-      run: echo "GOOGLE_BACKEND_CREDENTIALS=$GOOGLE_BACKEND_CREDENTIALS" >> "$GITHUB_ENV"
+    - if: steps.target-config.outputs.gcp_remote_backend_service_account != ''
+      shell: bash
       env:
         GOOGLE_BACKEND_CREDENTIALS: ${{ steps.google-backend-credentials.outputs.credentials_file_path }}
-
-    - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
-      if: steps.target-config.outputs.gcp_service_account != ''
+      run: echo "GOOGLE_BACKEND_CREDENTIALS=$GOOGLE_BACKEND_CREDENTIALS" >> "$GITHUB_ENV"
+    - if: steps.target-config.outputs.gcp_service_account != ''
+      uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
       with:
         workload_identity_provider: ${{ steps.target-config.outputs.gcp_workload_identity_provider }}
         service_account: ${{ steps.target-config.outputs.gcp_service_account }}
         access_token_scopes: ${{ steps.target-config.outputs.gcp_access_token_scopes }}
         token_format: ${{ steps.target-config.outputs.gcp_access_token_scopes != '' && 'access_token' || '' }}
 
-    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
-      if: inputs.ssh_key != ''
-      with:
-        ssh_key: ${{ inputs.ssh_key }}
+    # Set up SSH key for Terraform Private Modules
+    - if: inputs.ssh_key != ''
+      shell: bash
+      run: mkdir -p "$HOME/.ssh"
+    - if: inputs.ssh_key != ''
+      shell: bash
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+      run: echo "$SSH_KEY" > "$HOME/.ssh/id_rsa"
+    - if: inputs.ssh_key != ''
+      shell: bash
+      run: chmod 600 "$HOME/.ssh/id_rsa"
 
-    - uses: suzuki-shunsuke/github-action-terraform-init@5c0cf078b5494b5828dd920139d54c65ba6fea5c # v1.2.1
+    # terraform init
+    - if: |
+        github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_')
+      shell: bash
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+      run: |
+        github-comment exec -- "$TF_COMMAND" init -input=false
+
+    - if: |
+        github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
+      id: terraform-init
+      shell: bash
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+        PROVIDERS_LOCK_OPTS: ${{ steps.target-config.outputs.providers_lock_opts }}
+        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
+      run: |
+        echo "::group::$TF_COMMAND init"
+        exist_lock_file=false
+        if [ -f .terraform.lock.hcl ]; then
+          exist_lock_file=true
+        fi
+
+        "$TF_COMMAND" init -input=false || github-comment exec -- "$TF_COMMAND" init -input=false -upgrade
+        echo "::endgroup::"
+        echo "::group::$TF_COMMAND providers lock"
+        # shellcheck disable=SC2086
+        github-comment exec -- "$TF_COMMAND" providers lock $PROVIDERS_LOCK_OPTS
+        echo "::endgroup::"
+        if [ "$exist_lock_file" = "false" ] || ! git diff --quiet .terraform.lock.hcl; then
+          if [ -n "$WORKING_DIR" ]; then
+            echo "changed_file=$WORKING_DIR/.terraform.lock.hcl" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "changed_file=.terraform.lock.hcl" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+    - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.terraform-init.outputs.changed_file != ''
+      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
       with:
-        working_directory: ${{ steps.target-config.outputs.working_directory }}
+        commit_message: "chore: update .terraform.lock.hcl"
         github_token: ${{ inputs.github_token }}
-        github_app_token: ${{ inputs.github_token }}
-        providers_lock_opts: ${{ steps.target-config.outputs.providers_lock_opts }}
-        skip_push: ${{ github.event_name != 'pull_request' && ! startsWith(github.event_name, 'pull_request_') }}
-        terraform_command: ${{ steps.target-config.outputs.terraform_command }}
-        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
-        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
+        files: ${{ steps.terraform-init.outputs.changed_file }}
+
+    - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.terraform-init.outputs.changed_file != ''
+      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
+      with:
+        action: client
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "chore: update .terraform.lock.hcl"
+        files: ${{ steps.terraform-init.outputs.changed_file }}
 
     - run: |
         "$TF" providers
