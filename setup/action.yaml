@@ -135,10 +135,17 @@ runs:
         access_token_scopes: ${{ steps.target-config.outputs.gcp_access_token_scopes }}
         token_format: ${{ steps.target-config.outputs.gcp_access_token_scopes != '' && 'access_token' || '' }}
 
-    - uses: suzuki-shunsuke/tfaction/deploy-ssh-key@main
-      if: inputs.ssh_key != ''
-      with:
-        ssh_key: ${{ inputs.ssh_key }}
+    - if: inputs.ssh_key != ''
+      shell: bash
+      run: mkdir -p "$HOME/.ssh"
+    - if: inputs.ssh_key != ''
+      shell: bash
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+      run: echo "$SSH_KEY" > "$HOME/.ssh/id_rsa"
+    - if: inputs.ssh_key != ''
+      shell: bash
+      run: chmod 600 "$HOME/.ssh/id_rsa"
 
     - uses: suzuki-shunsuke/github-action-terraform-init@5c0cf078b5494b5828dd920139d54c65ba6fea5c # v1.2.1
       with:
