@@ -18,15 +18,12 @@ jobs:
           persist-credentials: false
 
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
           # pull_requests:write - Post and hide comments
-          permissions: >-
-            {"pull_requests": "write"}
-          repositories: >-
-            ["${{github.event.repository.name}}"]
+          permission-pull-requests: write
 
       - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
         with:
