@@ -51,36 +51,54 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GH_COMMENT_CONFIG: ${{steps.action-path.outputs.value}}/github-comment.yaml
 
-    - uses: suzuki-shunsuke/trivy-config-action@6c7c845cbf76e5745c4d772719de7a34453ae81d # v0.2.2
-      if: fromJSON(steps.global-config.outputs.enable_trivy)
+    # trivy
+    - if: fromJSON(steps.global-config.outputs.enable_trivy)
+      uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: trivy
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_comment: "true"
 
-    - uses: suzuki-shunsuke/github-action-tfsec@6b4afce3060c0d8865d269de0c5fabc90e1b20f7 # v1.0.0
-      if: fromJSON(steps.global-config.outputs.enable_tfsec)
+    # tfsec
+    - if: fromJSON(steps.global-config.outputs.enable_tfsec)
+      uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: tfsec
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_comment: "true"
 
-    - uses: suzuki-shunsuke/github-action-tflint@bd4ef9de624ea35f63b554d4d20a26b6b32d1913 # v1.3.0
-      if: fromJSON(steps.global-config.outputs.enable_tflint)
+    # tflint
+    - if: fromJSON(steps.global-config.outputs.enable_tflint)
+      id: tflint
+      uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: tflint
         github_token: ${{ inputs.github_token }}
         working_directory: ${{ env.TFACTION_TARGET }}
-        github_comment: "true"
-        fix: ${{ steps.global-config.outputs.tflint_fix == 'true' }}
-        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
-        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
-        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        tflint_fix: ${{ steps.global-config.outputs.tflint_fix == 'true' }}
+        use_securefix_action: ${{ steps.global-config.outputs.securefix_action_server_repository != '' }}
+        # github_token_for_tflint_init
+        # github_token_for_fix
+
+    # tflint --fix with Securefix Action
+    - if: |
+        steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true' &&
+        steps.global-config.outputs.securefix_action_server_repository != '' && steps.tflint.outputs.fixed_files != ''
+      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
+      with:
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "fix(tflint): auto fix"
+        files: |
+          ${{ steps.tflint.outputs.fixed_files }}
 
     # Remove .terraform.lock.hcl created by `terraform init` before running terraform-docs
     - run: "! test -f .terraform.lock.hcl || rm .terraform.lock.hcl"
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
 
+    # terraform-docs
     - uses: suzuki-shunsuke/tfaction/terraform-docs@main
       with:
         github_token: ${{ inputs.github_token }}
@@ -88,10 +106,45 @@ runs:
         securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
         working_directory: ${{ env.TFACTION_TARGET }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
+    # terraform fmt
+    - shell: bash
+      working-directory: ${{ env.TFACTION_TARGET }}
+      id: fmt-files
+      env:
+        TF_COMMAND: ${{ steps.global-config.outputs.terraform_command }}
+        DIR: ${{ env.TFACTION_TARGET }}
+      run: |
+        if [ -z "$DIR" ]; then
+          {
+            echo 'value<<EOF'
+            "$TF_COMMAND" fmt -recursive
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        {
+          echo 'value<<EOF'
+          "$TF_COMMAND" fmt -recursive | sed "s|^|${DIR}/|"
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
+    # terraform fmt & commit action
+    - if: |
+        steps.global-config.outputs.securefix_action_server_repository == '' && steps.fmt-files.outputs.value != ''
+      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
       with:
-        working_directory: ${{ env.TFACTION_TARGET }}
-        terraform_command: ${{ steps.global-config.outputs.terraform_command }}
+        commit_message: "style: ${{ steps.global-config.outputs.terraform_command }} fmt -recursive"
         github_token: ${{ inputs.github_token }}
-        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
-        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
+        files: ${{ steps.fmt-files.outputs.value }}
+
+    # terraform fmt & securefix action
+    - if: |
+        steps.global-config.outputs.securefix_action_server_repository != '' && steps.fmt-files.outputs.value != ''
+      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
+      with:
+        action: client
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "style: ${{ steps.global-config.outputs.terraform_command }} fmt -recursive"
+        files: ${{ steps.fmt-files.outputs.value }}
