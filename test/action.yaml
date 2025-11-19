@@ -91,14 +91,48 @@ runs:
         files: |
           ${{ steps.tflint.outputs.fixed_files }}
 
-    - uses: suzuki-shunsuke/tfaction/terraform-fmt@main
-      if: steps.target-config.outputs.destroy != 'true'
+    - if: steps.target-config.outputs.destroy != 'true'
+      shell: bash
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      id: fmt-files
+      env:
+        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+        DIR: ${{ steps.target-config.outputs.working_directory }}
+      run: |
+        if [ -z "$DIR" ]; then
+          {
+            echo 'value<<EOF'
+            "$TF_COMMAND" fmt -recursive
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        {
+          echo 'value<<EOF'
+          "$TF_COMMAND" fmt -recursive | sed "s|^|${DIR}/|"
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
+    - if: |
+        steps.target-config.outputs.destroy != 'true' &&
+        steps.global-config.outputs.securefix_action_server_repository == '' && steps.fmt-files.outputs.value != ''
+      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
       with:
-        working_directory: ${{ steps.target-config.outputs.working_directory }}
-        terraform_command: ${{ steps.target-config.outputs.terraform_command }}
+        commit_message: "style: ${{ steps.target-config.outputs.terraform_command }} fmt -recursive"
         github_token: ${{ inputs.github_token }}
-        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
-        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
+        files: ${{ steps.fmt-files.outputs.value }}
+
+    - if: |
+        steps.target-config.outputs.destroy != 'true' &&
+        steps.global-config.outputs.securefix_action_server_repository != '' && steps.fmt-files.outputs.value != ''
+      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
+      with:
+        action: client
+        app_id: ${{inputs.securefix_action_app_id}}
+        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
+        commit_message: "style: ${{ steps.target-config.outputs.terraform_command }} fmt -recursive"
+        files: ${{ steps.fmt-files.outputs.value }}
 
     - uses: suzuki-shunsuke/tfaction/terraform-docs@main
       if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
