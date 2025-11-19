@@ -56,6 +56,7 @@ runs:
     - if: steps.global-config.outputs.securefix_action_server_repository != ''
       uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
       with:
+        action: client
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
