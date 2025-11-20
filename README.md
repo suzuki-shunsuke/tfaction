@@ -29,6 +29,8 @@ https://suzuki-shunsuke.github.io/tfaction/docs/
   - [tfactionを使ったGitHub Actions Workflowの構築](https://tech.newmo.me/entry/tfaction-github-terraform-workflow)
 - [tacoms Inc.](https://www.tacoms-inc.com/)
   - [tfactionを使ってTerraformの実行を自動化した！！](https://zenn.dev/tacoms/articles/988e4c7efc8cf3)
+- [LayerX Inc.](https://layerx.co.jp/)
+  - [コンパウンドスタートアップのためのスケーラブルでセキュアなInfrastructure as Codeパイプラインを考える](https://speakerdeck.com/yuyatakeyama/scalable-and-secure-infrastructure-as-code-pipeline-for-a-compound-startup-c8f5baa6-b9ac-48e5-a680-f8830004ed7f)
 
 ## LICENSE
 
