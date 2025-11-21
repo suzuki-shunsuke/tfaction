@@ -12,6 +12,8 @@ export const main = async (): Promise<void> => {
     fix: core.getBooleanInput("tflint_fix", { required: true }),
     serverRepository: core.getInput("securefix_action_server_repository"),
     securefixActionAppId: core.getInput("securefix_action_app_id"),
-    securefixActionAppPrivateKey: core.getInput("securefix_action_app_private_key"),
+    securefixActionAppPrivateKey: core.getInput(
+      "securefix_action_app_private_key",
+    ),
   });
 };
