@@ -6,21 +6,13 @@ import * as commit from "@suzuki-shunsuke/commit-ts";
 type Inputs = {
   commitMessage: string;
   githubToken: string;
-  files: string;
+  files: Set<string>;
   serverRepository: string;
   appId: string;
   appPrivateKey: string;
 };
 
-export const main = async () => {
-  const inputs: Inputs = {
-    commitMessage: core.getInput("commit_message", { required: true }),
-    githubToken: core.getInput("github_token"),
-    files: core.getInput("files"),
-    serverRepository: core.getInput("securefix_action_server_repository"),
-    appId: core.getInput("app_id"),
-    appPrivateKey: core.getInput("app_private_key"),
-  };
+export const create = async (inputs: Inputs) => {
   if (inputs.serverRepository) {
     if (!inputs.appId || !inputs.appPrivateKey) {
       throw new Error(
@@ -32,12 +24,7 @@ export const main = async () => {
       appId: inputs.appId,
       privateKey: inputs.appPrivateKey,
       serverRepository: inputs.serverRepository,
-      files: new Set(
-        inputs.files
-          .split("\n")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0),
-      ),
+      files: inputs.files,
       commitMessage: inputs.commitMessage,
       workspace: process.env.GITHUB_WORKSPACE ?? "",
     });
@@ -50,13 +37,25 @@ export const main = async () => {
     repo: github.context.repo.repo,
     branch: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || "",
     message: inputs.commitMessage,
-    files: inputs.files
-      .split("\n")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0),
+    files: [...inputs.files],
     deleteIfNotExist: true,
     logger: {
       info: core.info,
     },
   });
+};
+
+export const main = async () => {
+  const inputs: Inputs = {
+    commitMessage: core.getInput("commit_message", { required: true }),
+    githubToken: core.getInput("github_token"),
+    files: new Set(core.getInput("files")
+      .split("\n")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0)),
+    serverRepository: core.getInput("securefix_action_server_repository"),
+    appId: core.getInput("securefix_action_app_id"),
+    appPrivateKey: core.getInput("securefix_action_app_private_key"),
+  };
+  await create(inputs);
 };

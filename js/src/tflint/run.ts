@@ -2,6 +2,7 @@ import * as exec from "@actions/exec";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
+import * as commit from "../commit";
 
 type Inputs = {
   workingDirectory: string;
@@ -179,31 +180,14 @@ export const run = async (inputs: Inputs): Promise<void> => {
     const changedFiles = out.stdout.split("\n").filter((f) => f.length > 0);
     if (changedFiles.length !== 0) {
       core.setOutput("fixed_files", changedFiles.join("\n"));
-      if (inputs.useSecurefixAction) {
-        return;
-      }
-      const branch =
-        process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF || "";
-      core.startGroup("ghcp commit");
-      await exec.exec(
-        "ghcp",
-        [
-          "commit",
-          "-r",
-          `${github.context.repo.owner}/${github.context.repo.repo}`,
-          "-b",
-          branch,
-          "-m",
-          "fix(tflint): auto fix",
-        ].concat(changedFiles),
-        {
-          env: {
-            ...process.env,
-            GITHUB_TOKEN: inputs.githubTokenForFix,
-          },
-        },
-      );
-      core.endGroup();
+      await commit.create({
+        commitMessage: "fix(tflint): auto fix",
+        githubToken: inputs.githubTokenForFix,
+        files: new Set(changedFiles),
+        serverRepository: core.getInput("securefix_action_server_repository"),
+        appId: core.getInput("securefix_action_app_id"),
+        appPrivateKey: core.getInput("securefix_action_app_private_key"),
+      });
       throw new Error("code is fixed by tflint --fix");
     }
   }

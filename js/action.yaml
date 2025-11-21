@@ -90,10 +90,10 @@ inputs:
   securefix_action_server_repository:
     description: Securefix Action Server Repository
     required: false
-  app_id:
+  securefix_action_app_id:
     description: GitHub App ID
     required: false
-  app_private_key:
+  securefix_action_app_private_key:
     description: GitHub App Private Key
     required: false
 

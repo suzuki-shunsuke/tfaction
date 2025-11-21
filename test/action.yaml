@@ -84,19 +84,6 @@ runs:
         # github_token_for_tflint_init
         # github_token_for_fix
 
-    # tflint --fix with Securefix Action
-    - if: |
-        steps.target-config.outputs.enable_tflint == 'true' && steps.target-config.outputs.destroy != 'true' &&
-        steps.global-config.outputs.securefix_action_server_repository != '' && steps.tflint.outputs.fixed_files != ''
-      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
-      with:
-        app_id: ${{inputs.securefix_action_app_id}}
-        app_private_key: ${{inputs.securefix_action_app_private_key}}
-        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        commit_message: "fix(tflint): auto fix"
-        files: |
-          ${{ steps.tflint.outputs.fixed_files }}
-
     # terraform fmt
     - if: steps.target-config.outputs.destroy != 'true'
       shell: bash
