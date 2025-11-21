@@ -120,28 +120,19 @@ runs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
 
-    # terraform fmt & commit action
+    # terraform fmt & commit
     - if: |
         steps.target-config.outputs.destroy != 'true' &&
-        steps.global-config.outputs.securefix_action_server_repository == '' && steps.fmt-files.outputs.value != ''
-      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
+        steps.fmt-files.outputs.value != ''
+      uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: commit
         commit_message: "style: ${{ steps.target-config.outputs.terraform_command }} fmt -recursive"
-        github_token: ${{ inputs.github_token }}
         files: ${{ steps.fmt-files.outputs.value }}
-
-    # terraform fmt & securefix action
-    - if: |
-        steps.target-config.outputs.destroy != 'true' &&
-        steps.global-config.outputs.securefix_action_server_repository != '' && steps.fmt-files.outputs.value != ''
-      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
-      with:
-        action: client
+        github_token: ${{ inputs.github_token }}
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
-        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        commit_message: "style: ${{ steps.target-config.outputs.terraform_command }} fmt -recursive"
-        files: ${{ steps.fmt-files.outputs.value }}
+        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
     # terraform-docs
     - uses: suzuki-shunsuke/tfaction/terraform-docs@main

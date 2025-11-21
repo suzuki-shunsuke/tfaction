@@ -13,6 +13,7 @@ import * as getFollowupPRParam from "./get-follow-up-pr-param";
 import * as tfsec from "./tfsec";
 import * as trivy from "./trivy";
 import * as tflint from "./tflint";
+import * as commit from "./commit";
 
 type Inputs = {
   action: string;
@@ -39,6 +40,7 @@ export const main = async (inputs: Inputs) => {
     ["tfsec", tfsec],
     ["trivy", trivy],
     ["tflint", tflint],
+    ["commit", commit],
   ]);
   const action = actions.get(inputs.action);
   if (action === undefined) {

@@ -80,6 +80,23 @@ inputs:
     required: false
     default: "false"
 
+  # commit
+  commit_message:
+    description: Commit message for the commit action
+    required: false
+  files:
+    description: Files to commit
+    required: false
+  securefix_server_repository:
+    description: Securefix Action Server Repository
+    required: false
+  app_id:
+    description: GitHub App ID
+    required: false
+  app_private_key:
+    description: GitHub App Private Key
+    required: false
+
 outputs:
   # get-target-config
   working_directory:
