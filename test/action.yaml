@@ -81,6 +81,9 @@ runs:
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         tflint_fix: ${{ steps.target-config.outputs.tflint_fix == 'true' }}
         use_securefix_action: ${{ steps.global-config.outputs.securefix_action_server_repository != '' }}
+        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
+        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
+        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         # github_token_for_tflint_init
         # github_token_for_fix
 
