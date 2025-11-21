@@ -87,7 +87,7 @@ inputs:
   files:
     description: Files to commit
     required: false
-  securefix_server_repository:
+  securefix_action_server_repository:
     description: Securefix Action Server Repository
     required: false
   app_id:
