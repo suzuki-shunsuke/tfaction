@@ -11,7 +11,9 @@ type Inputs = {
   githubTokenForFix: string;
   githubComment: boolean;
   fix: boolean;
-  useSecurefixAction: boolean;
+  serverRepository: string;
+  securefixActionAppId: string;
+  securefixActionAppPrivateKey: string;
 };
 
 const getSeverity = (s: string): string => {
@@ -184,9 +186,9 @@ export const run = async (inputs: Inputs): Promise<void> => {
         commitMessage: "fix(tflint): auto fix",
         githubToken: inputs.githubTokenForFix,
         files: new Set(changedFiles),
-        serverRepository: core.getInput("securefix_action_server_repository"),
-        appId: core.getInput("securefix_action_app_id"),
-        appPrivateKey: core.getInput("securefix_action_app_private_key"),
+        serverRepository: inputs.serverRepository,
+        appId: inputs.securefixActionAppId,
+        appPrivateKey: inputs.securefixActionAppPrivateKey,
       });
       throw new Error("code is fixed by tflint --fix");
     }
