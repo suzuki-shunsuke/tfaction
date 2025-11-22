@@ -80,25 +80,23 @@ export const run = async (inputs: Inputs): Promise<void> => {
     args.push("--", "terraform-docs", ...opts, ".");
 
     // Execute terraform-docs via github-comment
-    const result = await exec.getExecOutput(
-      "github-comment",
-      args,
-      {
-        cwd: inputs.workingDirectory,
-        ignoreReturnCode: true,
-        env: {
-          ...process.env,
-          GITHUB_TOKEN: inputs.githubToken,
-        },
+    const result = await exec.getExecOutput("github-comment", args, {
+      cwd: inputs.workingDirectory,
+      ignoreReturnCode: true,
+      env: {
+        ...process.env,
+        GITHUB_TOKEN: inputs.githubToken,
       },
-    );
+    });
 
     // Write output to temp file
     fs.writeFileSync(tempFile.name, result.stdout);
 
     // Check if command failed
     if (result.exitCode !== 0) {
-      throw new Error(`terraform-docs failed with exit code ${result.exitCode}`);
+      throw new Error(
+        `terraform-docs failed with exit code ${result.exitCode}`,
+      );
     }
 
     // Check for error: .terraform-docs.yml is required
@@ -109,7 +107,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
 
     // Check if README.md has the BEGIN_TF_DOCS marker
     // If not, write the entire output to README.md
-    if (!fs.existsSync(readmePath) || !fs.readFileSync(readmePath, "utf8").includes("<!-- BEGIN_TF_DOCS -->")) {
+    if (
+      !fs.existsSync(readmePath) ||
+      !fs.readFileSync(readmePath, "utf8").includes("<!-- BEGIN_TF_DOCS -->")
+    ) {
       fs.writeFileSync(readmePath, output);
     }
 
@@ -128,7 +129,9 @@ export const run = async (inputs: Inputs): Promise<void> => {
     if (changed) {
       const eventName = github.context.eventName;
       if (eventName !== "pull_request" && eventName !== "pull_request_target") {
-        throw new Error("Please generate Module's README.md with terraform-docs.");
+        throw new Error(
+          "Please generate Module's README.md with terraform-docs.",
+        );
       }
       core.setOutput("changed", "true");
       await commit.create({
