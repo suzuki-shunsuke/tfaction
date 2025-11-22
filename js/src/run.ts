@@ -15,6 +15,7 @@ import * as trivy from "./trivy";
 import * as tflint from "./tflint";
 import * as commit from "./commit";
 import * as terraformDocs from "./terraform-docs";
+import * as aquaUpdateChecksum from "./aqua-update-checksum";
 
 type Inputs = {
   action: string;
@@ -26,6 +27,7 @@ interface API {
 
 export const main = async (inputs: Inputs) => {
   const actions = new Map<string, API>([
+    ["aqua-update-checksum", aquaUpdateChecksum],
     ["check-terraform-skip", checkTerraformSkip],
     ["conftest", conftest],
     ["create-drift-issues", createDriftIssues],

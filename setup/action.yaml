@@ -88,9 +88,10 @@ runs:
       env:
         TARGET_CONFIG: ${{toJSON(steps.target-config.outputs)}}
 
-    - uses: aquaproj/update-checksum-action@c5df5a5c2a897a9b807068f062140506d092e7ac # v0.2.7
+    - uses: suzuki-shunsuke/tfaction/js@main
       if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'
       with:
+        action: aqua-update-checksum
         skip_push: ${{ steps.global-config.outputs.aqua_update_checksum_skip_push }}
         prune: ${{ steps.global-config.outputs.aqua_update_checksum_prune }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
