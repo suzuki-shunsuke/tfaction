@@ -33,7 +33,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@02ec5c9dda813b61802cc9943b12d9ee5a7511dd
     # ci-info
     - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
@@ -56,7 +56,7 @@ runs:
           exit 1
         fi
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@02ec5c9dda813b61802cc9943b12d9ee5a7511dd
       id: target-config
       with:
         action: get-target-config
@@ -73,7 +73,7 @@ runs:
           -H "Content-type: application/json" \
           -d "[{\"name\":\"${TFACTION_TARGET}\"}]"
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@02ec5c9dda813b61802cc9943b12d9ee5a7511dd
       id: global-config
       with:
         action: get-global-config
@@ -112,7 +112,7 @@ runs:
         role-session-name: ${{ steps.target-config.outputs.aws_role_session_name }}
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@02ec5c9dda813b61802cc9943b12d9ee5a7511dd
       with:
         action: export-aws-secrets-manager
 
