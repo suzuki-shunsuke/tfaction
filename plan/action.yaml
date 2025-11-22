@@ -88,13 +88,14 @@ runs:
 
     # tfmigrate plan
 
-    - if: env.TFACTION_JOB_TYPE == 'tfmigrate'
-      run: bash "$GITHUB_ACTION_PATH/tfmigrate.sh"
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: migrate
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
-      shell: bash
+      if: env.TFACTION_JOB_TYPE == 'tfmigrate'
+      with:
+        action: plan
+        working_directory: ${{ steps.target-config.outputs.working_directory }}
+        github_token: ${{ inputs.github_token }}
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
         WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
         ROOT_DIR: ${{ github.workspace }}
         PR_NUMBER: ${{ github.event.pull_request.number }}

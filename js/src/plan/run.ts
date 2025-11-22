@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
+import { string } from "zod/v4";
 
 type Inputs = {
   githubToken: string;
@@ -18,6 +19,8 @@ type Inputs = {
   driftIssueNumber?: string;
   prAuthor?: string;
   ciInfoTempDir?: string;
+  s3BucketNameTfmigrateHistory?: string;
+  gcsBucketNameTfmigrateHistory?: string;
 };
 
 type TerraformPlanOutputs = {
@@ -25,6 +28,12 @@ type TerraformPlanOutputs = {
   planBinary: string;
   planJson: string;
   skipped?: boolean;
+};
+
+type TfmigratePlanOutputs = {
+  changed?: boolean;
+  planBinary?: string;
+  planJson?: string;
 };
 
 const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
@@ -73,6 +82,154 @@ const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
   throw new Error(
     "Renovate PR must have 'No change' or 'renovate-change' label",
   );
+};
+
+const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
+  const tfmigrateHclPath = path.join(inputs.workingDirectory, ".tfmigrate.hcl");
+
+  // Check if .tfmigrate.hcl already exists
+  if (fs.existsSync(tfmigrateHclPath)) {
+    return false;
+  }
+
+  const githubActionPath = process.env.GITHUB_ACTION_PATH || "";
+  let templatePath = "";
+  let content = "";
+
+  // Generate from S3 template
+  if (inputs.s3BucketNameTfmigrateHistory) {
+    templatePath = path.join(githubActionPath, "tfmigrate.hcl");
+    content = fs.readFileSync(templatePath, "utf8");
+    content = content.replace(/%%TARGET%%/g, inputs.target);
+    content = content.replace(
+      /%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%/g,
+      inputs.s3BucketNameTfmigrateHistory,
+    );
+  }
+  // Generate from GCS template
+  else if (inputs.gcsBucketNameTfmigrateHistory) {
+    templatePath = path.join(githubActionPath, "tfmigrate-gcs.hcl");
+    content = fs.readFileSync(templatePath, "utf8");
+    content = content.replace(/%%TARGET%%/g, inputs.target);
+    content = content.replace(
+      /%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%/g,
+      inputs.gcsBucketNameTfmigrateHistory,
+    );
+  }
+  // Error: neither S3 nor GCS bucket is configured
+  else {
+    const commentConfig = path.join(githubActionPath, "github-comment.yaml");
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "--config",
+        commentConfig,
+        "-var",
+        `tfaction_target:${inputs.target}`,
+        "-k",
+        "tfmigrate-hcl-not-found",
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: inputs.githubToken,
+        },
+      },
+    );
+    throw new Error(
+      ".tfmigrate.hcl is required but neither S3 nor GCS bucket is configured",
+    );
+  }
+
+  // Write .tfmigrate.hcl
+  fs.writeFileSync(tfmigrateHclPath, content);
+  return true;
+};
+
+export const runTfmigratePlan = async (
+  inputs: Inputs,
+): Promise<TfmigratePlanOutputs> => {
+  // Generate .tfmigrate.hcl if it doesn't exist
+  const wasCreated = await generateTfmigrateHcl(inputs);
+  if (wasCreated) {
+    // Early exit: .tfmigrate.hcl was just created
+    core.setOutput("changed", "true");
+    return { changed: true };
+  }
+
+  const githubActionPath = process.env.GITHUB_ACTION_PATH || "";
+  const commentConfig = path.join(githubActionPath, "github-comment.yaml");
+
+  // Run tfmigrate plan
+  core.startGroup("tfmigrate plan");
+  const planBinaryPath = path.join(inputs.workingDirectory, "tfplan.binary");
+
+  const env: { [key: string]: string } = {
+    ...process.env,
+    GITHUB_TOKEN: inputs.githubToken,
+  };
+  // Set TFMIGRATE_EXEC_PATH if TF_COMMAND is not "terraform"
+  if (!process.env.TFMIGRATE_EXEC_PATH && inputs.tfCommand !== "terraform") {
+    env.TFMIGRATE_EXEC_PATH = inputs.tfCommand;
+  }
+
+  await exec.exec(
+    "github-comment",
+    [
+      "exec",
+      "--config",
+      commentConfig,
+      "-var",
+      `tfaction_target:${inputs.target}`,
+      "-k",
+      "tfmigrate-plan",
+      "--",
+      "tfmigrate",
+      "plan",
+      "--out",
+      planBinaryPath,
+    ],
+    {
+      cwd: inputs.workingDirectory,
+      env: env,
+    },
+  );
+  core.endGroup();
+
+  // Run terraform show to convert plan to JSON
+  core.startGroup(`${inputs.tfCommand} show`);
+  const planJsonPath = path.join(inputs.workingDirectory, "tfplan.json");
+
+  await exec.exec(
+    "github-comment",
+    ["exec", "--", inputs.tfCommand, "show", "-json", "tfplan.binary"],
+    {
+      cwd: inputs.workingDirectory,
+      env: {
+        ...process.env,
+        GITHUB_TOKEN: inputs.githubToken,
+      },
+      outStream: fs.createWriteStream(planJsonPath),
+    },
+  );
+  core.endGroup();
+
+  // Create temp directory and copy plan files
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
+  const tempPlanBinary = path.join(tempDir, "tfplan.binary");
+  const tempPlanJson = path.join(tempDir, "tfplan.json");
+
+  fs.copyFileSync(planBinaryPath, tempPlanBinary);
+  fs.copyFileSync(planJsonPath, tempPlanJson);
+
+  core.setOutput("plan_json", tempPlanJson);
+  core.setOutput("plan_binary", tempPlanBinary);
+
+  return {
+    planBinary: tempPlanBinary,
+    planJson: tempPlanJson,
+  };
 };
 
 export const runTerraformPlan = async (
@@ -199,7 +356,25 @@ export const main = async (): Promise<void> => {
     driftIssueNumber: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
     prAuthor: process.env.CI_INFO_PR_AUTHOR,
     ciInfoTempDir: process.env.CI_INFO_TEMP_DIR,
+    s3BucketNameTfmigrateHistory: process.env.S3_BUCKET_NAME_TFMIGRATE_HISTORY,
+    gcsBucketNameTfmigrateHistory:
+      process.env.GCS_BUCKET_NAME_TFMIGRATE_HISTORY,
   };
 
-  await runTerraformPlan(inputs);
+  const jobType = process.env.TFACTION_JOB_TYPE;
+
+  switch (jobType) {
+    case undefined:
+      throw new Error("TFACTION_JOB_TYPE is not set");
+    case "":
+      throw new Error("TFACTION_JOB_TYPE is not set");
+    case "tfmigrate":
+      await runTfmigratePlan(inputs);
+      break;
+    case "terraform":
+      await runTerraformPlan(inputs);
+      break;
+    default:
+      throw new Error(`Unknown TFACTION_JOB_TYPE: ${jobType}`);
+  }
 };
