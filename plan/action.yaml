@@ -65,18 +65,19 @@ runs:
         pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
-    - run: bash "$GITHUB_ACTION_PATH/terraform.sh"
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: main
-      shell: bash
       if: |
         env.TFACTION_JOB_TYPE == 'terraform' &&
         (
           env.TFACTION_DRIFT_ISSUE_NUMBER ||
           !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
         )
+      with:
+        action: plan
+        working_directory: ${{ steps.target-config.outputs.working_directory }}
+        github_token: ${{ inputs.github_token }}
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
         ROOT_DIR: ${{ github.workspace }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
