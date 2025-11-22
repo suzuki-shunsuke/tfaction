@@ -125,10 +125,12 @@ runs:
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
     # terraform-docs
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/js@main
       if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
+        action: terraform-docs
         github_token: ${{ inputs.github_token }}
         securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
         securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
+        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}

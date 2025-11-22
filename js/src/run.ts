@@ -14,6 +14,7 @@ import * as tfsec from "./tfsec";
 import * as trivy from "./trivy";
 import * as tflint from "./tflint";
 import * as commit from "./commit";
+import * as terraformDocs from "./terraform-docs";
 
 type Inputs = {
   action: string;
@@ -37,6 +38,7 @@ export const main = async (inputs: Inputs) => {
     ["list-changed-modules", listChangeModules],
     ["list-module-callers", listModuleCallers],
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
+    ["terraform-docs", terraformDocs],
     ["tfsec", tfsec],
     ["trivy", trivy],
     ["tflint", tflint],

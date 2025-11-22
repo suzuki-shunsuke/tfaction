@@ -24,3 +24,5 @@ runs:
         AQUA_GITHUB_TOKEN: ${{ inputs.github_token }}
     - shell: bash
       run: echo "AQUA_GLOBAL_CONFIG=$GITHUB_ACTION_PATH/aqua.yaml:${AQUA_GLOBAL_CONFIG:-}" >> "$GITHUB_ENV"
+    - shell: bash
+      run: echo "TFACTION_GITHUB_COMMENT_CONFIG=$GITHUB_ACTION_PATH/github-comment.yaml" >> "$GITHUB_ENV"
