@@ -35,8 +35,10 @@ export const main = async (): Promise<void> => {
     drift_issue_number: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
   });
 
-  const baseWorkingDirectory = globalConfigResult.outputs.base_working_directory;
-  const workingDirectoryFile = globalConfigResult.outputs.working_directory_file;
+  const baseWorkingDirectory =
+    globalConfigResult.outputs.base_working_directory;
+  const workingDirectoryFile =
+    globalConfigResult.outputs.working_directory_file;
   const moduleBaseDirectory = globalConfigResult.outputs.module_base_directory;
   const moduleFile = globalConfigResult.outputs.module_file;
 
