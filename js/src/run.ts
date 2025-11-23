@@ -18,6 +18,7 @@ import * as terraformDocs from "./terraform-docs";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as plan from "./plan";
 import * as ciinfo from "./ci-info";
+import * as listWorkingDirs from "./list-working-dirs";
 
 type Inputs = {
   action: string;
@@ -42,6 +43,7 @@ export const main = async (inputs: Inputs) => {
     ["list-changed-modules", listChangeModules],
     ["list-module-callers", listModuleCallers],
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
+    ["list-working-dirs", listWorkingDirs],
     ["plan", plan],
     ["terraform-docs", terraformDocs],
     ["tfsec", tfsec],
