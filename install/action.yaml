@@ -26,3 +26,5 @@ runs:
       run: echo "AQUA_GLOBAL_CONFIG=$GITHUB_ACTION_PATH/aqua.yaml:${AQUA_GLOBAL_CONFIG:-}" >> "$GITHUB_ENV"
     - shell: bash
       run: echo "TFACTION_GITHUB_COMMENT_CONFIG=$GITHUB_ACTION_PATH/github-comment.yaml" >> "$GITHUB_ENV"
+    - shell: bash
+      run: echo "TFACTION_INSTALL_DIR=$GITHUB_ACTION_PATH" >> "$GITHUB_ENV"

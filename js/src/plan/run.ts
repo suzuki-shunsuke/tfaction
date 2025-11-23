@@ -57,15 +57,11 @@ const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
   if (hasRenovateChangeLabel) {
     return;
   }
-  const githubActionPath = process.env.GITHUB_ACTION_PATH || "";
-  const commentConfig = path.join(githubActionPath, "github-comment.yaml");
 
   await exec.exec(
     "github-comment",
     [
       "post",
-      "--config",
-      commentConfig,
       "-var",
       `tfaction_target:${inputs.target}`,
       "-k",
@@ -92,13 +88,13 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
     return false;
   }
 
-  const githubActionPath = process.env.GITHUB_ACTION_PATH || "";
+  const installDir = process.env.TFACTION_INSTALL_DIR || "";
   let templatePath = "";
   let content = "";
 
   // Generate from S3 template
   if (inputs.s3BucketNameTfmigrateHistory) {
-    templatePath = path.join(githubActionPath, "tfmigrate.hcl");
+    templatePath = path.join(installDir, "tfmigrate.hcl");
     content = fs.readFileSync(templatePath, "utf8");
     content = content.replace(/%%TARGET%%/g, inputs.target);
     content = content.replace(
@@ -108,7 +104,7 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   }
   // Generate from GCS template
   else if (inputs.gcsBucketNameTfmigrateHistory) {
-    templatePath = path.join(githubActionPath, "tfmigrate-gcs.hcl");
+    templatePath = path.join(installDir, "tfmigrate-gcs.hcl");
     content = fs.readFileSync(templatePath, "utf8");
     content = content.replace(/%%TARGET%%/g, inputs.target);
     content = content.replace(
@@ -118,7 +114,7 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   }
   // Error: neither S3 nor GCS bucket is configured
   else {
-    const commentConfig = path.join(githubActionPath, "github-comment.yaml");
+    const commentConfig = path.join(installDir, "github-comment.yaml");
     await exec.exec(
       "github-comment",
       [
@@ -158,9 +154,6 @@ export const runTfmigratePlan = async (
     return { changed: true };
   }
 
-  const githubActionPath = process.env.GITHUB_ACTION_PATH || "";
-  const commentConfig = path.join(githubActionPath, "github-comment.yaml");
-
   // Create temp directory and copy plan files
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
   const tempPlanBinary = path.join(tempDir, "tfplan.binary");
@@ -182,8 +175,6 @@ export const runTfmigratePlan = async (
     "github-comment",
     [
       "exec",
-      "--config",
-      commentConfig,
       "-var",
       `tfaction_target:${inputs.target}`,
       "-k",
@@ -231,7 +222,7 @@ export const runTfmigratePlan = async (
 export const runTerraformPlan = async (
   inputs: Inputs,
 ): Promise<TerraformPlanOutputs> => {
-  const githubActionPath = process.env.GITHUB_ACTION_PATH || "";
+  const installDir = process.env.TFACTION_INSTALL_DIR || "";
 
   // Run terraform plan with tfcmt
   core.startGroup(`${inputs.tfCommand} plan`);
@@ -249,7 +240,7 @@ export const runTerraformPlan = async (
   ];
   // Set TFCMT_CONFIG for drift detection mode
   if (inputs.driftIssueNumber) {
-    planArgs.push("-config", path.join(githubActionPath, "tfcmt-drift.yaml"));
+    planArgs.push("-config", path.join(installDir, "tfcmt-drift.yaml"));
   }
   planArgs.push(
     "plan",
