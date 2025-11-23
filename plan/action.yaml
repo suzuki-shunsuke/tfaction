@@ -71,17 +71,7 @@ runs:
         !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       with:
         action: plan
-        working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
-        root_dir: ${{ github.workspace }}
-        pr_number: ${{ github.event.pull_request.number }}
-        renovate_login: ${{ steps.global-config.outputs.renovate_login }}
-        head_sha: ${{ github.event.pull_request.head.sha }}
-        destroy: ${{ steps.target-config.outputs.destroy }}
-        conftest_policy_directory: ${{ steps.global-config.outputs.conftest_policy_directory }}
-        tf_command: ${{ steps.target-config.outputs.terraform_command }}
-        s3_bucket_name_tfmigrate_history: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}
-        gcs_bucket_name_tfmigrate_history: ${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}
 
     # Commit .tfmigrate.hcl if changed
     - if: |

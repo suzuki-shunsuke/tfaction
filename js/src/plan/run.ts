@@ -4,14 +4,14 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
+import * as lib from "../lib";
+import * as getGlobalConfig from "../get-global-config";
+import * as getTargetConfig from "../get-target-config";
 
 type Inputs = {
   githubToken: string;
   workingDirectory: string;
-  rootDir: string;
-  prNumber?: string;
   renovateLogin: string;
-  headSha?: string;
   destroy: boolean;
   conftestPolicyDirectory?: string;
   tfCommand: string;
@@ -355,25 +355,34 @@ export const runTerraformPlan = async (
 };
 
 export const main = async (): Promise<void> => {
+  const config = lib.getConfig();
+  const targetConfig = await getTargetConfig.run(
+    {
+      isApply: false,
+      jobType: lib.getJobType(),
+      target: process.env.TFACTION_TARGET,
+      workingDir: process.env.TFACTION_WORKING_DIR,
+    },
+    config,
+  );
+
   const inputs: Inputs = {
     githubToken: core.getInput("github_token"),
-    workingDirectory: core.getInput("working_directory") || process.cwd(),
-    rootDir: core.getInput("root_dir") || process.env.GITHUB_WORKSPACE || "",
-    prNumber: core.getInput("pr_number") || undefined,
-    renovateLogin: core.getInput("renovate_login") || "",
-    headSha: core.getInput("head_sha") || undefined,
-    destroy: core.getBooleanInput("destroy"),
-    conftestPolicyDirectory:
-      core.getInput("conftest_policy_directory") || undefined,
-    tfCommand: core.getInput("tf_command") || "terraform",
+    workingDirectory: lib.getWorkingDir() ?? "",
+    renovateLogin: config.renovate_login || "",
+    destroy: targetConfig.outputs.get("destroy") || false,
+    conftestPolicyDirectory: config.conftest_policy_directory,
+    tfCommand: targetConfig.outputs.get("terraform_command") || "terraform",
     target: process.env.TFACTION_TARGET || "",
     driftIssueNumber: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
     prAuthor: process.env.CI_INFO_PR_AUTHOR,
     ciInfoTempDir: process.env.CI_INFO_TEMP_DIR,
-    s3BucketNameTfmigrateHistory:
-      core.getInput("s3_bucket_name_tfmigrate_history") || undefined,
-    gcsBucketNameTfmigrateHistory:
-      core.getInput("gcs_bucket_name_tfmigrate_history") || undefined,
+    s3BucketNameTfmigrateHistory: targetConfig.outputs.get(
+      "s3_bucket_name_tfmigrate_history",
+    ),
+    gcsBucketNameTfmigrateHistory: targetConfig.outputs.get(
+      "gcs_bucket_name_tfmigrate_history",
+    ),
   };
 
   const jobType = process.env.TFACTION_JOB_TYPE;
