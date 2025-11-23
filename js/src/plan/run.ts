@@ -316,17 +316,19 @@ export const runTerraformPlan = async (
   core.setOutput("plan_json", tempPlanJson);
 
   // Upload plan files as artifact
+  core.startGroup("upload plan artifacts");
   const artifact = new DefaultArtifactClient();
   await artifact.uploadArtifact(
     `terraform_plan_file_${inputs.target.replaceAll("/", "__")}`,
     [tempPlanBinary],
-    process.env.GITHUB_WORKSPACE || "",
+    tempDir,
   );
   await artifact.uploadArtifact(
     `terraform_plan_json_${inputs.target.replaceAll("/", "__")}`,
     [tempPlanJson],
-    process.env.GITHUB_WORKSPACE || "",
+    tempDir,
   );
+  core.endGroup();
 
   // If no changes, exit successfully
   if (detailedExitcode === 0) {
