@@ -110,27 +110,3 @@ runs:
         github_token: ${{inputs.github_token}}
       env:
         GH_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
-
-    # terraform plan upload plan file and json
-    - if: |
-        env.TFACTION_JOB_TYPE == 'terraform' &&
-        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-      run: |
-        echo "plan_file=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
-        echo "plan_json=terraform_plan_json_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
-      id: artifact_name
-      shell: bash
-    - if: |
-        env.TFACTION_JOB_TYPE == 'terraform' &&
-        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-      with:
-        name: ${{ steps.artifact_name.outputs.plan_file }}
-        path: ${{ steps.main.outputs.plan_binary }}
-    - if: |
-        env.TFACTION_JOB_TYPE == 'terraform' &&
-        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-      with:
-        name: ${{ steps.artifact_name.outputs.plan_json }}
-        path: ${{ steps.main.outputs.plan_json }}

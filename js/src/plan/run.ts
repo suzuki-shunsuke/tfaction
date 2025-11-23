@@ -3,7 +3,7 @@ import * as core from "@actions/core";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { string } from "zod/v4";
+import { DefaultArtifactClient } from "@actions/artifact";
 
 type Inputs = {
   githubToken: string;
@@ -314,6 +314,19 @@ export const runTerraformPlan = async (
   const tempPlanJson = path.join(tempDir, "tfplan.json");
   fs.copyFileSync(planJsonPath, tempPlanJson);
   core.setOutput("plan_json", tempPlanJson);
+
+  // Upload plan files as artifact
+  const artifact = new DefaultArtifactClient();
+  await artifact.uploadArtifact(
+    `terraform_plan_file_${inputs.target.replaceAll("/", "__")}`,
+    [tempPlanBinary],
+    process.env.GITHUB_WORKSPACE || "",
+  );
+  await artifact.uploadArtifact(
+    `terraform_plan_json_${inputs.target.replaceAll("/", "__")}`,
+    [tempPlanJson],
+    process.env.GITHUB_WORKSPACE || "",
+  );
 
   // If no changes, exit successfully
   if (detailedExitcode === 0) {
