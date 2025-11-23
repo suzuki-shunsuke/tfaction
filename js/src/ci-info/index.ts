@@ -21,7 +21,9 @@ const getPRNumberFromMergeGroup = (): number | undefined => {
   const dashIndex = withoutPrefix.indexOf("-");
 
   if (dashIndex === -1) {
-    core.warning(`GITHUB_REF_NAME is not a valid merge_group format: ${refName}`);
+    core.warning(
+      `GITHUB_REF_NAME is not a valid merge_group format: ${refName}`,
+    );
     return undefined;
   }
 
@@ -43,11 +45,12 @@ const getPRNumberFromSHA = async (
   sha: string,
 ): Promise<number | undefined> => {
   try {
-    const { data } = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
-      owner,
-      repo,
-      commit_sha: sha,
-    });
+    const { data } =
+      await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+        owner,
+        repo,
+        commit_sha: sha,
+      });
 
     if (data.length === 0) {
       return undefined;
@@ -72,7 +75,7 @@ const getPRFiles = async (
 
   let page = 1;
   while (files.length < maxFiles) {
-    const {data} = await octokit.rest.pulls.listFiles({
+    const { data } = await octokit.rest.pulls.listFiles({
       owner,
       repo,
       pull_number: prNumber,
@@ -84,10 +87,12 @@ const getPRFiles = async (
       break;
     }
 
-    files.push(...data.map(f => ({
-      filename: f.filename,
-      previous_filename: f.previous_filename,
-    })));
+    files.push(
+      ...data.map((f) => ({
+        filename: f.filename,
+        previous_filename: f.previous_filename,
+      })),
+    );
 
     if (data.length < maxPerPage) {
       break;
@@ -108,11 +113,7 @@ const setValue = (key: string, value: any) => {
   core.exportVariable(`CI_INFO_${key.toUpperCase()}`, value);
 };
 
-const writeOutputFiles = async (
-  dir: string,
-  prData: any,
-  files: PRFile[],
-) => {
+const writeOutputFiles = async (dir: string, prData: any, files: PRFile[]) => {
   await fs.mkdir(dir, { recursive: true });
 
   // Write pr.json
@@ -128,12 +129,12 @@ const writeOutputFiles = async (
   );
 
   // Write pr_files.txt
-  const filenames = files.map(f => f.filename).join("\n");
+  const filenames = files.map((f) => f.filename).join("\n");
   await fs.writeFile(path.join(dir, "pr_files.txt"), filenames);
 
   // Write pr_all_filenames.txt (including previous_filename for renames)
   const allFilenames = new Set<string>();
-  files.forEach(f => {
+  files.forEach((f) => {
     allFilenames.add(f.filename);
     if (f.previous_filename) {
       allFilenames.add(f.previous_filename);
@@ -162,13 +163,20 @@ export const main = async () => {
   }
   setValue("is_pr", prNumber !== undefined);
 
-  const octokit = github.getOctokit(core.getInput("github_token", {
-    required: true,
-  }));
+  const octokit = github.getOctokit(
+    core.getInput("github_token", {
+      required: true,
+    }),
+  );
 
   // Try to get PR number from SHA
   if (!prNumber) {
-    prNumber = await getPRNumberFromSHA(octokit, github.context.repo.owner, github.context.repo.repo, github.context.sha);
+    prNumber = await getPRNumberFromSHA(
+      octokit,
+      github.context.repo.owner,
+      github.context.repo.repo,
+      github.context.sha,
+    );
   }
   setValue("has_associated_pr", prNumber !== undefined);
 
@@ -193,7 +201,12 @@ export const main = async () => {
 
   // Get PR files
   core.info("Fetching PR files");
-  const files = await getPRFiles(octokit, github.context.repo.owner, github.context.repo.repo, prNumber);
+  const files = await getPRFiles(
+    octokit,
+    github.context.repo.owner,
+    github.context.repo.repo,
+    prNumber,
+  );
   core.info(`Found ${files.length} files`);
 
   // Determine output directory
