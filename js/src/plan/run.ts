@@ -161,9 +161,13 @@ export const runTfmigratePlan = async (
   const githubActionPath = process.env.GITHUB_ACTION_PATH || "";
   const commentConfig = path.join(githubActionPath, "github-comment.yaml");
 
+  // Create temp directory and copy plan files
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
+  const tempPlanBinary = path.join(tempDir, "tfplan.binary");
+  const tempPlanJson = path.join(tempDir, "tfplan.json");
+
   // Run tfmigrate plan
   core.startGroup("tfmigrate plan");
-  const planBinaryPath = path.join(inputs.workingDirectory, "tfplan.binary");
 
   const env: { [key: string]: string } = {
     ...process.env,
@@ -188,7 +192,7 @@ export const runTfmigratePlan = async (
       "tfmigrate",
       "plan",
       "--out",
-      "tfplan.binary",
+      tempPlanBinary,
     ],
     {
       cwd: inputs.workingDirectory,
@@ -203,25 +207,17 @@ export const runTfmigratePlan = async (
 
   await exec.exec(
     "github-comment",
-    ["exec", "--", inputs.tfCommand, "show", "-json", "tfplan.binary"],
+    ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
       },
-      outStream: fs.createWriteStream(planJsonPath),
+      outStream: fs.createWriteStream(tempPlanJson),
     },
   );
   core.endGroup();
-
-  // Create temp directory and copy plan files
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
-  const tempPlanBinary = path.join(tempDir, "tfplan.binary");
-  const tempPlanJson = path.join(tempDir, "tfplan.json");
-
-  fs.copyFileSync(planBinaryPath, tempPlanBinary);
-  fs.copyFileSync(planJsonPath, tempPlanJson);
 
   core.setOutput("plan_json", tempPlanJson);
   core.setOutput("plan_binary", tempPlanBinary);
@@ -240,7 +236,11 @@ export const runTerraformPlan = async (
   // Run terraform plan with tfcmt
   core.startGroup(`${inputs.tfCommand} plan`);
 
-  const planBinaryPath = path.join(inputs.workingDirectory, "tfplan.binary");
+  // Create temp directory and copy plan binary
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
+  const tempPlanBinary = path.join(tempDir, "tfplan.binary");
+  const tempPlanJson = path.join(tempDir, "tfplan.json");
+
   const planArgs = [
     "-var",
     `target:${inputs.target}`,
@@ -259,7 +259,7 @@ export const runTerraformPlan = async (
     "-no-color",
     "-detailed-exitcode",
     "-out",
-    "tfplan.binary",
+    tempPlanBinary,
     "-input=false",
   );
   if (inputs.destroy) {
@@ -282,10 +282,6 @@ export const runTerraformPlan = async (
   // Set detailed_exitcode output immediately
   core.setOutput("detailed_exitcode", detailedExitcode);
 
-  // Create temp directory and copy plan binary
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
-  const tempPlanBinary = path.join(tempDir, "tfplan.binary");
-  fs.copyFileSync(planBinaryPath, tempPlanBinary);
   core.setOutput("plan_binary", tempPlanBinary);
 
   // If terraform plan failed, exit immediately
@@ -299,20 +295,18 @@ export const runTerraformPlan = async (
 
   await exec.exec(
     "github-comment",
-    ["exec", "--", inputs.tfCommand, "show", "-json", "tfplan.binary"],
+    ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
       },
-      outStream: fs.createWriteStream(planJsonPath),
+      outStream: fs.createWriteStream(tempPlanJson),
     },
   );
   core.endGroup();
 
-  const tempPlanJson = path.join(tempDir, "tfplan.json");
-  fs.copyFileSync(planJsonPath, tempPlanJson);
   core.setOutput("plan_json", tempPlanJson);
 
   // Upload plan files as artifact
