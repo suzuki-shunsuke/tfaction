@@ -17,6 +17,7 @@ import * as commit from "./commit";
 import * as terraformDocs from "./terraform-docs";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as plan from "./plan";
+import * as ciinfo from "./ci-info";
 
 type Inputs = {
   action: string;
@@ -47,6 +48,7 @@ export const main = async (inputs: Inputs) => {
     ["trivy", trivy],
     ["tflint", tflint],
     ["commit", commit],
+    ["ci-info", ciinfo],
   ]);
   const action = actions.get(inputs.action);
   if (action === undefined) {

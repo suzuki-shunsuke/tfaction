@@ -77,14 +77,13 @@ runs:
         action: plan
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
-      env:
-        ROOT_DIR: ${{ github.workspace }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
-        HEAD_SHA: ${{github.event.pull_request.head.sha}}
-        DESTROY: ${{ steps.target-config.outputs.destroy }}
-        CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
-        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+        root_dir: ${{ github.workspace }}
+        pr_number: ${{ github.event.pull_request.number }}
+        renovate_login: ${{ steps.global-config.outputs.renovate_login }}
+        head_sha: ${{ github.event.pull_request.head.sha }}
+        destroy: ${{ steps.target-config.outputs.destroy }}
+        conftest_policy_directory: ${{ steps.global-config.outputs.conftest_policy_directory }}
+        tf_command: ${{ steps.target-config.outputs.terraform_command }}
 
     # tfmigrate plan
 
@@ -95,14 +94,12 @@ runs:
         action: plan
         working_directory: ${{ steps.target-config.outputs.working_directory }}
         github_token: ${{ inputs.github_token }}
-      env:
-        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
-        ROOT_DIR: ${{ github.workspace }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        S3_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}
-        GCS_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}
-        CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
-        TF_COMMAND: ${{ steps.global-config.outputs.terraform_command }}
+        root_dir: ${{ github.workspace }}
+        pr_number: ${{ github.event.pull_request.number }}
+        s3_bucket_name_tfmigrate_history: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}
+        gcs_bucket_name_tfmigrate_history: ${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}
+        conftest_policy_directory: ${{ steps.global-config.outputs.conftest_policy_directory }}
+        tf_command: ${{ steps.global-config.outputs.terraform_command }}
 
     # Commit .tfmigrate.hcl if changed
     - if: |

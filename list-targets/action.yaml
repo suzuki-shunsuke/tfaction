@@ -20,12 +20,11 @@ runs:
   steps:
     - uses: suzuki-shunsuke/tfaction/install@main
       id: install
-    - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
-      shell: bash
-      if: |
+    - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+      uses: suzuki-shunsuke/tfaction/js@main
+      with:
+        action: ci-info
 
     - name: Check if the commit is latest
       shell: bash

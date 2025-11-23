@@ -37,10 +37,9 @@ runs:
     # ci-info
     - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-      run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
+      uses: suzuki-shunsuke/tfaction/js@main
+      with:
+        action: ci-info
 
     # Check if the commit is latest
     - if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')

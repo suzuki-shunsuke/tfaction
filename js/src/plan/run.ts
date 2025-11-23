@@ -345,20 +345,22 @@ export const main = async (): Promise<void> => {
   const inputs: Inputs = {
     githubToken: core.getInput("github_token"),
     workingDirectory: core.getInput("working_directory") || process.cwd(),
-    rootDir: process.env.ROOT_DIR || process.env.GITHUB_WORKSPACE || "",
-    prNumber: process.env.PR_NUMBER,
-    renovateLogin: process.env.RENOVATE_LOGIN || "",
-    headSha: process.env.HEAD_SHA,
-    destroy: process.env.DESTROY === "true",
-    conftestPolicyDirectory: process.env.CONFTEST_POLICY_DIRECTORY,
-    tfCommand: process.env.TF_COMMAND || "terraform",
+    rootDir: core.getInput("root_dir") || process.env.GITHUB_WORKSPACE || "",
+    prNumber: core.getInput("pr_number") || undefined,
+    renovateLogin: core.getInput("renovate_login") || "",
+    headSha: core.getInput("head_sha") || undefined,
+    destroy: core.getBooleanInput("destroy"),
+    conftestPolicyDirectory:
+      core.getInput("conftest_policy_directory") || undefined,
+    tfCommand: core.getInput("tf_command") || "terraform",
     target: process.env.TFACTION_TARGET || "",
     driftIssueNumber: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
     prAuthor: process.env.CI_INFO_PR_AUTHOR,
     ciInfoTempDir: process.env.CI_INFO_TEMP_DIR,
-    s3BucketNameTfmigrateHistory: process.env.S3_BUCKET_NAME_TFMIGRATE_HISTORY,
+    s3BucketNameTfmigrateHistory:
+      core.getInput("s3_bucket_name_tfmigrate_history") || undefined,
     gcsBucketNameTfmigrateHistory:
-      process.env.GCS_BUCKET_NAME_TFMIGRATE_HISTORY,
+      core.getInput("gcs_bucket_name_tfmigrate_history") || undefined,
   };
 
   const jobType = process.env.TFACTION_JOB_TYPE;
