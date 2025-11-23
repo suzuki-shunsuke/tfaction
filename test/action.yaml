@@ -30,20 +30,16 @@ runs:
         action: get-global-config
 
     # Conftest
-    - shell: bash
-      id: action_path
-      run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
     - uses: suzuki-shunsuke/tfaction/js@main
       with:
         action: conftest
         github_token: ${{inputs.github_token}}
       env:
-        GH_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
+        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}
 
     # terraform validate
     - run: |
         github-comment exec \
-          -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
           -k terraform-validate \
           -var "tfaction_target:${TFACTION_TARGET}" \
           -- "$TF_COMMAND" validate
@@ -53,6 +49,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}
 
     # trivy
     - uses: suzuki-shunsuke/tfaction/js@main
