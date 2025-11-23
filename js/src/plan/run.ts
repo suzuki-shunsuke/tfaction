@@ -188,7 +188,7 @@ export const runTfmigratePlan = async (
       "tfmigrate",
       "plan",
       "--out",
-      planBinaryPath,
+      "tfplan.binary",
     ],
     {
       cwd: inputs.workingDirectory,
@@ -259,7 +259,7 @@ export const runTerraformPlan = async (
     "-no-color",
     "-detailed-exitcode",
     "-out",
-    planBinaryPath,
+    "tfplan.binary",
     "-input=false",
   );
   if (inputs.destroy) {
