@@ -54,16 +54,18 @@ runs:
         action: download-plan
         github_token: ${{ inputs.github_token }}
 
-    - run: bash "$GITHUB_ACTION_PATH/main.sh"
+    - uses: suzuki-shunsuke/tfaction/js@main
       working-directory: ${{ steps.target-config.outputs.working_directory }}
-      shell: bash
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
+      with:
+        action: terraform-apply
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
         TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
         DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}
         TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
+        PLAN_FILE_PATH: ${{ steps.download-plan.outputs.plan_file_path }}
 
     - if: |
         always() &&

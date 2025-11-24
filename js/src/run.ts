@@ -20,6 +20,7 @@ import * as plan from "./plan";
 import * as ciinfo from "./ci-info";
 import * as listWorkingDirs from "./list-working-dirs";
 import * as downloadPlan from "./download-plan";
+import * as terraformApply from "./terraform-apply";
 
 type Inputs = {
   action: string;
@@ -47,6 +48,7 @@ export const main = async (inputs: Inputs) => {
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
     ["list-working-dirs", listWorkingDirs],
     ["plan", plan],
+    ["terraform-apply", terraformApply],
     ["terraform-docs", terraformDocs],
     ["tfsec", tfsec],
     ["trivy", trivy],
