@@ -19,6 +19,7 @@ import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as plan from "./plan";
 import * as ciinfo from "./ci-info";
 import * as listWorkingDirs from "./list-working-dirs";
+import * as downloadPlan from "./download-plan";
 
 type Inputs = {
   action: string;
@@ -34,6 +35,7 @@ export const main = async (inputs: Inputs) => {
     ["check-terraform-skip", checkTerraformSkip],
     ["conftest", conftest],
     ["create-drift-issues", createDriftIssues],
+    ["download-plan", downloadPlan],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["export-secrets", exportSecrets],
     ["get-follow-up-pr-param", getFollowupPRParam],
