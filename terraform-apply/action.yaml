@@ -27,6 +27,9 @@ outputs:
   issue_state:
     description: Drift Issue state
     value: ${{ steps.drift-issue.outputs.issue_state }}
+  pr_numbers:
+    description: Related pull request numbers
+    value: ${{ steps.terraform-apply.outputs.pr_numbers }}
 
 runs:
   using: composite
@@ -55,6 +58,7 @@ runs:
         github_token: ${{ inputs.github_token }}
 
     - uses: suzuki-shunsuke/tfaction/js@main
+      id: terraform-apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
       with:
@@ -69,34 +73,12 @@ runs:
 
     - if: |
         always() &&
-        steps.global-config.outputs.disable_update_related_pull_requests != 'true'
-      id: update-branches
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-      run: |
-        {
-          echo "value<<EOF"
-          github-comment exec \
-            -config "${GITHUB_ACTION_PATH}/github-comment.yaml" \
-            -var "tfaction_target:$TFACTION_TARGET" -- \
-            gh pr list \
-              --json number \
-              -L 100 \
-              -l "$TFACTION_TARGET" \
-              -S "-label:tfaction:disable-auto-update" \
-              -q ".[].number"
-          echo "EOF"
-        } >> "$GITHUB_OUTPUT"
-
-    - if: |
-        always() &&
         steps.global-config.outputs.disable_update_related_pull_requests != 'true' &&
         steps.global-config.outputs.securefix_action_server_repository == ''
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        PR_NUMBERS: ${{ steps.update-branches.outputs.value }}
+        PR_NUMBERS: ${{ steps.terraform-apply.outputs.pr_numbers }}
       run: bash "$GITHUB_ACTION_PATH/update_branches.sh"
 
     - if: |
@@ -108,4 +90,4 @@ runs:
         app_id: ${{inputs.securefix_action_app_id}}
         app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository_name: ${{steps.global-config.outputs.securefix_action_server_repository}}
-        pull_request_number: ${{ steps.update-branches.outputs.value }}
+        pull_request_number: ${{ steps.terraform-apply.outputs.pr_numbers }}

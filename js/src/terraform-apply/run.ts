@@ -1,8 +1,41 @@
 import * as exec from "@actions/exec";
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
+
+const listRelatedPullRequests = async (
+  githubToken: string,
+  target: string,
+): Promise<number[]> => {
+  const octokit = github.getOctokit(githubToken);
+  const { owner, repo } = github.context.repo;
+
+  // Search pull requests using GraphQL
+  const query = `repo:${owner}/${repo} is:pr is:open label:"${target}" -label:tfaction:disable-auto-update`;
+
+  const result: {
+    search: {
+      nodes: Array<{ number: number }>;
+    };
+  } = await octokit.graphql(
+    `
+    query($query: String!) {
+      search(query: $query, type: ISSUE, first: 100) {
+        nodes {
+          ... on PullRequest {
+            number
+          }
+        }
+      }
+    }
+  `,
+    { query },
+  );
+
+  return result.search.nodes.map((pr) => pr.number);
+};
 
 export const main = async (): Promise<void> => {
   const tfCommand = process.env.TF_COMMAND || "terraform";
@@ -114,6 +147,12 @@ export const main = async (): Promise<void> => {
 
   if (disableUpdateRelatedPullRequests) {
     core.notice("Skip updating related pull requests");
+  } else {
+    // List related pull requests that need to be updated
+    const githubToken = process.env.GITHUB_TOKEN || "";
+    const prNumbers = await listRelatedPullRequests(githubToken, target);
+    const prNumbersOutput = prNumbers.join("\n");
+    core.setOutput("pr_numbers", prNumbersOutput);
   }
 
   if (exitCode !== 0) {
