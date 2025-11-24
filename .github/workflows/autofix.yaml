@@ -13,7 +13,7 @@ jobs:
           persist-credentials: false
       - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
         with:
-          aqua_version: v2.55.1
+          aqua_version: v2.55.2
         env:
           GITHUB_TOKEN: ${{github.token}}
       - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
