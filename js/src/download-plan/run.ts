@@ -1,5 +1,6 @@
 import * as exec from "@actions/exec";
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -22,18 +23,6 @@ export const main = async (): Promise<void> => {
   const filename = "tfplan.binary";
   const artifactName = `terraform_plan_file_${target.replaceAll("/", "__")}`;
 
-  // Check jq and gh versions
-  await exec.exec(
-    "github-comment",
-    ["exec", "-var", `tfaction_target:${target}`, "--", "jq", "--version"],
-    {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: githubToken,
-      },
-    },
-  );
-
   await exec.exec(
     "github-comment",
     ["exec", "-var", `tfaction_target:${target}`, "--", "gh", "version"],
@@ -51,41 +40,17 @@ export const main = async (): Promise<void> => {
   const prHeadSha = prJson.head.sha;
 
   // Get workflow run
-  const result = await exec.getExecOutput(
-    "github-comment",
-    [
-      "exec",
-      "-var",
-      `tfaction_target:${target}`,
-      "-var",
-      `plan_workflow_name:${planWorkflowName}`,
-      "-k",
-      "list-workflow-runs",
-      "--",
-      "gh",
-      "run",
-      "list",
-      "-w",
-      planWorkflowName,
-      "-b",
-      branch,
-      "-L",
-      "1",
-      "--json",
-      "headSha,databaseId",
-      "--jq",
-      ".[0]",
-    ],
-    {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: githubToken,
-      },
-    },
-  );
+  const octokit = github.getOctokit(githubToken);
+  const { data: workflowRuns } = await octokit.rest.actions.listWorkflowRuns({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    workflow_id: planWorkflowName,
+    branch: branch,
+    per_page: 1,
+  });
 
-  if (!result.stdout.trim()) {
-    core.error("body is empty. No workflow run is found");
+  if (workflowRuns.workflow_runs.length === 0) {
+    core.error("No workflow run is found");
     await exec.exec(
       "github-comment",
       [
@@ -109,7 +74,11 @@ export const main = async (): Promise<void> => {
     throw new Error("No workflow run is found");
   }
 
-  const workflowRun: WorkflowRun = JSON.parse(result.stdout);
+  const latestRun = workflowRuns.workflow_runs[0];
+  const workflowRun: WorkflowRun = {
+    headSha: latestRun.head_sha,
+    databaseId: latestRun.id,
+  };
   const runId = workflowRun.databaseId;
   const headSha = workflowRun.headSha;
 
