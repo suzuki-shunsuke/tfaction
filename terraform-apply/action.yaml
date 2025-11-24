@@ -48,6 +48,7 @@ runs:
         skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
     - uses: suzuki-shunsuke/tfaction/js@main
+      id: download-plan
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
       with:
         action: download-plan

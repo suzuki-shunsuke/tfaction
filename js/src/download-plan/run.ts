@@ -5,10 +5,43 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../lib";
+import { DefaultArtifactClient, FindOptions, DownloadArtifactOptions } from "@actions/artifact";
 
 type WorkflowRun = {
   headSha: string;
   databaseId: number;
+};
+
+const downloadArtifact = async (
+  token: string,
+  owner: string,
+  repo: string,
+  runId: number,
+  artifactName: string,
+  dest: string,
+): Promise<void> => {
+  // Download a GitHub Actions Artifact
+  const artifact = new DefaultArtifactClient();
+  core.info(`Getting an artifact`);
+  const artifactOpts: DownloadArtifactOptions & FindOptions = {
+    findBy: {
+      token: token,
+      repositoryOwner: owner,
+      repositoryName: repo,
+      workflowRunId: runId,
+    },
+    path: dest,
+  };
+  const { artifact: targetArtifact } = await artifact.getArtifact(
+    artifactName,
+    artifactOpts,
+  );
+  if (!targetArtifact) {
+    core.setFailed(`Artifact '${artifactName}' not found`);
+    return;
+  }
+  core.info(`Downloading an artifact`);
+  await artifact.downloadArtifact(targetArtifact.id, artifactOpts);
 };
 
 export const main = async (): Promise<void> => {
@@ -22,17 +55,6 @@ export const main = async (): Promise<void> => {
 
   const filename = "tfplan.binary";
   const artifactName = `terraform_plan_file_${target.replaceAll("/", "__")}`;
-
-  await exec.exec(
-    "github-comment",
-    ["exec", "-var", `tfaction_target:${target}`, "--", "gh", "version"],
-    {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: githubToken,
-      },
-    },
-  );
 
   // Get PR head SHA
   const prJsonPath = path.join(ciInfoTempDir, "pr.json");
@@ -113,34 +135,15 @@ export const main = async (): Promise<void> => {
   // Download artifact
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
 
-  await exec.exec(
-    "github-comment",
-    [
-      "exec",
-      "-var",
-      `tfaction_target:${target}`,
-      "-k",
-      "download-plan-file",
-      "--",
-      "gh",
-      "run",
-      "download",
-      "-D",
-      tempDir,
-      "-n",
-      artifactName,
-      runId.toString(),
-    ],
-    {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: githubToken,
-      },
-    },
+  await downloadArtifact(
+    githubToken,
+    github.context.repo.owner,
+    github.context.repo.repo,
+    runId,
+    artifactName,
+    tempDir,
   );
 
-  // Copy file to working directory
   const sourcePath = path.join(tempDir, filename);
-  const destPath = path.join(workingDirectory, filename);
-  fs.copyFileSync(sourcePath, destPath);
+  core.setOutput("plan_file_path", sourcePath);
 };
