@@ -26,21 +26,57 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/terraform-apply@main
-      if: env.TFACTION_JOB_TYPE == 'terraform'
+    # common
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: target-config
       with:
-        # pull-requests:write - Create pull request comments and labels
-        # actions:read - Download artifacts
-        # contents:write - Update pull request branches
-        github_token: ${{inputs.github_token}}
-        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
-        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
+        action: get-target-config
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: global-config
+      with:
+        action: get-global-config
 
-    - uses: suzuki-shunsuke/tfaction/tfmigrate-apply@main
-      if: env.TFACTION_JOB_TYPE == 'tfmigrate'
+    # terraform-apply
+    - uses: suzuki-shunsuke/tfaction/js@main
+      if: env.TFACTION_JOB_TYPE == 'terraform'
+      id: check-terraform-skip
       with:
-        # pull-requests:write - Create pull request comments
-        # contents:write - Update pull request branches
-        github_token: ${{inputs.github_token}}
+        action: check-terraform-skip
+        labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
+        pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
+        skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
+
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: download-plan
+      if: |
+        steps.check-terraform-skip.outputs.skip_terraform != 'true' &&
+        env.TFACTION_JOB_TYPE == 'terraform'
+      with:
+        action: download-plan
+        github_token: ${{ inputs.github_token }}
+
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: terraform-apply
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      if: |
+        steps.check-terraform-skip.outputs.skip_terraform != 'true' &&
+        env.TFACTION_JOB_TYPE == 'terraform'
+      with:
+        action: terraform-apply
         securefix_action_app_id: ${{inputs.securefix_action_app_id}}
         securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        PLAN_FILE_PATH: ${{ steps.download-plan.outputs.plan_file_path }}
+
+    # tfmigrate-apply
+    - uses: suzuki-shunsuke/tfaction/js@main
+      if: env.TFACTION_JOB_TYPE == 'tfmigrate'
+      id: tfmigrate-apply
+      working-directory: ${{ steps.target-config.outputs.working_directory }}
+      with:
+        action: tfmigrate-apply
+        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
+        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
