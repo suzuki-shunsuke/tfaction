@@ -21,6 +21,7 @@ import * as ciinfo from "./ci-info";
 import * as listWorkingDirs from "./list-working-dirs";
 import * as downloadPlan from "./download-plan";
 import * as terraformApply from "./terraform-apply";
+import * as tfmigrateApply from "./tfmigrate-apply";
 
 type Inputs = {
   action: string;
@@ -50,6 +51,7 @@ export const main = async (inputs: Inputs) => {
     ["plan", plan],
     ["terraform-apply", terraformApply],
     ["terraform-docs", terraformDocs],
+    ["tfmigrate-apply", tfmigrateApply],
     ["tfsec", tfsec],
     ["trivy", trivy],
     ["tflint", tflint],

@@ -10,7 +10,7 @@ import * as getTargetConfig from "../get-target-config";
 import * as updateBranchAction from "@csm-actions/update-branch-action";
 import * as githubAppToken from "@suzuki-shunsuke/github-app-token";
 
-const listRelatedPullRequests = async (
+export const listRelatedPullRequests = async (
   githubToken: string,
   target: string,
 ): Promise<number[]> => {
