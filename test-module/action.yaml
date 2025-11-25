@@ -34,7 +34,7 @@ runs:
     - uses: suzuki-shunsuke/tfaction/install@main
     - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
       with:
-        aqua_version: v2.55.1
+        aqua_version: v2.55.2
         aqua_opts: -l -a
         working_directory: ${{ env.TFACTION_TARGET }}
         skip_install_aqua: "true"
