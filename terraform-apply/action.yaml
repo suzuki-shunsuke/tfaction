@@ -65,29 +65,4 @@ runs:
         action: terraform-apply
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        TFACTION_DRIFT_ISSUE_REPO_OWNER: ${{steps.global-config.outputs.drift_issue_repo_owner}}
-        TFACTION_DRIFT_ISSUE_REPO_NAME: ${{steps.global-config.outputs.drift_issue_repo_name}}
-        DISABLE_UPDATE_RELATED_PULL_REQUESTS: ${{ steps.global-config.outputs.disable_update_related_pull_requests }}
-        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
         PLAN_FILE_PATH: ${{ steps.download-plan.outputs.plan_file_path }}
-
-    - if: |
-        always() &&
-        steps.global-config.outputs.disable_update_related_pull_requests != 'true' &&
-        steps.global-config.outputs.securefix_action_server_repository == ''
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        PR_NUMBERS: ${{ steps.terraform-apply.outputs.pr_numbers }}
-      run: bash "$GITHUB_ACTION_PATH/update_branches.sh"
-
-    - if: |
-        always() &&
-        steps.global-config.outputs.disable_update_related_pull_requests != 'true' &&
-        steps.global-config.outputs.securefix_action_server_repository != ''
-      uses: csm-actions/update-branch-action@a9203c8441eee4b478c8f2cfbe3c2d4bfa193d97 # v0.1.3
-      with:
-        app_id: ${{inputs.securefix_action_app_id}}
-        app_private_key: ${{inputs.securefix_action_app_private_key}}
-        server_repository_name: ${{steps.global-config.outputs.securefix_action_server_repository}}
-        pull_request_number: ${{ steps.terraform-apply.outputs.pr_numbers }}
