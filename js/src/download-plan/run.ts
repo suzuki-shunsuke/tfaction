@@ -55,7 +55,6 @@ export const main = async (): Promise<void> => {
   const planWorkflowName = cfg.plan_workflow_name;
   const ciInfoTempDir = process.env.CI_INFO_TEMP_DIR || "";
   const branch = process.env.CI_INFO_HEAD_REF || "";
-  const workingDirectory = process.env.TFACTION_WORKING_DIR || process.cwd();
 
   const filename = "tfplan.binary";
   const artifactName = `terraform_plan_file_${target.replaceAll("/", "__")}`;
@@ -76,7 +75,6 @@ export const main = async (): Promise<void> => {
   });
 
   if (workflowRuns.workflow_runs.length === 0) {
-    core.error("No workflow run is found");
     await exec.exec(
       "github-comment",
       [
@@ -110,9 +108,6 @@ export const main = async (): Promise<void> => {
 
   // Check if headSha matches
   if (headSha !== prHeadSha) {
-    core.error(
-      `workflow run's headSha (${headSha}) is different from the associated pull request's head sha (${prHeadSha})`,
-    );
     await exec.exec(
       "github-comment",
       [
@@ -133,7 +128,9 @@ export const main = async (): Promise<void> => {
         },
       },
     );
-    throw new Error("workflow run's headSha is invalid");
+    throw new Error(
+      `workflow run's headSha (${headSha}) is different from the associated pull request's head sha (${prHeadSha})`,
+    );
   }
 
   // Download artifact

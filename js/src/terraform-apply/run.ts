@@ -9,6 +9,16 @@ import * as getGlobalConfig from "../get-global-config";
 import * as getTargetConfig from "../get-target-config";
 import * as updateBranchAction from "@csm-actions/update-branch-action";
 import * as githubAppToken from "@suzuki-shunsuke/github-app-token";
+import {
+  DefaultArtifactClient,
+  FindOptions,
+  DownloadArtifactOptions,
+} from "@actions/artifact";
+
+type WorkflowRun = {
+  headSha: string;
+  databaseId: number;
+};
 
 export const listRelatedPullRequests = async (
   githubToken: string,
@@ -52,10 +62,11 @@ export const main = async (): Promise<void> => {
   if (!target) {
     throw new Error("TFACTION_TARGET is not set");
   }
+  const workingDir = lib.getWorkingDir();
   const targetConfig = await getTargetConfig.run(
     {
       target: target,
-      workingDir: lib.getWorkingDir(),
+      workingDir: workingDir,
       isApply: true,
       jobType: lib.getJobType(),
     },
@@ -69,7 +80,7 @@ export const main = async (): Promise<void> => {
   const disableUpdateRelatedPullRequests =
     globalConfig.outputs.disable_update_related_pull_requests;
   const installDir = process.env.TFACTION_INSTALL_DIR || "";
-  const planFilePath = process.env.PLAN_FILE_PATH || "";
+  const planFilePath = await downloadPlanFile();
   if (!planFilePath) {
     throw new Error("PLAN_FILE_PATH is not set");
   }
@@ -100,6 +111,7 @@ export const main = async (): Promise<void> => {
           planFilePath,
         ],
         {
+          cwd: workingDir,
           ignoreReturnCode: true,
           listeners: {
             stdout: (data: Buffer) => {
@@ -252,4 +264,137 @@ export const updateBranchByCommit = async (
       core.warning(`Failed to update branch for PR #${prNumber}: ${error}`);
     }
   }
+};
+
+const downloadArtifact = async (
+  token: string,
+  owner: string,
+  repo: string,
+  runId: number,
+  artifactName: string,
+  dest: string,
+): Promise<void> => {
+  // Download a GitHub Actions Artifact
+  const artifact = new DefaultArtifactClient();
+  core.info(`Getting an artifact`);
+  const artifactOpts: DownloadArtifactOptions & FindOptions = {
+    findBy: {
+      token: token,
+      repositoryOwner: owner,
+      repositoryName: repo,
+      workflowRunId: runId,
+    },
+    path: dest,
+  };
+  const { artifact: targetArtifact } = await artifact.getArtifact(
+    artifactName,
+    artifactOpts,
+  );
+  if (!targetArtifact) {
+    core.setFailed(`Artifact '${artifactName}' not found`);
+    return;
+  }
+  core.info(`Downloading an artifact`);
+  await artifact.downloadArtifact(targetArtifact.id, artifactOpts);
+};
+
+const downloadPlanFile = async (): Promise<string> => {
+  const cfg = lib.getConfig();
+  const githubToken = core.getInput("github_token");
+  const target = process.env.TFACTION_TARGET || "";
+  const planWorkflowName = cfg.plan_workflow_name;
+  const ciInfoTempDir = process.env.CI_INFO_TEMP_DIR || "";
+  const branch = process.env.CI_INFO_HEAD_REF || "";
+
+  const filename = "tfplan.binary";
+  const artifactName = `terraform_plan_file_${target.replaceAll("/", "__")}`;
+
+  // Get PR head SHA
+  const prJsonPath = path.join(ciInfoTempDir, "pr.json");
+  const prJson = JSON.parse(fs.readFileSync(prJsonPath, "utf8"));
+  const prHeadSha = prJson.head.sha;
+
+  // Get workflow run
+  const octokit = github.getOctokit(githubToken);
+  const { data: workflowRuns } = await octokit.rest.actions.listWorkflowRuns({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    workflow_id: planWorkflowName,
+    branch: branch,
+    per_page: 1,
+  });
+
+  if (workflowRuns.workflow_runs.length === 0) {
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-var",
+        `tfaction_target:${target}`,
+        "-var",
+        `plan_workflow_name:${planWorkflowName}`,
+        "-var",
+        `branch:${branch}`,
+        "-k",
+        "no-workflow-run-found",
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: githubToken,
+        },
+      },
+    );
+    throw new Error("No workflow run is found");
+  }
+
+  const latestRun = workflowRuns.workflow_runs[0];
+  const workflowRun: WorkflowRun = {
+    headSha: latestRun.head_sha,
+    databaseId: latestRun.id,
+  };
+  const runId = workflowRun.databaseId;
+  const headSha = workflowRun.headSha;
+
+  // Check if headSha matches
+  if (headSha !== prHeadSha) {
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-var",
+        `tfaction_target:${target}`,
+        "-var",
+        `wf_sha:${headSha}`,
+        "-var",
+        `pr_sha:${prHeadSha}`,
+        "-k",
+        "invalid-workflow-sha",
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: githubToken,
+        },
+      },
+    );
+    throw new Error(
+      `workflow run's headSha (${headSha}) is different from the associated pull request's head sha (${prHeadSha})`,
+    );
+  }
+
+  // Download artifact
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
+
+  await downloadArtifact(
+    githubToken,
+    github.context.repo.owner,
+    github.context.repo.repo,
+    runId,
+    artifactName,
+    tempDir,
+  );
+
+  const sourcePath = path.join(tempDir, filename);
+  return sourcePath;
 };

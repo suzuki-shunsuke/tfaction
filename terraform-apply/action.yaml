@@ -35,10 +35,6 @@ runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction/js@main
-      id: target-config
-      with:
-        action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
       id: global-config
       with:
         action: get-global-config
@@ -46,23 +42,10 @@ runs:
       id: check-terraform-skip
       with:
         action: check-terraform-skip
-        labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
-        pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
-        skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
-
-    - uses: suzuki-shunsuke/tfaction/js@main
-      id: download-plan
-      if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
-      with:
-        action: download-plan
-        github_token: ${{ inputs.github_token }}
 
     - uses: suzuki-shunsuke/tfaction/js@main
       id: terraform-apply
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
       with:
         action: terraform-apply
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        PLAN_FILE_PATH: ${{ steps.download-plan.outputs.plan_file_path }}
+        github_token: ${{ inputs.github_token }}

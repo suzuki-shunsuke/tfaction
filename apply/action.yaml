@@ -34,17 +34,7 @@ runs:
         action: check-terraform-skip
 
     - uses: suzuki-shunsuke/tfaction/js@main
-      id: download-plan
-      if: |
-        steps.check-terraform-skip.outputs.skip_terraform != 'true' &&
-        env.TFACTION_JOB_TYPE == 'terraform'
-      with:
-        action: download-plan
-        github_token: ${{ inputs.github_token }}
-
-    - uses: suzuki-shunsuke/tfaction/js@main
       id: terraform-apply
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
       if: |
         steps.check-terraform-skip.outputs.skip_terraform != 'true' &&
         env.TFACTION_JOB_TYPE == 'terraform'
@@ -53,8 +43,6 @@ runs:
         github_token: ${{ inputs.github_token }}
         securefix_action_app_id: ${{inputs.securefix_action_app_id}}
         securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
-      env:
-        PLAN_FILE_PATH: ${{ steps.download-plan.outputs.plan_file_path }}
 
     # tfmigrate-apply
     - uses: suzuki-shunsuke/tfaction/js@main

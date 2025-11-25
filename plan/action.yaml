@@ -61,9 +61,6 @@ runs:
         ! env.TFACTION_DRIFT_ISSUE_NUMBER
       with:
         action: check-terraform-skip
-        labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
-        pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
-        skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
     - uses: suzuki-shunsuke/tfaction/js@main
       id: main
