@@ -43,18 +43,18 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@cf4f0c5458a391a2aac11eff094ecea531a6b7c8
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@cf4f0c5458a391a2aac11eff094ecea531a6b7c8
       id: global-config
       with:
         action: get-global-config
 
     # terraform plan
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@cf4f0c5458a391a2aac11eff094ecea531a6b7c8
       id: check-terraform-skip
       if: |
         env.TFACTION_JOB_TYPE == 'terraform' &&
@@ -131,7 +131,7 @@ runs:
       shell: bash
       id: action_path
     - if: steps.migrate.outputs.changed != 'true'
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@cf4f0c5458a391a2aac11eff094ecea531a6b7c8
       with:
         action: conftest
         plan: "true"
