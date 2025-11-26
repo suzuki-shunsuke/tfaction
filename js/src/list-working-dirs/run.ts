@@ -31,7 +31,6 @@ export const main = async (): Promise<void> => {
   // Get global config
   const config = lib.getConfig();
   const globalConfigResult = getGlobalConfig.main_(config, {
-    repository: process.env.GITHUB_REPOSITORY,
     drift_issue_number: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
   });
 
