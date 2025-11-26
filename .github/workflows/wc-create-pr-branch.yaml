@@ -72,6 +72,11 @@ jobs:
       - name: Install dependencies
         uses: ./install
 
+      - name: ci-info
+        uses: ./js
+        with:
+          action: ci-info
+
       - name: Test js/get-target-config
         uses: ./js
         id: js-target-config
