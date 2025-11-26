@@ -4,6 +4,7 @@ import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../lib";
+import * as getGlobalConfig from "../get-global-config";
 
 type TargetConfig = {
   target: string;
@@ -371,16 +372,21 @@ const handleLabels = (
 
 export const main = async () => {
   // The path to ci-info's pr.json.
-  const prPath = core.getInput("pull_request");
+  if (!process.env.CI_INFO_TEMP_DIR) {
+    throw new Error("CI_INFO_TEMP_DIR is not set");
+  }
+  const prPath = `${process.env.CI_INFO_TEMP_DIR}/pr.json`;
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
   const moduleCallersPath = core.getInput("module_callers");
+  const cfg = lib.getConfig();
+  const globalConfig = await getGlobalConfig.main_(cfg, {});
 
   const result = await run({
-    labels: fs.readFileSync(core.getInput("labels"), "utf8").split("\n"),
+    labels: fs.readFileSync(`${process.env.CI_INFO_TEMP_DIR}/labels.txt`, "utf8").split("\n"),
     config: lib.getConfig(),
     isApply: lib.getIsApply(),
     changedFiles: fs
-      .readFileSync(core.getInput("changed_files"), "utf8")
+      .readFileSync(`${process.env.CI_INFO_TEMP_DIR}/pr_all_filenames.txt`, "utf8")
       .split("\n"),
     configFiles: fs
       .readFileSync(core.getInput("config_files"), "utf8")
@@ -388,10 +394,8 @@ export const main = async () => {
     moduleFiles: fs
       .readFileSync(core.getInput("module_files"), "utf8")
       .split("\n"),
-    maxChangedWorkingDirectories: parseInt(
-      core.getInput("max_changed_working_dirs"),
-    ),
-    maxChangedModules: parseInt(core.getInput("max_changed_modules")),
+    maxChangedWorkingDirectories: globalConfig.outputs.max_changed_working_dirs ?? 0,
+    maxChangedModules: globalConfig.outputs.max_changed_modules ?? 0,
     pr,
     payload: github.context.payload,
     githubToken: core.getInput("github_token", { required: true }),

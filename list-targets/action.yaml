@@ -60,14 +60,9 @@ runs:
       id: list-targets
       with:
         action: list-targets-with-changed-files
-        changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
-        labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
-        pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
         config_files: ${{ steps.list-working-directory-configs.outputs.file }}
         module_callers: ${{ steps.list-module-callers.outputs.file }}
         module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
-        max_changed_working_dirs: ${{ steps.global-config.outputs.max_changed_working_dirs }}
-        max_changed_modules: ${{ steps.global-config.outputs.max_changed_modules }}
         github_token: ${{ inputs.github_token }}
       env:
         GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}
