@@ -382,11 +382,16 @@ export const main = async () => {
   const globalConfig = await getGlobalConfig.main_(cfg, {});
 
   const result = await run({
-    labels: fs.readFileSync(`${process.env.CI_INFO_TEMP_DIR}/labels.txt`, "utf8").split("\n"),
+    labels: fs
+      .readFileSync(`${process.env.CI_INFO_TEMP_DIR}/labels.txt`, "utf8")
+      .split("\n"),
     config: lib.getConfig(),
     isApply: lib.getIsApply(),
     changedFiles: fs
-      .readFileSync(`${process.env.CI_INFO_TEMP_DIR}/pr_all_filenames.txt`, "utf8")
+      .readFileSync(
+        `${process.env.CI_INFO_TEMP_DIR}/pr_all_filenames.txt`,
+        "utf8",
+      )
       .split("\n"),
     configFiles: fs
       .readFileSync(core.getInput("config_files"), "utf8")
@@ -394,7 +399,8 @@ export const main = async () => {
     moduleFiles: fs
       .readFileSync(core.getInput("module_files"), "utf8")
       .split("\n"),
-    maxChangedWorkingDirectories: globalConfig.outputs.max_changed_working_dirs ?? 0,
+    maxChangedWorkingDirectories:
+      globalConfig.outputs.max_changed_working_dirs ?? 0,
     maxChangedModules: globalConfig.outputs.max_changed_modules ?? 0,
     pr,
     payload: github.context.payload,
