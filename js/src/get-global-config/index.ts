@@ -123,16 +123,17 @@ export const main_ = (config: lib.Config, input: Input): Result => {
       config?.scaffold_working_directory?.skip_adding_aqua_packages ?? true,
   };
 
-  if (config.drift_detection && config.drift_detection.issue_repo_owner) {
-    outputs.drift_issue_repo_owner = config.drift_detection.issue_repo_owner;
-  } else {
-    outputs.drift_issue_repo_owner = github.context.repo.owner;
-  }
-
-  if (config.drift_detection && config.drift_detection.issue_repo_name) {
-    outputs.drift_issue_repo_name = config.drift_detection.issue_repo_name;
-  } else {
-    outputs.drift_issue_repo_name = github.context.repo.repo;
+  if (config.drift_detection) {
+    if (config.drift_detection.issue_repo_owner) {
+      outputs.drift_issue_repo_owner = config.drift_detection.issue_repo_owner;
+    } else {
+      outputs.drift_issue_repo_owner = github.context.repo.owner;
+    }
+    if (config.drift_detection.issue_repo_name) {
+      outputs.drift_issue_repo_name = config.drift_detection.issue_repo_name;
+    } else {
+      outputs.drift_issue_repo_name = github.context.repo.repo;
+    }
   }
 
   return {
