@@ -4,16 +4,6 @@ inputs:
   action:
     description: action
     required: true
-  # check-terraform-skip
-  labels:
-    description: "Labels File"
-    required: false
-  skip_label_prefix:
-    description: "Skip Label Prefix"
-    required: false
-  pr_author:
-    description: "Pull Request Author"
-    required: false
 
   # list-changed-modules
   changed_files:
