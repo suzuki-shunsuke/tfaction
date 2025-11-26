@@ -2,10 +2,10 @@ name: List targets with changed files
 description: List targets with changed files
 inputs:
   changed_files:
-    description: "Changed Files"
+    description: "Deprecated. This input is ignored"
     required: true
   labels:
-    description: "Labels File"
+    description: "Deprecated. This input is ignored"
     required: true
   config_files:
     description: "config file paths"
@@ -14,7 +14,7 @@ inputs:
     description: "module file paths"
     required: true
   pull_request:
-    description: "pull request file"
+    description: "Deprecated. This input is ignored"
     required: false
   module_callers:
     description: "A json file that describes module's direct and transitive callers"
@@ -40,9 +40,6 @@ runs:
       id: main
       with:
         action: list-targets-with-changed-files
-        changed_files: ${{inputs.changed_files}}
-        labels: ${{inputs.labels}}
         config_files: ${{inputs.config_files}}
         module_files: ${{inputs.module_files}}
-        pull_request: ${{inputs.pull_request}}
         module_callers: ${{inputs.module_callers}}

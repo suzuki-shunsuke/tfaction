@@ -157,9 +157,6 @@ jobs:
         id: js-list-targets-with-changed-files
         with:
           action: list-targets-with-changed-files
-          changed_files: js/test/changed_files.txt
-          labels: js/test/labels.txt
-          module_files: js/test/list-module-callers/module_files.txt
           config_files: js/test/list-module-callers/config_files.txt
           pull_request: "" # A path to ci-info's pr.json
           module_callers: ""
