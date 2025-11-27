@@ -21,7 +21,7 @@ runs:
     - run: |
         echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
       shell: bash
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@8f7912270331b97d883cf4c4a512a42c1de3e28d
       id: main
       with:
         action: list-module-callers
