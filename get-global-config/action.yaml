@@ -96,7 +96,7 @@ runs:
     - run: |
         echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
       shell: bash
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@bd38a1f2332f5e1366086d7255daa1ef2606d593
       id: global-config
       with:
         action: get-global-config
