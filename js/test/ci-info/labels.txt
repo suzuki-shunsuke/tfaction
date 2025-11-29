@@ -1,5 +1,1 @@
-setup/test/foo
-setup/test/foo/add-or-update
-setup/test/opentofu/foo
-setup/test/opentofu/foo/add-or-update
-setup/test/terragrunt/foo
+enhancement
