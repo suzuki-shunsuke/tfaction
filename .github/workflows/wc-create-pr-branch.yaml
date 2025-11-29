@@ -138,42 +138,20 @@ jobs:
           changed_files: js/test/changed_files.txt
           config_files: js/test/modules.txt
 
-      - name: Test js/list-module-callers
-        uses: ./js
-        id: js-list-module-callers
-        with:
-          action: list-module-callers
-          module_files: js/test/list-module-callers/module_files.txt
-          config_files: js/test/list-module-callers/config_files.txt
-      - name: Test list-module-callers
-        uses: ./list-module-callers
-        id: list-module-callers
-        with:
-          module_files: js/test/list-module-callers/module_files.txt
-          config_files: js/test/list-module-callers/config_files.txt
-
       - name: Test js/list-targets-with-changed-files
         uses: ./js
         id: js-list-targets-with-changed-files
         with:
           action: list-targets-with-changed-files
-          config_files: js/test/list-module-callers/config_files.txt
-          module_files: js/test/list-module-callers/module_files.txt
-          pull_request: "" # A path to ci-info's pr.json
-          module_callers: ""
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
+          CI_INFO_TEMP_DIR: js/test/ci-info
       - name: Test list-targets-with-changed-files
         uses: ./list-targets-with-changed-files
         id: list-targets-with-changed-files
-        with:
-          changed_files: js/test/changed_files.txt
-          labels: js/test/labels.txt
-          module_files: js/test/list-module-callers/module_files.txt
-          config_files: js/test/list-module-callers/config_files.txt
-          module_callers: ""
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
+          CI_INFO_TEMP_DIR: js/test/ci-info
 
       - name: Test conftest
         uses: ./conftest
@@ -252,8 +230,6 @@ jobs:
           JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
           LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
           JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
-          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
-          JS_LIST_MODULE_CALLERS: ${{ toJSON(steps.js-list-module-callers.outputs) }}
           LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
           JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.js-list-targets-with-changed-files.outputs) }}
 
@@ -268,8 +244,6 @@ jobs:
           JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
           LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
           JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
-          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
-          JS_LIST_MODULE_CALLERS: ${{ toJSON(steps.js-list-module-callers.outputs) }}
           LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
           JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.js-list-targets-with-changed-files.outputs) }}
 
@@ -464,21 +438,12 @@ jobs:
           permission-pull-requests: write
           permission-contents: write
 
-      - name: Test list-module-callers
-        uses: ./js
-        id: list-module-callers
-        with:
-          action: list-module-callers
-          module_files: js/test/list-module-callers/terragrunt/module_files.txt
-          config_files: js/test/list-module-callers/terragrunt/config_files.txt
-
       - name: Test actions' outputs
         uses: ./js
         with:
           action: test-action
         env:
           TFACTION_TEST_ACTION_TERRAGRUNT: "true"
-          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
 
       - name: Test setup
         uses: ./setup
