@@ -6,7 +6,7 @@ import * as path from "path";
 import * as lib from "../lib";
 import * as getGlobalConfig from "../get-global-config";
 
-const listFiles = async (
+export const listFiles = async (
   baseDir: string,
   fileName: string,
 ): Promise<string[]> => {

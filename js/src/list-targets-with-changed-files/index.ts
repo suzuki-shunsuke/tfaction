@@ -5,6 +5,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../lib";
 import * as getGlobalConfig from "../get-global-config";
+import { listFiles } from "../list-working-dirs";
+import { list as listModuleCallers } from "../list-module-callers";
 
 type TargetConfig = {
   target: string;
@@ -377,9 +379,22 @@ export const main = async () => {
   }
   const prPath = `${process.env.CI_INFO_TEMP_DIR}/pr.json`;
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
-  const moduleCallersPath = core.getInput("module_callers");
   const cfg = lib.getConfig();
   const globalConfig = await getGlobalConfig.main_(cfg, {});
+
+  const baseWorkingDirectory = globalConfig.outputs.base_working_directory;
+  const workingDirectoryFile = globalConfig.outputs.working_directory_file;
+
+  const configFiles = await listFiles(
+    baseWorkingDirectory,
+    workingDirectoryFile,
+  );
+
+  const moduleBaseDirectory = globalConfig.outputs.module_base_directory;
+  const moduleFile = globalConfig.outputs.module_file;
+  const modules = await listFiles(moduleBaseDirectory, moduleFile);
+
+  const moduleCallers = await listModuleCallers(configFiles, modules);
 
   const result = await run({
     labels: fs
@@ -393,12 +408,8 @@ export const main = async () => {
         "utf8",
       )
       .split("\n"),
-    configFiles: fs
-      .readFileSync(core.getInput("config_files"), "utf8")
-      .split("\n"),
-    moduleFiles: fs
-      .readFileSync(core.getInput("module_files"), "utf8")
-      .split("\n"),
+    configFiles,
+    moduleFiles: modules,
     maxChangedWorkingDirectories:
       globalConfig.outputs.max_changed_working_dirs ?? 0,
     maxChangedModules: globalConfig.outputs.max_changed_modules ?? 0,
@@ -411,9 +422,7 @@ export const main = async () => {
       module1: [caller1, caller2],
     }
     */
-    moduleCallers: moduleCallersPath
-      ? JSON.parse(fs.readFileSync(moduleCallersPath, "utf8"))
-      : {},
+    moduleCallers,
   });
 
   core.info(`result: ${JSON.stringify(result)}`);

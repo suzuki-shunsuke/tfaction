@@ -1,1 +1,1 @@
-export { main } from "./run";
+export { main, listFiles } from "./run";
