@@ -37,10 +37,9 @@ runs:
     # ci-info
     - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-      run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
+      uses: suzuki-shunsuke/tfaction/js@main
+      with:
+        action: ci-info
 
     # Check if the commit is latest
     - if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
@@ -88,9 +87,10 @@ runs:
       env:
         TARGET_CONFIG: ${{toJSON(steps.target-config.outputs)}}
 
-    - uses: aquaproj/update-checksum-action@c5df5a5c2a897a9b807068f062140506d092e7ac # v0.2.7
+    - uses: suzuki-shunsuke/tfaction/js@main
       if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'
       with:
+        action: aqua-update-checksum
         skip_push: ${{ steps.global-config.outputs.aqua_update_checksum_skip_push }}
         prune: ${{ steps.global-config.outputs.aqua_update_checksum_prune }}
         working_directory: ${{ steps.target-config.outputs.working_directory }}
@@ -192,22 +192,16 @@ runs:
           exit 0
         fi
 
-    - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.terraform-init.outputs.changed_file != ''
-      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
+    - if: steps.terraform-init.outputs.changed_file != ''
+      uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: commit
         commit_message: "chore: update .terraform.lock.hcl"
         github_token: ${{ inputs.github_token }}
         files: ${{ steps.terraform-init.outputs.changed_file }}
-
-    - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.terraform-init.outputs.changed_file != ''
-      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
-      with:
-        action: client
-        app_id: ${{inputs.securefix_action_app_id}}
-        app_private_key: ${{inputs.securefix_action_app_private_key}}
-        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        commit_message: "chore: update .terraform.lock.hcl"
-        files: ${{ steps.terraform-init.outputs.changed_file }}
+        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
+        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
+        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
     - run: |
         "$TF" providers

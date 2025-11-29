@@ -4,7 +4,11 @@ import * as tmp from "tmp";
 import * as semver from "semver";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import { buildModuleToCallers, resolveRelativeCallTree } from "./lib";
+import {
+  buildModuleToCallers,
+  resolveRelativeCallTree,
+  ModuleToCallers,
+} from "./lib";
 
 export const main = async () => {
   const configFiles = fs
@@ -16,6 +20,19 @@ export const main = async () => {
     .trim()
     .split("\n");
 
+  const moduleCallers = await list(configFiles, moduleFiles);
+
+  const json = JSON.stringify(moduleCallers);
+  core.info(`file: ${json}`);
+  const tmpobj = tmp.fileSync();
+  fs.writeFileSync(tmpobj.name, json);
+  core.setOutput("file", tmpobj.name);
+};
+
+export const list = async (
+  configFiles: string[],
+  moduleFiles: string[],
+): Promise<ModuleToCallers> => {
   // directory where uses modules => used modules
   const rawModuleCalls: Record<string, Array<string>> = {};
 
@@ -121,9 +138,5 @@ export const main = async () => {
   const moduleCallers = buildModuleToCallers(
     resolveRelativeCallTree(rawModuleCalls),
   );
-  const json = JSON.stringify(moduleCallers);
-  core.info(`file: ${json}`);
-  const tmpobj = tmp.fileSync();
-  fs.writeFileSync(tmpobj.name, json);
-  core.setOutput("file", tmpobj.name);
+  return moduleCallers;
 };

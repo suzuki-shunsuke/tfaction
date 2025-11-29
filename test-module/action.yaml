@@ -39,17 +39,13 @@ runs:
         working_directory: ${{ env.TFACTION_TARGET }}
         skip_install_aqua: "true"
 
-    - shell: bash
-      id: action-path
-      run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
-
     - run: github-comment exec -var "tfaction_target:$TFACTION_TARGET" -- terraform init
       # https://github.com/suzuki-shunsuke/tfaction/issues/1576
       shell: bash
       working-directory: ${{ env.TFACTION_TARGET }}
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        GH_COMMENT_CONFIG: ${{steps.action-path.outputs.value}}/github-comment.yaml
+        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}
 
     # trivy
     - if: fromJSON(steps.global-config.outputs.enable_trivy)

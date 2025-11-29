@@ -28,27 +28,14 @@ runs:
       id: global-config
       with:
         action: get-global-config
-    - shell: bash
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: fix
-      working-directory: ${{ inputs.working_directory }}
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
         TFACTION_WORKING_DIR: ${{ inputs.working_directory }}
-      run: bash "${GITHUB_ACTION_PATH}/terraform-docs.sh"
-
-    - if: steps.global-config.outputs.securefix_action_server_repository == '' && steps.fix.outputs.changed == 'true'
-      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
       with:
-        commit_message: "docs: generate document by terraform-docs"
+        action: terraform-docs
+        working_directory: ${{ inputs.working_directory }}
         github_token: ${{ inputs.github_token }}
-        files: ${{ inputs.working_directory }}/README.md
-
-    - if: steps.global-config.outputs.securefix_action_server_repository != '' && steps.fix.outputs.changed == 'true'
-      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
-      with:
-        action: client
-        app_id: ${{inputs.securefix_action_app_id}}
-        app_private_key: ${{inputs.securefix_action_app_private_key}}
+        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
+        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
         server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        commit_message: "docs: generate document by terraform-docs"
-        files: ${{ inputs.working_directory }}/README.md

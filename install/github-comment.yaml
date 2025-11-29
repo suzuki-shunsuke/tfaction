@@ -1,0 +1,227 @@
+# https://github.com/suzuki-shunsuke/github-comment
+# This file is a merged version of all github-comment.yaml files in the repository
+post:
+  invalid-workflow-sha:
+    template: |
+      ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}workflow run's headSha is invalid
+
+      {{template "link" .}}
+
+      It failed to get a Terraform plan file from the pull request workflow run's artifacts.
+      workflow run's headSha ({{.Vars.wf_sha}}) is different from the associated pull request's head sha ({{.Vars.pr_sha}}).
+
+  no-workflow-run-found:
+    template: |
+      ## :x: {{.Vars.tfaction_target}}: No workflow run is found `{{.Vars.plan_workflow_name}}`
+
+      {{template "link" .}}
+
+      plan_workflow_name: {{.Vars.plan_workflow_name}}
+      branch: {{.Vars.branch}}
+
+      Maybe the setting `plan_workflow_name` in `tfaction-root.yaml` is wrong.
+      `plan_workflow_name` must be the workflow name where terraform plan is run in CI of pull requests.
+
+  create-follow-up-pr:
+    template: |
+      ## {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Follow up PR was created
+
+      {{template "link" .}}
+
+      {{.Vars.mentions}}
+
+      Apply failed. Please handle the problem. **:warning: Don't rerun GitHub Actions Workflow**
+
+      1. Check the error message
+      1. Check {{.Vars.follow_up_pr_url}}
+      1. Add commits to {{.Vars.follow_up_pr_url}} to fix the problem if needed
+      1. Review and merge {{.Vars.follow_up_pr_url}}
+
+  skip-create-follow-up-pr:
+    template: |
+      ## {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Please create a follow up pull request
+
+      {{template "link" .}}
+
+      {{.Vars.mentions}}
+
+      Apply failed. Please handle the problem. **:warning: Don't rerun GitHub Actions Workflow**
+
+      1. Check the error message
+      1. Create a follow up pull request
+
+      ```sh
+      gh pr create {{.Vars.opts | AvoidHTMLEscape}}
+      ```
+
+      ref. [gh pr create](https://cli.github.com/manual/gh_pr_create)
+
+      3. Add commits to the follow up pull request to fix the problem if needed
+      4. Review and merge {{.Vars.follow_up_pr_url}}
+
+  too-many-changed-dirs:
+    template: |
+      ## :x: Too many working directories are changed
+
+      {{template "link" .}}
+
+      Too many working directories are changed in one pull request.
+      You can change up to {{.Vars.max_changed_dirs}} working directories.
+      This is configured in tfaction-root.yaml.
+
+      [For more details, please see the document](https://suzuki-shunsuke.github.io/tfaction/docs/codes/001).
+
+  too-many-changed-modules:
+    template: |
+      ## :x: Too many modules are changed
+
+      {{template "link" .}}
+
+      Too many modules are changed in one pull request.
+      You can change up to {{.Vars.max_changed_modules}} modules.
+      This is configured in tfaction-root.yaml.
+
+      [For more details, please see the document](https://suzuki-shunsuke.github.io/tfaction/docs/codes/001).
+
+  tfmigrate-hcl-not-found:
+    template: |
+      ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}.tfmigrate.hcl isn't found
+
+      {{template "link" .}}
+
+      To run `tfmigrate plan`, `.tfmigrate.hcl` is required.
+
+  renovate-plan-change:
+    template: |
+      ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Renovate's PR must be `No change`
+
+      {{template "link" .}}
+
+      In the pull request created by Renovate, the result of `terraform plan` must be `No change` to enable automerge safely.
+      If you allow changes, please set the pull request label `renovate-change` and rerun CI.
+
+exec:
+  default:
+    - when: ExitCode != 0
+      template: |
+        :x: {{.Vars.tfaction_target}}
+
+        {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+
+  list-workflow-runs:
+    - when: ExitCode != 0 and Stderr contains "could not find any workflows named"
+      template: |
+        ## :x: {{.Vars.tfaction_target}}: Failed to list workflow runs `{{.Vars.plan_workflow_name}}`
+
+        {{template "link" .}}
+
+        It failed to list workflow runs `{{.Vars.plan_workflow_name}}`.
+        Probably the setting `plan_workflow_name` in `tfaction-root.yaml` is wrong.
+        `plan_workflow_name` must be the workflow name where terraform plan is run in CI of pull requests.
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{.Vars.tfaction_target}}: Failed to list workflow runs `{{.Vars.plan_workflow_name}}`
+
+        {{template "link" .}}
+
+        It failed to list workflow runs `{{.Vars.plan_workflow_name}}`.
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+    - when: Stdout == ""
+      template: |
+        ## :x: {{.Vars.tfaction_target}}: No workflow run is found `{{.Vars.plan_workflow_name}}`
+
+        {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+
+  download-plan-file:
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{.Vars.tfaction_target}}: Failed to download a plan file from GitHub Actions Artifact
+
+        {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+
+  terraform-docs:
+    - when: ExitCode != 0
+      template: |
+        ## :x: Failed to generate a Module document with terraform-docs ({{.Vars.tfaction_target}})
+
+        [terraform-docs](https://terraform-docs.io/) | {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+
+  tfmigrate-apply:
+    - when: true
+      template: |
+        ## {{template "status" .}} {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}} tfmigrate apply
+
+        {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+
+  drift-apply:
+    - when: true
+      template: |
+        ## {{template "status" .}} tfmigrate apply
+
+        [Pull Request]({{.Vars.pr_url}}) | {{template "link" .}}
+
+        ```console
+        $ tfmigrate apply
+        ```
+
+        {{template "hidden_combined_output" .}}
+
+  conftest:
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Violate Conftest Policy
+
+        {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{.CombinedOutput | AvoidHTMLEscape}}
+
+  tfmigrate-plan:
+    - when: true
+      template: |
+        ## {{template "status" .}} {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}} tfmigrate plan
+
+        {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}
+
+  terraform-validate:
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{.Vars.tfaction_target}}: terraform validate
+
+        {{template "link" .}}
+
+        {{template "join_command" .}}
+
+        {{template "hidden_combined_output" .}}

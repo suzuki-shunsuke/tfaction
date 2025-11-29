@@ -161,28 +161,6 @@ export const main = async () => {
       actual: process.env.JS_LIST_CHANGED_MODULES,
     },
     {
-      name: "list-module-callers",
-      expected: {
-        file: { "js/test/modules/foo": ["js/test/aws/foo/dev"] },
-      },
-      actual: process.env.LIST_MODULE_CALLERS,
-      convert: (data: any): any => {
-        data.file = JSON.parse(fs.readFileSync(data.file, "utf8"));
-        return data;
-      },
-    },
-    {
-      name: "js/list-module-callers",
-      expected: {
-        file: { "js/test/modules/foo": ["js/test/aws/foo/dev"] },
-      },
-      actual: process.env.JS_LIST_MODULE_CALLERS,
-      convert: (data: any): any => {
-        data.file = JSON.parse(fs.readFileSync(data.file, "utf8"));
-        return data;
-      },
-    },
-    {
       name: "list-targets-with-changed-files",
       expected: {
         targets: "[]",

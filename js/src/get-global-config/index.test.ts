@@ -50,7 +50,6 @@ test("default", () => {
         target_groups: [],
       },
       {
-        repository: "",
         drift_issue_number: "",
       },
     ),
@@ -68,7 +67,6 @@ test("plan_workflow_name is required", () => {
         target_groups: [],
       },
       {
-        repository: "",
         drift_issue_number: "",
       },
     );
@@ -133,7 +131,6 @@ test("customize", () => {
         terraform_command: "tofu",
       },
       {
-        repository: "",
         drift_issue_number: "",
       },
     ),
