@@ -99,7 +99,7 @@ runs:
       working-directory: ${{ env.TFACTION_TARGET }}
 
     # terraform-docs
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/terraform-docs@e9eb7c4b30ae71191ceb7adc0cb116497e40848a
       with:
         github_token: ${{ inputs.github_token }}
         securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
