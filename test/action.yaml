@@ -144,7 +144,7 @@ runs:
         files: ${{ steps.fmt-files.outputs.value }}
 
     # terraform-docs
-    - uses: suzuki-shunsuke/tfaction/terraform-docs@main
+    - uses: suzuki-shunsuke/tfaction/terraform-docs@f05052594c52db383586f9513d9a64c12c7589e8
       if: steps.target-config.outputs.enable_terraform_docs == 'true' && steps.target-config.outputs.destroy != 'true'
       with:
         github_token: ${{ inputs.github_token }}
