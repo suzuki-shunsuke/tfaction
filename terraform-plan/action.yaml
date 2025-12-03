@@ -36,16 +36,16 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@87a979b360b2deab68154d68b9aabc8d8601a164
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@87a979b360b2deab68154d68b9aabc8d8601a164
       id: global-config
       with:
         action: get-global-config
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@87a979b360b2deab68154d68b9aabc8d8601a164
       id: check-terraform-skip
       if: "! env.TFACTION_DRIFT_ISSUE_NUMBER"
       with:
@@ -77,7 +77,7 @@ runs:
       id: action_path
     - if: |
         env.TFACTION_DRIFT_ISSUE_NUMBER || !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@87a979b360b2deab68154d68b9aabc8d8601a164
       with:
         action: conftest
         plan: "true"
