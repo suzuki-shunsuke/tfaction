@@ -28,11 +28,11 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@b60f8ba94db5647f36b464d82bbd5b588c8a294d
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@b60f8ba94db5647f36b464d82bbd5b588c8a294d
       id: target-config
       with:
         action: get-target-config
@@ -73,7 +73,7 @@ runs:
       shell: bash
       id: action_path
     - if: steps.migrate.outputs.changed != 'true'
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@b60f8ba94db5647f36b464d82bbd5b588c8a294d
       with:
         action: conftest
         plan: "true"

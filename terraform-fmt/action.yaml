@@ -26,7 +26,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@b60f8ba94db5647f36b464d82bbd5b588c8a294d
       id: global-config
       with:
         action: get-global-config
