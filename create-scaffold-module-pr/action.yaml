@@ -34,7 +34,7 @@ runs:
         echo "::error ::env.TFACTION_MODULE_PATH is required"
         exit 1
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@ffea78306d89928553e1b4e61b2c81fc1c5f1d10
       id: global-config
       with:
         action: get-global-config
