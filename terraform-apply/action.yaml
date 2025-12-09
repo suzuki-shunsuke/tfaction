@@ -31,15 +31,15 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@fe28cf10cb5cb22eed4c64a70e1b9ebdd0e62ee7
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@fe28cf10cb5cb22eed4c64a70e1b9ebdd0e62ee7
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@fe28cf10cb5cb22eed4c64a70e1b9ebdd0e62ee7
       id: check-terraform-skip
       with:
         action: check-terraform-skip
