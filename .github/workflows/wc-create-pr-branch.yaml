@@ -129,13 +129,13 @@ jobs:
         id: js-list-changed-modules
         with:
           action: list-changed-modules
-          changed_files: js/test/changed_files.txt
+          changed_files: js/test/ci-info/pr_all_filenames.txt
           config_files: js/test/modules.txt
       - name: Test list-changed-modules
         uses: ./list-changed-modules
         id: list-changed-modules
         with:
-          changed_files: js/test/changed_files.txt
+          changed_files: js/test/ci-info/pr_all_filenames.txt
           config_files: js/test/modules.txt
 
       - name: Test js/list-targets-with-changed-files
