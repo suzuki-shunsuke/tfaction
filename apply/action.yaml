@@ -26,7 +26,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/terraform-apply@main
+    - uses: suzuki-shunsuke/tfaction/terraform-apply@26b66864e4a971018646dd3fa00e81f2a50cb915
       if: env.TFACTION_JOB_TYPE == 'terraform'
       with:
         # pull-requests:write - Create pull request comments and labels
@@ -36,7 +36,7 @@ runs:
         securefix_action_app_id: ${{inputs.securefix_action_app_id}}
         securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
 
-    - uses: suzuki-shunsuke/tfaction/tfmigrate-apply@main
+    - uses: suzuki-shunsuke/tfaction/tfmigrate-apply@26b66864e4a971018646dd3fa00e81f2a50cb915
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
       with:
         # pull-requests:write - Create pull request comments
