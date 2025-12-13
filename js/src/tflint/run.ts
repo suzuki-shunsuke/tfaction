@@ -241,6 +241,7 @@ ${table}`;
     "-level",
     "warning",
   ];
+  const failLevel = config.tflint?.reviewdog?.fail_level ?? "error";
   const reviewdogHelp = await exec.getExecOutput("reviewdog", ["--help"], {
     cwd: inputs.workingDirectory,
     silent: true,
@@ -250,7 +251,7 @@ ${table}`;
     reviewdogHelp.stdout.includes("-fail-level") ||
     reviewdogHelp.stderr.includes("-fail-level")
   ) {
-    reviewdogArgs.push("-fail-level", "error");
+    reviewdogArgs.push("-fail-level", failLevel);
   } else {
     reviewdogArgs.push("-fail-on-error", "1");
   }
