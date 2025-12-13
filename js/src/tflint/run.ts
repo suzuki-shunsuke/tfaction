@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
 import * as commit from "../commit";
+import * as lib from "../lib";
 
 type Inputs = {
   workingDirectory: string;
@@ -226,13 +227,15 @@ ${table}`;
   core.info(`Reviewdog input: ${reviewDogInput}`);
   core.info("Running reviewdog");
 
+  const config = lib.getConfig();
+  const filterMode = config.tflint?.reviewdog?.filter_mode ?? "nofilter";
   const reviewdogArgs = [
     "-f",
     "rdjson",
     "-name",
     "tflint",
     "-filter-mode",
-    "nofilter",
+    filterMode,
     "-reporter",
     reporter,
     "-level",
@@ -262,7 +265,4 @@ ${table}`;
     },
   });
   core.endGroup();
-  if (out.exitCode != 0) {
-    throw new Error("tflint failed");
-  }
 };
