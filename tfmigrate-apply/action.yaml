@@ -22,16 +22,16 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@ea382a763cdf106b97c89aa5bef1c7030db5a951
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@ea382a763cdf106b97c89aa5bef1c7030db5a951
       id: target-config
       with:
         action: get-target-config
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@ea382a763cdf106b97c89aa5bef1c7030db5a951
       id: tfmigrate-apply
       working-directory: ${{ steps.target-config.outputs.working_directory }}
       with:
