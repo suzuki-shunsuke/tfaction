@@ -131,28 +131,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.7/tofu_1.10.7_darwin_amd64.tar.gz",
-      "checksum": "EC063E3920FAB7CC80299F66D2FDA3EC752F774B88CAF3C207122336674843A3",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_darwin_amd64.tar.gz",
+      "checksum": "47D90AF87179E0B168DE3DFCE39D8EDDFDC0D413529C9B5FCE4289F6B803D508",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.7/tofu_1.10.7_darwin_arm64.tar.gz",
-      "checksum": "E5CDC6D0BDD85B0CF699F00E2CD547C3B3D0892C7B5ECB22BD02C72D9D1FF8BC",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_darwin_arm64.tar.gz",
+      "checksum": "77510368FB2906D3BF7161EF3584FC3F86D75F4173705FB945AC5480B3427A35",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.7/tofu_1.10.7_linux_amd64.tar.gz",
-      "checksum": "765A7374AEAFCAD15FE8DA5359DE76CE11BA0FD3CB6C2DC85D3B390E6362CAE5",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_linux_amd64.tar.gz",
+      "checksum": "2463CE749BBE7396E7A384918E1065AEDA54317E3FEC8DB07C2BDDEE8F714C61",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.7/tofu_1.10.7_linux_arm64.tar.gz",
-      "checksum": "CFDE76D660CBAA7B7B1AD1DAB02FE99085F2FC7A2D2E7F9FD2FF4167358D52C0",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_linux_arm64.tar.gz",
+      "checksum": "CD0B275699416F1417FED4D2911E557EEF78126A545FCFC0CB5EEE68FE192524",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.10.7/tofu_1.10.7_windows_amd64.tar.gz",
-      "checksum": "58E9F247C57C7C1FAEF3B20FD735DCAD272154E93BD02246EEFF36CB756B03DF",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_windows_amd64.tar.gz",
+      "checksum": "264730D09EC5CA99FDA4E752D86CFDAC20F6DF5531624DB10C73540D0E536BDA",
       "algorithm": "sha256"
     },
     {
@@ -306,33 +306,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.4.6/pinact_darwin_amd64.tar.gz",
-      "checksum": "13B6167EA25BEFA2115F7E44BBA2CFF5B2FB6448D98B3BD7B4592EDA973B7B12",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.5.0/pinact_darwin_amd64.tar.gz",
+      "checksum": "D86DF98BE282A613CE82D07FAAD4AD070312B35B03E66A5D468C53317565D3C3",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.4.6/pinact_darwin_arm64.tar.gz",
-      "checksum": "1D6E8239537EADA29E94285EA1E5D1A1DB27DB9320A9621C9E1D6427F118AEE4",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.5.0/pinact_darwin_arm64.tar.gz",
+      "checksum": "A51B767D839C19C82B773872DA376A430AF51B6C9410F11CA58CFA6F4E28EAB0",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.4.6/pinact_linux_amd64.tar.gz",
-      "checksum": "1876DDD571BA8452C07A1B9B9A325BDFE074A467BE9A81F3FD42743BF6043618",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.5.0/pinact_linux_amd64.tar.gz",
+      "checksum": "BACC6DBF388CB09C13584A305BE83AEF938A0BC5CE91B738BE2F01C16C0E0B37",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.4.6/pinact_linux_arm64.tar.gz",
-      "checksum": "6AEFEA25EB7B9D1C7D03E6B42564F20D2F30EFEFECB991428B33348418397C14",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.5.0/pinact_linux_arm64.tar.gz",
+      "checksum": "11B8690D2605329C60476EEC31E100410F0D8689D3EC810D462AE6525270DC79",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.4.6/pinact_windows_amd64.zip",
-      "checksum": "FE68E29AD61ECBF48F7DCF3ABBE722EFC626237E43FAD04E1EC5DB23CDF05E94",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.5.0/pinact_windows_amd64.zip",
+      "checksum": "F3908FA9CF85F9DF482C7D1F2D8DE45A0F3258378752ABFCFEDAB2F8FA9E38D8",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.4.6/pinact_windows_arm64.zip",
-      "checksum": "D8D57E69AD40717BD5B1E9DDEEF5AEFDA150F4CF21AFA1A548E783DDD792101A",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.5.0/pinact_windows_arm64.zip",
+      "checksum": "DA18ABF23EB0C16E6849F814118453104661883FE7BB6CC0F55A73AEDC6BAE4E",
       "algorithm": "sha256"
     },
     {
@@ -411,8 +411,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.444.2/registry.yaml",
-      "checksum": "3278676BF2A1DDBFE46EAA952F2D8DF226166CA799685328FA9E8E1B1B2FCAA0C422764A12306E0EB9BEC559E9CFB1031A2A5EAD4282B689A69D50B257B93510",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.445.0/registry.yaml",
+      "checksum": "AEC9F10EF0D8DD8CB3A3DC7AAC1655FF182432BDCB18811469B59C18E7316CC9BE6EB99DC850AA4E761B4570111DFD4439C46D24436A0ACF458EBD2ED6C058AE",
       "algorithm": "sha512"
     }
   ]
