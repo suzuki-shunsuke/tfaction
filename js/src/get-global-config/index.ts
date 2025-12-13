@@ -1,10 +1,10 @@
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 import * as lib from "../lib";
 
 export const main = async () => {
   const config = lib.getConfig();
   const result = main_(config, {
-    repository: process.env.GITHUB_REPOSITORY,
     drift_issue_number: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
   });
   for (const [key, value] of Object.entries(result.envs)) {
@@ -16,7 +16,6 @@ export const main = async () => {
 };
 
 interface Input {
-  repository?: string;
   drift_issue_number?: string;
 }
 
@@ -124,22 +123,16 @@ export const main_ = (config: lib.Config, input: Input): Result => {
       config?.scaffold_working_directory?.skip_adding_aqua_packages ?? true,
   };
 
-  if (config.drift_detection && config.drift_detection.issue_repo_owner) {
-    outputs.drift_issue_repo_owner = config.drift_detection.issue_repo_owner;
-  } else {
-    if (input.repository) {
-      outputs.drift_issue_repo_owner = input.repository.split("/")[0];
+  if (config.drift_detection) {
+    if (config.drift_detection.issue_repo_owner) {
+      outputs.drift_issue_repo_owner = config.drift_detection.issue_repo_owner;
+    } else {
+      outputs.drift_issue_repo_owner = github.context.repo.owner;
     }
-  }
-
-  if (config.drift_detection && config.drift_detection.issue_repo_name) {
-    outputs.drift_issue_repo_name = config.drift_detection.issue_repo_name;
-  } else {
-    if (input.repository) {
-      const a = input.repository.split("/");
-      if (a.length > 1) {
-        outputs.drift_issue_repo_name = a[1];
-      }
+    if (config.drift_detection.issue_repo_name) {
+      outputs.drift_issue_repo_name = config.drift_detection.issue_repo_name;
+    } else {
+      outputs.drift_issue_repo_name = github.context.repo.repo;
     }
   }
 

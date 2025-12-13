@@ -13,6 +13,15 @@ import * as getFollowupPRParam from "./get-follow-up-pr-param";
 import * as tfsec from "./tfsec";
 import * as trivy from "./trivy";
 import * as tflint from "./tflint";
+import * as commit from "./commit";
+import * as terraformDocs from "./terraform-docs";
+import * as aquaUpdateChecksum from "./aqua-update-checksum";
+import * as plan from "./plan";
+import * as ciinfo from "./ci-info";
+import * as listWorkingDirs from "./list-working-dirs";
+import * as downloadPlan from "./download-plan";
+import * as terraformApply from "./terraform-apply";
+import * as tfmigrateApply from "./tfmigrate-apply";
 
 type Inputs = {
   action: string;
@@ -24,9 +33,11 @@ interface API {
 
 export const main = async (inputs: Inputs) => {
   const actions = new Map<string, API>([
+    ["aqua-update-checksum", aquaUpdateChecksum],
     ["check-terraform-skip", checkTerraformSkip],
     ["conftest", conftest],
     ["create-drift-issues", createDriftIssues],
+    ["download-plan", downloadPlan],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["export-secrets", exportSecrets],
     ["get-follow-up-pr-param", getFollowupPRParam],
@@ -36,9 +47,16 @@ export const main = async (inputs: Inputs) => {
     ["list-changed-modules", listChangeModules],
     ["list-module-callers", listModuleCallers],
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
+    ["list-working-dirs", listWorkingDirs],
+    ["plan", plan],
+    ["terraform-apply", terraformApply],
+    ["terraform-docs", terraformDocs],
+    ["tfmigrate-apply", tfmigrateApply],
     ["tfsec", tfsec],
     ["trivy", trivy],
     ["tflint", tflint],
+    ["commit", commit],
+    ["ci-info", ciinfo],
   ]);
   const action = actions.get(inputs.action);
   if (action === undefined) {

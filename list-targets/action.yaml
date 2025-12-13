@@ -20,12 +20,11 @@ runs:
   steps:
     - uses: suzuki-shunsuke/tfaction/install@main
       id: install
-    - run: github-comment exec -- ci-info run | sed "s/^export //" >> "$GITHUB_ENV"
-      shell: bash
-      if: |
+    - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+      uses: suzuki-shunsuke/tfaction/js@main
+      with:
+        action: ci-info
 
     - name: Check if the commit is latest
       shell: bash
@@ -41,36 +40,10 @@ runs:
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
-    - uses: suzuki-shunsuke/tfaction/list-working-dirs@main
-      id: list-working-directory-configs
-    - uses: suzuki-shunsuke/tfaction/js@main
-      id: global-config
-      with:
-        action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
-      id: list-module-callers
-      if: steps.global-config.outputs.update_local_path_module_caller == 'true'
-      with:
-        action: list-module-callers
-        config_files: ${{ steps.list-working-directory-configs.outputs.file }}
-        module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
-
-    - id: gh_comment_config
-      shell: bash
-      run: echo "value=${GITHUB_ACTION_PATH}/github-comment.yaml" >> "$GITHUB_OUTPUT"
-
     - uses: suzuki-shunsuke/tfaction/js@main
       id: list-targets
       with:
         action: list-targets-with-changed-files
-        changed_files: ${{ env.CI_INFO_TEMP_DIR }}/pr_all_filenames.txt
-        labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
-        pull_request: ${{ env.CI_INFO_TEMP_DIR }}/pr.json
-        config_files: ${{ steps.list-working-directory-configs.outputs.file }}
-        module_callers: ${{ steps.list-module-callers.outputs.file }}
-        module_files: ${{ steps.list-working-directory-configs.outputs.module_file }}
-        max_changed_working_dirs: ${{ steps.global-config.outputs.max_changed_working_dirs }}
-        max_changed_modules: ${{ steps.global-config.outputs.max_changed_modules }}
         github_token: ${{ inputs.github_token }}
       env:
-        GH_COMMENT_CONFIG: ${{ steps.gh_comment_config.outputs.value }}
+        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}

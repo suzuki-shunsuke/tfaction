@@ -1,0 +1,2 @@
+js/test/modules/foo/main.tf
+js/test/README.md

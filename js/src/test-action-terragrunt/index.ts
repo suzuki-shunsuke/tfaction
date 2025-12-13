@@ -1,5 +1,3 @@
-import * as lib from "../lib";
-import * as core from "@actions/core";
 import * as fs from "fs";
 import { diffString } from "json-diff";
 

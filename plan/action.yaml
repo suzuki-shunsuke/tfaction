@@ -61,75 +61,32 @@ runs:
         ! env.TFACTION_DRIFT_ISSUE_NUMBER
       with:
         action: check-terraform-skip
-        labels: ${{ env.CI_INFO_TEMP_DIR }}/labels.txt
-        pr_author: ${{ env.CI_INFO_PR_AUTHOR }}
-        skip_label_prefix: ${{ steps.global-config.outputs.label_prefix_skip }}
 
-    - run: bash "$GITHUB_ACTION_PATH/terraform.sh"
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
+    - uses: suzuki-shunsuke/tfaction/js@main
       id: main
-      shell: bash
       if: |
-        env.TFACTION_JOB_TYPE == 'terraform' &&
-        (
-          env.TFACTION_DRIFT_ISSUE_NUMBER ||
-          !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-        )
+        !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
+      with:
+        action: plan
+        github_token: ${{ inputs.github_token }}
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        ROOT_DIR: ${{ github.workspace }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        RENOVATE_LOGIN: ${{ steps.global-config.outputs.renovate_login }}
-        HEAD_SHA: ${{github.event.pull_request.head.sha}}
-        DESTROY: ${{ steps.target-config.outputs.destroy }}
-        CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
-        TF_COMMAND: ${{ steps.target-config.outputs.terraform_command }}
-
-    # tfmigrate plan
-
-    - if: env.TFACTION_JOB_TYPE == 'tfmigrate'
-      run: bash "$GITHUB_ACTION_PATH/tfmigrate.sh"
-      id: migrate
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
-        ROOT_DIR: ${{ github.workspace }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        S3_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.s3_bucket_name_tfmigrate_history }}
-        GCS_BUCKET_NAME_TFMIGRATE_HISTORY: ${{ steps.target-config.outputs.gcs_bucket_name_tfmigrate_history }}
-        CONFTEST_POLICY_DIRECTORY: ${{ steps.global-config.outputs.conftest_policy_directory }}
-        TF_COMMAND: ${{ steps.global-config.outputs.terraform_command }}
+        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}
 
     # Commit .tfmigrate.hcl if changed
     - if: |
         env.TFACTION_JOB_TYPE == 'tfmigrate' &&
-        steps.migrate.outputs.changed == 'true' &&
-        steps.global-config.outputs.securefix_action_server_repository == ''
-      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
+        steps.main.outputs.changed == 'true'
+      uses: suzuki-shunsuke/tfaction/js@main
       with:
+        action: commit
         commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
         github_token: ${{ inputs.github_token }}
         files: ${{ steps.target-config.outputs.working_directory }}/.tfmigrate.hcl
-    - if: |
-        env.TFACTION_JOB_TYPE == 'tfmigrate' &&
-        steps.migrate.outputs.changed == 'true' &&
-        steps.global-config.outputs.securefix_action_server_repository != ''
-      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
-      with:
-        action: client
-        app_id: ${{inputs.securefix_action_app_id}}
-        app_private_key: ${{inputs.securefix_action_app_private_key}}
-        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
-        files: ${{ steps.target-config.outputs.working_directory }}/.tfmigrate.hcl
+        securefix_action_app_id: ${{inputs.securefix_action_app_id}}
+        securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
+        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
 
     # Conftest
-    - if: steps.migrate.outputs.changed != 'true'
-      run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
-      shell: bash
-      id: action_path
     - if: steps.migrate.outputs.changed != 'true'
       uses: suzuki-shunsuke/tfaction/js@main
       with:
@@ -137,28 +94,4 @@ runs:
         plan: "true"
         github_token: ${{inputs.github_token}}
       env:
-        GH_COMMENT_CONFIG: ${{ steps.action_path.outputs.value }}/github-comment.yaml
-
-    # terraform plan upload plan file and json
-    - if: |
-        env.TFACTION_JOB_TYPE == 'terraform' &&
-        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-      run: |
-        echo "plan_file=terraform_plan_file_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
-        echo "plan_json=terraform_plan_json_${TFACTION_TARGET//\//__}" >> "$GITHUB_OUTPUT"
-      id: artifact_name
-      shell: bash
-    - if: |
-        env.TFACTION_JOB_TYPE == 'terraform' &&
-        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-      with:
-        name: ${{ steps.artifact_name.outputs.plan_file }}
-        path: ${{ steps.main.outputs.plan_binary }}
-    - if: |
-        env.TFACTION_JOB_TYPE == 'terraform' &&
-        ! env.TFACTION_DRIFT_ISSUE_NUMBER && !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-      with:
-        name: ${{ steps.artifact_name.outputs.plan_json }}
-        path: ${{ steps.main.outputs.plan_json }}
+        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}

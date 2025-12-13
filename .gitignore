@@ -6,3 +6,4 @@ dist
 .terraform
 schema
 terragrunt.rendered.json
+.terragrunt-cache
