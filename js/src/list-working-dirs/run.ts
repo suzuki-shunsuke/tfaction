@@ -16,7 +16,7 @@ export const listFiles = async (
   });
 
   const arr: string[] = [];
-  for (const line of result.stderr.split("\n").map((l) => l.trim())) {
+  for (const line of result.stdout.split("\n").map((l) => l.trim())) {
     if (line === "") {
       continue;
     }
