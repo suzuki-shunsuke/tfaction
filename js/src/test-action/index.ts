@@ -163,7 +163,8 @@ export const main = async () => {
     {
       name: "list-targets-with-changed-files",
       expected: {
-        targets: "[]",
+        targets:
+          '[{"target":"js/test/aws/foo/dev","working_directory":"js/test/aws/foo/dev","runs_on":"ubuntu-latest","job_type":"terraform"}]',
         modules: '["js/test/modules/foo"]',
       },
       actual: process.env.LIST_TARGETS_WITH_CHANGED_FILES,
@@ -171,7 +172,8 @@ export const main = async () => {
     {
       name: "js/list-targets-with-changed-files",
       expected: {
-        targets: "[]",
+        targets:
+          '[{"target":"js/test/aws/foo/dev","working_directory":"js/test/aws/foo/dev","runs_on":"ubuntu-latest","job_type":"terraform"}]',
         modules: '["js/test/modules/foo"]',
       },
       actual: process.env.JS_LIST_TARGETS_WITH_CHANGED_FILES,
