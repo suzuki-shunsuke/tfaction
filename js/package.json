@@ -5,7 +5,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@actions/core": "1.11.1",
+    "@actions/core": "2.0.0",
     "@actions/exec": "^2.0.0",
     "@actions/github": "6.0.1",
     "@aws-sdk/client-secrets-manager": "3.948.0",
