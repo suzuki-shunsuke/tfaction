@@ -131,28 +131,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_darwin_amd64.tar.gz",
-      "checksum": "47D90AF87179E0B168DE3DFCE39D8EDDFDC0D413529C9B5FCE4289F6B803D508",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.1/tofu_1.11.1_darwin_amd64.tar.gz",
+      "checksum": "C751C4E5B2DCA52CE3F591D2166BE9D7CE2255AF3551309B4C2336B02C496B12",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_darwin_arm64.tar.gz",
-      "checksum": "77510368FB2906D3BF7161EF3584FC3F86D75F4173705FB945AC5480B3427A35",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.1/tofu_1.11.1_darwin_arm64.tar.gz",
+      "checksum": "0028F250BDA3293C59FC9D48F2A0446853E447574554ECDE415CE8C7E3779F0B",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_linux_amd64.tar.gz",
-      "checksum": "2463CE749BBE7396E7A384918E1065AEDA54317E3FEC8DB07C2BDDEE8F714C61",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.1/tofu_1.11.1_linux_amd64.tar.gz",
+      "checksum": "7941A5742A9DC1685BB4CE14ABC555A17CAA368A09724DFCA53015391EB469A0",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_linux_arm64.tar.gz",
-      "checksum": "CD0B275699416F1417FED4D2911E557EEF78126A545FCFC0CB5EEE68FE192524",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.1/tofu_1.11.1_linux_arm64.tar.gz",
+      "checksum": "59ACEFCC170F1BCA00268EE06CEF5B87C0B46C255879E092092AEA6FB4CE63BF",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.11.0/tofu_1.11.0_windows_amd64.tar.gz",
-      "checksum": "264730D09EC5CA99FDA4E752D86CFDAC20F6DF5531624DB10C73540D0E536BDA",
+      "id": "github_release/github.com/opentofu/opentofu/v1.11.1/tofu_1.11.1_windows_amd64.tar.gz",
+      "checksum": "B4D581C5787EE7B98DDD3C4C968E47361A47410557D6CC29ED314AEFF1A5C4DA",
       "algorithm": "sha256"
     },
     {
