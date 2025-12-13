@@ -241,7 +241,7 @@ ${table}`;
     "-level",
     "warning",
   ];
-  const failLevel = config.tflint?.reviewdog?.fail_level ?? "error";
+  const failLevel = config.tflint?.reviewdog?.fail_level ?? "any";
   const reviewdogHelp = await exec.getExecOutput("reviewdog", ["--help"], {
     cwd: inputs.workingDirectory,
     silent: true,
