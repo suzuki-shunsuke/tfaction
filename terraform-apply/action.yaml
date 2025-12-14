@@ -34,16 +34,16 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@112809419c91bbb784356bffc776cc672285ca27
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@112809419c91bbb784356bffc776cc672285ca27
       id: check-terraform-skip
       with:
         action: check-terraform-skip
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@112809419c91bbb784356bffc776cc672285ca27
       id: terraform-apply
       if: "!fromJSON(steps.check-terraform-skip.outputs.skip_terraform)"
       with:
