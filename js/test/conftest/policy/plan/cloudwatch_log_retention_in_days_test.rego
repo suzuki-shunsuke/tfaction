@@ -1,10 +1,12 @@
 package main
 
-test_deny_aws_cloudwatch_log_group_retention_in_days {
+import rego.v1
+
+test_deny_aws_cloudwatch_log_group_retention_in_days if {
 	not any_deny_aws_cloudwatch_log_group_retention_in_days
 }
 
-any_deny_aws_cloudwatch_log_group_retention_in_days {
+any_deny_aws_cloudwatch_log_group_retention_in_days if {
 	seeds := [
 		{
 			"exp": set(), "msg": "pass",
