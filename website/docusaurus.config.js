@@ -37,13 +37,13 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      announcementBar: {
-        id: "notebooklm",
-        content: `<a href="https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451">Google NotebookLM for tfaction (2025-11-15)</a>`,
-        backgroundColor: "#7FFF00",
-        textColor: "#091E42",
-        isCloseable: true,
-      },
+      // announcementBar: {
+      //   id: "notebooklm",
+      //   content: `<a href="https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451">Google NotebookLM for tfaction (2025-11-15)</a>`,
+      //   backgroundColor: "#7FFF00",
+      //   textColor: "#091E42",
+      //   isCloseable: true,
+      // },
       navbar: {
         title: "tfaction",
         items: [
@@ -55,6 +55,11 @@ const config = {
           {
             href: "https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451",
             label: "NotebookLM",
+            position: "right",
+          },
+          {
+            href: "https://deepwiki.com/suzuki-shunsuke/tfaction",
+            label: "DeepWiki",
             position: "right",
           },
         ],
