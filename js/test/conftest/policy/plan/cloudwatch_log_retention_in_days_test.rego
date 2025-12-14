@@ -2,6 +2,10 @@ package main
 
 import rego.v1
 
+wrap_single_resource(resource) = x if {
+	x := {"planned_values": {"root_module": {"resources": [resource]}}}
+}
+
 test_deny_aws_cloudwatch_log_group_retention_in_days if {
 	not any_deny_aws_cloudwatch_log_group_retention_in_days
 }
