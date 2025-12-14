@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
 import * as commit from "../commit";
+import * as lib from "../lib";
 
 type Inputs = {
   workingDirectory: string;
@@ -226,18 +227,21 @@ ${table}`;
   core.info(`Reviewdog input: ${reviewDogInput}`);
   core.info("Running reviewdog");
 
+  const config = lib.getConfig();
+  const filterMode = config.tflint?.reviewdog?.filter_mode ?? "nofilter";
   const reviewdogArgs = [
     "-f",
     "rdjson",
     "-name",
     "tflint",
     "-filter-mode",
-    "nofilter",
+    filterMode,
     "-reporter",
     reporter,
     "-level",
     "warning",
   ];
+  const failLevel = config.tflint?.reviewdog?.fail_level ?? "any";
   const reviewdogHelp = await exec.getExecOutput("reviewdog", ["--help"], {
     cwd: inputs.workingDirectory,
     silent: true,
@@ -247,7 +251,7 @@ ${table}`;
     reviewdogHelp.stdout.includes("-fail-level") ||
     reviewdogHelp.stderr.includes("-fail-level")
   ) {
-    reviewdogArgs.push("-fail-level", "error");
+    reviewdogArgs.push("-fail-level", failLevel);
   } else {
     reviewdogArgs.push("-fail-on-error", "1");
   }
@@ -262,7 +266,4 @@ ${table}`;
     },
   });
   core.endGroup();
-  if (out.exitCode != 0) {
-    throw new Error("tflint failed");
-  }
 };

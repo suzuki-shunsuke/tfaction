@@ -36,9 +36,17 @@ const TfsecConfig = z.object({
 
 type TfsecConfig = z.infer<typeof TfsecConfig>;
 
+const TflintReviewdogConfig = z.object({
+  filter_mode: z.optional(
+    z.enum(["added", "diff_context", "file", "nofilter"]),
+  ),
+  fail_level: z.optional(z.enum(["none", "any", "info", "warning", "error"])),
+});
+
 const TflintConfig = z.object({
   enabled: z.optional(z.boolean()),
   fix: z.optional(z.boolean()),
+  reviewdog: z.optional(TflintReviewdogConfig),
 });
 type TflintConfig = z.infer<typeof TflintConfig>;
 
