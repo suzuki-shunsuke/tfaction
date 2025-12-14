@@ -8,7 +8,7 @@ The resource `aws_cloudwatch_log_group`'s `retention_in_days` must be set and gr
 
 ## Target resources and attributes
 
-* [aws_cloudwatch_log_group's retention_in_days](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group#retention_in_days)
+- [aws_cloudwatch_log_group's retention_in_days](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group#retention_in_days)
 
 ## Why is this policy needed?
 
