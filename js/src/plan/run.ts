@@ -195,8 +195,7 @@ export const runTfmigratePlan = async (
   // Run terraform show to convert plan to JSON
   core.startGroup(`${inputs.tfCommand} show`);
 
-  const planJsonStream = fs.createWriteStream(tempPlanJson);
-  await exec.exec(
+  const showResult = await exec.getExecOutput(
     "github-comment",
     ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
     {
@@ -205,23 +204,20 @@ export const runTfmigratePlan = async (
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
       },
-      outStream: planJsonStream,
       silent: true,
     },
   );
-  planJsonStream.end();
-  await new Promise<void>((resolve) => planJsonStream.on("finish", resolve));
+  fs.writeFileSync(tempPlanJson, showResult.stdout);
 
   // Debug: output plan JSON info
-  const stats = fs.statSync(tempPlanJson);
-  const content = fs.readFileSync(tempPlanJson, "utf8");
-  console.error(`[DEBUG] tempPlanJson size: ${stats.size} bytes`);
-  console.error(`[DEBUG] tempPlanJson content length: ${content.length}`);
   console.error(
-    `[DEBUG] tempPlanJson first 200 chars: ${content.substring(0, 200)}`,
+    `[DEBUG] tempPlanJson stdout length: ${showResult.stdout.length}`,
   );
   console.error(
-    `[DEBUG] tempPlanJson last 200 chars: ${content.substring(content.length - 200)}`,
+    `[DEBUG] tempPlanJson first 200 chars: ${showResult.stdout.substring(0, 200)}`,
+  );
+  console.error(
+    `[DEBUG] tempPlanJson last 200 chars: ${showResult.stdout.substring(showResult.stdout.length - 200)}`,
   );
 
   core.endGroup();
@@ -299,8 +295,7 @@ export const runTerraformPlan = async (
   // Run terraform show to convert plan to JSON
   core.startGroup(`${inputs.tfCommand} show`);
 
-  const planJsonStream = fs.createWriteStream(tempPlanJson);
-  await exec.exec(
+  const showResult = await exec.getExecOutput(
     "github-comment",
     ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
     {
@@ -309,23 +304,20 @@ export const runTerraformPlan = async (
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
       },
-      outStream: planJsonStream,
       silent: true,
     },
   );
-  planJsonStream.end();
-  await new Promise<void>((resolve) => planJsonStream.on("finish", resolve));
+  fs.writeFileSync(tempPlanJson, showResult.stdout);
 
   // Debug: output plan JSON info
-  const stats = fs.statSync(tempPlanJson);
-  const content = fs.readFileSync(tempPlanJson, "utf8");
-  console.error(`[DEBUG] tempPlanJson size: ${stats.size} bytes`);
-  console.error(`[DEBUG] tempPlanJson content length: ${content.length}`);
   console.error(
-    `[DEBUG] tempPlanJson first 200 chars: ${content.substring(0, 200)}`,
+    `[DEBUG] tempPlanJson stdout length: ${showResult.stdout.length}`,
   );
   console.error(
-    `[DEBUG] tempPlanJson last 200 chars: ${content.substring(content.length - 200)}`,
+    `[DEBUG] tempPlanJson first 200 chars: ${showResult.stdout.substring(0, 200)}`,
+  );
+  console.error(
+    `[DEBUG] tempPlanJson last 200 chars: ${showResult.stdout.substring(showResult.stdout.length - 200)}`,
   );
 
   core.endGroup();
