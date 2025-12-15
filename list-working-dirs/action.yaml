@@ -10,7 +10,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@1c8171cf567ee2fbd8dc67bc0be5498089eeaeb1
       id: main
       with:
         action: list-working-dirs
