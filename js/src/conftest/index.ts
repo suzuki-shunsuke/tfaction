@@ -14,6 +14,199 @@ type Inputs = {
   plan: boolean;
 };
 
+const getConftestPaths = (
+  policy: lib.ConftestPolicyConfig,
+  workingDir: string,
+): string[] => {
+  const paths: string[] = [];
+  if (policy.tf) {
+    const tfFiles = globSync(path.join(workingDir, "*.tf"), {
+      ignore: ".terraform/**",
+    });
+    const tfJSONFiles = globSync(path.join(workingDir, "*.tf.json"), {
+      ignore: ".terraform/**",
+    });
+    for (const tfFile of tfFiles.concat(tfJSONFiles)) {
+      paths.push(path.relative(workingDir, tfFile));
+    }
+  } else if (policy.plan) {
+    paths.push("tfplan.json");
+  } else if (policy.paths) {
+    for (const p of policy.paths) {
+      const files = globSync(path.join(workingDir, p), {
+        ignore: ".terraform/**",
+      });
+      for (const file of files) {
+        paths.push(path.relative(workingDir, file));
+      }
+    }
+  }
+  return paths;
+};
+
+const buildConftestArgs = (
+  policy: lib.ConftestPolicyConfig,
+  target: string,
+  rootDir: string,
+  workingDir: string,
+  paths: string[],
+): string[] => {
+  const args = [
+    "exec",
+    "-var",
+    `tfaction_target:${target}`,
+    "-k",
+    "conftest",
+    "--",
+    "conftest",
+    "test",
+    "--no-color",
+  ];
+
+  if (typeof policy.policy === "string") {
+    args.push("-p", path.join(rootDir, policy.policy));
+  } else if (policy.policy) {
+    for (const p of policy.policy) {
+      args.push("-p", path.join(rootDir, p));
+    }
+  }
+
+  if (policy.combine) {
+    args.push("--combine");
+  }
+
+  if (policy.data !== undefined) {
+    if (typeof policy.data === "string") {
+      args.push("--data", path.join(rootDir, policy.data));
+    } else {
+      for (const p of policy.data) {
+        args.push("--data", path.join(rootDir, p));
+      }
+    }
+  }
+
+  // create a special data file
+  tmp.setGracefulCleanup();
+  const tmpobj = tmp.dirSync();
+  const data = {
+    tfaction: {
+      target: target,
+      working_directory: workingDir,
+    },
+  };
+  const tmpFile = path.join(tmpobj.name, "data.json");
+  fs.writeFileSync(tmpFile, JSON.stringify(data));
+  args.push("--data", tmpFile);
+
+  if (policy.fail_on_warn) {
+    args.push("--fail-on-warn");
+  }
+  if (policy.no_fail) {
+    args.push("--no-fail");
+  }
+  if (policy.all_namespaces) {
+    args.push("--all-namespaces");
+  }
+  if (policy.quiet) {
+    args.push("--quiet");
+  }
+  if (policy.trace) {
+    args.push("--trace");
+  }
+  if (policy.strict) {
+    args.push("--strict");
+  }
+  if (policy.show_builtin_errors) {
+    args.push("--show-builtin-errors");
+  }
+  if (policy.junit_hide_message) {
+    args.push("--junit-hide-message");
+  }
+  if (policy.suppress_exceptions) {
+    args.push("--suppress-exceptions");
+  }
+  if (policy.tls) {
+    args.push("--tls");
+  }
+  if (policy.parser) {
+    args.push("--parser", policy.parser);
+  }
+  if (policy.output) {
+    args.push("--output", policy.output);
+  }
+  for (const n of policy.namespaces ?? []) {
+    args.push("-n", n);
+  }
+
+  args.push(...paths);
+  return args;
+};
+
+const buildPolicies = (
+  config: lib.Config,
+  targetGroup: lib.TargetGroup,
+  wdConfig: lib.TargetConfig,
+  isPlan: boolean,
+): lib.ConftestPolicyConfig[] => {
+  const policyMap = new Map<string, lib.ConftestPolicyConfig>();
+  const conftest = config.conftest ?? {};
+
+  for (const policy of config.conftest?.policies ?? []) {
+    if (policy.id) {
+      policyMap.set(policy.id, policy);
+    }
+  }
+
+  if (conftest.policies === undefined) {
+    conftest.policies = [];
+    if (config.conftest_policy_directory) {
+      conftest.policies.push({
+        policy: config.conftest_policy_directory,
+        plan: true,
+      });
+    } else {
+      if (fs.existsSync("policy")) {
+        conftest.policies.push({
+          policy: "policy",
+          plan: true,
+        });
+      }
+    }
+  }
+
+  for (const cfg of [targetGroup, wdConfig]) {
+    if (cfg.conftest?.disable_all) {
+      for (const [, value] of policyMap) {
+        value.enabled = false;
+      }
+      for (const policy of conftest.policies) {
+        policy.enabled = false;
+      }
+    }
+    for (const policy of cfg.conftest?.policies ?? []) {
+      if (!policy.id) {
+        conftest.policies.push(policy);
+        continue;
+      }
+      const elem = policyMap.get(policy.id);
+      if (!elem) {
+        policyMap.set(policy.id, policy);
+        continue;
+      }
+      Object.assign(elem, policy);
+    }
+  }
+
+  const policies: lib.ConftestPolicyConfig[] = [];
+  for (const policy of conftest.policies.concat(...policyMap.values())) {
+    if (policy.enabled !== false && isPlan === !!policy.plan) {
+      policies.push(policy);
+    }
+  }
+
+  return policies;
+};
+
 export const main = async () => {
   run(
     {
@@ -40,58 +233,8 @@ const run = async (inputs: Inputs, config: lib.Config) => {
     path.join(t.workingDir, workingDirectoryFile),
   );
 
-  const policyMap = new Map<string, lib.ConftestPolicyConfig>();
-  const conftest = config.conftest ?? {};
-  for (const policy of config.conftest?.policies ?? []) {
-    if (policy.id) {
-      policyMap.set(policy.id, policy);
-    }
-  }
-  if (conftest.policies === undefined) {
-    conftest.policies = [];
-    if (config.conftest_policy_directory) {
-      conftest.policies.push({
-        policy: config.conftest_policy_directory,
-        plan: true,
-      });
-    } else {
-      if (fs.existsSync("policy")) {
-        conftest.policies.push({
-          policy: "policy",
-          plan: true,
-        });
-      }
-    }
-  }
+  const policies = buildPolicies(config, t.group, wdConfig, inputs.plan);
 
-  for (const cfg of [t.group, wdConfig]) {
-    if (cfg.conftest?.disable_all) {
-      for (const [key, value] of policyMap) {
-        value.enabled = false;
-      }
-      for (const policy of conftest.policies) {
-        policy.enabled = false;
-      }
-    }
-    for (const policy of cfg.conftest?.policies ?? []) {
-      if (!policy.id) {
-        conftest.policies.push(policy);
-        continue;
-      }
-      const elem = policyMap.get(policy.id);
-      if (!elem) {
-        policyMap.set(policy.id, policy);
-        continue;
-      }
-      Object.assign(elem, policy);
-    }
-  }
-  const policies = [];
-  for (const policy of conftest.policies.concat(...policyMap.values())) {
-    if (policy.enabled !== false && inputs.plan === !!policy.plan) {
-      policies.push(policy);
-    }
-  }
   if (policies.length !== 0) {
     await exec.exec(
       "github-comment",
@@ -105,131 +248,20 @@ const run = async (inputs: Inputs, config: lib.Config) => {
       },
     );
   }
+
   for (const policy of policies) {
     if (!policy.policy) {
       continue;
     }
     core.info("Running conftest");
-    const paths: string[] = [];
-    if (policy.tf) {
-      const tfFiles = globSync(path.join(t.workingDir, "*.tf"), {
-        ignore: ".terraform/**",
-      });
-      const tfJSONFiles = globSync(path.join(t.workingDir, "*.tf.json"), {
-        ignore: ".terraform/**",
-      });
-      for (const tfFile of tfFiles.concat(tfJSONFiles)) {
-        paths.push(path.relative(t.workingDir, tfFile));
-      }
-    } else if (policy.plan) {
-      paths.push("tfplan.json");
-    } else if (policy.paths) {
-      for (const p of policy.paths) {
-        const files = globSync(path.join(t.workingDir, p), {
-          ignore: ".terraform/**",
-        });
-        for (const file of files) {
-          paths.push(path.relative(t.workingDir, file));
-        }
-      }
-    }
-    const args = [
-      "exec",
-      "-var",
-      `tfaction_target:${t.target}`,
-      "-k",
-      "conftest",
-      "--",
-      "conftest",
-      "test",
-      "--no-color",
-    ];
-
-    if (typeof policy.policy === "string") {
-      args.push("-p", path.join(inputs.rootDir, policy.policy));
-    } else {
-      for (const p of policy.policy) {
-        args.push("-p", path.join(inputs.rootDir, p));
-      }
-    }
-
-    if (policy.combine) {
-      args.push("--combine");
-    }
-
-    if (policy.data !== undefined) {
-      if (typeof policy.data === "string") {
-        args.push("--data", path.join(inputs.rootDir, policy.data));
-      } else {
-        for (const p of policy.data) {
-          args.push("--data", path.join(inputs.rootDir, p));
-        }
-      }
-    }
-
-    // create a special data file
-    tmp.setGracefulCleanup();
-    const tmpobj = tmp.dirSync();
-    const data = {
-      tfaction: {
-        target: t.target,
-        working_directory: t.workingDir,
-      },
-    };
-    const tmpFile = path.join(tmpobj.name, "data.json");
-    fs.writeFileSync(tmpFile, JSON.stringify(data));
-    args.push("--data", tmpFile);
-
-    if (policy.fail_on_warn) {
-      args.push("--fail-on-warn");
-    }
-    if (policy.no_fail) {
-      args.push("--no-fail");
-    }
-    if (policy.all_namespaces) {
-      args.push("--all-namespaces");
-    }
-    if (policy.quiet) {
-      args.push("--quiet");
-    }
-    if (policy.trace) {
-      args.push("--trace");
-    }
-    if (policy.strict) {
-      args.push("--strict");
-    }
-    if (policy.show_builtin_errors) {
-      args.push("--show-builtin-errors");
-    }
-    if (policy.junit_hide_message) {
-      args.push("--junit-hide-message");
-    }
-    if (policy.suppress_exceptions) {
-      args.push("--suppress-exceptions");
-    }
-    if (policy.tls) {
-      args.push("--tls");
-    }
-    // if (policy.ignore) {
-    //   args.push("--ignore", policy.ignore);
-    // }
-    if (policy.parser) {
-      args.push("--parser", policy.parser);
-    }
-    // if (policy.capabilities) {
-    //   args.push("--capabilities", policy.capabilities);
-    // }
-    if (policy.output) {
-      args.push("--output", policy.output);
-    }
-    for (const n of policy.namespaces ?? []) {
-      args.push("-n", n);
-    }
-    // for (const n of policy.proto_file_dirs ?? []) {
-    //   args.push("--proto-file-dirs", n);
-    // }
-
-    args.push(...paths);
+    const paths = getConftestPaths(policy, t.workingDir);
+    const args = buildConftestArgs(
+      policy,
+      t.target,
+      inputs.rootDir,
+      t.workingDir,
+      paths,
+    );
     core.info("github-comment " + args.join(" "));
     await exec.exec("github-comment", args, {
       cwd: t.workingDir,
