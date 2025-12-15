@@ -205,15 +205,9 @@ export const runTfmigratePlan = async (
         GITHUB_TOKEN: inputs.githubToken,
       },
       outStream: fs.createWriteStream(tempPlanJson),
+      silent: true,
     },
   );
-
-  // Debug: output plan JSON content
-  const planJsonContent = fs.readFileSync(tempPlanJson, "utf8");
-  console.error(
-    `[DEBUG] tempPlanJson content (first 500 chars): ${planJsonContent.substring(0, 500)}`,
-  );
-
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
@@ -299,15 +293,9 @@ export const runTerraformPlan = async (
         GITHUB_TOKEN: inputs.githubToken,
       },
       outStream: fs.createWriteStream(tempPlanJson),
+      silent: true,
     },
   );
-
-  // Debug: output plan JSON content
-  const planJsonContent = fs.readFileSync(tempPlanJson, "utf8");
-  console.error(
-    `[DEBUG] tempPlanJson content (first 500 chars): ${planJsonContent.substring(0, 500)}`,
-  );
-
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
