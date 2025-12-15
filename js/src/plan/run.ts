@@ -207,6 +207,11 @@ export const runTfmigratePlan = async (
       outStream: fs.createWriteStream(tempPlanJson),
     },
   );
+
+  // Debug: output plan JSON content
+  const planJsonContent = fs.readFileSync(tempPlanJson, "utf8");
+  console.error(`[DEBUG] tempPlanJson content (first 500 chars): ${planJsonContent.substring(0, 500)}`);
+
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
@@ -294,6 +299,11 @@ export const runTerraformPlan = async (
       outStream: fs.createWriteStream(tempPlanJson),
     },
   );
+
+  // Debug: output plan JSON content
+  const planJsonContent = fs.readFileSync(tempPlanJson, "utf8");
+  console.error(`[DEBUG] tempPlanJson content (first 500 chars): ${planJsonContent.substring(0, 500)}`);
+
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
