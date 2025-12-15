@@ -40,6 +40,7 @@ runs:
       uses: suzuki-shunsuke/tfaction/js@main
       with:
         action: ci-info
+        github_token: ${{ inputs.github_token }}
 
     # Check if the commit is latest
     - if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
