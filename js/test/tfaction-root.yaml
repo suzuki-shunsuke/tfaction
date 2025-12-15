@@ -14,8 +14,10 @@ providers_lock_opts: -platform=linux_amd64 -platform=darwin_amd64
 
 conftest:
   policies:
-    - policy: js/test/conftest/policy
+    - policy: js/test/conftest/policy/hcl
       tf: true
+    - policy: js/test/conftest/policy/plan
+      plan: true
 
 update_local_path_module_caller:
   enabled: true

@@ -117,12 +117,16 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
+          CI_INFO_TEMP_DIR: js/test/ci-info
+          CI_INFO_PR_AUTHOR: suzuki-shunsuke
       - name: Test check-terraform-skip
         uses: ./check-terraform-skip
         id: check-terraform-skip
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
+          CI_INFO_TEMP_DIR: js/test/ci-info
+          CI_INFO_PR_AUTHOR: suzuki-shunsuke
 
       - name: Test js/list-changed-modules
         uses: ./js
