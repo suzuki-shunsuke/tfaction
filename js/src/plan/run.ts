@@ -5,8 +5,8 @@ import * as os from "os";
 import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 import * as getTargetConfig from "../get-target-config";
+import * as conftest from "../conftest";
 
 type Inputs = {
   githubToken: string;
@@ -194,9 +194,8 @@ export const runTfmigratePlan = async (
 
   // Run terraform show to convert plan to JSON
   core.startGroup(`${inputs.tfCommand} show`);
-  const planJsonPath = path.join(inputs.workingDirectory, "tfplan.json");
 
-  await exec.exec(
+  const showResult = await exec.getExecOutput(
     "github-comment",
     ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
     {
@@ -205,9 +204,10 @@ export const runTfmigratePlan = async (
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
       },
-      outStream: fs.createWriteStream(tempPlanJson),
+      silent: true,
     },
   );
+  fs.writeFileSync(tempPlanJson, showResult.stdout);
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
@@ -282,9 +282,8 @@ export const runTerraformPlan = async (
 
   // Run terraform show to convert plan to JSON
   core.startGroup(`${inputs.tfCommand} show`);
-  const planJsonPath = path.join(inputs.workingDirectory, "tfplan.json");
 
-  await exec.exec(
+  const showResult = await exec.getExecOutput(
     "github-comment",
     ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
     {
@@ -293,9 +292,10 @@ export const runTerraformPlan = async (
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
       },
-      outStream: fs.createWriteStream(tempPlanJson),
+      silent: true,
     },
   );
+  fs.writeFileSync(tempPlanJson, showResult.stdout);
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
@@ -374,18 +374,43 @@ export const main = async (): Promise<void> => {
 
   const jobType = process.env.TFACTION_JOB_TYPE;
 
+  let planJsonPath: string | undefined;
+
   switch (jobType) {
     case undefined:
       throw new Error("TFACTION_JOB_TYPE is not set");
     case "":
       throw new Error("TFACTION_JOB_TYPE is not set");
-    case "tfmigrate":
-      await runTfmigratePlan(inputs);
+    case "tfmigrate": {
+      const result = await runTfmigratePlan(inputs);
+      if (result.changed) {
+        // .tfmigrate.hcl was just created, skip conftest
+        return;
+      }
+      planJsonPath = result.planJson;
       break;
-    case "terraform":
-      await runTerraformPlan(inputs);
+    }
+    case "terraform": {
+      const result = await runTerraformPlan(inputs);
+      planJsonPath = result.planJson;
       break;
+    }
     default:
       throw new Error(`Unknown TFACTION_JOB_TYPE: ${jobType}`);
+  }
+
+  // Run conftest for plan
+  if (planJsonPath) {
+    await conftest.run(
+      {
+        workingDir: inputs.workingDirectory,
+        target: inputs.target,
+        rootDir: process.env.GITHUB_WORKSPACE ?? "",
+        githubToken: inputs.githubToken,
+        plan: true,
+        planJsonPath: planJsonPath,
+      },
+      config,
+    );
   }
 };

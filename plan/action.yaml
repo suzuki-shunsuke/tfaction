@@ -85,13 +85,3 @@ runs:
         securefix_action_app_id: ${{inputs.securefix_action_app_id}}
         securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-
-    # Conftest
-    - if: steps.migrate.outputs.changed != 'true'
-      uses: suzuki-shunsuke/tfaction/js@main
-      with:
-        action: conftest
-        plan: "true"
-        github_token: ${{inputs.github_token}}
-      env:
-        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}
