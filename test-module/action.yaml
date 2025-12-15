@@ -20,7 +20,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@cb0f517bf5a0282bd3065592b2c22cf1ab89f74d
       id: global-config
       with:
         action: get-global-config
@@ -31,7 +31,7 @@ runs:
     #   with:
     #     github_token: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@cb0f517bf5a0282bd3065592b2c22cf1ab89f74d
     - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
       with:
         aqua_version: v2.55.3
@@ -49,7 +49,7 @@ runs:
 
     # trivy
     - if: fromJSON(steps.global-config.outputs.enable_trivy)
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@cb0f517bf5a0282bd3065592b2c22cf1ab89f74d
       with:
         action: trivy
         github_token: ${{ inputs.github_token }}
@@ -57,7 +57,7 @@ runs:
 
     # tfsec
     - if: fromJSON(steps.global-config.outputs.enable_tfsec)
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@cb0f517bf5a0282bd3065592b2c22cf1ab89f74d
       with:
         action: tfsec
         github_token: ${{ inputs.github_token }}
@@ -66,7 +66,7 @@ runs:
     # tflint
     - if: fromJSON(steps.global-config.outputs.enable_tflint)
       id: tflint
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@cb0f517bf5a0282bd3065592b2c22cf1ab89f74d
       with:
         action: tflint
         github_token: ${{ inputs.github_token }}
@@ -85,7 +85,7 @@ runs:
       working-directory: ${{ env.TFACTION_TARGET }}
 
     # terraform-docs
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@cb0f517bf5a0282bd3065592b2c22cf1ab89f74d
       with:
         action: terraform-docs
         github_token: ${{ inputs.github_token }}
@@ -119,7 +119,7 @@ runs:
     # terraform fmt & commit action
     - if: |
         steps.fmt-files.outputs.value != ''
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@cb0f517bf5a0282bd3065592b2c22cf1ab89f74d
       with:
         action: commit
         commit_message: "style: ${{ steps.global-config.outputs.terraform_command }} fmt -recursive"
