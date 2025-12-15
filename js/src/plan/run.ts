@@ -210,7 +210,9 @@ export const runTfmigratePlan = async (
 
   // Debug: output plan JSON content
   const planJsonContent = fs.readFileSync(tempPlanJson, "utf8");
-  console.error(`[DEBUG] tempPlanJson content (first 500 chars): ${planJsonContent.substring(0, 500)}`);
+  console.error(
+    `[DEBUG] tempPlanJson content (first 500 chars): ${planJsonContent.substring(0, 500)}`,
+  );
 
   core.endGroup();
 
@@ -302,7 +304,9 @@ export const runTerraformPlan = async (
 
   // Debug: output plan JSON content
   const planJsonContent = fs.readFileSync(tempPlanJson, "utf8");
-  console.error(`[DEBUG] tempPlanJson content (first 500 chars): ${planJsonContent.substring(0, 500)}`);
+  console.error(
+    `[DEBUG] tempPlanJson content (first 500 chars): ${planJsonContent.substring(0, 500)}`,
+  );
 
   core.endGroup();
 
