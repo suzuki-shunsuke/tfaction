@@ -12,11 +12,13 @@ type Inputs = {
   rootDir: string;
   githubToken: string;
   plan: boolean;
+  planJsonPath?: string;
 };
 
 const getConftestPaths = (
   policy: lib.ConftestPolicyConfig,
   workingDir: string,
+  planJsonPath?: string,
 ): string[] => {
   const paths: string[] = [];
   if (policy.tf) {
@@ -30,7 +32,11 @@ const getConftestPaths = (
       paths.push(path.relative(workingDir, tfFile));
     }
   } else if (policy.plan) {
-    paths.push("tfplan.json");
+    if (planJsonPath) {
+      paths.push(planJsonPath);
+    } else {
+      paths.push("tfplan.json");
+    }
   } else if (policy.paths) {
     for (const p of policy.paths) {
       const files = globSync(path.join(workingDir, p), {
@@ -220,7 +226,7 @@ export const main = async () => {
   );
 };
 
-const run = async (inputs: Inputs, config: lib.Config) => {
+export const run = async (inputs: Inputs, config: lib.Config) => {
   const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
@@ -254,7 +260,7 @@ const run = async (inputs: Inputs, config: lib.Config) => {
       continue;
     }
     core.info("Running conftest");
-    const paths = getConftestPaths(policy, t.workingDir);
+    const paths = getConftestPaths(policy, t.workingDir, inputs.planJsonPath);
     const args = buildConftestArgs(
       policy,
       t.target,
