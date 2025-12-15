@@ -274,6 +274,7 @@ export const runTerraformPlan = async (
   core.setOutput("detailed_exitcode", detailedExitcode);
 
   core.setOutput("plan_binary", tempPlanBinary);
+  core.setOutput("plan_binary_artifact_path", tempPlanBinary); // Keep for backward compatibility
 
   // If terraform plan failed, exit immediately
   if (detailedExitcode === 1) {
@@ -299,20 +300,17 @@ export const runTerraformPlan = async (
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
+  core.setOutput("plan_json_artifact_path", tempPlanJson); // Keep for backward compatibility
 
   // Upload plan files as artifact
   core.startGroup("upload plan artifacts");
   const artifact = new DefaultArtifactClient();
-  await artifact.uploadArtifact(
-    `terraform_plan_file_${inputs.target.replaceAll("/", "__")}`,
-    [tempPlanBinary],
-    tempDir,
-  );
-  await artifact.uploadArtifact(
-    `terraform_plan_json_${inputs.target.replaceAll("/", "__")}`,
-    [tempPlanJson],
-    tempDir,
-  );
+  const artifactNameBinary = `terraform_plan_file_${inputs.target.replaceAll("/", "__")}`;
+  core.setOutput("plan_binary_artifact_name", artifactNameBinary);
+  const artifactNameJson = `terraform_plan_json_${inputs.target.replaceAll("/", "__")}`;
+  core.setOutput("plan_json_artifact_name", artifactNameJson);
+  await artifact.uploadArtifact(artifactNameBinary, [tempPlanBinary], tempDir);
+  await artifact.uploadArtifact(artifactNameJson, [tempPlanJson], tempDir);
   core.endGroup();
 
   // If no changes, exit successfully
