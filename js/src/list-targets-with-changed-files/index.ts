@@ -98,7 +98,7 @@ const prepareModuleData = (
   moduleFiles: string[],
 ): ModuleData => {
   const moduleCallerMap: Map<string, string[]> = new Map(
-    Object.entries(moduleCallers),
+    Object.entries(moduleCallers ?? {}),
   );
   const modules = [...moduleCallerMap.keys()];
   modules.sort();
