@@ -85,4 +85,3 @@ runs:
         securefix_action_app_id: ${{inputs.securefix_action_app_id}}
         securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
         securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-
