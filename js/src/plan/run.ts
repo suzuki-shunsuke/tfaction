@@ -208,18 +208,6 @@ export const runTfmigratePlan = async (
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
-
-  // Debug: output plan JSON info
-  console.error(
-    `[DEBUG] tempPlanJson stdout length: ${showResult.stdout.length}`,
-  );
-  console.error(
-    `[DEBUG] tempPlanJson first 200 chars: ${showResult.stdout.substring(0, 200)}`,
-  );
-  console.error(
-    `[DEBUG] tempPlanJson last 200 chars: ${showResult.stdout.substring(showResult.stdout.length - 200)}`,
-  );
-
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
@@ -308,18 +296,6 @@ export const runTerraformPlan = async (
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
-
-  // Debug: output plan JSON info
-  console.error(
-    `[DEBUG] tempPlanJson stdout length: ${showResult.stdout.length}`,
-  );
-  console.error(
-    `[DEBUG] tempPlanJson first 200 chars: ${showResult.stdout.substring(0, 200)}`,
-  );
-  console.error(
-    `[DEBUG] tempPlanJson last 200 chars: ${showResult.stdout.substring(showResult.stdout.length - 200)}`,
-  );
-
   core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
