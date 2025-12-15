@@ -394,7 +394,10 @@ export const main = async () => {
   const moduleFile = globalConfig.outputs.module_file;
   const modules = await listFiles(moduleBaseDirectory, moduleFile);
 
-  const moduleCallers = await listModuleCallers(configFiles, modules);
+  let moduleCallers: any = null;
+  if (cfg.update_local_path_module_caller) {
+    moduleCallers = await listModuleCallers(configFiles, modules);
+  }
 
   const result = await run({
     labels: fs
