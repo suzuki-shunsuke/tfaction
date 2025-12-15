@@ -24,11 +24,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@5b347c8a9b720371b8642a72d6f4d07681cf748a
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@5b347c8a9b720371b8642a72d6f4d07681cf748a
       id: fix
       env:
         TFACTION_WORKING_DIR: ${{ inputs.working_directory }}
