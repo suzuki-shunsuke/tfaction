@@ -18,7 +18,7 @@ runs:
     - run: echo "value=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
       shell: bash
       id: action_path
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@00c7ef1a74140ffd09b5fe0296182acb00b22a93
       with:
         action: conftest
         plan: ${{inputs.plan}}
