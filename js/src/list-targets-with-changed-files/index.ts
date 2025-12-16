@@ -487,7 +487,7 @@ export const main = async () => {
   const modules = await listFiles(moduleBaseDirectory, moduleFile);
 
   let moduleCallers: any = null;
-  if (cfg.update_local_path_module_caller) {
+  if (cfg.update_local_path_module_caller?.enabled) {
     moduleCallers = await listModuleCallers(configFiles, modules);
   }
 
