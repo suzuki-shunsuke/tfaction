@@ -27,13 +27,13 @@ runs:
   using: composite
   steps:
     # terraform-apply
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@6b711cba733c22f3ce5158cfb0337d5d2961c84d
       if: env.TFACTION_JOB_TYPE == 'terraform'
       id: check-terraform-skip
       with:
         action: check-terraform-skip
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@6b711cba733c22f3ce5158cfb0337d5d2961c84d
       id: terraform-apply
       if: |
         steps.check-terraform-skip.outputs.skip_terraform != 'true' &&
@@ -45,7 +45,7 @@ runs:
         securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
 
     # tfmigrate-apply
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@6b711cba733c22f3ce5158cfb0337d5d2961c84d
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
       id: tfmigrate-apply
       with:
