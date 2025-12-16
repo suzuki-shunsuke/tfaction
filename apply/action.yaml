@@ -48,7 +48,6 @@ runs:
     - uses: suzuki-shunsuke/tfaction/js@main
       if: env.TFACTION_JOB_TYPE == 'tfmigrate'
       id: tfmigrate-apply
-      working-directory: ${{ steps.target-config.outputs.working_directory }}
       with:
         github_token: ${{ inputs.github_token }}
         action: tfmigrate-apply
