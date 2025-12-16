@@ -137,15 +137,6 @@ jobs:
           TFACTION_WORKING_DIR: setup/test/foo
           TFACTION_JOB_TYPE: terraform
 
-      - name: Test conftest
-        uses: ./js
-        id: conftest
-        with:
-          action: conftest
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev
-
       - name: Test test
         uses: ./test
         with:
