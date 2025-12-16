@@ -14,6 +14,7 @@ import {
 } from "../terraform-apply/run";
 
 export const main = async (): Promise<void> => {
+  const githubToken = core.getInput("github_token");
   const driftIssueNumber = process.env.TFACTION_DRIFT_ISSUE_NUMBER || "";
   const cfg = lib.getConfig();
   const globalConfig = await getGlobalConfig.main_(cfg, {
@@ -74,6 +75,10 @@ export const main = async (): Promise<void> => {
         ],
         {
           ignoreReturnCode: true,
+          env: {
+            ...process.env,
+            GITHUB_TOKEN: githubToken,
+          },
           listeners: {
             stdout: (data: Buffer) => {
               process.stdout.write(data);
@@ -129,6 +134,10 @@ export const main = async (): Promise<void> => {
         ],
         {
           ignoreReturnCode: true,
+          env: {
+            ...process.env,
+            GITHUB_TOKEN: githubToken,
+          },
         },
       );
     } catch (error) {
@@ -147,7 +156,6 @@ export const main = async (): Promise<void> => {
   if (disableUpdateRelatedPullRequests) {
     core.notice("Skip updating related pull requests");
   } else {
-    const githubToken = process.env.GITHUB_TOKEN || "";
     const prNumbers = await listRelatedPullRequests(githubToken, target);
     if (globalConfig.outputs.securefix_action_server_repository) {
       await updateBranchBySecurefix(globalConfig, prNumbers);
