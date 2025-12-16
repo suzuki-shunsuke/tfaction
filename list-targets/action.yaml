@@ -25,6 +25,7 @@ runs:
       uses: suzuki-shunsuke/tfaction/js@main
       with:
         action: ci-info
+        github_token: ${{ inputs.github_token }}
 
     - name: Check if the commit is latest
       shell: bash

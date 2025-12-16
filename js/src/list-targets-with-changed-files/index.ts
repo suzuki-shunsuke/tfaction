@@ -74,61 +74,66 @@ type Result = {
   modules: string[];
 };
 
-export const run = async (input: Input): Promise<Result> => {
-  const config = input.config;
-  const isApply = input.isApply;
+type ModuleData = {
+  moduleCallerMap: Map<string, string[]>;
+  modules: string[];
+  moduleDirs: string[];
+  moduleSet: Set<string>;
+};
 
-  const workingDirs = listWD(input.configFiles);
-
+const createTargetMaps = (
+  workingDirs: string[],
+  config: lib.Config,
+): { wdTargetMap: Map<string, string>; targetWDMap: Map<string, string> } => {
   const wdTargetMap = lib.createWDTargetMap(workingDirs, config);
   const targetWDMap = new Map<string, string>();
   for (const [wd, t] of wdTargetMap) {
     targetWDMap.set(t, wd);
   }
+  return { wdTargetMap, targetWDMap };
+};
 
-  const terraformTargets = new Set<string>();
-  const tfmigrates = new Set<string>();
-  const terraformTargetObjs = new Array<TargetConfig>();
-  const tfmigrateObjs = new Array<TargetConfig>();
-
-  handleLabels(
-    input.labels,
-    isApply,
-    terraformTargets,
-    targetWDMap,
-    config,
-    terraformTargetObjs,
-    tfmigrateObjs,
-    tfmigrates,
-  );
-
+const prepareModuleData = (
+  moduleCallers: any,
+  moduleFiles: string[],
+): ModuleData => {
   const moduleCallerMap: Map<string, string[]> = new Map(
-    Object.entries(input.moduleCallers),
+    Object.entries(moduleCallers ?? {}),
   );
   const modules = [...moduleCallerMap.keys()];
   modules.sort();
   modules.reverse();
 
-  const moduleDirs = input.moduleFiles.map((moduleFile) => {
+  const moduleDirs = moduleFiles.map((moduleFile) => {
     return path.dirname(moduleFile);
   });
   moduleDirs.sort();
   moduleDirs.reverse();
   const moduleSet = new Set(moduleDirs);
 
+  return { moduleCallerMap, modules, moduleDirs, moduleSet };
+};
+
+const processChangedFiles = (
+  changedFiles: string[],
+  moduleData: ModuleData,
+  workingDirs: string[],
+  wdTargetMap: Map<string, string>,
+): { changedWorkingDirs: Set<string>; changedModules: Set<string> } => {
   const changedWorkingDirs = new Set<string>();
   const changedModules = new Set<string>();
-  for (const changedFile of input.changedFiles) {
+
+  for (const changedFile of changedFiles) {
     if (changedFile == "") {
       continue;
     }
-    for (const module of modules) {
+    for (const module of moduleData.modules) {
       if (changedFile.startsWith(module + "/")) {
-        moduleCallerMap.get(module)?.forEach((caller) => {
+        moduleData.moduleCallerMap.get(module)?.forEach((caller) => {
           if (wdTargetMap.has(caller)) {
             changedWorkingDirs.add(caller);
           }
-          if (moduleSet.has(caller)) {
+          if (moduleData.moduleSet.has(caller)) {
             changedModules.add(caller);
           }
         });
@@ -141,7 +146,7 @@ export const run = async (input: Input): Promise<Result> => {
         break;
       }
     }
-    for (const module of moduleDirs) {
+    for (const module of moduleData.moduleDirs) {
       if (changedFile.startsWith(module + "/")) {
         changedModules.add(module);
         break;
@@ -149,6 +154,18 @@ export const run = async (input: Input): Promise<Result> => {
     }
   }
 
+  return { changedWorkingDirs, changedModules };
+};
+
+const addTargetsFromChangedWorkingDirs = (
+  changedWorkingDirs: Set<string>,
+  wdTargetMap: Map<string, string>,
+  terraformTargets: Set<string>,
+  tfmigrates: Set<string>,
+  config: lib.Config,
+  isApply: boolean,
+  terraformTargetObjs: TargetConfig[],
+): void => {
   for (const changedWorkingDir of changedWorkingDirs) {
     const target = wdTargetMap.get(changedWorkingDir);
     if (target === undefined) {
@@ -171,7 +188,17 @@ export const run = async (input: Input): Promise<Result> => {
       }
     }
   }
+};
 
+const addFollowupTarget = (
+  input: Input,
+  tfmigrates: Set<string>,
+  terraformTargets: Set<string>,
+  targetWDMap: Map<string, string>,
+  config: lib.Config,
+  isApply: boolean,
+  terraformTargetObjs: TargetConfig[],
+): void => {
   const followupTarget = getFollowupTarget(input);
 
   if (
@@ -197,15 +224,18 @@ export const run = async (input: Input): Promise<Result> => {
       terraformTargetObjs.push(obj);
     }
   }
+};
 
-  const ret = {
-    targetConfigs: terraformTargetObjs.concat(tfmigrateObjs),
-    modules: Array.from(changedModules),
-  };
-
+const validateChangeLimits = async (
+  targetConfigs: TargetConfig[],
+  modules: string[],
+  maxChangedWorkingDirectories: number,
+  maxChangedModules: number,
+  githubToken: string,
+): Promise<void> => {
   if (
-    input.maxChangedWorkingDirectories > 0 &&
-    ret.targetConfigs.length > input.maxChangedWorkingDirectories
+    maxChangedWorkingDirectories > 0 &&
+    targetConfigs.length > maxChangedWorkingDirectories
   ) {
     await exec.exec(
       "github-comment",
@@ -214,23 +244,20 @@ export const run = async (input: Input): Promise<Result> => {
         "-k",
         "too-many-changed-dirs",
         "-var",
-        `max_changed_dirs:${input.maxChangedWorkingDirectories}`,
+        `max_changed_dirs:${maxChangedWorkingDirectories}`,
       ],
       {
         env: {
           ...process.env,
-          GITHUB_TOKEN: input.githubToken,
+          GITHUB_TOKEN: githubToken,
         },
       },
     );
     throw new Error(
-      `Too many working directories are changed (${ret.targetConfigs.length}). Max is ${input.maxChangedWorkingDirectories}.`,
+      `Too many working directories are changed (${targetConfigs.length}). Max is ${maxChangedWorkingDirectories}.`,
     );
   }
-  if (
-    input.maxChangedModules > 0 &&
-    ret.modules.length > input.maxChangedModules
-  ) {
+  if (maxChangedModules > 0 && modules.length > maxChangedModules) {
     await exec.exec(
       "github-comment",
       [
@@ -238,21 +265,86 @@ export const run = async (input: Input): Promise<Result> => {
         "-k",
         "too-many-changed-modules",
         "-var",
-        `max_changed_modules:${input.maxChangedModules}`,
+        `max_changed_modules:${maxChangedModules}`,
       ],
       {
         env: {
           ...process.env,
-          GITHUB_TOKEN: input.githubToken,
+          GITHUB_TOKEN: githubToken,
         },
       },
     );
     throw new Error(
-      `Too many modules are changed (${ret.modules.length}). Max is ${input.maxChangedModules}.`,
+      `Too many modules are changed (${modules.length}). Max is ${maxChangedModules}.`,
     );
   }
+};
 
-  return ret;
+export const run = async (input: Input): Promise<Result> => {
+  const config = input.config;
+  const isApply = input.isApply;
+
+  const workingDirs = listWD(input.configFiles);
+  const { wdTargetMap, targetWDMap } = createTargetMaps(workingDirs, config);
+
+  const terraformTargets = new Set<string>();
+  const tfmigrates = new Set<string>();
+  const terraformTargetObjs = new Array<TargetConfig>();
+  const tfmigrateObjs = new Array<TargetConfig>();
+
+  handleLabels(
+    input.labels,
+    isApply,
+    terraformTargets,
+    targetWDMap,
+    config,
+    terraformTargetObjs,
+    tfmigrateObjs,
+    tfmigrates,
+  );
+
+  const moduleData = prepareModuleData(input.moduleCallers, input.moduleFiles);
+  const { changedWorkingDirs, changedModules } = processChangedFiles(
+    input.changedFiles,
+    moduleData,
+    workingDirs,
+    wdTargetMap,
+  );
+
+  addTargetsFromChangedWorkingDirs(
+    changedWorkingDirs,
+    wdTargetMap,
+    terraformTargets,
+    tfmigrates,
+    config,
+    isApply,
+    terraformTargetObjs,
+  );
+
+  addFollowupTarget(
+    input,
+    tfmigrates,
+    terraformTargets,
+    targetWDMap,
+    config,
+    isApply,
+    terraformTargetObjs,
+  );
+
+  const result = {
+    targetConfigs: terraformTargetObjs.concat(tfmigrateObjs),
+    modules: Array.from(changedModules),
+  };
+
+  await validateChangeLimits(
+    result.targetConfigs,
+    result.modules,
+    input.maxChangedWorkingDirectories,
+    input.maxChangedModules,
+    input.githubToken,
+  );
+
+  return result;
 };
 
 type Input = {
@@ -394,7 +486,10 @@ export const main = async () => {
   const moduleFile = globalConfig.outputs.module_file;
   const modules = await listFiles(moduleBaseDirectory, moduleFile);
 
-  const moduleCallers = await listModuleCallers(configFiles, modules);
+  let moduleCallers: any = null;
+  if (cfg.update_local_path_module_caller) {
+    moduleCallers = await listModuleCallers(configFiles, modules);
+  }
 
   const result = await run({
     labels: fs

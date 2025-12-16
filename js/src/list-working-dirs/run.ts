@@ -13,6 +13,7 @@ export const listFiles = async (
   // Run git ls-files
   const result = await exec.getExecOutput("git", ["ls-files", baseDir], {
     ignoreReturnCode: true,
+    silent: true,
   });
 
   const arr: string[] = [];

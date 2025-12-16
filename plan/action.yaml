@@ -18,28 +18,28 @@ inputs:
 outputs:
   plan_binary_path:
     description: "Path to the plan binary file"
-    value: ${{ env.TFACTION_JOB_TYPE == 'terraform' && steps.terraform.outputs.plan_binary_path || steps.tfmigrate.outputs.plan_binary }}
+    value: ${{ steps.main.outputs.plan_binary }}
   plan_json_path:
     description: "Path to the plan json file"
-    value: ${{ env.TFACTION_JOB_TYPE == 'terraform' && steps.terraform.outputs.plan_json_path || steps.tfmigrate.outputs.plan_json }}
+    value: ${{ steps.main.outputs.plan_json }}
   detailed_exitcode:
     description: Detailed exit code of `terraform plan`
-    value: ${{ steps.terraform.outputs.detailed_exitcode }}
+    value: ${{ steps.main.outputs.detailed_exitcode }}
   plan_binary_artifact_name:
     description: GitHub Artifact name for the plan file
-    value: ${{steps.terraform.outputs.plan_binary_artifact_name}}
+    value: ${{steps.main.outputs.plan_binary_artifact_name}}
   plan_binary_artifact_path:
     description: GitHub Artifact path for the plan file
-    value: ${{steps.terraform.outputs.plan_binary_artifact_path}}
+    value: ${{steps.main.outputs.plan_binary_artifact_path}}
   plan_json_artifact_name:
     description: GitHub Artifact name for the plan json
-    value: ${{ steps.terraform.outputs.plan_json_artifact_name }}
+    value: ${{steps.main.outputs.plan_json}}
   plan_json_artifact_path:
     description: GitHub Artifact path for the plan json
-    value: ${{ steps.terraform.outputs.plan_json_artifact_path }}
+    value: ${{steps.main.outputs.plan_json}}
   skipped:
     description: Whether the terraform plan was skipped
-    value: ${{ steps.terraform.outputs.skipped }}
+    value: ${{ steps.check-terraform-skip.outputs.skip_terraform }}
 runs:
   using: composite
   steps:
