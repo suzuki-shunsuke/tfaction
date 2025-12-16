@@ -27,8 +27,9 @@ runs:
 
     # TODO Run conftest on modules
     # https://github.com/suzuki-shunsuke/tfaction/issues/1908#issuecomment-2415572321
-    # - uses: suzuki-shunsuke/tfaction/conftest@main
+    # - uses: suzuki-shunsuke/tfaction/js@main
     #   with:
+    #     action: conftest
     #     github_token: ${{ inputs.github_token }}
 
     - uses: suzuki-shunsuke/tfaction/install@main

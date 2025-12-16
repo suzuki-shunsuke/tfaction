@@ -86,25 +86,12 @@ jobs:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_TARGET: js/test/aws/foo/dev
           TFACTION_JOB_TYPE: terraform
-      - name: Test get-target-config
-        uses: ./get-target-config
-        id: target-config
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test js/get-global-config
         uses: ./js
         id: js-global-config
         with:
           action: get-global-config
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
-      - name: Test get-global-config
-        uses: ./get-global-config
-        id: global-config
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
@@ -119,26 +106,12 @@ jobs:
           TFACTION_JOB_TYPE: terraform
           CI_INFO_TEMP_DIR: js/test/ci-info
           CI_INFO_PR_AUTHOR: suzuki-shunsuke
-      - name: Test check-terraform-skip
-        uses: ./check-terraform-skip
-        id: check-terraform-skip
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
-          CI_INFO_TEMP_DIR: js/test/ci-info
-          CI_INFO_PR_AUTHOR: suzuki-shunsuke
 
       - name: Test js/list-changed-modules
         uses: ./js
         id: js-list-changed-modules
         with:
           action: list-changed-modules
-          changed_files: js/test/ci-info/pr_all_filenames.txt
-          config_files: js/test/modules.txt
-      - name: Test list-changed-modules
-        uses: ./list-changed-modules
-        id: list-changed-modules
-        with:
           changed_files: js/test/ci-info/pr_all_filenames.txt
           config_files: js/test/modules.txt
 
@@ -150,19 +123,6 @@ jobs:
         env:
           TFACTION_CONFIG: js/test/tfaction-root.yaml
           CI_INFO_TEMP_DIR: js/test/ci-info
-      - name: Test list-targets-with-changed-files
-        uses: ./list-targets-with-changed-files
-        id: list-targets-with-changed-files
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          CI_INFO_TEMP_DIR: js/test/ci-info
-
-      - name: Test conftest
-        uses: ./conftest
-        id: conftest
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev
 
       - name: Test setup
         uses: ./setup
@@ -226,29 +186,19 @@ jobs:
           action: test-action
         env:
           TFACTION_TEST_ACTION: "true"
-          GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
-          GET_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
           JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
-          CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
           JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
-          LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
           JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
-          LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
           JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.js-list-targets-with-changed-files.outputs) }}
 
       - name: Outputs actions' outputs
         run: "true"
         env:
-          GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
-          GET_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
           JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
-          CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
           JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
-          LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
           JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
-          LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
           JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.js-list-targets-with-changed-files.outputs) }}
 
   test-drift-detection:

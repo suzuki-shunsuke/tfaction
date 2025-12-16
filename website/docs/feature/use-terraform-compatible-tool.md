@@ -49,8 +49,10 @@ You can validate `terraform_command` in GitHub Actions Workflows.
 e.g.
 
 ```yaml
-- uses: suzuki-shunsuke/tfaction/get-target-config@v1.2.0
+- uses: suzuki-shunsuke/tfaction/js@v1.2.0
   id: target-config
+  with:
+    action: get-target-config
 
 - run: |
     echo "::error:: terraform_command is invalid"

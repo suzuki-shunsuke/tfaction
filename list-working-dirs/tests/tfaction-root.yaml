@@ -1,4 +1,0 @@
-base_working_directory: list-working-dirs/tests
-working_directory_file: tfaction.yaml
-plan_workflow_name: test
-target_groups: []

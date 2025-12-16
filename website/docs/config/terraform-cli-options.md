@@ -13,9 +13,9 @@ https://www.terraform.io/cli/config/environment-variables#tf_cli_args-and-tf_cli
 e.g.
 
 ```yaml
-- uses: suzuki-shunsuke/tfaction/terraform-plan@main
+- uses: suzuki-shunsuke/tfaction/plan@latest
   with:
-    github_app_token: ${{ secrets.GITHUB_APP_TOKEN }}
+    github_token: ${{ secrets.GITHUB_TOKEN }}
   env:
     TF_CLI_ARGS_plan: "-parallelism=30"
 ```
