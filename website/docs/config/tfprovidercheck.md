@@ -19,8 +19,10 @@ https://github.com/suzuki-shunsuke/tfaction-example/blob/836e7ce5decb3e8c3c368e3
   with:
     github_app_token: ${{steps.token.outputs.token}}
 
-- uses: suzuki-shunsuke/tfaction/get-target-config@26effa08b92b77b5cfe04e2a25c15845fd00b04f # v0.7.2
+- uses: suzuki-shunsuke/tfaction/js@26effa08b92b77b5cfe04e2a25c15845fd00b04f # v0.7.2
   id: target-config
+  with:
+    action: get-target-config
 
 - run: |
     set -euo pipefail
