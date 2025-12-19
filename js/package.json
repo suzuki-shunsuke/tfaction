@@ -30,7 +30,7 @@
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.4",
     "typescript": "5.9.3",
-    "vitest": "4.0.15",
+    "vitest": "4.0.16",
     "zod-to-json-schema": "3.25.0"
   }
 }
