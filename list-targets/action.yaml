@@ -18,11 +18,11 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@d35d515fe0706f4e1d81178635ab6b2b5a6e662e
       id: install
     - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@d35d515fe0706f4e1d81178635ab6b2b5a6e662e
       with:
         action: ci-info
         github_token: ${{ inputs.github_token }}
@@ -41,7 +41,7 @@ runs:
       env:
         HEAD_SHA: ${{github.event.pull_request.head.sha}}
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@d35d515fe0706f4e1d81178635ab6b2b5a6e662e
       id: list-targets
       with:
         action: list-targets-with-changed-files
