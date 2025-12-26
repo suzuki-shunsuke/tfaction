@@ -126,7 +126,7 @@ runs:
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
         steps.global-config.outputs.skip_create_pr != 'true' && !inputs.pr_number
-      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
+      uses: csm-actions/securefix-action@6c2c819fa6ababdcc1554403d16a11148fd9b8c6 # v0.4.2
       with:
         action: client
         app_id: ${{inputs.securefix_action_app_id}}
@@ -153,7 +153,7 @@ runs:
     - if: |
         steps.global-config.outputs.securefix_action_server_repository != '' &&
         (steps.global-config.outputs.skip_create_pr == 'true' || inputs.pr_number)
-      uses: csm-actions/securefix-action@949d3cfb554abee10f695014674759978ba8ba34 # v0.4.1
+      uses: csm-actions/securefix-action@6c2c819fa6ababdcc1554403d16a11148fd9b8c6 # v0.4.2
       with:
         action: client
         app_id: ${{inputs.securefix_action_app_id}}
