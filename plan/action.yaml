@@ -43,18 +43,18 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@e38bc0ba5a292c21bf42ffbc098ce1945a4adcc8
       id: target-config
       with:
         action: get-target-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@e38bc0ba5a292c21bf42ffbc098ce1945a4adcc8
       id: global-config
       with:
         action: get-global-config
 
     # terraform plan
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@e38bc0ba5a292c21bf42ffbc098ce1945a4adcc8
       id: check-terraform-skip
       if: |
         env.TFACTION_JOB_TYPE == 'terraform' &&
@@ -62,7 +62,7 @@ runs:
       with:
         action: check-terraform-skip
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@e38bc0ba5a292c21bf42ffbc098ce1945a4adcc8
       id: main
       if: |
         !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
@@ -76,7 +76,7 @@ runs:
     - if: |
         env.TFACTION_JOB_TYPE == 'tfmigrate' &&
         steps.main.outputs.changed == 'true'
-      uses: suzuki-shunsuke/tfaction/js@main
+      uses: suzuki-shunsuke/tfaction/js@e38bc0ba5a292c21bf42ffbc098ce1945a4adcc8
       with:
         action: commit
         commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
