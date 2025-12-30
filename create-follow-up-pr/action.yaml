@@ -47,13 +47,14 @@ runs:
       env:
         WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
 
-    - run: bash "$GITHUB_ACTION_PATH/create_commit.sh"
-      shell: bash
+    - uses: suzuki-shunsuke/tfaction/js@main
       if: |
         steps.global-config.outputs.securefix_action_server_repository == '' &&
         fromJSON(steps.global-config.outputs.skip_create_pr)
+      with:
+        action: create-follow-up-commit
+        github_token: ${{ inputs.github_token }}
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
         WORKING_DIR: ${{ steps.target-config.outputs.working_directory }}
         BRANCH: ${{ steps.follow-up-pr-param.outputs.branch }}
         COMMIT_MESSAGE: ${{ steps.follow-up-pr-param.outputs.commit_message }}
