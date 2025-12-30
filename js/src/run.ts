@@ -1,5 +1,6 @@
 import * as checkTerraformSkip from "./check-terraform-skip";
 import * as conftest from "./conftest";
+import * as createGroupLabel from "./create-group-label";
 import * as exportAWSSecretsManager from "./export-aws-secrets-manager";
 import * as exportSecrets from "./export-secrets";
 import * as getGlobalConfig from "./get-global-config";
@@ -37,6 +38,7 @@ export const main = async (inputs: Inputs) => {
     ["check-terraform-skip", checkTerraformSkip],
     ["conftest", conftest],
     ["create-drift-issues", createDriftIssues],
+    ["create-group-label", createGroupLabel],
     ["download-plan", downloadPlan],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["export-secrets", exportSecrets],
