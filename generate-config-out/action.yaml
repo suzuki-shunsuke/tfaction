@@ -26,13 +26,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction/install@29c469df2ced0ae5148a290f6576e51da2cecb82
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@29c469df2ced0ae5148a290f6576e51da2cecb82
       id: global-config
       with:
         action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction/js@29c469df2ced0ae5148a290f6576e51da2cecb82
       id: target-config
       with:
         action: get-target-config
