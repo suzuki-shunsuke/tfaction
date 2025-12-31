@@ -39,7 +39,9 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
+    - uses: suzuki-shunsuke/tfaction@main
+      with:
+        action: install
     - uses: suzuki-shunsuke/tfaction@main
       id: global-config
       with:

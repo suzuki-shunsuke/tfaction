@@ -8,6 +8,7 @@ import * as exportSecrets from "./export-secrets";
 import * as getGlobalConfig from "./get-global-config";
 import * as getTargetConfig from "./get-target-config";
 import * as listChangeModules from "./list-changed-modules";
+import * as install from "./install";
 import * as listModuleCallers from "./list-module-callers";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 import * as createDriftIssues from "./create-drift-issues";
@@ -50,6 +51,7 @@ export const main = async (inputs: Inputs) => {
     ["get-global-config", getGlobalConfig],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
     ["get-target-config", getTargetConfig],
+    ["install", install],
     ["list-changed-modules", listChangeModules],
     ["list-module-callers", listModuleCallers],
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
