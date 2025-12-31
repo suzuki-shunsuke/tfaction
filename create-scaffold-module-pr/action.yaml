@@ -21,7 +21,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@577e1af1f3331217b417e5639aeb4a46969cfa65
       with:
         action: create-scaffold-module-pr
         github_token: ${{ inputs.github_token }}
