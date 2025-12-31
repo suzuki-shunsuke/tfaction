@@ -26,104 +26,95 @@ const escapeRegExp = (str: string): string => {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
 
-export const main = async () => {
-  const githubToken = core.getInput("github_token", { required: true });
-  const securefixAppId = core.getInput("securefix_action_app_id") || "";
-  const securefixAppPrivateKey =
-    core.getInput("securefix_action_app_private_key") || "";
+type Octokit = ReturnType<typeof github.getOctokit>;
 
-  const octokit = github.getOctokit(githubToken);
+interface GroupLabelParams {
+  octokit: Octokit;
+  groupLabelEnabled: boolean;
+  groupLabelPrefix: string;
+  prNumber: string;
+  tempDir: string;
+}
 
-  // Step 1: Get global config
-  const config = lib.getConfig();
-  const globalConfigResult = getGlobalConfig.main_(config, {});
+const getOrCreateGroupLabel = async (
+  params: GroupLabelParams,
+): Promise<string> => {
+  const { octokit, groupLabelEnabled, groupLabelPrefix, prNumber, tempDir } =
+    params;
 
-  const skipCreatePr = globalConfigResult.outputs.skip_create_pr;
-  const draftPr = globalConfigResult.outputs.draft_pr;
-  const groupLabelEnabled =
-    globalConfigResult.outputs.follow_up_pr_group_label_enabled;
-  const groupLabelPrefix =
-    globalConfigResult.outputs.follow_up_pr_group_label_prefix;
-  const securefixServerRepository =
-    globalConfigResult.outputs.securefix_action_server_repository;
-  const securefixPRBaseBranch =
-    globalConfigResult.outputs.securefix_action_pull_request_base_branch;
+  if (!groupLabelEnabled || !tempDir) {
+    return "";
+  }
 
-  // Step 2: Get target config
-  const targetConfigResult = await getTargetConfig.run(
-    {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
-      isApply: lib.getIsApply(),
-      jobType: lib.getJobType(),
-    },
-    config,
+  const labelsFilePath = `${tempDir}/labels.txt`;
+  let labels: string[] = [];
+  if (fs.existsSync(labelsFilePath)) {
+    const content = fs.readFileSync(labelsFilePath, "utf8");
+    labels = content.split("\n").filter((l) => l.length > 0);
+  }
+
+  const groupLabelPattern = new RegExp(
+    `${escapeRegExp(groupLabelPrefix)}[0-9]+`,
   );
+  let groupLabel =
+    labels.find((label) => groupLabelPattern.test(label)) || "";
 
-  const workingDir =
-    targetConfigResult.outputs.get("working_directory") ||
-    process.env.TFACTION_WORKING_DIR ||
-    "";
-  const target =
-    targetConfigResult.envs.get("TFACTION_TARGET") ||
-    process.env.TFACTION_TARGET ||
-    "";
-
-  // Step 3: Create/get group label
-  const prNumber = process.env.CI_INFO_PR_NUMBER || "";
-  const tempDir = process.env.CI_INFO_TEMP_DIR || "";
-  let groupLabel = "";
-
-  if (groupLabelEnabled && tempDir) {
-    const labelsFilePath = `${tempDir}/labels.txt`;
-    let labels: string[] = [];
-    if (fs.existsSync(labelsFilePath)) {
-      const content = fs.readFileSync(labelsFilePath, "utf8");
-      labels = content.split("\n").filter((l) => l.length > 0);
-    }
-
-    const groupLabelPattern = new RegExp(
-      `${escapeRegExp(groupLabelPrefix)}[0-9]+`,
-    );
-    groupLabel = labels.find((label) => groupLabelPattern.test(label)) || "";
-
-    if (!groupLabel) {
-      groupLabel = `${groupLabelPrefix}${prNumber}`;
-      try {
-        await octokit.rest.issues.createLabel({
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
-          name: groupLabel,
-        });
-        core.info(`Created label: ${groupLabel}`);
-      } catch (error: unknown) {
-        if (
-          error instanceof Error &&
-          "status" in error &&
-          (error as { status: number }).status === 422
-        ) {
-          core.info(`Label ${groupLabel} already exists`);
-        } else {
-          throw error;
-        }
-      }
-    }
-
-    if (!labels.includes(groupLabel)) {
-      await octokit.rest.issues.addLabels({
+  if (!groupLabel) {
+    groupLabel = `${groupLabelPrefix}${prNumber}`;
+    try {
+      await octokit.rest.issues.createLabel({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
-        issue_number: parseInt(prNumber, 10),
-        labels: [groupLabel],
+        name: groupLabel,
       });
-      core.info(`Added label ${groupLabel} to PR #${prNumber}`);
+      core.info(`Created label: ${groupLabel}`);
+    } catch (error: unknown) {
+      if (
+        error instanceof Error &&
+        "status" in error &&
+        (error as { status: number }).status === 422
+      ) {
+        core.info(`Label ${groupLabel} already exists`);
+      } else {
+        throw error;
+      }
     }
   }
 
-  // Step 4: Generate follow-up PR parameters
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
-  const repository = process.env.GITHUB_REPOSITORY ?? "";
-  const runId = process.env.GITHUB_RUN_ID ?? "";
+  if (!labels.includes(groupLabel)) {
+    await octokit.rest.issues.addLabels({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      issue_number: parseInt(prNumber, 10),
+      labels: [groupLabel],
+    });
+    core.info(`Added label ${groupLabel} to PR #${prNumber}`);
+  }
+
+  return groupLabel;
+};
+
+interface PRParams {
+  branch: string;
+  commitMessage: string;
+  prTitle: string;
+  prBody: string;
+  assignees: string[];
+  mentions: string;
+}
+
+interface GeneratePRParamsInput {
+  prNumber: string;
+  target: string;
+  tempDir: string;
+  serverUrl: string;
+  repository: string;
+  runId: string;
+}
+
+const generatePRParams = (input: GeneratePRParamsInput): PRParams => {
+  const { prNumber, target, tempDir, serverUrl, repository, runId } = input;
+
   const runURL = `${serverUrl}/${repository}/actions/runs/${runId}`;
   const actor = process.env.GITHUB_ACTOR ?? "";
   const prAuthor = process.env.CI_INFO_PR_AUTHOR ?? "";
@@ -183,7 +174,22 @@ ${prData.body}
   const assigneesArray = [...assignees];
   const mentions = assigneesArray.map((a) => `@${a}`).join(" ");
 
-  // Create failed-prs file
+  return {
+    branch,
+    commitMessage,
+    prTitle,
+    prBody,
+    assignees: assigneesArray,
+    mentions,
+  };
+};
+
+const createFailedPrsFile = (
+  workingDir: string,
+  serverUrl: string,
+  repository: string,
+  prNumber: string,
+): string => {
   const tfactionDir = path.join(workingDir, ".tfaction");
   const failedPrsFile = path.join(tfactionDir, "failed-prs");
 
@@ -204,32 +210,59 @@ ${prData.body}
   fs.appendFileSync(failedPrsFile, `${prUrl}\n`);
   core.info(`Updated ${failedPrsFile} with PR URL: ${prUrl}`);
 
-  const configPath = process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "";
+  return failedPrsFile;
+};
 
-  // Step 5: Execute based on conditions
-  if (securefixServerRepository) {
-    // Use securefix
-    if (!securefixAppId || !securefixAppPrivateKey) {
-      throw new Error(
-        "securefix_action_app_id and securefix_action_app_private_key are required when securefix_action_server_repository is set",
-      );
-    }
+interface SecurefixParams {
+  appId: string;
+  privateKey: string;
+  serverRepository: string;
+  branch: string;
+  failedPrsFile: string;
+  commitMessage: string;
+  skipCreatePr: boolean;
+  prTitle: string;
+  prBody: string;
+  baseBranch: string;
+  groupLabel: string;
+  assignees: string[];
+  draftPr: boolean;
+  mentions: string;
+  prNumber: string;
+}
 
-    if (skipCreatePr) {
-      // Securefix: commit only
-      await securefix.request({
-        appId: securefixAppId,
-        privateKey: securefixAppPrivateKey,
-        serverRepository: securefixServerRepository,
-        branch: branch,
-        files: new Set([failedPrsFile]),
-        commitMessage: commitMessage,
-        workspace: process.env.GITHUB_WORKSPACE ?? "",
-      });
-      core.info("Created commit via securefix");
-    } else {
-      // Securefix: commit + PR
-      const prComment = `${mentions}
+const createViaSecurefix = async (params: SecurefixParams): Promise<void> => {
+  const {
+    appId,
+    privateKey,
+    serverRepository,
+    branch,
+    failedPrsFile,
+    commitMessage,
+    skipCreatePr,
+    prTitle,
+    prBody,
+    baseBranch,
+    groupLabel,
+    assignees,
+    draftPr,
+    mentions,
+    prNumber,
+  } = params;
+
+  if (skipCreatePr) {
+    await securefix.request({
+      appId,
+      privateKey,
+      serverRepository,
+      branch,
+      files: new Set([failedPrsFile]),
+      commitMessage,
+      workspace: process.env.GITHUB_WORKSPACE ?? "",
+    });
+    core.info("Created commit via securefix");
+  } else {
+    const prComment = `${mentions}
 This pull request was created because \`terraform apply\` failed.
 
 - #${prNumber}
@@ -241,171 +274,372 @@ Please handle this pull request.
 1. Add commits to this pull request and fix the problem if needed
 1. Review and merge this pull request`;
 
-      await securefix.request({
-        appId: securefixAppId,
-        privateKey: securefixAppPrivateKey,
-        serverRepository: securefixServerRepository,
-        branch: branch,
-        files: new Set([failedPrsFile]),
-        commitMessage: commitMessage,
-        workspace: process.env.GITHUB_WORKSPACE ?? "",
-        pr: {
-          title: prTitle,
-          body: prBody,
-          base: securefixPRBaseBranch,
-          labels: groupLabel ? [groupLabel] : undefined,
-          assignees: assigneesArray.length > 0 ? assigneesArray : undefined,
-          draft: draftPr,
-          comment: prComment,
-        },
-      });
-      core.info("Created PR via securefix");
-    }
-  } else {
-    // Use GitHub API directly
-    // Commit only
-    await commit.createCommit(octokit, {
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      branch: branch,
-      message: commitMessage,
-      files: [failedPrsFile],
-      deleteIfNotExist: true,
-      logger: {
-        info: core.info,
-      },
-    });
-    core.info(`Created commit on branch ${branch}`);
-    if (!skipCreatePr) {
-      // Create PR
-      const { data: repoData } = await octokit.rest.repos.get({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-      });
-      const baseBranch = repoData.default_branch;
-
-      const { data: pr } = await octokit.rest.pulls.create({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        head: branch,
-        base: baseBranch,
+    await securefix.request({
+      appId,
+      privateKey,
+      serverRepository,
+      branch,
+      files: new Set([failedPrsFile]),
+      commitMessage,
+      workspace: process.env.GITHUB_WORKSPACE ?? "",
+      pr: {
         title: prTitle,
         body: prBody,
+        base: baseBranch,
+        labels: groupLabel ? [groupLabel] : undefined,
+        assignees: assignees.length > 0 ? assignees : undefined,
         draft: draftPr,
-      });
+        comment: prComment,
+      },
+    });
+    core.info("Created PR via securefix");
+  }
+};
 
-      const followUpPrUrl = pr.html_url;
-      core.info(`Created PR: ${followUpPrUrl}`);
-      core.notice(`The follow up pull request: ${followUpPrUrl}`);
+interface GitHubAPIParams {
+  octokit: Octokit;
+  githubToken: string;
+  branch: string;
+  failedPrsFile: string;
+  commitMessage: string;
+  skipCreatePr: boolean;
+  prTitle: string;
+  prBody: string;
+  groupLabelEnabled: boolean;
+  groupLabel: string;
+  assignees: string[];
+  draftPr: boolean;
+  target: string;
+  mentions: string;
+  configPath: string;
+}
 
-      // Add labels
-      if (groupLabelEnabled && groupLabel) {
-        await octokit.rest.issues.addLabels({
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
-          issue_number: pr.number,
-          labels: [groupLabel],
-        });
-        core.info(`Added label ${groupLabel} to PR #${pr.number}`);
-      }
+const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
+  const {
+    octokit,
+    githubToken,
+    branch,
+    failedPrsFile,
+    commitMessage,
+    skipCreatePr,
+    prTitle,
+    prBody,
+    groupLabelEnabled,
+    groupLabel,
+    assignees,
+    draftPr,
+    target,
+    mentions,
+    configPath,
+  } = params;
 
-      // Add assignees
-      if (assigneesArray.length > 0) {
-        await octokit.rest.issues.addAssignees({
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
-          issue_number: pr.number,
-          assignees: assigneesArray,
-        });
-        core.info(
-          `Added assignees ${assigneesArray.join(", ")} to PR #${pr.number}`,
-        );
-      }
+  await commit.createCommit(octokit, {
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    branch,
+    message: commitMessage,
+    files: [failedPrsFile],
+    deleteIfNotExist: true,
+    logger: {
+      info: core.info,
+    },
+  });
+  core.info(`Created commit on branch ${branch}`);
 
-      // Post comment
-      if (configPath) {
-        await exec.exec(
-          "github-comment",
-          [
-            "post",
-            "-config",
-            configPath,
-            "-var",
-            `tfaction_target:${target}`,
-            "-var",
-            `mentions:${mentions}`,
-            "-var",
-            `follow_up_pr_url:${followUpPrUrl}`,
-            "-k",
-            "create-follow-up-pr",
-          ],
-          {
-            env: {
-              ...process.env,
-              GITHUB_TOKEN: githubToken,
-            },
-          },
-        );
-        core.info("Posted comment to the original PR");
-      } else {
-        core.warning(
-          "TFACTION_GITHUB_COMMENT_CONFIG is not set, skipping github-comment",
-        );
-      }
-    }
+  if (skipCreatePr) {
+    return;
   }
 
-  // Step 6: Post skip-create comment if skip_create_pr is true
-  if (skipCreatePr) {
-    const createOpts: string[] = [
-      "-R",
-      repository,
-      "-H",
-      branch,
-      "-t",
-      `"${prTitle}"`,
-      "-b",
-      `"Follow up #${prNumber}"`,
-    ];
+  const { data: repoData } = await octokit.rest.repos.get({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+  });
+  const baseBranch = repoData.default_branch;
 
-    if (draftPr) {
-      createOpts.push("-d");
-    }
+  const { data: pr } = await octokit.rest.pulls.create({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    head: branch,
+    base: baseBranch,
+    title: prTitle,
+    body: prBody,
+    draft: draftPr,
+  });
 
-    if (groupLabelEnabled && groupLabel) {
-      createOpts.push("-l", groupLabel);
-    }
+  const followUpPrUrl = pr.html_url;
+  core.info(`Created PR: ${followUpPrUrl}`);
+  core.notice(`The follow up pull request: ${followUpPrUrl}`);
 
-    const optsString = createOpts.join(" ");
+  if (groupLabelEnabled && groupLabel) {
+    await octokit.rest.issues.addLabels({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      issue_number: pr.number,
+      labels: [groupLabel],
+    });
+    core.info(`Added label ${groupLabel} to PR #${pr.number}`);
+  }
 
-    if (configPath) {
-      await exec.exec(
-        "github-comment",
-        [
-          "post",
-          "-config",
-          configPath,
-          "-k",
-          "skip-create-follow-up-pr",
-          "-var",
-          `tfaction_target:${target}`,
-          "-var",
-          `mentions:${mentions}`,
-          "-var",
-          `opts:${optsString}`,
-        ],
-        {
-          env: {
-            ...process.env,
-            GITHUB_TOKEN: githubToken,
-          },
+  if (assignees.length > 0) {
+    await octokit.rest.issues.addAssignees({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      issue_number: pr.number,
+      assignees,
+    });
+    core.info(`Added assignees ${assignees.join(", ")} to PR #${pr.number}`);
+  }
+
+  if (configPath) {
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-config",
+        configPath,
+        "-var",
+        `tfaction_target:${target}`,
+        "-var",
+        `mentions:${mentions}`,
+        "-var",
+        `follow_up_pr_url:${followUpPrUrl}`,
+        "-k",
+        "create-follow-up-pr",
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: githubToken,
         },
-      );
-      core.info("Posted skip-create-follow-up-pr comment");
-    } else {
-      core.warning(
-        "TFACTION_GITHUB_COMMENT_CONFIG is not set, skipping github-comment",
+      },
+    );
+    core.info("Posted comment to the original PR");
+  } else {
+    core.warning(
+      "TFACTION_GITHUB_COMMENT_CONFIG is not set, skipping github-comment",
+    );
+  }
+};
+
+interface SkipCreateCommentParams {
+  githubToken: string;
+  configPath: string;
+  repository: string;
+  branch: string;
+  prTitle: string;
+  prNumber: string;
+  draftPr: boolean;
+  groupLabelEnabled: boolean;
+  groupLabel: string;
+  target: string;
+  mentions: string;
+}
+
+const postSkipCreateComment = async (
+  params: SkipCreateCommentParams,
+): Promise<void> => {
+  const {
+    githubToken,
+    configPath,
+    repository,
+    branch,
+    prTitle,
+    prNumber,
+    draftPr,
+    groupLabelEnabled,
+    groupLabel,
+    target,
+    mentions,
+  } = params;
+
+  const createOpts: string[] = [
+    "-R",
+    repository,
+    "-H",
+    branch,
+    "-t",
+    `"${prTitle}"`,
+    "-b",
+    `"Follow up #${prNumber}"`,
+  ];
+
+  if (draftPr) {
+    createOpts.push("-d");
+  }
+
+  if (groupLabelEnabled && groupLabel) {
+    createOpts.push("-l", groupLabel);
+  }
+
+  const optsString = createOpts.join(" ");
+
+  if (configPath) {
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-config",
+        configPath,
+        "-k",
+        "skip-create-follow-up-pr",
+        "-var",
+        `tfaction_target:${target}`,
+        "-var",
+        `mentions:${mentions}`,
+        "-var",
+        `opts:${optsString}`,
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: githubToken,
+        },
+      },
+    );
+    core.info("Posted skip-create-follow-up-pr comment");
+  } else {
+    core.warning(
+      "TFACTION_GITHUB_COMMENT_CONFIG is not set, skipping github-comment",
+    );
+  }
+};
+
+export const main = async () => {
+  const githubToken = core.getInput("github_token", { required: true });
+  const securefixAppId = core.getInput("securefix_action_app_id") || "";
+  const securefixAppPrivateKey =
+    core.getInput("securefix_action_app_private_key") || "";
+
+  const octokit = github.getOctokit(githubToken);
+
+  // Get global config
+  const config = lib.getConfig();
+  const globalConfigResult = getGlobalConfig.main_(config, {});
+
+  const skipCreatePr = globalConfigResult.outputs.skip_create_pr;
+  const draftPr = globalConfigResult.outputs.draft_pr;
+  const groupLabelEnabled =
+    globalConfigResult.outputs.follow_up_pr_group_label_enabled;
+  const groupLabelPrefix =
+    globalConfigResult.outputs.follow_up_pr_group_label_prefix;
+  const securefixServerRepository =
+    globalConfigResult.outputs.securefix_action_server_repository;
+  const securefixPRBaseBranch =
+    globalConfigResult.outputs.securefix_action_pull_request_base_branch;
+
+  // Get target config
+  const targetConfigResult = await getTargetConfig.run(
+    {
+      target: process.env.TFACTION_TARGET,
+      workingDir: process.env.TFACTION_WORKING_DIR,
+      isApply: lib.getIsApply(),
+      jobType: lib.getJobType(),
+    },
+    config,
+  );
+
+  const workingDir =
+    targetConfigResult.outputs.get("working_directory") ||
+    process.env.TFACTION_WORKING_DIR ||
+    "";
+  const target =
+    targetConfigResult.envs.get("TFACTION_TARGET") ||
+    process.env.TFACTION_TARGET ||
+    "";
+
+  const prNumber = process.env.CI_INFO_PR_NUMBER || "";
+  const tempDir = process.env.CI_INFO_TEMP_DIR || "";
+  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
+  const repository = process.env.GITHUB_REPOSITORY ?? "";
+  const runId = process.env.GITHUB_RUN_ID ?? "";
+  const configPath = process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "";
+
+  // Get or create group label
+  const groupLabel = await getOrCreateGroupLabel({
+    octokit,
+    groupLabelEnabled,
+    groupLabelPrefix,
+    prNumber,
+    tempDir,
+  });
+
+  // Generate PR parameters
+  const prParams = generatePRParams({
+    prNumber,
+    target,
+    tempDir,
+    serverUrl,
+    repository,
+    runId,
+  });
+
+  // Create failed-prs file
+  const failedPrsFile = createFailedPrsFile(
+    workingDir,
+    serverUrl,
+    repository,
+    prNumber,
+  );
+
+  // Execute based on conditions
+  if (securefixServerRepository) {
+    if (!securefixAppId || !securefixAppPrivateKey) {
+      throw new Error(
+        "securefix_action_app_id and securefix_action_app_private_key are required when securefix_action_server_repository is set",
       );
     }
+
+    await createViaSecurefix({
+      appId: securefixAppId,
+      privateKey: securefixAppPrivateKey,
+      serverRepository: securefixServerRepository,
+      branch: prParams.branch,
+      failedPrsFile,
+      commitMessage: prParams.commitMessage,
+      skipCreatePr,
+      prTitle: prParams.prTitle,
+      prBody: prParams.prBody,
+      baseBranch: securefixPRBaseBranch,
+      groupLabel,
+      assignees: prParams.assignees,
+      draftPr,
+      mentions: prParams.mentions,
+      prNumber,
+    });
+  } else {
+    await createViaGitHubAPI({
+      octokit,
+      githubToken,
+      branch: prParams.branch,
+      failedPrsFile,
+      commitMessage: prParams.commitMessage,
+      skipCreatePr,
+      prTitle: prParams.prTitle,
+      prBody: prParams.prBody,
+      groupLabelEnabled,
+      groupLabel,
+      assignees: prParams.assignees,
+      draftPr,
+      target,
+      mentions: prParams.mentions,
+      configPath,
+    });
+  }
+
+  // Post skip-create comment if skip_create_pr is true
+  if (skipCreatePr) {
+    await postSkipCreateComment({
+      githubToken,
+      configPath,
+      repository,
+      branch: prParams.branch,
+      prTitle: prParams.prTitle,
+      prNumber,
+      draftPr,
+      groupLabelEnabled,
+      groupLabel,
+      target,
+      mentions: prParams.mentions,
+    });
   }
 };
