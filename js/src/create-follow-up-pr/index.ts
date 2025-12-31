@@ -56,8 +56,7 @@ const getOrCreateGroupLabel = async (
   const groupLabelPattern = new RegExp(
     `${escapeRegExp(groupLabelPrefix)}[0-9]+`,
   );
-  let groupLabel =
-    labels.find((label) => groupLabelPattern.test(label)) || "";
+  let groupLabel = labels.find((label) => groupLabelPattern.test(label)) || "";
 
   if (!groupLabel) {
     groupLabel = `${groupLabelPrefix}${prNumber}`;
