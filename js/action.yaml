@@ -179,6 +179,10 @@ outputs:
   # list-targets-with-changed-files
   targets:
     description: list of targets
+
+  # install
+  config:
+    description: aqua config paths
 runs:
   using: node20
   main: dist/index.js

@@ -10,21 +10,12 @@ inputs:
 outputs:
   config:
     description: aqua config paths
-    value: ${{ steps.config.outputs.config }}
+    value: ${{ steps.install.outputs.config }}
 runs:
   using: composite
   steps:
-    - shell: bash
-      id: config
-      run: echo "config=$GITHUB_ACTION_PATH/aqua/aqua.yaml" >> "$GITHUB_OUTPUT"
-    - run: aqua i -l
-      shell: bash
-      env:
-        AQUA_CONFIG: ${{ steps.config.outputs.config }}
-        AQUA_GITHUB_TOKEN: ${{ inputs.github_token }}
-    - shell: bash
-      run: echo "AQUA_GLOBAL_CONFIG=$GITHUB_ACTION_PATH/aqua/aqua.yaml:${AQUA_GLOBAL_CONFIG:-}" >> "$GITHUB_ENV"
-    - shell: bash
-      run: echo "TFACTION_GITHUB_COMMENT_CONFIG=$GITHUB_ACTION_PATH/github-comment.yaml" >> "$GITHUB_ENV"
-    - shell: bash
-      run: echo "TFACTION_INSTALL_DIR=$GITHUB_ACTION_PATH" >> "$GITHUB_ENV"
+    - uses: suzuki-shunsuke/tfaction/js@main
+      id: install
+      with:
+        action: install
+        github_token: ${{ inputs.github_token }}
