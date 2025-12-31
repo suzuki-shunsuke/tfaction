@@ -54,7 +54,7 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: js/dist
+          path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
@@ -73,12 +73,12 @@ jobs:
         uses: ./install
 
       - name: ci-info
-        uses: ./js
+        uses: ./
         with:
           action: ci-info
 
       - name: Test js/get-target-config
-        uses: ./js
+        uses: ./
         id: js-target-config
         with:
           action: get-target-config
@@ -88,7 +88,7 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test js/get-global-config
-        uses: ./js
+        uses: ./
         id: js-global-config
         with:
           action: get-global-config
@@ -97,32 +97,32 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test js/check-terraform-skip
-        uses: ./js
+        uses: ./
         id: js-check-terraform-skip
         with:
           action: check-terraform-skip
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
-          CI_INFO_TEMP_DIR: js/test/ci-info
+          CI_INFO_TEMP_DIR: tests/ci-info
           CI_INFO_PR_AUTHOR: suzuki-shunsuke
 
       - name: Test js/list-changed-modules
-        uses: ./js
+        uses: ./
         id: js-list-changed-modules
         with:
           action: list-changed-modules
-          changed_files: js/test/ci-info/pr_all_filenames.txt
-          config_files: js/test/modules.txt
+          changed_files: tests/ci-info/pr_all_filenames.txt
+          config_files: tests/modules.txt
 
       - name: Test js/list-targets-with-changed-files
-        uses: ./js
+        uses: ./
         id: js-list-targets-with-changed-files
         with:
           action: list-targets-with-changed-files
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          CI_INFO_TEMP_DIR: js/test/ci-info
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          CI_INFO_TEMP_DIR: tests/ci-info
 
       - name: Test setup
         uses: ./setup
@@ -170,8 +170,8 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/modules/foo
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_TARGET: tests/modules/foo
 
       - name: Outputs actions' outputs (Not Fork)
         run: "true"
@@ -181,7 +181,7 @@ jobs:
           SETUP: ${{ toJSON(steps.setup.outputs) }}
 
       - name: Test actions' outputs
-        uses: ./js
+        uses: ./
         with:
           action: test-action
         env:
@@ -222,7 +222,7 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: js/dist
+          path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
@@ -243,31 +243,31 @@ jobs:
         uses: ./install
 
       - name: Create a dummy working directory
-        run: mkdir -p "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+        run: mkdir -p "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Create a dummy tfaction.yaml
-        run: echo '{}' > "js/test/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
-      - run: git add "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+        run: echo '{}' > "tests/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
+      - run: git add "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Test get-or-create-drift-issue
-        uses: ./js
+        uses: ./
         id: get-or-create-drift-issue
         with:
           github_token: ${{steps.token.outputs.token}}
           action: get-or-create-drift-issue
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev-${{github.run_id}}
-      - run: git reset HEAD "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_TARGET: tests/aws/foo/dev-${{github.run_id}}
+      - run: git reset HEAD "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Remove a dummy working directory
-        run: rm -R "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+        run: rm -R "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - run: sleep 5
       - name: Test create-drift-issues
-        uses: ./js
+        uses: ./
         id: create-drift-issues
         with:
           github_token: ${{steps.token.outputs.token}}
           action: create-drift-issues
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
 
       - name: Test env
         run: |
@@ -303,7 +303,7 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: js/dist
+          path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
@@ -377,7 +377,7 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: js/dist
+          path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
@@ -393,15 +393,15 @@ jobs:
           permission-contents: write
 
       - name: Test list-module-callers
-        uses: ./js
+        uses: ./
         id: list-module-callers
         with:
           action: list-module-callers
-          module_files: js/test/list-module-callers/terragrunt/module_files.txt
-          config_files: js/test/list-module-callers/terragrunt/config_files.txt
+          module_files: tests/list-module-callers/terragrunt/module_files.txt
+          config_files: tests/list-module-callers/terragrunt/config_files.txt
 
       - name: Test actions' outputs
-        uses: ./js
+        uses: ./
         with:
           action: test-action
         env:

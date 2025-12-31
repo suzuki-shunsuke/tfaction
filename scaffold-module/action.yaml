@@ -44,7 +44,7 @@ runs:
 
     - uses: suzuki-shunsuke/tfaction/install@main
 
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction@main
       id: global-config
       with:
         action: get-global-config

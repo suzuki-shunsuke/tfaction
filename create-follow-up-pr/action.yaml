@@ -22,7 +22,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/js@main
+    - uses: suzuki-shunsuke/tfaction@main
       with:
         action: create-follow-up-pr
         github_token: ${{ inputs.github_token }}
