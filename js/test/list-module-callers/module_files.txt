@@ -1,1 +1,0 @@
-js/test/modules/foo/tfaction_module.yaml

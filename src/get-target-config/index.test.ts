@@ -5,17 +5,17 @@ test("default", async () => {
   const runID = process.env.GITHUB_RUN_ID ?? "";
   const result: Result = {
     envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "test/aws/foo/dev"],
-      ["TFACTION_TARGET", "test/aws/foo/dev"],
+      ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
+      ["TFACTION_TARGET", "tests/aws/foo/dev"],
     ]),
     outputs: new Map<string, any>([
-      ["working_directory", "test/aws/foo/dev"],
+      ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
       ["template_dir", "templates/aws"],
-      ["aws_role_session_name", "tfaction-plan-test_aws_foo_dev-" + runID],
+      ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
       ["enable_tfsec", false],
       ["enable_tflint", true],
       ["enable_trivy", true],
@@ -28,7 +28,7 @@ test("default", async () => {
   expect(
     await run(
       {
-        target: "test/aws/foo/dev",
+        target: "tests/aws/foo/dev",
         workingDir: "",
         isApply: false,
         jobType: "terraform",
@@ -37,8 +37,8 @@ test("default", async () => {
         plan_workflow_name: "plan",
         target_groups: [
           {
-            target: "test/aws/",
-            working_directory: "test/aws/",
+            target: "tests/aws/",
+            working_directory: "tests/aws/",
             template_dir: "templates/aws",
           },
         ],
@@ -50,11 +50,11 @@ test("default", async () => {
 test("config", async () => {
   const result: Result = {
     envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "test/aws/foo/dev"],
-      ["TFACTION_TARGET", "test/aws/foo/dev"],
+      ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
+      ["TFACTION_TARGET", "tests/aws/foo/dev"],
     ]),
     outputs: new Map<string, any>([
-      ["working_directory", "test/aws/foo/dev"],
+      ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
@@ -74,7 +74,7 @@ test("config", async () => {
   expect(
     await run(
       {
-        target: "test/aws/foo/dev",
+        target: "tests/aws/foo/dev",
         workingDir: "",
         isApply: false,
         jobType: "terraform",
@@ -93,8 +93,8 @@ test("config", async () => {
         },
         target_groups: [
           {
-            target: "test/aws/",
-            working_directory: "test/aws/",
+            target: "tests/aws/",
+            working_directory: "tests/aws/",
             template_dir: "templates/aws",
             aws_region: "ap-northeast-1",
             aws_role_session_name: "test",
@@ -108,11 +108,11 @@ test("config", async () => {
 test("scaffold_working_dir", async () => {
   const result: Result = {
     envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "test/aws/foo/dev"],
-      ["TFACTION_TARGET", "test/aws/foo/dev"],
+      ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
+      ["TFACTION_TARGET", "tests/aws/foo/dev"],
     ]),
     outputs: new Map<string, any>([
-      ["working_directory", "test/aws/foo/dev"],
+      ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
@@ -128,7 +128,7 @@ test("scaffold_working_dir", async () => {
   expect(
     await run(
       {
-        target: "test/aws/foo/dev",
+        target: "tests/aws/foo/dev",
         workingDir: "",
         isApply: false,
         jobType: "scaffold_working_dir",
@@ -137,8 +137,8 @@ test("scaffold_working_dir", async () => {
         plan_workflow_name: "plan",
         target_groups: [
           {
-            target: "test/aws/",
-            working_directory: "test/aws/",
+            target: "tests/aws/",
+            working_directory: "tests/aws/",
             template_dir: "templates/aws",
           },
         ],
