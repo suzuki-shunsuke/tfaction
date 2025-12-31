@@ -56,12 +56,11 @@ replace:
       replace: /
 
 target_groups:
-  - working_directory: js/test/aws/
-    target: js/test/aws/
+  - working_directory: tests/aws/
+    target: tests/aws/
     aws_region: ap-northeast-1
     s3_bucket_name_tfmigrate_history: 0000-0000-0000-suzuki-shunsuke-tfmigrate-history
-    template_dir: js/test/templates/aws
-
+    template_dir: tests/templates/aws
     terraform_plan_config:
       aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan
     tfmigrate_plan_config:
