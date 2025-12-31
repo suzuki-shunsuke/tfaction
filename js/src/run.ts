@@ -1,6 +1,7 @@
 import * as checkTerraformSkip from "./check-terraform-skip";
 import * as conftest from "./conftest";
 import * as createFollowUpPR from "./create-follow-up-pr";
+import * as createScaffoldModulePR from "./create-scaffold-module-pr";
 import * as exportAWSSecretsManager from "./export-aws-secrets-manager";
 import * as exportSecrets from "./export-secrets";
 import * as getGlobalConfig from "./get-global-config";
@@ -39,6 +40,7 @@ export const main = async (inputs: Inputs) => {
     ["conftest", conftest],
     ["create-drift-issues", createDriftIssues],
     ["create-follow-up-pr", createFollowUpPR],
+    ["create-scaffold-module-pr", createScaffoldModulePR],
     ["download-plan", downloadPlan],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["export-secrets", exportSecrets],
