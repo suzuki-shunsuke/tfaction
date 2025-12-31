@@ -26,48 +26,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
-
     - uses: suzuki-shunsuke/tfaction/js@main
-      id: global-config
       with:
-        action: get-global-config
-    - uses: suzuki-shunsuke/tfaction/js@main
-      id: target-config
-      with:
-        action: get-target-config
-
-    - name: Run terraform plan -generate-config-out
-      shell: bash
-      working-directory: ${{steps.target-config.outputs.working_directory}}
-      env:
-        FILE: ${{inputs.file}}
-      run: |
-        tempfile=generated_${GITHUB_RUN_ID}_$(date +%Y%m%d%H%M%S).tf
-        tfcmt -output "$GITHUB_STEP_SUMMARY" \
-              -var "target:$TFACTION_TARGET" plan \
-          -- terraform plan -generate-config-out "$tempfile"
-        if [ -f "$FILE" ]; then
-          echo "" >> "$FILE"
-        fi
-        grep -v -E "^#|^$" "$tempfile" >> "$FILE"
-        rm "$tempfile"
-
-    - if: steps.global-config.outputs.securefix_action_server_repository != ''
-      uses: csm-actions/securefix-action@6c2c819fa6ababdcc1554403d16a11148fd9b8c6 # v0.4.2
-      with:
-        action: client
-        app_id: ${{inputs.securefix_action_app_id}}
-        app_private_key: ${{inputs.securefix_action_app_private_key}}
-        server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
-        commit_message: "chore: import resources"
-        files: ${{steps.target-config.outputs.working_directory}}/${{inputs.file}}
-        branch: ${{inputs.branch}}
-
-    - if: steps.global-config.outputs.securefix_action_server_repository == ''
-      uses: suzuki-shunsuke/commit-action@87b297f0ce551411b43d1880f4fb3cbc60381055 # v0.0.14
-      with:
-        commit_message: "chore: import resources"
+        action: generate-config-out
         github_token: ${{ inputs.github_token }}
-        files: ${{steps.target-config.outputs.working_directory}}/${{inputs.file}}
-        branch: ${{inputs.branch}}
+        branch: ${{ inputs.branch }}
+        file: ${{ inputs.file }}
+        securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
+        securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}
