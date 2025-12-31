@@ -1,1 +1,1 @@
-js/test/modules/foo/tfaction_module.yaml
+tests/modules/foo/tfaction_module.yaml

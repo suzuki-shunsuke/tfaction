@@ -1,2 +1,2 @@
-js/test/modules/foo/main.tf
-js/test/README.md
+tests/modules/foo/main.tf
+tests/README.md

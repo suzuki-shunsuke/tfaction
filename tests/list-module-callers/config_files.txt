@@ -1,1 +1,1 @@
-js/test/aws/foo/dev/tfaction.yaml
+tests/aws/foo/dev/tfaction.yaml
