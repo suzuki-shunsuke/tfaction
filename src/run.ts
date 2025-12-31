@@ -5,6 +5,7 @@ import * as createScaffoldModulePR from "./create-scaffold-module-pr";
 import * as createScaffoldPR from "./create-scaffold-pr";
 import * as exportAWSSecretsManager from "./export-aws-secrets-manager";
 import * as exportSecrets from "./export-secrets";
+import * as generateConfigOut from "./generate-config-out";
 import * as getGlobalConfig from "./get-global-config";
 import * as getTargetConfig from "./get-target-config";
 import * as listChangeModules from "./list-changed-modules";
@@ -47,6 +48,7 @@ export const main = async (inputs: Inputs) => {
     ["download-plan", downloadPlan],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["export-secrets", exportSecrets],
+    ["generate-config-out", generateConfigOut],
     ["get-follow-up-pr-param", getFollowupPRParam],
     ["get-global-config", getGlobalConfig],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
