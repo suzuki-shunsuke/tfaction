@@ -58,7 +58,7 @@ jobs:
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction/(.*)@main|uses: ./\1|'
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - name: Install dependencies
         uses: ./install
       - id: token
@@ -226,7 +226,7 @@ jobs:
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction/(.*)@main|uses: ./\1|'
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - name: Install dependencies
         uses: ./install
       - id: token
@@ -307,7 +307,7 @@ jobs:
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction/(.*)@main|uses: ./\1|'
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - name: Install dependencies
         uses: ./install
       - id: token
@@ -381,7 +381,7 @@ jobs:
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction/(.*)@main|uses: ./\1|'
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - name: Install dependencies
         uses: ./install
       - id: token
