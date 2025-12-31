@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 export const main = async () => {
   const githubToken = core.getInput("github_token") || "";
 
-  const installDir = path.join(__dirname, "install");
+  const installDir = path.join(__dirname, "..", "install");
   const aquaConfig = path.join(installDir, "aqua", "aqua.yaml");
   const githubCommentConfig = path.join(installDir, "github-comment.yaml");
 
