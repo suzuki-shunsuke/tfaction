@@ -4,11 +4,11 @@ export const main = async () => {
   // Compare outputs
   const testdata = [
     {
-      name: "js/get-target-config",
+      name: "get-target-config",
       expected: {
-        working_directory: "js/test/aws/foo/dev",
+        working_directory: "tests/aws/foo/dev",
         providers_lock_opts: "-platform=linux_amd64 -platform=darwin_amd64",
-        template_dir: "js/test/templates/aws",
+        template_dir: "tests/templates/aws",
         enable_tfsec: "false",
         enable_tflint: "true",
         enable_trivy: "true",
@@ -31,7 +31,7 @@ export const main = async () => {
       actual: process.env.JS_TARGET_CONFIG,
     },
     {
-      name: "js/get-global-config",
+      name: "get-global-config",
       expected: {
         base_working_directory: ".",
         working_directory_file: "tfaction.yaml",
@@ -66,25 +66,25 @@ export const main = async () => {
       actual: process.env.JS_GLOBAL_CONFIG,
     },
     {
-      name: "js/check-terraform-skip",
+      name: "check-terraform-skip",
       expected: {
         skip_terraform: "false",
       },
       actual: process.env.JS_CHECK_TERRAFORM_SKIP,
     },
     {
-      name: "js/list-changed-modules",
+      name: "list-changed-modules",
       expected: {
-        modules: '["js/test/modules/foo"]',
+        modules: '["tests/modules/foo"]',
       },
       actual: process.env.JS_LIST_CHANGED_MODULES,
     },
     {
-      name: "js/list-targets-with-changed-files",
+      name: "list-targets-with-changed-files",
       expected: {
         targets:
-          '[{"target":"js/test/aws/foo/dev","working_directory":"js/test/aws/foo/dev","runs_on":"ubuntu-latest","job_type":"terraform"}]',
-        modules: '["js/test/modules/foo"]',
+          '[{"target":"tests/aws/foo/dev","working_directory":"js/test/aws/foo/dev","runs_on":"ubuntu-latest","job_type":"terraform"}]',
+        modules: '["tests/modules/foo"]',
       },
       actual: process.env.JS_LIST_TARGETS_WITH_CHANGED_FILES,
     },

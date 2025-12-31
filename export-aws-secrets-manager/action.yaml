@@ -4,7 +4,7 @@ runs:
   using: composite
   steps:
     - run: |
-        echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction/js action.'
+        echo '::warning::This action was deprecated. Please use suzuki-shunsuke/tfaction action.'
       shell: bash
     - uses: suzuki-shunsuke/tfaction@main
       id: main

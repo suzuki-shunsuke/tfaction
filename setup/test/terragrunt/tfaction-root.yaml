@@ -16,7 +16,7 @@ terraform_command: terragrunt
 
 conftest:
   policies:
-    - policy: js/test/conftest/policy
+    - policy: tests/conftest/policy
       tf: true
 
 update_local_path_module_caller:
@@ -58,4 +58,4 @@ replace:
 target_groups:
   - working_directory: setup/test/
     target: setup/test/
-    template_dir: js/test/templates/aws
+    template_dir: tests/templates/aws
