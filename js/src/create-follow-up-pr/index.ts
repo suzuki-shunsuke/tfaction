@@ -69,11 +69,6 @@ export const main = async () => {
     process.env.TFACTION_TARGET ||
     "";
 
-  // Export environment variables
-  for (const [key, value] of targetConfigResult.envs) {
-    core.exportVariable(key, value);
-  }
-
   // Step 3: Create/get group label
   const prNumber = process.env.CI_INFO_PR_NUMBER || "";
   const tempDir = process.env.CI_INFO_TEMP_DIR || "";
@@ -209,7 +204,7 @@ ${prData.body}
   fs.appendFileSync(failedPrsFile, `${prUrl}\n`);
   core.info(`Updated ${failedPrsFile} with PR URL: ${prUrl}`);
 
-  const actionPath = process.env.GITHUB_ACTION_PATH ?? "";
+  const configPath = process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "";
 
   // Step 5: Execute based on conditions
   if (securefixServerRepository) {
@@ -268,35 +263,20 @@ Please handle this pull request.
     }
   } else {
     // Use GitHub API directly
-    if (skipCreatePr) {
-      // Commit only
-      await commit.createCommit(octokit, {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        branch: branch,
-        message: commitMessage,
-        files: [failedPrsFile],
-        deleteIfNotExist: true,
-        logger: {
-          info: core.info,
-        },
-      });
-      core.info(`Created commit on branch ${branch}`);
-    } else {
-      // Commit + PR + comment
-      await commit.createCommit(octokit, {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        branch: branch,
-        message: commitMessage,
-        files: [failedPrsFile],
-        deleteIfNotExist: true,
-        logger: {
-          info: core.info,
-        },
-      });
-      core.info(`Created commit on branch ${branch}`);
-
+    // Commit only
+    await commit.createCommit(octokit, {
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      branch: branch,
+      message: commitMessage,
+      files: [failedPrsFile],
+      deleteIfNotExist: true,
+      logger: {
+        info: core.info,
+      },
+    });
+    core.info(`Created commit on branch ${branch}`);
+    if (!skipCreatePr) {
       // Create PR
       const { data: repoData } = await octokit.rest.repos.get({
         owner: github.context.repo.owner,
@@ -343,30 +323,35 @@ Please handle this pull request.
       }
 
       // Post comment
-      const configPath = path.join(actionPath, "github-comment.yaml");
-      await exec.exec(
-        "github-comment",
-        [
-          "post",
-          "-config",
-          configPath,
-          "-var",
-          `tfaction_target:${target}`,
-          "-var",
-          `mentions:${mentions}`,
-          "-var",
-          `follow_up_pr_url:${followUpPrUrl}`,
-          "-k",
-          "create-follow-up-pr",
-        ],
-        {
-          env: {
-            ...process.env,
-            GITHUB_TOKEN: githubToken,
+      if (configPath) {
+        await exec.exec(
+          "github-comment",
+          [
+            "post",
+            "-config",
+            configPath,
+            "-var",
+            `tfaction_target:${target}`,
+            "-var",
+            `mentions:${mentions}`,
+            "-var",
+            `follow_up_pr_url:${followUpPrUrl}`,
+            "-k",
+            "create-follow-up-pr",
+          ],
+          {
+            env: {
+              ...process.env,
+              GITHUB_TOKEN: githubToken,
+            },
           },
-        },
-      );
-      core.info("Posted comment to the original PR");
+        );
+        core.info("Posted comment to the original PR");
+      } else {
+        core.warning(
+          "TFACTION_GITHUB_COMMENT_CONFIG is not set, skipping github-comment",
+        );
+      }
     }
   }
 
@@ -393,29 +378,34 @@ Please handle this pull request.
 
     const optsString = createOpts.join(" ");
 
-    const configPath = path.join(actionPath, "github-comment.yaml");
-    await exec.exec(
-      "github-comment",
-      [
-        "post",
-        "-config",
-        configPath,
-        "-k",
-        "skip-create-follow-up-pr",
-        "-var",
-        `tfaction_target:${target}`,
-        "-var",
-        `mentions:${mentions}`,
-        "-var",
-        `opts:${optsString}`,
-      ],
-      {
-        env: {
-          ...process.env,
-          GITHUB_TOKEN: githubToken,
+    if (configPath) {
+      await exec.exec(
+        "github-comment",
+        [
+          "post",
+          "-config",
+          configPath,
+          "-k",
+          "skip-create-follow-up-pr",
+          "-var",
+          `tfaction_target:${target}`,
+          "-var",
+          `mentions:${mentions}`,
+          "-var",
+          `opts:${optsString}`,
+        ],
+        {
+          env: {
+            ...process.env,
+            GITHUB_TOKEN: githubToken,
+          },
         },
-      },
-    );
-    core.info("Posted skip-create-follow-up-pr comment");
+      );
+      core.info("Posted skip-create-follow-up-pr comment");
+    } else {
+      core.warning(
+        "TFACTION_GITHUB_COMMENT_CONFIG is not set, skipping github-comment",
+      );
+    }
   }
 };
