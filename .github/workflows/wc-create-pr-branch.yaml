@@ -79,7 +79,7 @@ jobs:
 
       - name: Test get-target-config
         uses: ./
-        id: js-target-config
+        id: target-config
         with:
           action: get-target-config
         env:
@@ -89,7 +89,7 @@ jobs:
 
       - name: Test get-global-config
         uses: ./
-        id: js-global-config
+        id: global-config
         with:
           action: get-global-config
         env:
@@ -98,7 +98,7 @@ jobs:
 
       - name: Test check-terraform-skip
         uses: ./
-        id: js-check-terraform-skip
+        id: check-terraform-skip
         with:
           action: check-terraform-skip
         env:
@@ -109,7 +109,7 @@ jobs:
 
       - name: Test list-changed-modules
         uses: ./
-        id: js-list-changed-modules
+        id: list-changed-modules
         with:
           action: list-changed-modules
           changed_files: tests/ci-info/pr_all_filenames.txt
@@ -186,19 +186,19 @@ jobs:
           action: test-action
         env:
           TFACTION_TEST_ACTION: "true"
-          JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
-          JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
-          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
-          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
+          JS_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
+          JS_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
+          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
+          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
           JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
 
       - name: Outputs actions' outputs
         run: "true"
         env:
-          JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
-          JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
-          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
-          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
+          JS_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
+          JS_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
+          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
+          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
           JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
 
   test-drift-detection:
