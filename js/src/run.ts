@@ -10,6 +10,7 @@ import * as getTargetConfig from "./get-target-config";
 import * as listChangeModules from "./list-changed-modules";
 import * as listModuleCallers from "./list-module-callers";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
+import * as skipCreateFollowUpPR from "./skip-create-follow-up-pr";
 import * as createDriftIssues from "./create-drift-issues";
 import * as getOrCreateDriftIssue from "./get-or-create-drift-issue";
 import * as getFollowupPRParam from "./get-follow-up-pr-param";
@@ -55,6 +56,7 @@ export const main = async (inputs: Inputs) => {
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
     ["list-working-dirs", listWorkingDirs],
     ["plan", plan],
+    ["skip-create-follow-up-pr", skipCreateFollowUpPR],
     ["terraform-apply", terraformApply],
     ["terraform-docs", terraformDocs],
     ["tfmigrate-apply", tfmigrateApply],
