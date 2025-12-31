@@ -24,7 +24,7 @@ runs:
   steps:
     - uses: suzuki-shunsuke/tfaction/js@main
       with:
-        action: create-follow-up-pr-action
+        action: create-follow-up-pr
         github_token: ${{ inputs.github_token }}
         securefix_action_app_id: ${{ inputs.securefix_action_app_id }}
         securefix_action_app_private_key: ${{ inputs.securefix_action_app_private_key }}

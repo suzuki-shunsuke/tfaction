@@ -1,64 +1,194 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
+import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
+import { z } from "zod";
 
-// Parse assignees from `-a user1 -a user2` format
-const parseAssignees = (assigneesStr: string): string[] => {
-  if (!assigneesStr) {
-    return [];
-  }
-  const assignees: string[] = [];
-  const parts = assigneesStr.split(/\s+/);
-  for (let i = 0; i < parts.length; i++) {
-    if (parts[i] === "-a" && i + 1 < parts.length) {
-      assignees.push(parts[i + 1]);
-      i++;
-    }
-  }
-  return assignees;
+import * as lib from "../lib";
+import * as getGlobalConfig from "../get-global-config";
+import * as getTargetConfig from "../get-target-config";
+
+const PRData = z.object({
+  body: z.string(),
+  assignees: z
+    .array(
+      z.object({
+        login: z.string(),
+      }),
+    )
+    .optional(),
+});
+
+const escapeRegExp = (str: string): string => {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
 
 export const main = async () => {
-  const workingDir = process.env.WORKING_DIR;
-  if (!workingDir) {
-    throw new Error("WORKING_DIR environment variable is required");
-  }
-
-  const branch = process.env.BRANCH;
-  if (!branch) {
-    throw new Error("BRANCH environment variable is required");
-  }
-
-  const commitMessage = process.env.COMMIT_MESSAGE;
-  if (!commitMessage) {
-    throw new Error("COMMIT_MESSAGE environment variable is required");
-  }
-
-  const prTitle = process.env.PR_TITLE;
-  if (!prTitle) {
-    throw new Error("PR_TITLE environment variable is required");
-  }
-
-  const prBody = process.env.PR_BODY ?? "";
-  const draft = process.env.TFACTION_DRAFT_PR === "true";
-  const assigneesStr = process.env.ASSIGNEES ?? "";
-  const mentions = process.env.MENTIONS ?? "";
-  const groupLabel = process.env.GROUP_LABEL ?? "";
-  const groupLabelEnabled =
-    process.env.FOLLOW_UP_PR_GROUP_LABEL_ENABLED === "true";
-  const target = process.env.TFACTION_TARGET ?? "";
-
   const githubToken = core.getInput("github_token", { required: true });
+  const securefixAppId = core.getInput("securefix_action_app_id") || "";
+  const securefixAppPrivateKey =
+    core.getInput("securefix_action_app_private_key") || "";
 
+  const octokit = github.getOctokit(githubToken);
+
+  // Step 1: Get global config
+  const config = lib.getConfig();
+  const globalConfigResult = getGlobalConfig.main_(config, {});
+
+  const skipCreatePr = globalConfigResult.outputs.skip_create_pr;
+  const draftPr = globalConfigResult.outputs.draft_pr;
+  const groupLabelEnabled =
+    globalConfigResult.outputs.follow_up_pr_group_label_enabled;
+  const groupLabelPrefix =
+    globalConfigResult.outputs.follow_up_pr_group_label_prefix;
+  const securefixServerRepository =
+    globalConfigResult.outputs.securefix_action_server_repository;
+  const securefixPRBaseBranch =
+    globalConfigResult.outputs.securefix_action_pull_request_base_branch;
+
+  // Step 2: Get target config
+  const targetConfigResult = await getTargetConfig.run(
+    {
+      target: process.env.TFACTION_TARGET,
+      workingDir: process.env.TFACTION_WORKING_DIR,
+      isApply: lib.getIsApply(),
+      jobType: lib.getJobType(),
+    },
+    config,
+  );
+
+  const workingDir =
+    targetConfigResult.outputs.get("working_directory") ||
+    process.env.TFACTION_WORKING_DIR ||
+    "";
+  const target =
+    targetConfigResult.envs.get("TFACTION_TARGET") ||
+    process.env.TFACTION_TARGET ||
+    "";
+
+  // Export environment variables
+  for (const [key, value] of targetConfigResult.envs) {
+    core.exportVariable(key, value);
+  }
+
+  // Step 3: Create/get group label
+  const prNumber = process.env.CI_INFO_PR_NUMBER || "";
+  const tempDir = process.env.CI_INFO_TEMP_DIR || "";
+  let groupLabel = "";
+
+  if (groupLabelEnabled && tempDir) {
+    const labelsFilePath = `${tempDir}/labels.txt`;
+    let labels: string[] = [];
+    if (fs.existsSync(labelsFilePath)) {
+      const content = fs.readFileSync(labelsFilePath, "utf8");
+      labels = content.split("\n").filter((l) => l.length > 0);
+    }
+
+    const groupLabelPattern = new RegExp(
+      `${escapeRegExp(groupLabelPrefix)}[0-9]+`,
+    );
+    groupLabel = labels.find((label) => groupLabelPattern.test(label)) || "";
+
+    if (!groupLabel) {
+      groupLabel = `${groupLabelPrefix}${prNumber}`;
+      try {
+        await octokit.rest.issues.createLabel({
+          owner: github.context.repo.owner,
+          repo: github.context.repo.repo,
+          name: groupLabel,
+        });
+        core.info(`Created label: ${groupLabel}`);
+      } catch (error: unknown) {
+        if (
+          error instanceof Error &&
+          "status" in error &&
+          (error as { status: number }).status === 422
+        ) {
+          core.info(`Label ${groupLabel} already exists`);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    if (!labels.includes(groupLabel)) {
+      await octokit.rest.issues.addLabels({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: parseInt(prNumber, 10),
+        labels: [groupLabel],
+      });
+      core.info(`Added label ${groupLabel} to PR #${prNumber}`);
+    }
+  }
+
+  // Step 4: Generate follow-up PR parameters
   const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
   const repository = process.env.GITHUB_REPOSITORY ?? "";
-  const prNumber = process.env.CI_INFO_PR_NUMBER ?? "";
-  const actionPath = process.env.GITHUB_ACTION_PATH ?? "";
+  const runId = process.env.GITHUB_RUN_ID ?? "";
+  const runURL = `${serverUrl}/${repository}/actions/runs/${runId}`;
+  const actor = process.env.GITHUB_ACTOR ?? "";
+  const prAuthor = process.env.CI_INFO_PR_AUTHOR ?? "";
 
-  // Step 1: Create commit (same logic as create-follow-up-commit)
+  const branch = `follow-up-${prNumber}-${target}-${new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "")}`;
+  const commitMessage = `chore: create a commit to open follow up pull request
+Follow up #${prNumber}
+${runURL}`;
+  const prTitle = `chore(${target}): follow up #${prNumber}`;
+
+  let prBody = `This pull request was created automatically to follow up the failure of apply.
+- Follow up #${prNumber} ([failed workflow](${runURL}))
+
+Please write the description of this pull request below.
+
+## Why did the terraform apply fail?
+
+## How do you fix the problem?
+
+`;
+
+  const assignees = new Set<string>();
+  if (prAuthor && !prAuthor.endsWith("[bot]")) {
+    assignees.add(prAuthor);
+  }
+  if (actor && !actor.endsWith("[bot]") && actor !== prAuthor) {
+    assignees.add(actor);
+  }
+
+  if (tempDir) {
+    const prJsonPath = `${tempDir}/pr.json`;
+    if (fs.existsSync(prJsonPath)) {
+      try {
+        const prDataRaw = JSON.parse(fs.readFileSync(prJsonPath, "utf8"));
+        const prData = PRData.parse(prDataRaw);
+        if (prData.assignees) {
+          for (const assignee of prData.assignees) {
+            assignees.add(assignee.login);
+          }
+        }
+        prBody += `
+---
+
+<details>
+<summary>Original PR description</summary>
+
+${prData.body}
+
+</details>
+`;
+      } catch (error) {
+        console.error("Failed to read or parse pr.json:", error);
+      }
+    }
+  }
+
+  const assigneesArray = [...assignees];
+  const mentions = assigneesArray.map((a) => `@${a}`).join(" ");
+
+  // Create failed-prs file
   const tfactionDir = path.join(workingDir, ".tfaction");
   const failedPrsFile = path.join(tfactionDir, "failed-prs");
 
@@ -79,87 +209,213 @@ export const main = async () => {
   fs.appendFileSync(failedPrsFile, `${prUrl}\n`);
   core.info(`Updated ${failedPrsFile} with PR URL: ${prUrl}`);
 
-  const octokit = github.getOctokit(githubToken);
-  await commit.createCommit(octokit, {
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    branch: branch,
-    message: commitMessage,
-    files: [failedPrsFile],
-    deleteIfNotExist: true,
-    logger: {
-      info: core.info,
-    },
-  });
-  core.info(`Created commit on branch ${branch}`);
+  const actionPath = process.env.GITHUB_ACTION_PATH ?? "";
 
-  // Step 2: Create PR using GitHub API
-  const { data: repoData } = await octokit.rest.repos.get({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-  });
-  const baseBranch = repoData.default_branch;
+  // Step 5: Execute based on conditions
+  if (securefixServerRepository) {
+    // Use securefix
+    if (!securefixAppId || !securefixAppPrivateKey) {
+      throw new Error(
+        "securefix_action_app_id and securefix_action_app_private_key are required when securefix_action_server_repository is set",
+      );
+    }
 
-  const { data: pr } = await octokit.rest.pulls.create({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    head: branch,
-    base: baseBranch,
-    title: prTitle,
-    body: prBody,
-    draft: draft,
-  });
+    if (skipCreatePr) {
+      // Securefix: commit only
+      await securefix.request({
+        appId: securefixAppId,
+        privateKey: securefixAppPrivateKey,
+        serverRepository: securefixServerRepository,
+        branch: branch,
+        files: new Set([failedPrsFile]),
+        commitMessage: commitMessage,
+        workspace: process.env.GITHUB_WORKSPACE ?? "",
+      });
+      core.info("Created commit via securefix");
+    } else {
+      // Securefix: commit + PR
+      const prComment = `${mentions}
+This pull request was created because \`terraform apply\` failed.
 
-  const followUpPrUrl = pr.html_url;
-  core.info(`Created PR: ${followUpPrUrl}`);
-  core.notice(`The follow up pull request: ${followUpPrUrl}`);
+- #${prNumber}
 
-  // Add labels if group label is enabled
-  if (groupLabelEnabled && groupLabel) {
-    await octokit.rest.issues.addLabels({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      labels: [groupLabel],
-    });
-    core.info(`Added label ${groupLabel} to PR #${pr.number}`);
+Please handle this pull request.
+
+1. Check the error message #${prNumber}
+1. Check the result of \`terraform plan\`
+1. Add commits to this pull request and fix the problem if needed
+1. Review and merge this pull request`;
+
+      await securefix.request({
+        appId: securefixAppId,
+        privateKey: securefixAppPrivateKey,
+        serverRepository: securefixServerRepository,
+        branch: branch,
+        files: new Set([failedPrsFile]),
+        commitMessage: commitMessage,
+        workspace: process.env.GITHUB_WORKSPACE ?? "",
+        pr: {
+          title: prTitle,
+          body: prBody,
+          base: securefixPRBaseBranch,
+          labels: groupLabel ? [groupLabel] : undefined,
+          assignees: assigneesArray.length > 0 ? assigneesArray : undefined,
+          draft: draftPr,
+          comment: prComment,
+        },
+      });
+      core.info("Created PR via securefix");
+    }
+  } else {
+    // Use GitHub API directly
+    if (skipCreatePr) {
+      // Commit only
+      await commit.createCommit(octokit, {
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        branch: branch,
+        message: commitMessage,
+        files: [failedPrsFile],
+        deleteIfNotExist: true,
+        logger: {
+          info: core.info,
+        },
+      });
+      core.info(`Created commit on branch ${branch}`);
+    } else {
+      // Commit + PR + comment
+      await commit.createCommit(octokit, {
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        branch: branch,
+        message: commitMessage,
+        files: [failedPrsFile],
+        deleteIfNotExist: true,
+        logger: {
+          info: core.info,
+        },
+      });
+      core.info(`Created commit on branch ${branch}`);
+
+      // Create PR
+      const { data: repoData } = await octokit.rest.repos.get({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+      });
+      const baseBranch = repoData.default_branch;
+
+      const { data: pr } = await octokit.rest.pulls.create({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        head: branch,
+        base: baseBranch,
+        title: prTitle,
+        body: prBody,
+        draft: draftPr,
+      });
+
+      const followUpPrUrl = pr.html_url;
+      core.info(`Created PR: ${followUpPrUrl}`);
+      core.notice(`The follow up pull request: ${followUpPrUrl}`);
+
+      // Add labels
+      if (groupLabelEnabled && groupLabel) {
+        await octokit.rest.issues.addLabels({
+          owner: github.context.repo.owner,
+          repo: github.context.repo.repo,
+          issue_number: pr.number,
+          labels: [groupLabel],
+        });
+        core.info(`Added label ${groupLabel} to PR #${pr.number}`);
+      }
+
+      // Add assignees
+      if (assigneesArray.length > 0) {
+        await octokit.rest.issues.addAssignees({
+          owner: github.context.repo.owner,
+          repo: github.context.repo.repo,
+          issue_number: pr.number,
+          assignees: assigneesArray,
+        });
+        core.info(
+          `Added assignees ${assigneesArray.join(", ")} to PR #${pr.number}`,
+        );
+      }
+
+      // Post comment
+      const configPath = path.join(actionPath, "github-comment.yaml");
+      await exec.exec(
+        "github-comment",
+        [
+          "post",
+          "-config",
+          configPath,
+          "-var",
+          `tfaction_target:${target}`,
+          "-var",
+          `mentions:${mentions}`,
+          "-var",
+          `follow_up_pr_url:${followUpPrUrl}`,
+          "-k",
+          "create-follow-up-pr",
+        ],
+        {
+          env: {
+            ...process.env,
+            GITHUB_TOKEN: githubToken,
+          },
+        },
+      );
+      core.info("Posted comment to the original PR");
+    }
   }
 
-  // Add assignees
-  const assignees = parseAssignees(assigneesStr);
-  if (assignees.length > 0) {
-    await octokit.rest.issues.addAssignees({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      assignees: assignees,
-    });
-    core.info(`Added assignees ${assignees.join(", ")} to PR #${pr.number}`);
-  }
+  // Step 6: Post skip-create comment if skip_create_pr is true
+  if (skipCreatePr) {
+    const createOpts: string[] = [
+      "-R",
+      repository,
+      "-H",
+      branch,
+      "-t",
+      `"${prTitle}"`,
+      "-b",
+      `"Follow up #${prNumber}"`,
+    ];
 
-  // Step 3: Post comment using github-comment
-  const configPath = path.join(actionPath, "github-comment.yaml");
-  await exec.exec(
-    "github-comment",
-    [
-      "post",
-      "-config",
-      configPath,
-      "-var",
-      `tfaction_target:${target}`,
-      "-var",
-      `mentions:${mentions}`,
-      "-var",
-      `follow_up_pr_url:${followUpPrUrl}`,
-      "-k",
-      "create-follow-up-pr",
-    ],
-    {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: githubToken,
+    if (draftPr) {
+      createOpts.push("-d");
+    }
+
+    if (groupLabelEnabled && groupLabel) {
+      createOpts.push("-l", groupLabel);
+    }
+
+    const optsString = createOpts.join(" ");
+
+    const configPath = path.join(actionPath, "github-comment.yaml");
+    await exec.exec(
+      "github-comment",
+      [
+        "post",
+        "-config",
+        configPath,
+        "-k",
+        "skip-create-follow-up-pr",
+        "-var",
+        `tfaction_target:${target}`,
+        "-var",
+        `mentions:${mentions}`,
+        "-var",
+        `opts:${optsString}`,
+      ],
+      {
+        env: {
+          ...process.env,
+          GITHUB_TOKEN: githubToken,
+        },
       },
-    },
-  );
-  core.info("Posted comment to the original PR");
+    );
+    core.info("Posted skip-create-follow-up-pr comment");
+  }
 };
