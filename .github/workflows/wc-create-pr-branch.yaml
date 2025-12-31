@@ -77,26 +77,26 @@ jobs:
         with:
           action: ci-info
 
-      - name: Test js/get-target-config
+      - name: Test get-target-config
         uses: ./
         id: js-target-config
         with:
           action: get-target-config
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_TARGET: tests/aws/foo/dev
           TFACTION_JOB_TYPE: terraform
 
-      - name: Test js/get-global-config
+      - name: Test get-global-config
         uses: ./
         id: js-global-config
         with:
           action: get-global-config
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
 
-      - name: Test js/check-terraform-skip
+      - name: Test check-terraform-skip
         uses: ./
         id: js-check-terraform-skip
         with:
@@ -107,7 +107,7 @@ jobs:
           CI_INFO_TEMP_DIR: tests/ci-info
           CI_INFO_PR_AUTHOR: suzuki-shunsuke
 
-      - name: Test js/list-changed-modules
+      - name: Test list-changed-modules
         uses: ./
         id: js-list-changed-modules
         with:
@@ -115,9 +115,9 @@ jobs:
           changed_files: tests/ci-info/pr_all_filenames.txt
           config_files: tests/modules.txt
 
-      - name: Test js/list-targets-with-changed-files
+      - name: Test list-targets-with-changed-files
         uses: ./
-        id: js-list-targets-with-changed-files
+        id: list-targets-with-changed-files
         with:
           action: list-targets-with-changed-files
         env:
@@ -453,4 +453,4 @@ jobs:
       #     ! github.event.pull_request.head.repo.fork
       #   env:
       #     TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
-      #     TFACTION_TARGET: js/test/modules/foo
+      #     TFACTION_TARGET: tests/modules/foo
