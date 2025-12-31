@@ -1,6 +1,7 @@
 import * as checkTerraformSkip from "./check-terraform-skip";
 import * as conftest from "./conftest";
 import * as createFollowUpCommit from "./create-follow-up-commit";
+import * as createFollowUpPR from "./create-follow-up-pr";
 import * as createGroupLabel from "./create-group-label";
 import * as exportAWSSecretsManager from "./export-aws-secrets-manager";
 import * as exportSecrets from "./export-secrets";
@@ -40,6 +41,7 @@ export const main = async (inputs: Inputs) => {
     ["conftest", conftest],
     ["create-drift-issues", createDriftIssues],
     ["create-follow-up-commit", createFollowUpCommit],
+    ["create-follow-up-pr", createFollowUpPR],
     ["create-group-label", createGroupLabel],
     ["download-plan", downloadPlan],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
