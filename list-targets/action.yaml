@@ -18,8 +18,9 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction/install@main
-      id: install
+    - uses: suzuki-shunsuke/tfaction@main
+      with:
+        action: install
     - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
       uses: suzuki-shunsuke/tfaction@main

@@ -60,7 +60,9 @@ jobs:
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - name: Install dependencies
-        uses: ./install
+        uses: ./
+        with:
+          action: install
       - id: token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
@@ -70,7 +72,9 @@ jobs:
           permission-contents: write
 
       - name: Install dependencies
-        uses: ./install
+        uses: ./
+        with:
+          action: install
 
       - name: ci-info
         uses: ./
@@ -228,7 +232,9 @@ jobs:
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - name: Install dependencies
-        uses: ./install
+        uses: ./
+        with:
+          action: install
       - id: token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
@@ -240,7 +246,9 @@ jobs:
           repositories: test-tfaction
 
       - name: Install dependencies
-        uses: ./install
+        uses: ./
+        with:
+          action: install
 
       - name: Create a dummy working directory
         run: mkdir -p "tests/aws/foo/dev-${GITHUB_RUN_ID}"
@@ -309,7 +317,9 @@ jobs:
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - name: Install dependencies
-        uses: ./install
+        uses: ./
+        with:
+          action: install
       - id: token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
@@ -383,7 +393,9 @@ jobs:
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - name: Install dependencies
-        uses: ./install
+        uses: ./
+        with:
+          action: install
       - id: token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
