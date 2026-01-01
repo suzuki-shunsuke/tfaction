@@ -13,6 +13,7 @@ import * as listModuleCallers from "./list-module-callers";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 import * as createDriftIssues from "./create-drift-issues";
 import * as getOrCreateDriftIssue from "./get-or-create-drift-issue";
+import * as updateDriftIssue from "./update-drift-issue";
 import * as getFollowupPRParam from "./get-follow-up-pr-param";
 import * as tfsec from "./tfsec";
 import * as trivy from "./trivy";
@@ -65,6 +66,7 @@ export const main = async (inputs: Inputs) => {
     ["tflint", tflint],
     ["commit", commit],
     ["ci-info", ciinfo],
+    ["update-drift-issue", updateDriftIssue],
   ]);
   const action = actions.get(inputs.action);
   if (action === undefined) {

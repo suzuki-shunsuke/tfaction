@@ -106,31 +106,6 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/mvdan/sh/v3.12.0/shfmt_v3.12.0_darwin_amd64",
-      "checksum": "C31548693DE6584E6164B7ED5FBB7B4A083F2D937CA94B4E0DDF59AA461A85E4",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/mvdan/sh/v3.12.0/shfmt_v3.12.0_darwin_arm64",
-      "checksum": "D903802E0CE3ECBC82B98512F55BA370B0D37A93F3F78DE394F5B657052B33DD",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/mvdan/sh/v3.12.0/shfmt_v3.12.0_linux_amd64",
-      "checksum": "D9FBB2A9C33D13F47E7618CF362A914D029D02A6DF124064FFF04FD688A745EA",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/mvdan/sh/v3.12.0/shfmt_v3.12.0_linux_arm64",
-      "checksum": "5F3FE3FA6A9F766E6A182BA79A94BEF8AFEDAFC57DB0B1AD32B0F67FAE971BA4",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/mvdan/sh/v3.12.0/shfmt_v3.12.0_windows_amd64.exe",
-      "checksum": "C8BDA517BA1C640CE4A715C0FA665439DDBE4357BA5E9B77B0E51E70E2B9C94B",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/opentofu/opentofu/v1.11.2/tofu_1.11.2_darwin_amd64.tar.gz",
       "checksum": "7EB10724DEA7240F7C80C95C27D73434DB9215855A7C608C58E0306FEB2F9228",
       "algorithm": "sha256"
