@@ -42,11 +42,11 @@ runs:
         fi
       shell: bash
 
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@b4a48d8dde05d060fcdee7ddbd40353e70bead80
       with:
         action: install
 
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@b4a48d8dde05d060fcdee7ddbd40353e70bead80
       id: global-config
       with:
         action: get-global-config
