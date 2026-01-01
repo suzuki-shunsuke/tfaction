@@ -14,6 +14,7 @@ import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files"
 import * as createDriftIssues from "./create-drift-issues";
 import * as getOrCreateDriftIssue from "./get-or-create-drift-issue";
 import * as updateDriftIssue from "./update-drift-issue";
+import * as setDriftEnv from "./set-drift-env";
 import * as getFollowupPRParam from "./get-follow-up-pr-param";
 import * as tfsec from "./tfsec";
 import * as trivy from "./trivy";
@@ -67,6 +68,7 @@ export const main = async (inputs: Inputs) => {
     ["commit", commit],
     ["ci-info", ciinfo],
     ["update-drift-issue", updateDriftIssue],
+    ["set-drift-env", setDriftEnv],
   ]);
   const action = actions.get(inputs.action);
   if (action === undefined) {
