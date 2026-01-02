@@ -1,7 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 
 type Inputs = {
   ghToken: string;
@@ -21,17 +20,15 @@ export const main = async () => {
   }
 
   const config = lib.getConfig();
-  const globalConfig = getGlobalConfig.main_(config, {
-    drift_issue_number: issueNumberStr,
-  });
+  const driftIssueRepo = lib.getDriftIssueRepo(config);
 
   const inputs: Inputs = {
     ghToken: core.getInput("github_token", { required: true }),
     status: core.getInput("status", { required: true }),
     issueNumber: parseInt(issueNumberStr, 10),
     issueState: process.env.TFACTION_DRIFT_ISSUE_STATE,
-    repoOwner: globalConfig.outputs.drift_issue_repo_owner,
-    repoName: globalConfig.outputs.drift_issue_repo_name,
+    repoOwner: driftIssueRepo.owner,
+    repoName: driftIssueRepo.name,
     skipTerraform: process.env.TFACTION_SKIP_TERRAFORM === "true",
   };
 

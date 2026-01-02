@@ -8,7 +8,6 @@ import * as path from "path";
 import { z } from "zod";
 
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 import * as getTargetConfig from "../get-target-config";
 
 const PRData = z.object({
@@ -511,20 +510,17 @@ export const main = async () => {
 
   const octokit = github.getOctokit(githubToken);
 
-  // Get global config
   const config = lib.getConfig();
-  const globalConfigResult = getGlobalConfig.main_(config, {});
 
-  const skipCreatePr = globalConfigResult.outputs.skip_create_pr;
-  const draftPr = globalConfigResult.outputs.draft_pr;
-  const groupLabelEnabled =
-    globalConfigResult.outputs.follow_up_pr_group_label_enabled;
+  const skipCreatePr = config.skip_create_pr;
+  const draftPr = config.draft_pr;
+  const groupLabelEnabled = config.follow_up_pr_group_label?.enabled ?? false;
   const groupLabelPrefix =
-    globalConfigResult.outputs.follow_up_pr_group_label_prefix;
+    config.follow_up_pr_group_label?.prefix ?? "tfaction:follow-up-pr-group/";
   const securefixServerRepository =
-    globalConfigResult.outputs.securefix_action_server_repository;
+    config.securefix_action?.server_repository ?? "";
   const securefixPRBaseBranch =
-    globalConfigResult.outputs.securefix_action_pull_request_base_branch;
+    config.securefix_action?.pull_request?.base_branch ?? "";
 
   // Get target config
   const targetConfigResult = await getTargetConfig.getTargetConfig(
