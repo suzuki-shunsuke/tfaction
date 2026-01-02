@@ -39,49 +39,14 @@ outputs:
     value: ${{steps.main.outputs.plan_json}}
   skipped:
     description: Whether the terraform plan was skipped
-    value: ${{ steps.check-terraform-skip.outputs.skip_terraform }}
+    value: ${{ steps.main.outputs.skipped }}
 runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction@main
-      id: target-config
-      with:
-        action: get-target-config
-    - uses: suzuki-shunsuke/tfaction@main
-      id: global-config
-      with:
-        action: get-global-config
-
-    # terraform plan
-
-    - uses: suzuki-shunsuke/tfaction@main
-      id: check-terraform-skip
-      if: |
-        env.TFACTION_JOB_TYPE == 'terraform' &&
-        ! env.TFACTION_DRIFT_ISSUE_NUMBER
-      with:
-        action: check-terraform-skip
-
-    - uses: suzuki-shunsuke/tfaction@main
       id: main
-      if: |
-        !fromJSON(steps.check-terraform-skip.outputs.skip_terraform)
       with:
-        action: plan
-        github_token: ${{ inputs.github_token }}
-      env:
-        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}
-
-    # Commit .tfmigrate.hcl if changed
-    - if: |
-        env.TFACTION_JOB_TYPE == 'tfmigrate' &&
-        steps.main.outputs.changed == 'true'
-      uses: suzuki-shunsuke/tfaction@main
-      with:
-        action: commit
-        commit_message: "chore(tfmigrate): add .tfmigrate.hcl"
-        github_token: ${{ inputs.github_token }}
-        files: ${{ steps.target-config.outputs.working_directory }}/.tfmigrate.hcl
+        action: plan-action
+        github_token: ${{inputs.github_token}}
         securefix_action_app_id: ${{inputs.securefix_action_app_id}}
         securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
-        securefix_action_server_repository: ${{ steps.global-config.outputs.securefix_action_server_repository }}
