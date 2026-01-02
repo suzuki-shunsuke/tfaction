@@ -266,6 +266,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
     });
   }
