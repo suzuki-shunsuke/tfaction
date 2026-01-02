@@ -340,7 +340,7 @@ export const runTerraformPlan = async (
 
 export const main = async (): Promise<void> => {
   const config = lib.getConfig();
-  const targetConfig = await getTargetConfig.run(
+  const targetConfig = await getTargetConfig.getTargetConfig(
     {
       isApply: false,
       jobType: lib.getJobType(),
@@ -354,18 +354,15 @@ export const main = async (): Promise<void> => {
     githubToken: core.getInput("github_token"),
     workingDirectory: lib.getWorkingDir() ?? "",
     renovateLogin: config.renovate_login || "",
-    destroy: targetConfig.outputs.get("destroy") || false,
-    tfCommand: targetConfig.outputs.get("terraform_command") || "terraform",
+    destroy: targetConfig.destroy || false,
+    tfCommand: targetConfig.terraform_command || "terraform",
     target: process.env.TFACTION_TARGET || "",
     driftIssueNumber: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
     prAuthor: process.env.CI_INFO_PR_AUTHOR,
     ciInfoTempDir: process.env.CI_INFO_TEMP_DIR,
-    s3BucketNameTfmigrateHistory: targetConfig.outputs.get(
-      "s3_bucket_name_tfmigrate_history",
-    ),
-    gcsBucketNameTfmigrateHistory: targetConfig.outputs.get(
-      "gcs_bucket_name_tfmigrate_history",
-    ),
+    s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
+    gcsBucketNameTfmigrateHistory:
+      targetConfig.gcs_bucket_name_tfmigrate_history,
   };
 
   const jobType = process.env.TFACTION_JOB_TYPE;

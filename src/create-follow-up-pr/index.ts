@@ -527,7 +527,7 @@ export const main = async () => {
     globalConfigResult.outputs.securefix_action_pull_request_base_branch;
 
   // Get target config
-  const targetConfigResult = await getTargetConfig.run(
+  const targetConfigResult = await getTargetConfig.getTargetConfig(
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
@@ -538,13 +538,10 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfigResult.outputs.get("working_directory") ||
+    targetConfigResult.working_directory ||
     process.env.TFACTION_WORKING_DIR ||
     "";
-  const target =
-    targetConfigResult.envs.get("TFACTION_TARGET") ||
-    process.env.TFACTION_TARGET ||
-    "";
+  const target = targetConfigResult.target || process.env.TFACTION_TARGET || "";
 
   const prNumber = process.env.CI_INFO_PR_NUMBER || "";
   const tempDir = process.env.CI_INFO_TEMP_DIR || "";
