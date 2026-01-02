@@ -43,7 +43,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@dd0ec4f1ca405591bf37f7d1943b62036c57eb24
       id: main
       with:
         action: plan
