@@ -13,7 +13,6 @@ type Inputs = {
   workingDirectory: string;
   renovateLogin: string;
   destroy: boolean;
-  conftestPolicyDirectory?: string;
   tfCommand: string;
   target: string;
   driftIssueNumber?: string;
@@ -356,7 +355,6 @@ export const main = async (): Promise<void> => {
     workingDirectory: lib.getWorkingDir() ?? "",
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.outputs.get("destroy") || false,
-    conftestPolicyDirectory: config.conftest_policy_directory,
     tfCommand: targetConfig.outputs.get("terraform_command") || "terraform",
     target: process.env.TFACTION_TARGET || "",
     driftIssueNumber: process.env.TFACTION_DRIFT_ISSUE_NUMBER,

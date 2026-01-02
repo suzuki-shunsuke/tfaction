@@ -34,7 +34,7 @@ test("default", async () => {
         jobType: "terraform",
       },
       {
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             target: "tests/aws/",
@@ -80,7 +80,7 @@ test("config", async () => {
         jobType: "terraform",
       },
       {
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         terraform_command: "tofu",
         tfsec: {
           enabled: true,
@@ -134,7 +134,7 @@ test("scaffold_working_dir", async () => {
         jobType: "scaffold_working_dir",
       },
       {
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             target: "tests/aws/",

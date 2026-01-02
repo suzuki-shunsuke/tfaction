@@ -155,28 +155,19 @@ const buildPolicies = (
   isPlan: boolean,
 ): lib.ConftestPolicyConfig[] => {
   const policyMap = new Map<string, lib.ConftestPolicyConfig>();
-  const conftest = config.conftest ?? {};
 
-  for (const policy of config.conftest?.policies ?? []) {
-    if (policy.id) {
-      policyMap.set(policy.id, policy);
-    }
+  if (!config.conftest) {
+    return [];
   }
 
-  if (conftest.policies === undefined) {
-    conftest.policies = [];
-    if (config.conftest_policy_directory) {
-      conftest.policies.push({
-        policy: config.conftest_policy_directory,
-        plan: true,
-      });
-    } else {
-      if (fs.existsSync("policy")) {
-        conftest.policies.push({
-          policy: "policy",
-          plan: true,
-        });
-      }
+  const conftest = config.conftest;
+  if (!conftest.policies || conftest.policies.length === 0) {
+    return [];
+  }
+
+  for (const policy of conftest.policies) {
+    if (policy.id) {
+      policyMap.set(policy.id, policy);
     }
   }
 

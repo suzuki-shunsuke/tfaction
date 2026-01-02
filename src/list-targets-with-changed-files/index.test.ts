@@ -5,7 +5,7 @@ test("normal", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             target: "foo/",
@@ -48,7 +48,7 @@ test("job config", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             target: "foo/",
@@ -101,7 +101,7 @@ test("job config", async () => {
 });
 
 const prCommentConfig = {
-  plan_workflow_name: "plan",
+  plan_workflow_name: "plan.yaml",
   target_groups: [
     {
       target: "foo/",
@@ -206,7 +206,7 @@ test("module callers", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             target: "foo/",
@@ -272,7 +272,7 @@ test("nest", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             target: "foo/",
