@@ -6,6 +6,29 @@ import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { fileURLToPath } from "node:url";
+
+export const GitHubActionPath = path.join(
+  fileURLToPath(import.meta.url),
+  "..",
+  "..",
+);
+
+export const GitHubCommentConfig = path.join(
+  GitHubActionPath,
+  "install",
+  "github-comment.yaml",
+);
+
+export const aquaConfig = path.join(
+  GitHubActionPath,
+  "install",
+  "aqua",
+  "aqua.yaml",
+);
+export const aquaGlobalConfig = process.env.AQUA_GLOBAL_CONFIG
+  ? `${process.env.AQUA_GLOBAL_CONFIG}:${aquaConfig}`
+  : aquaConfig;
 
 const GitHubEnvironment = z.union([
   z.string(),

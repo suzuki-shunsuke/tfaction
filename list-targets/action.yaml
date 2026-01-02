@@ -19,33 +19,7 @@ runs:
   using: composite
   steps:
     - uses: suzuki-shunsuke/tfaction@main
-      with:
-        action: install
-    - if: |
-        ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      uses: suzuki-shunsuke/tfaction@main
-      with:
-        action: ci-info
-        github_token: ${{ inputs.github_token }}
-
-    - name: Check if the commit is latest
-      shell: bash
-      if: github.event_name == 'pull_request' || startsWith(github.event_name, 'pull_request_')
-      run: |
-        set -euo pipefail
-
-        latest_head_sha=$(jq -r ".head.sha" $CI_INFO_TEMP_DIR/pr.json)
-        if [ "$HEAD_SHA" != "$latest_head_sha" ]; then
-          echo "::error::The head sha ($HEAD_SHA) isn't latest ($latest_head_sha)."
-          exit 1
-        fi
-      env:
-        HEAD_SHA: ${{github.event.pull_request.head.sha}}
-
-    - uses: suzuki-shunsuke/tfaction@main
       id: list-targets
       with:
-        action: list-targets-with-changed-files
-        github_token: ${{ inputs.github_token }}
-      env:
-        GH_COMMENT_CONFIG: ${{ env.TFACTION_GITHUB_COMMENT_CONFIG }}
+        action: list-targets
+        github_token: ${{inputs.github_token}}

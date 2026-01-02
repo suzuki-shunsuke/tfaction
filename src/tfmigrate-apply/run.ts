@@ -62,8 +62,6 @@ export const main = async (): Promise<void> => {
         "github-comment",
         [
           "exec",
-          "--config",
-          path.join(installDir, "tfmigrate-apply/github-comment.yaml"),
           "-var",
           `tfaction_target:${target}`,
           "-k",
@@ -76,6 +74,7 @@ export const main = async (): Promise<void> => {
           ignoreReturnCode: true,
           env: {
             ...process.env,
+            GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
             GITHUB_TOKEN: githubToken,
           },
           listeners: {
@@ -112,8 +111,6 @@ export const main = async (): Promise<void> => {
         "github-comment",
         [
           "exec",
-          "--config",
-          githubCommentConfig,
           "-org",
           driftIssueRepoOwner,
           "-repo",
@@ -135,6 +132,7 @@ export const main = async (): Promise<void> => {
           ignoreReturnCode: true,
           env: {
             ...process.env,
+            GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
             GITHUB_TOKEN: githubToken,
           },
         },

@@ -31,31 +31,6 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/int128/ghcp/v1.15.1/ghcp_darwin_amd64.zip",
-      "checksum": "9FB8839EE08BC0D98973970F3FEF88322E49E8486AC3BD80DCE57DCEA97035E2",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/int128/ghcp/v1.15.1/ghcp_darwin_arm64.zip",
-      "checksum": "5A923E288CE67B454CD1C7D5118EBF4028E9F1905DF3B1105AE8D05A1FE23A6E",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/int128/ghcp/v1.15.1/ghcp_linux_amd64.zip",
-      "checksum": "C5BA74D0B2652A4375C4AE653B7C065024A619ADCFF40DEDBFDD10D40E287D3D",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/int128/ghcp/v1.15.1/ghcp_linux_arm64.zip",
-      "checksum": "801DB65A3EA5148C7A89F5201F8992963F2592FC17ED5FD88E4D996BAD9542B2",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/int128/ghcp/v1.15.1/ghcp_windows_amd64.zip",
-      "checksum": "A7673944CEFAA9955A3FEFA5DDF5B03C4CCEC2F7E5F0D14D2707804AF88BA22B",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/minamijoyo/tfmigrate/v0.4.4/tfmigrate_0.4.4_darwin_amd64.tar.gz",
       "checksum": "3AC9A4F860D277712AFF98F0CC7A3C46FCE25E764DE95B31FCD24649FE357195",
       "algorithm": "sha256"

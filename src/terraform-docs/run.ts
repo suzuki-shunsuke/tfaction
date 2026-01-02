@@ -5,6 +5,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as tmp from "tmp";
 import * as commit from "../commit";
+import * as lib from "../lib";
 
 type Inputs = {
   workingDirectory: string;
@@ -57,6 +58,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
     // Check terraform-docs version
     await exec.exec("terraform-docs", ["-v"], {
       cwd: inputs.workingDirectory,
+      env: {
+        ...process.env,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+      },
     });
 
     // Search for config file
@@ -86,6 +91,8 @@ export const run = async (inputs: Inputs): Promise<void> => {
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
 
