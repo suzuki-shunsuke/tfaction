@@ -20,9 +20,13 @@ export const GitHubCommentConfig = path.join(
   "github-comment.yaml",
 );
 
-const aquaConfig = path.join(GitHubActionPath, "install", "aqua", "aqua.yaml");
-
-export const AquaConfig = process.env.AQUA_GLOBAL_CONFIG
+export const aquaConfig = path.join(
+  GitHubActionPath,
+  "install",
+  "aqua",
+  "aqua.yaml",
+);
+export const aquaGlobalConfig = process.env.AQUA_GLOBAL_CONFIG
   ? `${process.env.AQUA_GLOBAL_CONFIG}:${aquaConfig}`
   : aquaConfig;
 
