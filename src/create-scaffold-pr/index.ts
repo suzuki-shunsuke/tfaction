@@ -246,8 +246,7 @@ export const main = async () => {
     targetConfigResult.working_directory ||
     process.env.TFACTION_WORKING_DIR ||
     "";
-  const target =
-    targetConfigResult.target || process.env.TFACTION_TARGET || "";
+  const target = targetConfigResult.target || process.env.TFACTION_TARGET || "";
 
   if (!target) {
     throw new Error("TFACTION_TARGET is required");

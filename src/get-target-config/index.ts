@@ -114,7 +114,11 @@ export const getTargetConfig = async (
     const wdConfig = lib.readTargetConfig(
       path.join(workingDir, workingDirectoryFile),
     );
-    const jobConfig = lib.getJobConfig(wdConfig, inputs.isApply, inputs.jobType);
+    const jobConfig = lib.getJobConfig(
+      wdConfig,
+      inputs.isApply,
+      inputs.jobType,
+    );
 
     // Override with values from wdConfig, targetGroup, config
     const m1 = lib.setOutputs(

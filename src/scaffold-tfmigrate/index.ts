@@ -233,21 +233,25 @@ const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
   } = params;
 
   // Push commit using ghcp
-  await exec.exec("ghcp", [
-    "commit",
-    "-r",
-    process.env.GITHUB_REPOSITORY ?? "",
-    "-b",
-    branch,
-    "-m",
-    commitMessage,
-    ...files,
-  ], {
-    env: {
-      ...process.env,
-      GITHUB_TOKEN: githubToken,
+  await exec.exec(
+    "ghcp",
+    [
+      "commit",
+      "-r",
+      process.env.GITHUB_REPOSITORY ?? "",
+      "-b",
+      branch,
+      "-m",
+      commitMessage,
+      ...files,
+    ],
+    {
+      env: {
+        ...process.env,
+        GITHUB_TOKEN: githubToken,
+      },
     },
-  });
+  );
   core.info(`Created commit on branch ${branch}`);
 
   if (skipCreatePr) {
