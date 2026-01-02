@@ -6,6 +6,29 @@ import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { fileURLToPath } from "node:url";
+
+export const GitHubActionPath = path.join(
+  fileURLToPath(import.meta.url),
+  "..",
+  "..",
+);
+
+export const GitHubCommentConfig = path.join(
+  GitHubActionPath,
+  "install",
+  "github-comment.yaml",
+);
+
+export const aquaConfig = path.join(
+  GitHubActionPath,
+  "install",
+  "aqua",
+  "aqua.yaml",
+);
+export const aquaGlobalConfig = process.env.AQUA_GLOBAL_CONFIG
+  ? `${process.env.AQUA_GLOBAL_CONFIG}:${aquaConfig}`
+  : aquaConfig;
 
 const GitHubEnvironment = z.union([
   z.string(),
@@ -209,7 +232,7 @@ const FollowUpPRGroupLabel = z.object({
 });
 type FollowUpPRGroupLabel = z.infer<typeof FollowUpPRGroupLabel>;
 
-const Config = z.object({
+const RawConfig = z.object({
   aqua: z.optional(
     z.object({
       update_checksum: z.optional(
@@ -222,7 +245,6 @@ const Config = z.object({
     }),
   ),
   base_working_directory: z.optional(z.string()),
-  conftest_policy_directory: z.optional(z.string()),
   conftest: z.optional(ConftestConfig),
   draft_pr: z.optional(z.boolean()),
   drift_detection: z.optional(
@@ -290,10 +312,57 @@ const Config = z.object({
     }),
   ),
 });
-export type Config = z.infer<typeof Config>;
+export type RawConfig = z.infer<typeof RawConfig>;
+
+// Config with default values applied
+export interface Config extends Omit<
+  RawConfig,
+  | "base_working_directory"
+  | "working_directory_file"
+  | "module_base_directory"
+  | "module_file"
+  | "renovate_login"
+  | "draft_pr"
+  | "skip_create_pr"
+  | "terraform_command"
+  | "label_prefixes"
+  | "tfsec"
+  | "tflint"
+  | "trivy"
+  | "follow_up_pr_group_label"
+> {
+  base_working_directory: string;
+  working_directory_file: string;
+  module_base_directory: string;
+  module_file: string;
+  renovate_login: string;
+  draft_pr: boolean;
+  skip_create_pr: boolean;
+  terraform_command: string;
+  label_prefixes: {
+    target: string;
+    tfmigrate: string;
+    skip: string;
+  };
+  tfsec: {
+    enabled: boolean;
+  };
+  tflint: {
+    enabled: boolean;
+    fix: boolean;
+    reviewdog?: z.infer<typeof TflintReviewdogConfig>;
+  };
+  trivy: {
+    enabled: boolean;
+  };
+  follow_up_pr_group_label: {
+    enabled: boolean;
+    prefix: string;
+  };
+}
 
 export const generateJSONSchema = (dir: string) => {
-  const configJSONSchema = zodToJsonSchema(Config, "config");
+  const configJSONSchema = zodToJsonSchema(RawConfig, "config");
   fs.writeFileSync(
     path.join(dir, "tfaction-root.json"),
     JSON.stringify(configJSONSchema, null, 2),
@@ -306,12 +375,48 @@ export const generateJSONSchema = (dir: string) => {
   );
 };
 
+export const applyConfigDefaults = (raw: RawConfig): Config => {
+  return {
+    ...raw,
+    base_working_directory: raw.base_working_directory ?? ".",
+    working_directory_file: raw.working_directory_file ?? "tfaction.yaml",
+    module_base_directory: raw.module_base_directory ?? ".",
+    module_file: raw.module_file ?? "tfaction_module.yaml",
+    renovate_login: raw.renovate_login ?? "renovate[bot]",
+    draft_pr: raw.draft_pr ?? false,
+    skip_create_pr: raw.skip_create_pr ?? false,
+    terraform_command: raw.terraform_command ?? "terraform",
+    label_prefixes: {
+      target: raw.label_prefixes?.target ?? "target:",
+      tfmigrate: raw.label_prefixes?.tfmigrate ?? "tfmigrate:",
+      skip: raw.label_prefixes?.skip ?? "skip:",
+    },
+    tfsec: {
+      enabled: raw.tfsec?.enabled ?? false,
+    },
+    tflint: {
+      enabled: raw.tflint?.enabled ?? true,
+      fix: raw.tflint?.fix ?? false,
+      reviewdog: raw.tflint?.reviewdog,
+    },
+    trivy: {
+      enabled: raw.trivy?.enabled ?? true,
+    },
+    follow_up_pr_group_label: {
+      enabled: raw.follow_up_pr_group_label?.enabled ?? false,
+      prefix:
+        raw.follow_up_pr_group_label?.prefix ?? "tfaction:follow-up-pr-group/",
+    },
+  };
+};
+
 export const getConfig = (): Config => {
   let configFilePath = process.env.TFACTION_CONFIG;
   if (!configFilePath) {
     configFilePath = "tfaction-root.yaml";
   }
-  return Config.parse(load(fs.readFileSync(configFilePath, "utf8")));
+  const raw = RawConfig.parse(load(fs.readFileSync(configFilePath, "utf8")));
+  return applyConfigDefaults(raw);
 };
 
 export const createWDTargetMap = (
@@ -486,9 +591,7 @@ export const getTargetGroup = async (
     silent: true,
   });
   const wds: string[] = [];
-  const files = await listWorkingDirFiles(
-    config.working_directory_file ?? "tfaction.yaml",
-  );
+  const files = await listWorkingDirFiles(config.working_directory_file);
   for (const file of files) {
     wds.push(path.dirname(file));
   }
@@ -574,4 +677,16 @@ export const checkDriftDetectionEnabled = (
     return targetGroup.drift_detection.enabled ?? true;
   }
   return cfg.drift_detection?.enabled ?? false;
+};
+
+export interface DriftIssueRepo {
+  owner: string;
+  name: string;
+}
+
+export const getDriftIssueRepo = (cfg: Config): DriftIssueRepo => {
+  return {
+    owner: cfg.drift_detection?.issue_repo_owner ?? github.context.repo.owner,
+    name: cfg.drift_detection?.issue_repo_name ?? github.context.repo.repo,
+  };
 };

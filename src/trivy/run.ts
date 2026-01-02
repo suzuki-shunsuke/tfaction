@@ -2,6 +2,7 @@ import * as exec from "@actions/exec";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
+import * as lib from "../lib";
 
 type Inputs = {
   workingDirectory: string;
@@ -90,6 +91,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const out = await exec.getExecOutput("trivy", args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+    },
   });
   core.endGroup();
   core.info("Parsing trivy config result");
@@ -140,6 +145,8 @@ ${table}`;
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
   }
@@ -179,6 +186,7 @@ ${table}`;
       env: {
         ...process.env,
         REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     },
   );

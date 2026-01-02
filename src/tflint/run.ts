@@ -102,6 +102,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     env: {
       ...process.env,
       GITHUB_TOKEN: inputs.githubTokenForTflintInit,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   core.endGroup();
@@ -111,6 +112,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const help = await exec.getExecOutput("tflint", ["--help"], {
     cwd: inputs.workingDirectory,
     silent: true,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+    },
   });
   if (help.stdout.includes("--call-module-type")) {
     args.push("--call-module-type=all");
@@ -124,6 +129,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const out = await exec.getExecOutput("tflint", args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+    },
   });
   core.info("Parsing tflint result");
   const outJSON = JSON.parse(out.stdout);
@@ -209,6 +218,8 @@ ${table}`;
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
   }
@@ -246,6 +257,10 @@ ${table}`;
     cwd: inputs.workingDirectory,
     silent: true,
     ignoreReturnCode: true,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+    },
   });
   if (
     reviewdogHelp.stdout.includes("-fail-level") ||
@@ -263,6 +278,7 @@ ${table}`;
     env: {
       ...process.env,
       REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   core.endGroup();

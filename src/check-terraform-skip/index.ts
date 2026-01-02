@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 
 type Inputs = {
   skipLabelPrefix: string;
@@ -13,7 +12,6 @@ type Inputs = {
 
 export const main = async () => {
   const config = lib.getConfig();
-  const globalConfig = getGlobalConfig.main_(config, {});
   if (!process.env.CI_INFO_TEMP_DIR) {
     throw new Error("CI_INFO_TEMP_DIR is not set");
   }
@@ -21,7 +19,7 @@ export const main = async () => {
     throw new Error("CI_INFO_PR_AUTHOR is not set");
   }
   const inputs = {
-    skipLabelPrefix: globalConfig.outputs.label_prefix_skip,
+    skipLabelPrefix: config.label_prefixes.skip,
     labels: path.join(process.env.CI_INFO_TEMP_DIR, "labels.txt"),
     prAuthor: process.env.CI_INFO_PR_AUTHOR,
     target: process.env.TFACTION_TARGET,

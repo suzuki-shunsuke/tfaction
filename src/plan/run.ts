@@ -13,7 +13,6 @@ type Inputs = {
   workingDirectory: string;
   renovateLogin: string;
   destroy: boolean;
-  conftestPolicyDirectory?: string;
   tfCommand: string;
   target: string;
   driftIssueNumber?: string;
@@ -71,6 +70,8 @@ const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     },
   );
@@ -114,13 +115,10 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   }
   // Error: neither S3 nor GCS bucket is configured
   else {
-    const commentConfig = path.join(installDir, "github-comment.yaml");
     await exec.exec(
       "github-comment",
       [
         "post",
-        "--config",
-        commentConfig,
         "-var",
         `tfaction_target:${inputs.target}`,
         "-k",
@@ -130,6 +128,8 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
         env: {
           ...process.env,
           GITHUB_TOKEN: inputs.githubToken,
+          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );
@@ -165,6 +165,8 @@ export const runTfmigratePlan = async (
   const env: { [key: string]: string } = {
     ...process.env,
     GITHUB_TOKEN: inputs.githubToken,
+    GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+    AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
   };
   // Set TFMIGRATE_EXEC_PATH if TF_COMMAND is not "terraform"
   if (!process.env.TFMIGRATE_EXEC_PATH && inputs.tfCommand !== "terraform") {
@@ -203,6 +205,8 @@ export const runTfmigratePlan = async (
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
       silent: true,
     },
@@ -264,6 +268,7 @@ export const runTerraformPlan = async (
     env: {
       ...process.env,
       GITHUB_TOKEN: inputs.githubToken,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
 
@@ -292,6 +297,8 @@ export const runTerraformPlan = async (
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
       silent: true,
     },
@@ -341,7 +348,7 @@ export const runTerraformPlan = async (
 
 export const main = async (): Promise<void> => {
   const config = lib.getConfig();
-  const targetConfig = await getTargetConfig.run(
+  const targetConfig = await getTargetConfig.getTargetConfig(
     {
       isApply: false,
       jobType: lib.getJobType(),
@@ -355,19 +362,15 @@ export const main = async (): Promise<void> => {
     githubToken: core.getInput("github_token"),
     workingDirectory: lib.getWorkingDir() ?? "",
     renovateLogin: config.renovate_login || "",
-    destroy: targetConfig.outputs.get("destroy") || false,
-    conftestPolicyDirectory: config.conftest_policy_directory,
-    tfCommand: targetConfig.outputs.get("terraform_command") || "terraform",
+    destroy: targetConfig.destroy || false,
+    tfCommand: targetConfig.terraform_command || "terraform",
     target: process.env.TFACTION_TARGET || "",
     driftIssueNumber: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
     prAuthor: process.env.CI_INFO_PR_AUTHOR,
     ciInfoTempDir: process.env.CI_INFO_TEMP_DIR,
-    s3BucketNameTfmigrateHistory: targetConfig.outputs.get(
-      "s3_bucket_name_tfmigrate_history",
-    ),
-    gcsBucketNameTfmigrateHistory: targetConfig.outputs.get(
-      "gcs_bucket_name_tfmigrate_history",
-    ),
+    s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
+    gcsBucketNameTfmigrateHistory:
+      targetConfig.gcs_bucket_name_tfmigrate_history,
   };
 
   const jobType = process.env.TFACTION_JOB_TYPE;

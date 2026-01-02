@@ -90,7 +90,6 @@ tasks:
     script: |
       set -eu
       npm run fmt
-      cmdx shfmt
 
   - name: pinact
     description: Run pinact
@@ -102,19 +101,3 @@ tasks:
       set -euo pipefail
       pinact run
       find . -name action.yaml | xargs pinact run
-
-  - name: shellcheck
-    shell:
-      - bash
-      - -c
-    script: |
-      set -euo pipefail
-      git ls-files | grep -E "\.sh$" | xargs shellcheck
-
-  - name: shfmt
-    shell:
-      - bash
-      - -c
-    script: |
-      set -euo pipefail
-      git ls-files | grep -E "\.sh$" | xargs shfmt -w -s

@@ -5,7 +5,6 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 import * as getTargetConfig from "../get-target-config";
 import {
   listRelatedPullRequests,
@@ -17,14 +16,11 @@ export const main = async (): Promise<void> => {
   const githubToken = core.getInput("github_token");
   const driftIssueNumber = process.env.TFACTION_DRIFT_ISSUE_NUMBER || "";
   const cfg = lib.getConfig();
-  const globalConfig = await getGlobalConfig.main_(cfg, {
-    drift_issue_number: driftIssueNumber,
-  });
   const target = lib.getTarget();
   if (!target) {
     throw new Error("TFACTION_TARGET is not set");
   }
-  const targetConfig = await getTargetConfig.run(
+  const targetConfig = await getTargetConfig.getTargetConfig(
     {
       target: target,
       workingDir: lib.getWorkingDir(),
@@ -33,13 +29,16 @@ export const main = async (): Promise<void> => {
     },
     cfg,
   );
-  const tfCommand =
-    targetConfig.outputs.get("terraform_command") || "terraform";
-  const driftIssueRepoOwner = globalConfig.outputs.drift_issue_repo_owner;
-  const driftIssueRepoName = globalConfig.outputs.drift_issue_repo_name;
+  const tfCommand = targetConfig.terraform_command || "terraform";
+  const driftIssueRepo = lib.getDriftIssueRepo(cfg);
+  const driftIssueRepoOwner = driftIssueRepo.owner;
+  const driftIssueRepoName = driftIssueRepo.name;
   const ciInfoPrNumber = process.env.CI_INFO_PR_NUMBER || "";
-  const disableUpdateRelatedPullRequests =
-    globalConfig.outputs.disable_update_related_pull_requests;
+  const disableUpdateRelatedPullRequests = !(
+    cfg.update_related_pull_requests?.enabled ?? true
+  );
+  const securefixServerRepository =
+    cfg.securefix_action?.server_repository ?? "";
   const installDir = process.env.TFACTION_INSTALL_DIR || "";
 
   // Set TFMIGRATE_EXEC_PATH if needed
@@ -63,8 +62,6 @@ export const main = async (): Promise<void> => {
         "github-comment",
         [
           "exec",
-          "--config",
-          path.join(installDir, "tfmigrate-apply/github-comment.yaml"),
           "-var",
           `tfaction_target:${target}`,
           "-k",
@@ -77,6 +74,7 @@ export const main = async (): Promise<void> => {
           ignoreReturnCode: true,
           env: {
             ...process.env,
+            GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
             GITHUB_TOKEN: githubToken,
           },
           listeners: {
@@ -113,8 +111,6 @@ export const main = async (): Promise<void> => {
         "github-comment",
         [
           "exec",
-          "--config",
-          githubCommentConfig,
           "-org",
           driftIssueRepoOwner,
           "-repo",
@@ -136,6 +132,7 @@ export const main = async (): Promise<void> => {
           ignoreReturnCode: true,
           env: {
             ...process.env,
+            GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
             GITHUB_TOKEN: githubToken,
           },
         },
@@ -157,8 +154,8 @@ export const main = async (): Promise<void> => {
     core.notice("Skip updating related pull requests");
   } else {
     const prNumbers = await listRelatedPullRequests(githubToken, target);
-    if (globalConfig.outputs.securefix_action_server_repository) {
-      await updateBranchBySecurefix(globalConfig, prNumbers);
+    if (securefixServerRepository) {
+      await updateBranchBySecurefix(securefixServerRepository, prNumbers);
     } else {
       await updateBranchByCommit(githubToken, prNumbers);
     }

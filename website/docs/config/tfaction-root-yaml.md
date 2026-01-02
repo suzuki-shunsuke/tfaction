@@ -40,13 +40,13 @@ Using Renovate and our Renovate Config Preset, you can automate the update:
 From tfaction v0.7.0, this setting is required.
 
 ```yaml
-plan_workflow_name: <GitHub Actions Workflow name running terraform-plan action>
+plan_workflow_name: <GitHub Actions Workflow file name running terraform-plan action>
 ```
 
 e.g.
 
 ```yaml
-plan_workflow_name: test
+plan_workflow_name: test.yaml
 ```
 
 ## `target` and `working_directory`
@@ -83,7 +83,7 @@ target_groups:
 
 ```yaml
 ---
-plan_workflow_name: test
+plan_workflow_name: test.yaml
 
 draft_pr: true # default is false. If `draft_pr` is true, tfaction creates pull requests as draft
 base_working_directory: "" # default is empty, which means the current directory
@@ -94,13 +94,6 @@ working_directory_file: tfaction.yaml # default is "tfaction.yaml"
 follow_up_pr_group_label:
   enabled: true # The default is false
   prefix: "tfaction:follow-up-pr-group/"
-
-# conftest_policy_directory: tfaction >= v1.1.0
-# conftest_policy_directory is the file path to the conftest policy directory.
-# The default value is "policy".
-# If conftest_policy_directory isn't set and the directory policy doesn't exist, conftest is skipped.
-# If conftest_policy_directory is set but the directory doesn't exist, the action fails.
-conftest_policy_directory: terraform/policy
 
 renovate_login: 'renovate[bot]' # default is "renovate[bot]"
 label_prefixes:

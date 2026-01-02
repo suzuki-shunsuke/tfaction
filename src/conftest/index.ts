@@ -155,28 +155,19 @@ const buildPolicies = (
   isPlan: boolean,
 ): lib.ConftestPolicyConfig[] => {
   const policyMap = new Map<string, lib.ConftestPolicyConfig>();
-  const conftest = config.conftest ?? {};
 
-  for (const policy of config.conftest?.policies ?? []) {
-    if (policy.id) {
-      policyMap.set(policy.id, policy);
-    }
+  if (!config.conftest) {
+    return [];
   }
 
-  if (conftest.policies === undefined) {
-    conftest.policies = [];
-    if (config.conftest_policy_directory) {
-      conftest.policies.push({
-        policy: config.conftest_policy_directory,
-        plan: true,
-      });
-    } else {
-      if (fs.existsSync("policy")) {
-        conftest.policies.push({
-          policy: "policy",
-          plan: true,
-        });
-      }
+  const conftest = config.conftest;
+  if (!conftest.policies || conftest.policies.length === 0) {
+    return [];
+  }
+
+  for (const policy of conftest.policies) {
+    if (policy.id) {
+      policyMap.set(policy.id, policy);
     }
   }
 
@@ -227,7 +218,7 @@ export const main = async () => {
 };
 
 export const run = async (inputs: Inputs, config: lib.Config) => {
-  const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
+  const workingDirectoryFile = config.working_directory_file;
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
 
@@ -250,6 +241,8 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
         env: {
           ...process.env,
           GITHUB_TOKEN: inputs.githubToken,
+          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );
@@ -274,6 +267,8 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
   }

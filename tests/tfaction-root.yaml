@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://github.com/suzuki-shunsuke/tfaction/raw/301cc05ddd21e733ed2f67e8c7f4b2672440373b/schema/tfaction-root.json
-plan_workflow_name: test
+plan_workflow_name: test.yaml
 
 label_prefixes:
   tfmigrate: "migrate:"
@@ -8,9 +8,6 @@ skip_terraform_by_renovate: true
 renovate_terraform_labels:
   - terraform
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_amd64
-# conftest_policy_directory: conftest-policy
-
-# skip_create_pr: true
 
 conftest:
   policies:

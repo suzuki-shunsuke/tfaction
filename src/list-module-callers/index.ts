@@ -9,6 +9,7 @@ import {
   resolveRelativeCallTree,
   ModuleToCallers,
 } from "./lib";
+import * as lib from "../lib";
 
 export const main = async () => {
   const configFiles = fs
@@ -108,10 +109,16 @@ export const list = async (
 
     const tfDir = path.dirname(tfFile);
 
-    const outInspect = await exec.getExecOutput("terraform-config-inspect", [
-      "--json",
-      tfDir,
-    ]);
+    const outInspect = await exec.getExecOutput(
+      "terraform-config-inspect",
+      ["--json", tfDir],
+      {
+        env: {
+          ...process.env,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+        },
+      },
+    );
     const inspection = JSON.parse(outInspect.stdout);
 
     // List keys of Local Path modules (source starts with ./ or ../) in module_calls
