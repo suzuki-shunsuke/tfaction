@@ -292,7 +292,22 @@ const RawConfig = z.object({
 export type RawConfig = z.infer<typeof RawConfig>;
 
 // Config with default values applied
-export interface Config extends Omit<RawConfig, "base_working_directory" | "working_directory_file" | "module_base_directory" | "module_file" | "renovate_login" | "draft_pr" | "skip_create_pr" | "terraform_command" | "label_prefixes" | "tfsec" | "tflint" | "trivy" | "follow_up_pr_group_label"> {
+export interface Config extends Omit<
+  RawConfig,
+  | "base_working_directory"
+  | "working_directory_file"
+  | "module_base_directory"
+  | "module_file"
+  | "renovate_login"
+  | "draft_pr"
+  | "skip_create_pr"
+  | "terraform_command"
+  | "label_prefixes"
+  | "tfsec"
+  | "tflint"
+  | "trivy"
+  | "follow_up_pr_group_label"
+> {
   base_working_directory: string;
   working_directory_file: string;
   module_base_directory: string;
