@@ -115,7 +115,7 @@ export const list = async (
       {
         env: {
           ...process.env,
-          AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );

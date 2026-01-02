@@ -67,7 +67,7 @@ export const main = async () => {
           ...process.env,
           GITHUB_TOKEN: githubToken,
           GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-          AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );

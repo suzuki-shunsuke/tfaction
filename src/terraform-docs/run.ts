@@ -60,7 +60,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
       cwd: inputs.workingDirectory,
       env: {
         ...process.env,
-        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
 
@@ -92,7 +92,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
 

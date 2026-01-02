@@ -102,7 +102,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     env: {
       ...process.env,
       GITHUB_TOKEN: inputs.githubTokenForTflintInit,
-      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   core.endGroup();
@@ -114,7 +114,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     silent: true,
     env: {
       ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   if (help.stdout.includes("--call-module-type")) {
@@ -131,7 +131,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     ignoreReturnCode: true,
     env: {
       ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   core.info("Parsing tflint result");
@@ -219,7 +219,7 @@ ${table}`;
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
   }
@@ -259,7 +259,7 @@ ${table}`;
     ignoreReturnCode: true,
     env: {
       ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   if (
@@ -278,7 +278,7 @@ ${table}`;
     env: {
       ...process.env,
       REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
-      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   core.endGroup();

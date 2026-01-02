@@ -169,7 +169,7 @@ export const main = async () => {
     cwd: modulePath,
     env: {
       ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
     listeners: {
       stdout: (data: Buffer) => {

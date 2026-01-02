@@ -71,7 +71,7 @@ const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     },
   );
@@ -129,7 +129,7 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
           ...process.env,
           GITHUB_TOKEN: inputs.githubToken,
           GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-          AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );
@@ -166,7 +166,7 @@ export const runTfmigratePlan = async (
     ...process.env,
     GITHUB_TOKEN: inputs.githubToken,
     GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-    AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+    AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
   };
   // Set TFMIGRATE_EXEC_PATH if TF_COMMAND is not "terraform"
   if (!process.env.TFMIGRATE_EXEC_PATH && inputs.tfCommand !== "terraform") {
@@ -206,7 +206,7 @@ export const runTfmigratePlan = async (
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
       silent: true,
     },
@@ -268,7 +268,7 @@ export const runTerraformPlan = async (
     env: {
       ...process.env,
       GITHUB_TOKEN: inputs.githubToken,
-      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
 
@@ -298,7 +298,7 @@ export const runTerraformPlan = async (
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
       silent: true,
     },

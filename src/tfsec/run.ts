@@ -118,7 +118,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     ignoreReturnCode: true,
     env: {
       ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   core.info("Parsing tfsec result");
@@ -170,7 +170,7 @@ ${table}`;
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
   }
@@ -209,7 +209,7 @@ ${table}`;
       env: {
         ...process.env,
         REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
-        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     },
   );
