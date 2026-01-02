@@ -40,7 +40,7 @@ export const main = async () => {
         renovate_login: "renovate[bot]",
         draft_pr: "false",
         skip_create_pr: "false",
-        plan_workflow_name: "test",
+        plan_workflow_name: "test.yaml",
         label_prefix_target: "target:",
         label_prefix_tfmigrate: "migrate:",
         label_prefix_skip: "skip:",
