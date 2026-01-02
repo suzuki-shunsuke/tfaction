@@ -26,9 +26,9 @@ import * as trivy from "./trivy";
 import * as tflint from "./tflint";
 import * as commit from "./commit";
 import * as terraformDocs from "./terraform-docs";
+import * as apply from "./apply";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as plan from "./plan";
-import * as planAction from "./plan-action";
 import * as releaseModule from "./release-module";
 import * as ciinfo from "./ci-info";
 import * as listWorkingDirs from "./list-working-dirs";
@@ -47,6 +47,7 @@ interface API {
 
 export const main = async (inputs: Inputs) => {
   const actions = new Map<string, API>([
+    ["apply", apply],
     ["aqua-update-checksum", aquaUpdateChecksum],
     ["check-terraform-skip", checkTerraformSkip],
     ["conftest", conftest],
@@ -68,7 +69,6 @@ export const main = async (inputs: Inputs) => {
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
     ["list-working-dirs", listWorkingDirs],
     ["plan", plan],
-    ["plan-action", planAction],
     ["release-module", releaseModule],
     ["scaffold-module", scaffoldModule],
     ["scaffold-tfmigrate", scaffoldTfmigrate],

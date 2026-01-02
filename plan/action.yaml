@@ -46,7 +46,7 @@ runs:
     - uses: suzuki-shunsuke/tfaction@main
       id: main
       with:
-        action: plan-action
+        action: plan
         github_token: ${{inputs.github_token}}
         securefix_action_app_id: ${{inputs.securefix_action_app_id}}
         securefix_action_app_private_key: ${{inputs.securefix_action_app_private_key}}
