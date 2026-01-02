@@ -13,11 +13,18 @@ export const GitHubActionPath = path.join(
   "..",
   "..",
 );
+
 export const GitHubCommentConfig = path.join(
   GitHubActionPath,
   "install",
   "github-comment.yaml",
 );
+
+const aquaConfig = path.join(GitHubActionPath, "install", "aqua", "aqua.yaml");
+
+export const AquaConfig = process.env.AQUA_GLOBAL_CONFIG
+  ? `${process.env.AQUA_GLOBAL_CONFIG}:${aquaConfig}`
+  : aquaConfig;
 
 const GitHubEnvironment = z.union([
   z.string(),

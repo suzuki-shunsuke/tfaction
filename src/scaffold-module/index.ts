@@ -167,6 +167,10 @@ export const main = async () => {
   let docsOutput = "";
   await exec.exec("terraform-docs", ["."], {
     cwd: modulePath,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+    },
     listeners: {
       stdout: (data: Buffer) => {
         docsOutput += data.toString();

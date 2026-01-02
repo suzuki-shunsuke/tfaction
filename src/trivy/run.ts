@@ -91,6 +91,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const out = await exec.getExecOutput("trivy", args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.AquaConfig,
+    },
   });
   core.endGroup();
   core.info("Parsing trivy config result");
@@ -142,6 +146,7 @@ ${table}`;
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
       },
     });
   }
@@ -181,6 +186,7 @@ ${table}`;
       env: {
         ...process.env,
         REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
+        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
       },
     },
   );

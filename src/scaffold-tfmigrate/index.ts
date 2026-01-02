@@ -249,6 +249,7 @@ const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
       env: {
         ...process.env,
         GITHUB_TOKEN: githubToken,
+        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
       },
     },
   );
@@ -411,6 +412,7 @@ export const main = async () => {
       env: {
         ...process.env,
         GITHUB_TOKEN: githubToken,
+        AQUA_GLOBAL_CONFIG: lib.AquaConfig,
       },
     });
     branch = await getCurrentBranch();
