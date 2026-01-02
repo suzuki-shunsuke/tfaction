@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 
 import * as lib from "../lib";
-import * as getTargetConfig from "../get-target-config";
+import { getTargetConfig } from "../get-target-config";
 import * as getGlobalConfig from "../get-global-config";
 import { run as runConftest } from "../conftest";
 import { run as runTrivy } from "../trivy/run";
@@ -19,7 +19,7 @@ export const main = async () => {
     core.getInput("securefix_action_app_private_key") || "";
 
   // Step 1: Get target config
-  const targetConfigResult = await getTargetConfig.run(
+  const targetConfig = await getTargetConfig(
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
@@ -28,22 +28,23 @@ export const main = async () => {
     },
     config,
   );
-  // Export envs and set outputs from target config
-  for (const [key, value] of targetConfigResult.envs) {
-    core.exportVariable(key, value);
-  }
-  for (const [key, value] of targetConfigResult.outputs) {
-    core.setOutput(key, value);
+
+  // Export envs
+  core.exportVariable("TFACTION_WORKING_DIR", targetConfig.working_directory);
+  core.exportVariable("TFACTION_TARGET", targetConfig.target);
+  if (targetConfig.env) {
+    for (const [key, value] of Object.entries(targetConfig.env)) {
+      core.exportVariable(key, value);
+    }
   }
 
   // Step 2: Get global config
   await getGlobalConfig.main();
 
-  const workingDir = targetConfigResult.outputs.get("working_directory") || "";
-  const destroy = targetConfigResult.outputs.get("destroy") === true;
-  const tfCommand =
-    targetConfigResult.outputs.get("terraform_command") || "terraform";
-  const target = process.env.TFACTION_TARGET || "";
+  const workingDir = targetConfig.working_directory;
+  const destroy = targetConfig.destroy ?? false;
+  const tfCommand = targetConfig.terraform_command;
+  const target = targetConfig.target;
   const serverRepository = config.securefix_action?.server_repository ?? "";
 
   // Step 3: Conftest
@@ -83,7 +84,7 @@ export const main = async () => {
   }
 
   // Step 5: trivy (conditional)
-  if (!destroy && config.trivy?.enabled) {
+  if (!destroy && targetConfig.enable_trivy) {
     await runTrivy({
       workingDirectory: workingDir,
       githubToken,
@@ -93,7 +94,7 @@ export const main = async () => {
   }
 
   // Step 6: tfsec (conditional)
-  if (!destroy && config.tfsec?.enabled) {
+  if (!destroy && targetConfig.enable_tfsec) {
     await runTfsec({
       workingDirectory: workingDir,
       githubToken,
@@ -103,14 +104,14 @@ export const main = async () => {
   }
 
   // Step 7: tflint (conditional)
-  if (!destroy && config.tflint?.enabled) {
+  if (!destroy && targetConfig.enable_tflint) {
     await runTflint({
       workingDirectory: workingDir,
       githubToken,
       githubTokenForTflintInit: "",
       githubTokenForFix: "",
       githubComment: true,
-      fix: config.tflint?.fix ?? false,
+      fix: targetConfig.tflint_fix,
       serverRepository,
       securefixActionAppId: securefixAppId,
       securefixActionAppPrivateKey: securefixAppPrivateKey,
@@ -150,10 +151,7 @@ export const main = async () => {
   }
 
   // Step 10: terraform-docs (conditional)
-  const enableTerraformDocs = targetConfigResult.outputs.get(
-    "enable_terraform_docs",
-  );
-  if (!destroy && enableTerraformDocs) {
+  if (!destroy && targetConfig.enable_terraform_docs) {
     await runTerraformDocs({
       workingDirectory: workingDir,
       githubToken,
