@@ -209,6 +209,7 @@ ${table}`;
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
     });
   }

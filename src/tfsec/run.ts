@@ -2,6 +2,7 @@ import * as exec from "@actions/exec";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
+import * as lib from "../lib";
 
 type Inputs = {
   workingDirectory: string;
@@ -164,6 +165,7 @@ ${table}`;
       env: {
         ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
     });
   }

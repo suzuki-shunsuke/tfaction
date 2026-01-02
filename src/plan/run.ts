@@ -113,13 +113,10 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   }
   // Error: neither S3 nor GCS bucket is configured
   else {
-    const commentConfig = path.join(installDir, "github-comment.yaml");
     await exec.exec(
       "github-comment",
       [
         "post",
-        "--config",
-        commentConfig,
         "-var",
         `tfaction_target:${inputs.target}`,
         "-k",
@@ -129,6 +126,7 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
         env: {
           ...process.env,
           GITHUB_TOKEN: inputs.githubToken,
+          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
         },
       },
     );
