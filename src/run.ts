@@ -30,6 +30,7 @@ import * as ciinfo from "./ci-info";
 import * as listWorkingDirs from "./list-working-dirs";
 import * as downloadPlan from "./download-plan";
 import * as terraformApply from "./terraform-apply";
+import * as testModule from "./test-module";
 import * as tfmigrateApply from "./tfmigrate-apply";
 
 type Inputs = {
@@ -66,6 +67,7 @@ export const main = async (inputs: Inputs) => {
     ["scaffold-working-dir", scaffoldWorkingDir],
     ["terraform-apply", terraformApply],
     ["terraform-docs", terraformDocs],
+    ["test-module", testModule],
     ["tfmigrate-apply", tfmigrateApply],
     ["tfsec", tfsec],
     ["trivy", trivy],
