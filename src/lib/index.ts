@@ -8,9 +8,16 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { fileURLToPath } from "node:url";
 
-export const getGitHubActionPath = (): string => {
-  return path.join(fileURLToPath(import.meta.url), "..", "..");
-};
+export const GitHubActionPath = path.join(
+  fileURLToPath(import.meta.url),
+  "..",
+  "..",
+);
+export const GitHubCommentConfig = path.join(
+  GitHubActionPath,
+  "install",
+  "github-comment.yaml",
+);
 
 const GitHubEnvironment = z.union([
   z.string(),

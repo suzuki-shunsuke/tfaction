@@ -1,5 +1,4 @@
-# https://github.com/suzuki-shunsuke/github-comment
-# This file is a merged version of all github-comment.yaml files in the repository
+# yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/github-comment/v6.4.1/json-schema/github-comment.json
 post:
   invalid-workflow-sha:
     template: |
