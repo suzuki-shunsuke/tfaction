@@ -1,4 +1,5 @@
 import { run, Result } from "./index";
+import * as lib from "../lib";
 import { expect, test } from "vitest";
 
 test("default", async () => {
@@ -33,7 +34,7 @@ test("default", async () => {
         isApply: false,
         jobType: "terraform",
       },
-      {
+      lib.applyConfigDefaults({
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
@@ -42,7 +43,7 @@ test("default", async () => {
             template_dir: "templates/aws",
           },
         ],
-      },
+      }),
     ),
   ).toStrictEqual(result);
 });
@@ -79,7 +80,7 @@ test("config", async () => {
         isApply: false,
         jobType: "terraform",
       },
-      {
+      lib.applyConfigDefaults({
         plan_workflow_name: "plan.yaml",
         terraform_command: "tofu",
         tfsec: {
@@ -100,7 +101,7 @@ test("config", async () => {
             aws_role_session_name: "test",
           },
         ],
-      },
+      }),
     ),
   ).toStrictEqual(result);
 });
@@ -133,7 +134,7 @@ test("scaffold_working_dir", async () => {
         isApply: false,
         jobType: "scaffold_working_dir",
       },
-      {
+      lib.applyConfigDefaults({
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
@@ -142,7 +143,7 @@ test("scaffold_working_dir", async () => {
             template_dir: "templates/aws",
           },
         ],
-      },
+      }),
     ),
   ).toStrictEqual(result);
 });
