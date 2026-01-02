@@ -4,7 +4,6 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 
 export const listFiles = async (
   baseDir: string,
@@ -29,18 +28,12 @@ export const listFiles = async (
 };
 
 export const main = async (): Promise<void> => {
-  // Get global config
   const config = lib.getConfig();
-  const globalConfigResult = getGlobalConfig.main_(config, {
-    drift_issue_number: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
-  });
 
-  const baseWorkingDirectory =
-    globalConfigResult.outputs.base_working_directory;
-  const workingDirectoryFile =
-    globalConfigResult.outputs.working_directory_file;
-  const moduleBaseDirectory = globalConfigResult.outputs.module_base_directory;
-  const moduleFile = globalConfigResult.outputs.module_file;
+  const baseWorkingDirectory = config.base_working_directory;
+  const workingDirectoryFile = config.working_directory_file;
+  const moduleBaseDirectory = config.module_base_directory;
+  const moduleFile = config.module_file;
 
   // List working directories
   const workingDirs = await listFiles(

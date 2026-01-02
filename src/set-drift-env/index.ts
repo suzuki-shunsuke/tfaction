@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 
 type Issue = {
   number: number;
@@ -13,10 +12,10 @@ export const main = async () => {
   const issue: Issue = JSON.parse(issueInput);
 
   const config = lib.getConfig();
-  const globalConfig = getGlobalConfig.main_(config, {});
+  const driftIssueRepo = lib.getDriftIssueRepo(config);
 
-  const repoOwner = globalConfig.outputs.drift_issue_repo_owner;
-  const repoName = globalConfig.outputs.drift_issue_repo_name;
+  const repoOwner = driftIssueRepo.owner;
+  const repoName = driftIssueRepo.name;
   const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
 
   // TFCMT environment variables

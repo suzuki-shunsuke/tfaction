@@ -5,7 +5,6 @@ import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 
@@ -232,16 +231,14 @@ export const main = async () => {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
 
-  // Get global config
   const config = lib.getConfig();
-  const globalConfigResult = getGlobalConfig.main_(config, {});
 
-  const skipCreatePr = globalConfigResult.outputs.skip_create_pr;
-  const draftPr = globalConfigResult.outputs.draft_pr;
+  const skipCreatePr = config.skip_create_pr;
+  const draftPr = config.draft_pr;
   const securefixServerRepository =
-    globalConfigResult.outputs.securefix_action_server_repository;
+    config.securefix_action?.server_repository ?? "";
   const securefixPRBaseBranch =
-    globalConfigResult.outputs.securefix_action_pull_request_base_branch;
+    config.securefix_action?.pull_request?.base_branch ?? "";
 
   // Run aqua i -l -a
   core.info(`Installing dependencies with aqua in ${modulePath}`);

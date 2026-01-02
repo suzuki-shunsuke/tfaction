@@ -4,7 +4,6 @@ import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 import { listFiles } from "../list-working-dirs";
 import { list as listModuleCallers } from "../list-module-callers";
 
@@ -472,18 +471,17 @@ export const main = async () => {
   const prPath = `${process.env.CI_INFO_TEMP_DIR}/pr.json`;
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
   const cfg = lib.getConfig();
-  const globalConfig = await getGlobalConfig.main_(cfg, {});
 
-  const baseWorkingDirectory = globalConfig.outputs.base_working_directory;
-  const workingDirectoryFile = globalConfig.outputs.working_directory_file;
+  const baseWorkingDirectory = cfg.base_working_directory;
+  const workingDirectoryFile = cfg.working_directory_file;
 
   const configFiles = await listFiles(
     baseWorkingDirectory,
     workingDirectoryFile,
   );
 
-  const moduleBaseDirectory = globalConfig.outputs.module_base_directory;
-  const moduleFile = globalConfig.outputs.module_file;
+  const moduleBaseDirectory = cfg.module_base_directory;
+  const moduleFile = cfg.module_file;
   const modules = await listFiles(moduleBaseDirectory, moduleFile);
 
   let moduleCallers: any = null;
@@ -495,7 +493,7 @@ export const main = async () => {
     labels: fs
       .readFileSync(`${process.env.CI_INFO_TEMP_DIR}/labels.txt`, "utf8")
       .split("\n"),
-    config: lib.getConfig(),
+    config: cfg,
     isApply: lib.getIsApply(),
     changedFiles: fs
       .readFileSync(
@@ -505,9 +503,8 @@ export const main = async () => {
       .split("\n"),
     configFiles,
     moduleFiles: modules,
-    maxChangedWorkingDirectories:
-      globalConfig.outputs.max_changed_working_dirs ?? 0,
-    maxChangedModules: globalConfig.outputs.max_changed_modules ?? 0,
+    maxChangedWorkingDirectories: cfg.limit_changed_dirs?.working_dirs ?? 0,
+    maxChangedModules: cfg.limit_changed_dirs?.modules ?? 0,
     pr,
     payload: github.context.payload,
     githubToken: core.getInput("github_token", { required: true }),

@@ -655,3 +655,16 @@ export const checkDriftDetectionEnabled = (
   }
   return cfg.drift_detection?.enabled ?? false;
 };
+
+export interface DriftIssueRepo {
+  owner: string;
+  name: string;
+}
+
+export const getDriftIssueRepo = (cfg: Config): DriftIssueRepo => {
+  return {
+    owner:
+      cfg.drift_detection?.issue_repo_owner ?? github.context.repo.owner,
+    name: cfg.drift_detection?.issue_repo_name ?? github.context.repo.repo,
+  };
+};

@@ -5,7 +5,6 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 import * as getTargetConfig from "../get-target-config";
 import * as updateBranchAction from "@csm-actions/update-branch-action";
 import * as githubAppToken from "@suzuki-shunsuke/github-app-token";
@@ -56,9 +55,6 @@ export const main = async (): Promise<void> => {
   const githubToken = core.getInput("github_token");
   const driftIssueNumber = process.env.TFACTION_DRIFT_ISSUE_NUMBER || "";
   const cfg = lib.getConfig();
-  const globalConfig = await getGlobalConfig.main_(cfg, {
-    drift_issue_number: driftIssueNumber,
-  });
   const target = lib.getTarget();
   if (!target) {
     throw new Error("TFACTION_TARGET is not set");
@@ -74,11 +70,15 @@ export const main = async (): Promise<void> => {
     cfg,
   );
   const tfCommand = targetConfig.terraform_command || "terraform";
-  const driftIssueRepoOwner = globalConfig.outputs.drift_issue_repo_owner;
-  const driftIssueRepoName = globalConfig.outputs.drift_issue_repo_name;
+  const driftIssueRepo = lib.getDriftIssueRepo(cfg);
+  const driftIssueRepoOwner = driftIssueRepo.owner;
+  const driftIssueRepoName = driftIssueRepo.name;
   const ciInfoPrNumber = process.env.CI_INFO_PR_NUMBER || "";
-  const disableUpdateRelatedPullRequests =
-    globalConfig.outputs.disable_update_related_pull_requests;
+  const disableUpdateRelatedPullRequests = !(
+    cfg.update_related_pull_requests?.enabled ?? true
+  );
+  const securefixServerRepository =
+    cfg.securefix_action?.server_repository ?? "";
   const installDir = process.env.TFACTION_INSTALL_DIR || "";
   const planFilePath = await downloadPlanFile();
   if (!planFilePath) {
@@ -190,8 +190,8 @@ export const main = async (): Promise<void> => {
     core.notice("Skip updating related pull requests");
   } else {
     const prNumbers = await listRelatedPullRequests(githubToken, target);
-    if (globalConfig.outputs.securefix_action_server_repository) {
-      await updateBranchBySecurefix(globalConfig, prNumbers);
+    if (securefixServerRepository) {
+      await updateBranchBySecurefix(securefixServerRepository, prNumbers);
     } else {
       await updateBranchByCommit(githubToken, prNumbers);
     }
@@ -203,13 +203,11 @@ export const main = async (): Promise<void> => {
 };
 
 export const updateBranchBySecurefix = async (
-  globalConfig: getGlobalConfig.Result,
+  securefixServerRepository: string,
   prNumbers: number[],
 ): Promise<void> => {
-  const serverRepoOwner =
-    globalConfig.outputs.securefix_action_server_repository.split("/")[0];
-  const serverRepoName =
-    globalConfig.outputs.securefix_action_server_repository.split("/")[1];
+  const serverRepoOwner = securefixServerRepository.split("/")[0];
+  const serverRepoName = securefixServerRepository.split("/")[1];
   const token = await githubAppToken.create({
     appId: core.getInput("securefix_action_app_id"),
     privateKey: core.getInput("securefix_action_app_private_key"),
