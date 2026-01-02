@@ -218,7 +218,8 @@ export const main = async () => {
 };
 
 export const run = async (inputs: Inputs, config: lib.Config) => {
-  const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
+  const workingDirectoryFile = config.working_directory_file;
+  const githubActionPath = lib.getGitHubActionPath();
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
 
@@ -241,6 +242,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
         env: {
           ...process.env,
           GITHUB_TOKEN: inputs.githubToken,
+          GH_COMMENT_CONFIG: path.join(githubActionPath, "github-comment.yaml"),
         },
       },
     );

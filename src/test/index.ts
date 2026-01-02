@@ -29,18 +29,6 @@ export const main = async () => {
     config,
   );
 
-  // Export envs
-  core.exportVariable("TFACTION_WORKING_DIR", targetConfig.working_directory);
-  core.exportVariable("TFACTION_TARGET", targetConfig.target);
-  if (targetConfig.env) {
-    for (const [key, value] of Object.entries(targetConfig.env)) {
-      core.exportVariable(key, value);
-    }
-  }
-
-  // Step 2: Get global config
-  await getGlobalConfig.main();
-
   const workingDir = targetConfig.working_directory;
   const destroy = targetConfig.destroy ?? false;
   const tfCommand = targetConfig.terraform_command;

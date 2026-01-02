@@ -6,6 +6,11 @@ import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { fileURLToPath } from "node:url";
+
+export const getGitHubActionPath = (): string => {
+  return path.join(fileURLToPath(import.meta.url), "..", "..");
+};
 
 const GitHubEnvironment = z.union([
   z.string(),
