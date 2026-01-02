@@ -24,7 +24,7 @@ export const main = async (): Promise<void> => {
   if (!target) {
     throw new Error("TFACTION_TARGET is not set");
   }
-  const targetConfig = await getTargetConfig.run(
+  const targetConfig = await getTargetConfig.getTargetConfig(
     {
       target: target,
       workingDir: lib.getWorkingDir(),
@@ -33,8 +33,7 @@ export const main = async (): Promise<void> => {
     },
     cfg,
   );
-  const tfCommand =
-    targetConfig.outputs.get("terraform_command") || "terraform";
+  const tfCommand = targetConfig.terraform_command || "terraform";
   const driftIssueRepoOwner = globalConfig.outputs.drift_issue_repo_owner;
   const driftIssueRepoName = globalConfig.outputs.drift_issue_repo_name;
   const ciInfoPrNumber = process.env.CI_INFO_PR_NUMBER || "";
