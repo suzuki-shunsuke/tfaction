@@ -37,7 +37,7 @@ export const run = async (
   inputs: Inputs,
   config: lib.Config,
 ): Promise<Result> => {
-  const workingDirectoryFile = config.working_directory_file ?? "tfaction.yaml";
+  const workingDirectoryFile = config.working_directory_file;
 
   const envs = new Map<string, any>();
   const outputs = new Map<string, any>();
