@@ -33,13 +33,13 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@e7a4912c0394f5344f0e56df111dafd4c129738d
       with:
         action: install
     # ci-info
     - if: |
         ! contains(fromJSON('["workflow_dispatch", "schedule"]'), github.event_name)
-      uses: suzuki-shunsuke/tfaction@main
+      uses: suzuki-shunsuke/tfaction@e7a4912c0394f5344f0e56df111dafd4c129738d
       with:
         action: ci-info
         github_token: ${{ inputs.github_token }}
@@ -58,7 +58,7 @@ runs:
           exit 1
         fi
 
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@e7a4912c0394f5344f0e56df111dafd4c129738d
       id: target-config
       with:
         action: get-target-config
@@ -75,7 +75,7 @@ runs:
           -H "Content-type: application/json" \
           -d "[{\"name\":\"${TFACTION_TARGET}\"}]"
 
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@e7a4912c0394f5344f0e56df111dafd4c129738d
       id: global-config
       with:
         action: get-global-config
@@ -90,7 +90,7 @@ runs:
       env:
         TARGET_CONFIG: ${{toJSON(steps.target-config.outputs)}}
 
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@e7a4912c0394f5344f0e56df111dafd4c129738d
       if: steps.global-config.outputs.aqua_update_checksum_enabled == 'true'
       with:
         action: aqua-update-checksum
@@ -115,7 +115,7 @@ runs:
         role-session-name: ${{ steps.target-config.outputs.aws_role_session_name }}
         aws-region: ${{ steps.target-config.outputs.aws_region }}
 
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@e7a4912c0394f5344f0e56df111dafd4c129738d
       with:
         action: export-aws-secrets-manager
 
@@ -196,7 +196,7 @@ runs:
         fi
 
     - if: steps.terraform-init.outputs.changed_file != ''
-      uses: suzuki-shunsuke/tfaction@main
+      uses: suzuki-shunsuke/tfaction@e7a4912c0394f5344f0e56df111dafd4c129738d
       with:
         action: commit
         commit_message: "chore: update .terraform.lock.hcl"
