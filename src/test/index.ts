@@ -66,6 +66,7 @@ export const main = async () => {
         env: {
           ...process.env,
           GITHUB_TOKEN: githubToken,
+          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
         },
       },
     );
