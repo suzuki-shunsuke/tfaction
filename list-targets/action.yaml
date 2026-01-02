@@ -18,7 +18,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@bee61a58383b8edf0ec308571ce924dc9cd142a6
       id: list-targets
       with:
         action: list-targets

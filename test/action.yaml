@@ -20,7 +20,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@bee61a58383b8edf0ec308571ce924dc9cd142a6
       with:
         action: test
         github_token: ${{inputs.github_token}}
