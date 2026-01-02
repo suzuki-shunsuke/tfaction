@@ -13,6 +13,7 @@ import * as getTargetConfig from "./get-target-config";
 import * as listChangeModules from "./list-changed-modules";
 import * as install from "./install";
 import * as listModuleCallers from "./list-module-callers";
+import * as listTargets from "./list-targets";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 import * as createDriftIssues from "./create-drift-issues";
 import * as getOrCreateDriftIssue from "./get-or-create-drift-issue";
@@ -62,6 +63,7 @@ export const main = async (inputs: Inputs) => {
     ["install", install],
     ["list-changed-modules", listChangeModules],
     ["list-module-callers", listModuleCallers],
+    ["list-targets", listTargets],
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
     ["list-working-dirs", listWorkingDirs],
     ["plan", plan],
