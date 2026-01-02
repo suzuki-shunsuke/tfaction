@@ -40,13 +40,13 @@ Using Renovate and our Renovate Config Preset, you can automate the update:
 From tfaction v0.7.0, this setting is required.
 
 ```yaml
-plan_workflow_name: <GitHub Actions Workflow name running terraform-plan action>
+plan_workflow_name: <GitHub Actions Workflow file name running terraform-plan action>
 ```
 
 e.g.
 
 ```yaml
-plan_workflow_name: test
+plan_workflow_name: test.yaml
 ```
 
 ## `target` and `working_directory`
@@ -83,7 +83,7 @@ target_groups:
 
 ```yaml
 ---
-plan_workflow_name: test
+plan_workflow_name: test.yaml
 
 draft_pr: true # default is false. If `draft_pr` is true, tfaction creates pull requests as draft
 base_working_directory: "" # default is empty, which means the current directory

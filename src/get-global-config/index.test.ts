@@ -14,7 +14,7 @@ test("default", () => {
       renovate_login: "renovate[bot]",
       draft_pr: false,
       skip_create_pr: false,
-      plan_workflow_name: "plan",
+      plan_workflow_name: "plan.yaml",
 
       label_prefix_target: "target:",
       label_prefix_tfmigrate: "tfmigrate:",
@@ -46,7 +46,7 @@ test("default", () => {
         label_prefixes: {
           skip: "skip:",
         },
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         target_groups: [],
       },
       {
@@ -79,7 +79,7 @@ test("customize", () => {
       TFACTION_SKIP_ADDING_AQUA_PACKAGES: true,
     },
     outputs: {
-      plan_workflow_name: "plan",
+      plan_workflow_name: "plan.yaml",
       base_working_directory: "terraform",
       working_directory_file: "tfaction-config.yaml",
       module_base_directory: "modules",
@@ -120,7 +120,7 @@ test("customize", () => {
           skip: "skip:",
         },
         target_groups: [],
-        plan_workflow_name: "plan",
+        plan_workflow_name: "plan.yaml",
         base_working_directory: "terraform",
         working_directory_file: "tfaction-config.yaml",
         module_base_directory: "modules",
