@@ -27,6 +27,7 @@ import * as commit from "./commit";
 import * as terraformDocs from "./terraform-docs";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as plan from "./plan";
+import * as releaseModule from "./release-module";
 import * as ciinfo from "./ci-info";
 import * as listWorkingDirs from "./list-working-dirs";
 import * as downloadPlan from "./download-plan";
@@ -64,6 +65,7 @@ export const main = async (inputs: Inputs) => {
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
     ["list-working-dirs", listWorkingDirs],
     ["plan", plan],
+    ["release-module", releaseModule],
     ["scaffold-module", scaffoldModule],
     ["scaffold-tfmigrate", scaffoldTfmigrate],
     ["scaffold-working-dir", scaffoldWorkingDir],

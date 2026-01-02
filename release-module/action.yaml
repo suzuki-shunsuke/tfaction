@@ -16,46 +16,9 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: |
-        echo "::error ::module_path is required"
-        exit 1
-      shell: bash
-      if: inputs.module_path == ''
-    - run: |
-        echo "::error ::version is required"
-        exit 1
-      shell: bash
-      if: inputs.version == ''
-    - run: |
-        if ! [ -d "$MODULE_PATH" ]; then
-          echo "::error ::module_path is invalid. $MODULE_PATH isn't found"
-          exit 1
-        fi
-      shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
-
-    - run: |
-        module_name=${MODULE_PATH//\//_}
-        echo "tag=module_${module_name}_${{inputs.version}}" >> "$GITHUB_OUTPUT"
-      id: get-tag
-      shell: bash
-      env:
-        MODULE_PATH: ${{inputs.module_path}}
-    - run: gh api "repos/{owner}/{repo}/git/refs" -f "sha=${GITHUB_SHA}" -f "ref=refs/tags/${{steps.get-tag.outputs.tag}}"
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-
-    - run: |
-        note="module: $MODULE_PATH
-        version: $MODULE_VERSION
-
-        [Source code]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/${{steps.get-tag.outputs.tag}}/$MODULE_PATH)
-        [Versions]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases?q=$MODULE_PATH)"
-        gh release create "${{steps.get-tag.outputs.tag}}" --title "${{steps.get-tag.outputs.tag}}" -n "${note}"
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{inputs.github_token}}
-        MODULE_PATH: ${{inputs.module_path}}
-        MODULE_VERSION: ${{inputs.version}}
+    - uses: suzuki-shunsuke/tfaction@main
+      with:
+        action: release-module
+        module_path: ${{inputs.module_path}}
+        version: ${{inputs.version}}
+        github_token: ${{inputs.github_token}}
