@@ -45,7 +45,9 @@ export const main = async () => {
   );
   core.setOutput(
     "aqua_update_checksum_skip_push",
-    driftIssueNumber ? true : (config.aqua?.update_checksum?.skip_push ?? false),
+    driftIssueNumber
+      ? true
+      : (config.aqua?.update_checksum?.skip_push ?? false),
   );
   core.setOutput("enable_tfsec", config.tfsec?.enabled ?? false);
   core.setOutput("enable_tflint", config.tflint?.enabled ?? true);

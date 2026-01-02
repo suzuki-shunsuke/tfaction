@@ -663,8 +663,7 @@ export interface DriftIssueRepo {
 
 export const getDriftIssueRepo = (cfg: Config): DriftIssueRepo => {
   return {
-    owner:
-      cfg.drift_detection?.issue_repo_owner ?? github.context.repo.owner,
+    owner: cfg.drift_detection?.issue_repo_owner ?? github.context.repo.owner,
     name: cfg.drift_detection?.issue_repo_name ?? github.context.repo.repo,
   };
 };
