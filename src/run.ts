@@ -3,6 +3,7 @@ import * as conftest from "./conftest";
 import * as createFollowUpPR from "./create-follow-up-pr";
 import * as createScaffoldModulePR from "./create-scaffold-module-pr";
 import * as createScaffoldPR from "./create-scaffold-pr";
+import * as scaffoldModule from "./scaffold-module";
 import * as scaffoldTfmigrate from "./scaffold-tfmigrate";
 import * as scaffoldWorkingDir from "./scaffold-working-dir";
 import * as exportAWSSecretsManager from "./export-aws-secrets-manager";
@@ -63,6 +64,7 @@ export const main = async (inputs: Inputs) => {
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
     ["list-working-dirs", listWorkingDirs],
     ["plan", plan],
+    ["scaffold-module", scaffoldModule],
     ["scaffold-tfmigrate", scaffoldTfmigrate],
     ["scaffold-working-dir", scaffoldWorkingDir],
     ["terraform-apply", terraformApply],
