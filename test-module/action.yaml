@@ -20,19 +20,19 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       id: global-config
       with:
         action: get-global-config
 
     # TODO Run conftest on modules
     # https://github.com/suzuki-shunsuke/tfaction/issues/1908#issuecomment-2415572321
-    # - uses: suzuki-shunsuke/tfaction@main
+    # - uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
     #   with:
     #     action: conftest
     #     github_token: ${{ inputs.github_token }}
 
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       with:
         action: install
     - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
@@ -52,7 +52,7 @@ runs:
 
     # trivy
     - if: fromJSON(steps.global-config.outputs.enable_trivy)
-      uses: suzuki-shunsuke/tfaction@main
+      uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       with:
         action: trivy
         github_token: ${{ inputs.github_token }}
@@ -60,7 +60,7 @@ runs:
 
     # tfsec
     - if: fromJSON(steps.global-config.outputs.enable_tfsec)
-      uses: suzuki-shunsuke/tfaction@main
+      uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       with:
         action: tfsec
         github_token: ${{ inputs.github_token }}
@@ -69,7 +69,7 @@ runs:
     # tflint
     - if: fromJSON(steps.global-config.outputs.enable_tflint)
       id: tflint
-      uses: suzuki-shunsuke/tfaction@main
+      uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       with:
         action: tflint
         github_token: ${{ inputs.github_token }}
@@ -88,7 +88,7 @@ runs:
       working-directory: ${{ env.TFACTION_TARGET }}
 
     # terraform-docs
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       with:
         action: terraform-docs
         github_token: ${{ inputs.github_token }}
@@ -122,7 +122,7 @@ runs:
     # terraform fmt & commit action
     - if: |
         steps.fmt-files.outputs.value != ''
-      uses: suzuki-shunsuke/tfaction@main
+      uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       with:
         action: commit
         commit_message: "style: ${{ steps.global-config.outputs.terraform_command }} fmt -recursive"

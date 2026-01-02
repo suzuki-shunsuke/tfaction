@@ -39,10 +39,10 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       with:
         action: install
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@28f9ae5e3d0e5e42944b407f00ce626c4b526ec0
       id: scaffold-tfmigrate
       with:
         action: scaffold-tfmigrate
