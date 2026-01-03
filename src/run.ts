@@ -12,6 +12,7 @@ import * as getGlobalConfig from "./get-global-config";
 import * as getTargetConfig from "./get-target-config";
 import * as listChangeModules from "./list-changed-modules";
 import * as install from "./install";
+import * as pickOutDriftIssues from "./pick-out-drift-issues";
 import * as listModuleCallers from "./list-module-callers";
 import * as listTargets from "./list-targets";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
@@ -67,6 +68,7 @@ export const main = async (inputs: Inputs) => {
     ["list-changed-modules", listChangeModules],
     ["list-module-callers", listModuleCallers],
     ["list-targets", listTargets],
+    ["pick-out-drift-issues", pickOutDriftIssues],
     ["list-targets-with-changed-files", listTargetsWithChangedFiles],
     ["list-working-dirs", listWorkingDirs],
     ["plan", plan],
