@@ -43,13 +43,8 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfig.working_directory ||
-    process.env.TFACTION_WORKING_DIR ||
-    "";
-  const target =
-    targetConfig.target ||
-    process.env.TFACTION_TARGET ||
-    "";
+    targetConfig.working_directory || process.env.TFACTION_WORKING_DIR || "";
+  const target = targetConfig.target || process.env.TFACTION_TARGET || "";
 
   if (!workingDir) {
     throw new Error("working_directory is required");
@@ -63,7 +58,7 @@ export const main = async () => {
       ...process.env,
       AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       AQUA_GITHUB_TOKEN: githubToken,
-    }
+    },
   });
 
   // Generate temp file name
@@ -100,7 +95,7 @@ export const main = async () => {
         ...process.env,
         AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         AQUA_GITHUB_TOKEN: githubToken,
-      }
+      },
     },
   );
 
