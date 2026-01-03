@@ -199,7 +199,9 @@ const listWorkingDirectoryFiles = async (
 };
 
 // List targets with runs_on
-const listTargets = async (config: lib.Config): Promise<Map<string, string>> => {
+const listTargets = async (
+  config: lib.Config,
+): Promise<Map<string, string>> => {
   const targets = new Map<string, string>();
   const pwd = process.env.GITHUB_WORKSPACE ?? process.cwd();
   const workingDirectoryFile = config.working_directory_file;
@@ -236,7 +238,10 @@ const listTargets = async (config: lib.Config): Promise<Map<string, string>> => 
     }
 
     // Get target and runs_on
-    const target = getTargetByWorkingDirectory(workingDirectoryPath, targetGroup);
+    const target = getTargetByWorkingDirectory(
+      workingDirectoryPath,
+      targetGroup,
+    );
     const runsOn = getRunsOn(config, targetGroup, wdConfig);
 
     targets.set(target, runsOn);
