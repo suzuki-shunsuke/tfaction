@@ -24,10 +24,7 @@ const copyDirectory = (src: string, dest: string): void => {
   }
 };
 
-const replaceInFiles = async (
-  workingDir: string,
-  vars: any,
-): Promise<void> => {
+const replaceInFiles = async (workingDir: string, vars: any): Promise<void> => {
   let output = "";
   await exec.exec(
     "git",

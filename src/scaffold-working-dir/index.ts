@@ -25,10 +25,7 @@ const copyDirectory = (src: string, dest: string): void => {
   }
 };
 
-const replaceInFiles = async (
-  workingDir: string,
-  vars: any,
-): Promise<void> => {
+const replaceInFiles = async (workingDir: string, vars: any): Promise<void> => {
   // Get list of modified and new files
   let output = "";
   await exec.exec(
@@ -120,15 +117,12 @@ export const main = async () => {
   }
 
   // Replace placeholders in files
-  await replaceInFiles(
-    workingDir,
-    {
-      s3_bucket_name_for_tfmigrate_history: s3Bucket,
-      gcs_bucket_name_for_tfmigrate_history: gcsBucket,
-      working_directory: workingDir,
-      target,
-    },
-  );
+  await replaceInFiles(workingDir, {
+    s3_bucket_name_for_tfmigrate_history: s3Bucket,
+    gcs_bucket_name_for_tfmigrate_history: gcsBucket,
+    working_directory: workingDir,
+    target,
+  });
 
   // Set output
   core.setOutput("working_directory", workingDir);

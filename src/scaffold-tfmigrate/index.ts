@@ -85,7 +85,6 @@ const createTfmigrateHcl = (
     fs.writeFileSync(tfmigrateHclPath, content);
     core.info(`Created .tfmigrate.hcl with S3 backend`);
   } else if (gcsBucket) {
-
     const template = fs.readFileSync(
       path.join(actionPath, "tfmigrate-gcs.hcl"),
       "utf8",
