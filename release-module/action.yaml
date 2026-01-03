@@ -16,7 +16,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@fcf6d6a323f9faca7d342473f08ab9f2e7ed455b
       with:
         action: release-module
         module_path: ${{inputs.module_path}}
