@@ -5,6 +5,7 @@ import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
+import Handlebars from "handlebars";
 
 import * as lib from "../lib";
 import { getTargetConfig } from "../get-target-config";
@@ -76,9 +77,11 @@ const createTfmigrateHcl = (
       path.join(actionPath, "tfmigrate.hcl"),
       "utf8",
     );
-    const content = template
-      .replace(/%%TARGET%%/g, target)
-      .replace(/%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%/g, s3Bucket);
+
+    const content = Handlebars.compile(template)({
+      target,
+      s3_bucket_name_for_tfmigrate_history: s3Bucket,
+    });
     fs.writeFileSync(tfmigrateHclPath, content);
     core.info(`Created .tfmigrate.hcl with S3 backend`);
   } else if (gcsBucket) {
@@ -86,9 +89,10 @@ const createTfmigrateHcl = (
       path.join(actionPath, "tfmigrate-gcs.hcl"),
       "utf8",
     );
-    const content = template
-      .replace(/%%TARGET%%/g, target)
-      .replace(/%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%/g, gcsBucket);
+    const content = Handlebars.compile(template)({
+      target,
+      gcs_bucket_name_for_tfmigrate_history: gcsBucket,
+    });
     fs.writeFileSync(tfmigrateHclPath, content);
     core.info(`Created .tfmigrate.hcl with GCS backend`);
   }
@@ -108,7 +112,9 @@ const createMigrationFile = (
     path.join(actionPath, "migration.hcl"),
     "utf8",
   );
-  const content = template.replace(/%%MIGRATION_NAME%%/g, migrationName);
+  const content = Handlebars.compile(template)({
+    migration_name: migrationName,
+  });
 
   const now = new Date();
   const timestamp =
