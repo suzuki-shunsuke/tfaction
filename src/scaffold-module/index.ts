@@ -60,17 +60,12 @@ const replaceInFiles = async (
 };
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token", { required: true });
+  const githubToken = core.getInput("github_token");
 
   const modulePath = process.env.TFACTION_MODULE_PATH ?? "";
   const templateDir = process.env.TFACTION_MODULE_TEMPLATE_DIR ?? "";
-  const skipAddingAquaPackages =
-    process.env.TFACTION_SKIP_ADDING_AQUA_PACKAGES === "true";
 
   // Validate inputs
-  if (!githubToken) {
-    throw new Error("github_token is required");
-  }
   if (!modulePath) {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
@@ -87,11 +82,6 @@ export const main = async () => {
   if (!fs.existsSync(templateDir) || !fs.statSync(templateDir).isDirectory()) {
     throw new Error(`${templateDir} doesn't exist`);
   }
-
-  const config = lib.getConfig();
-  const enableTfsec = config.tfsec?.enabled ?? false;
-  const enableTrivy = config.trivy?.enabled ?? true;
-  const enableTflint = config.tflint?.enabled ?? true;
 
   // Create parent directory
   const parentDir = path.dirname(modulePath);
@@ -126,41 +116,15 @@ export const main = async () => {
   await replaceInFiles(modulePath, "%%REF%%", ref);
   core.info("Replaced REF placeholder");
 
-  // Add aqua packages if not skipped
-  if (!skipAddingAquaPackages) {
-    core.info("Initializing aqua");
-    await exec.exec("aqua", ["init"], { cwd: modulePath });
-
-    core.info("Adding hashicorp/terraform to aqua");
-    await exec.exec("aqua", ["g", "-i", "hashicorp/terraform"], {
-      cwd: modulePath,
-    });
-
-    if (enableTfsec) {
-      core.info("Adding aquasecurity/tfsec to aqua");
-      await exec.exec("aqua", ["g", "-i", "aquasecurity/tfsec"], {
-        cwd: modulePath,
-      });
-    }
-
-    if (enableTrivy) {
-      core.info("Adding aquasecurity/trivy to aqua");
-      await exec.exec("aqua", ["g", "-i", "aquasecurity/trivy"], {
-        cwd: modulePath,
-      });
-    }
-
-    if (enableTflint) {
-      core.info("Adding terraform-linters/tflint to aqua");
-      await exec.exec("aqua", ["g", "-i", "terraform-linters/tflint"], {
-        cwd: modulePath,
-      });
-    }
-  }
-
   // Install aqua packages
   core.info("Installing aqua packages");
-  await exec.exec("aqua", ["i", "-l", "-a"], { cwd: modulePath });
+  await exec.exec("aqua", ["i", "-l", "-a"], {
+    cwd: modulePath,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+    },
+  });
 
   // Run terraform-docs
   core.info("Running terraform-docs");
@@ -169,6 +133,7 @@ export const main = async () => {
     cwd: modulePath,
     env: {
       ...process.env,
+      GITHUB_TOKEN: githubToken,
       AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
     listeners: {
