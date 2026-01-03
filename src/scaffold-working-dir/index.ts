@@ -2,16 +2,10 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
-import { fileURLToPath } from "url";
+import Handlebars from "handlebars";
 
 import * as lib from "../lib";
 import * as getTargetConfig from "../get-target-config";
-
-const getActionPath = (): string => {
-  const currentFilePath = fileURLToPath(import.meta.url);
-  // Navigate from dist/index.js to scaffold-working-dir/
-  return path.join(path.dirname(currentFilePath), "..", "scaffold-working-dir");
-};
 
 const copyDirectory = (src: string, dest: string): void => {
   if (!fs.existsSync(dest)) {
@@ -33,8 +27,7 @@ const copyDirectory = (src: string, dest: string): void => {
 
 const replaceInFiles = async (
   workingDir: string,
-  pattern: string,
-  replacement: string,
+  vars: any,
 ): Promise<void> => {
   // Get list of modified and new files
   let output = "";
@@ -60,7 +53,7 @@ const replaceInFiles = async (
     const filePath = path.join(workingDir, file);
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const content = fs.readFileSync(filePath, "utf8");
-      const newContent = content.replace(new RegExp(pattern, "g"), replacement);
+      const newContent = Handlebars.compile(content)(vars);
       if (content !== newContent) {
         fs.writeFileSync(filePath, newContent);
       }
@@ -86,7 +79,7 @@ export const main = async () => {
   const s3Bucket = targetConfig.s3_bucket_name_tfmigrate_history;
   const gcsBucket = targetConfig.gcs_bucket_name_tfmigrate_history;
   const workingDirectoryFile = config.working_directory_file;
-  const actionPath = getActionPath();
+  const actionPath = path.join(lib.GitHubActionPath, "scaffold-working-dir");
 
   // Create parent directory
   const parentDir = path.dirname(workingDir);
@@ -127,27 +120,15 @@ export const main = async () => {
   }
 
   // Replace placeholders in files
-  if (s3Bucket) {
-    await replaceInFiles(
-      workingDir,
-      "%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%",
-      s3Bucket,
-    );
-    core.info("Replaced S3 bucket placeholder");
-  }
-
-  if (gcsBucket) {
-    await replaceInFiles(
-      workingDir,
-      "%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%",
-      gcsBucket,
-    );
-    core.info("Replaced GCS bucket placeholder");
-  }
-
-  // Replace target placeholder
-  await replaceInFiles(workingDir, "%%TARGET%%", target);
-  core.info("Replaced TARGET placeholder");
+  await replaceInFiles(
+    workingDir,
+    {
+      s3_bucket_name_for_tfmigrate_history: s3Bucket,
+      gcs_bucket_name_for_tfmigrate_history: gcsBucket,
+      working_directory: workingDir,
+      target,
+    },
+  );
 
   // Set output
   core.setOutput("working_directory", workingDir);

@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
+import Handlebars from "handlebars";
 
 import * as lib from "../lib";
 
@@ -25,8 +26,7 @@ const copyDirectory = (src: string, dest: string): void => {
 
 const replaceInFiles = async (
   workingDir: string,
-  pattern: string,
-  replacement: string,
+  vars: any,
 ): Promise<void> => {
   let output = "";
   await exec.exec(
@@ -51,7 +51,9 @@ const replaceInFiles = async (
     const filePath = path.join(workingDir, file);
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const content = fs.readFileSync(filePath, "utf8");
-      const newContent = content.replace(new RegExp(pattern, "g"), replacement);
+
+      const newContent = Handlebars.compile(content)(vars);
+
       if (content !== newContent) {
         fs.writeFileSync(filePath, newContent);
       }
@@ -104,20 +106,14 @@ export const main = async () => {
   const ref = `module_${modulePath.replace(/\//g, "_")}_v0.1.0`;
 
   // Replace placeholders
-  await replaceInFiles(modulePath, "%%MODULE_NAME%%", moduleName);
-  core.info("Replaced MODULE_NAME placeholder");
+  await replaceInFiles(modulePath, {
+    module_name: moduleName,
+    module_path: modulePath,
+    github_repository: repository,
+    ref: ref,
+  });
 
-  await replaceInFiles(modulePath, "%%MODULE_PATH%%", modulePath);
-  core.info("Replaced MODULE_PATH placeholder");
-
-  await replaceInFiles(modulePath, "%%GITHUB_REPOSITORY%%", repository);
-  core.info("Replaced GITHUB_REPOSITORY placeholder");
-
-  await replaceInFiles(modulePath, "%%REF%%", ref);
-  core.info("Replaced REF placeholder");
-
-  // Install aqua packages
-  core.info("Installing aqua packages");
+  core.startGroup("aqua i -l -a");
   await exec.exec("aqua", ["i", "-l", "-a"], {
     cwd: modulePath,
     env: {
@@ -125,6 +121,7 @@ export const main = async () => {
       AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
+  core.endGroup();
 
   // Run terraform-docs
   core.info("Running terraform-docs");

@@ -18,6 +18,7 @@
     "@suzuki-shunsuke/github-app-token": "npm:@jsr/suzuki-shunsuke__github-app-token@^0.0.3",
     "@types/json-diff": "^1.0.3",
     "glob": "13.0.0",
+    "handlebars": "^4.7.8",
     "js-yaml": "4.1.1",
     "json-diff": "^1.0.6",
     "semver": "^7.7.2",
@@ -30,10 +31,10 @@
     "@types/semver": "7.7.1",
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.4",
+    "prettier": "3.7.4",
     "typescript": "5.9.3",
     "vitest": "4.0.16",
-    "zod-to-json-schema": "3.25.1",
-    "prettier": "3.7.4"
+    "zod-to-json-schema": "3.25.1"
   },
   "volta": {
     "node": "20.19.6"
