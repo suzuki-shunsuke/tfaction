@@ -87,6 +87,14 @@ inputs:
     description: GitHub App Private Key
     required: false
 
+  # generate-config-out
+  branch:
+    description: Branch name to be updated
+    required: false
+  file:
+    description: File name to be updated
+    required: false
+
 outputs:
   # get-target-config
   working_directory:
