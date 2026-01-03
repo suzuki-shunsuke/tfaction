@@ -31,14 +31,17 @@ export const main = async () => {
   const securefixServerRepository =
     config.securefix_action?.server_repository ?? "";
 
-  // Run aqua install
-  core.info(`Installing dependencies with aqua in ${target}`);
+  core.startGroup("aqua i -l -a");
   await exec.exec("aqua", ["i", "-l", "-a"], {
     cwd: target,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+    },
   });
+  core.endGroup();
 
-  // Run terraform init
-  core.info("Running terraform init");
+  core.startGroup("terraform init");
   await exec.exec(
     "github-comment",
     ["exec", "-var", `tfaction_target:${target}`, "--", "terraform", "init"],
@@ -48,9 +51,11 @@ export const main = async () => {
         ...process.env,
         GITHUB_TOKEN: githubToken,
         GH_COMMENT_CONFIG: process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "",
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     },
   );
+  core.endGroup();
 
   // Run trivy
   if (enableTrivy) {
