@@ -142,8 +142,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test
-        uses: ./test
+        uses: ./
         with:
+          action: test
           github_token: ${{steps.token.outputs.token}}
         id: test
         if: |
@@ -155,9 +156,10 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
-        uses: ./plan
+        uses: ./
         id: plan
         with:
+          action: plan
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -341,8 +343,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test
-        uses: ./test
+        uses: ./
         with:
+          action: test
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -353,8 +356,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
-        uses: ./plan
+        uses: ./
         with:
+          action: plan
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -433,8 +437,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test
-        uses: ./test
+        uses: ./
         with:
+          action: test
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -445,8 +450,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
-        uses: ./plan
+        uses: ./
         with:
+          action: plan
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
