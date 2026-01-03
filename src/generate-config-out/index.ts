@@ -29,10 +29,9 @@ export const main = async () => {
 
   // Get global config
   const config = lib.getConfig();
-  const globalConfigResult = getGlobalConfig.main_(config, {});
 
   const securefixServerRepository =
-    globalConfigResult.outputs.securefix_action_server_repository;
+    config?.securefix_action?.server_repository;
 
   // Get target config
   const targetConfigResult = await getTargetConfig.run(
