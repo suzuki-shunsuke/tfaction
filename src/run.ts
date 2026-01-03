@@ -6,6 +6,7 @@ import * as createScaffoldPR from "./create-scaffold-pr";
 import * as scaffoldModule from "./scaffold-module";
 import * as scaffoldTfmigrate from "./scaffold-tfmigrate";
 import * as scaffoldWorkingDir from "./scaffold-working-dir";
+import * as setup from "./setup";
 import * as exportAWSSecretsManager from "./export-aws-secrets-manager";
 import * as exportSecrets from "./export-secrets";
 import * as generateConfigOut from "./generate-config-out";
@@ -79,6 +80,7 @@ export const main = async (inputs: Inputs) => {
     ["scaffold-module", scaffoldModule],
     ["scaffold-tfmigrate", scaffoldTfmigrate],
     ["scaffold-working-dir", scaffoldWorkingDir],
+    ["setup", setup],
     ["terraform-apply", terraformApply],
     ["terraform-init", terraformInit],
     ["terraform-docs", terraformDocs],
