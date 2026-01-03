@@ -7,7 +7,6 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as lib from "../lib";
-import * as getGlobalConfig from "../get-global-config";
 import * as getTargetConfig from "../get-target-config";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
@@ -33,7 +32,7 @@ export const main = async () => {
   const securefixServerRepository = config?.securefix_action?.server_repository;
 
   // Get target config
-  const targetConfigResult = await getTargetConfig.run(
+  const targetConfig = await getTargetConfig.getTargetConfig(
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
@@ -44,11 +43,11 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfigResult.outputs.get("working_directory") ||
+    targetConfig.working_directory ||
     process.env.TFACTION_WORKING_DIR ||
     "";
   const target =
-    targetConfigResult.envs.get("TFACTION_TARGET") ||
+    targetConfig.target ||
     process.env.TFACTION_TARGET ||
     "";
 
@@ -60,6 +59,11 @@ export const main = async () => {
   core.info(`Installing dependencies with aqua in ${workingDir}`);
   await exec.exec("aqua", ["i", "-l", "-a"], {
     cwd: workingDir,
+    env: {
+      ...process.env,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+      AQUA_GITHUB_TOKEN: githubToken,
+    }
   });
 
   // Generate temp file name
@@ -92,6 +96,11 @@ export const main = async () => {
     ],
     {
       cwd: workingDir,
+      env: {
+        ...process.env,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+        AQUA_GITHUB_TOKEN: githubToken,
+      }
     },
   );
 
