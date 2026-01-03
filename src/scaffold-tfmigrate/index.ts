@@ -5,18 +5,11 @@ import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
-import { fileURLToPath } from "url";
 
 import * as lib from "../lib";
-import * as getTargetConfig from "../get-target-config";
+import { getTargetConfig } from "../get-target-config";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
-
-const getActionPath = (): string => {
-  const currentFilePath = fileURLToPath(import.meta.url);
-  // Navigate from dist/index.js to scaffold-tfmigrate/
-  return path.join(path.dirname(currentFilePath), "..", "scaffold-tfmigrate");
-};
 
 const generateBranchName = (target: string, prNumber: string): string => {
   if (prNumber) {
@@ -357,19 +350,20 @@ const createLabel = async (octokit: Octokit, label: string): Promise<void> => {
 };
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token", { required: true });
+  const githubToken = core.getInput("github_token");
   const migrationName = core.getInput("migration_name") || "main";
   const prNumber = core.getInput("pr_number") || "";
-  const securefixAppId = core.getInput("securefix_action_app_id") || "";
-  const securefixAppPrivateKey =
-    core.getInput("securefix_action_app_private_key") || "";
+  const securefixAppId = core.getInput("securefix_action_app_id");
+  const securefixAppPrivateKey = core.getInput(
+    "securefix_action_app_private_key",
+  );
 
   const octokit = github.getOctokit(githubToken);
-  const actionPath = getActionPath();
+  const actionPath = lib.GitHubActionPath;
 
   // Get config
   const config = lib.getConfig();
-  const targetConfig = await getTargetConfig.getTargetConfig(
+  const targetConfig = await getTargetConfig(
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
