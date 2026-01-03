@@ -7,7 +7,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as lib from "../lib";
-import {getTargetConfig} from "../get-target-config";
+import { getTargetConfig } from "../get-target-config";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 
@@ -354,8 +354,9 @@ export const main = async () => {
   const migrationName = core.getInput("migration_name") || "main";
   const prNumber = core.getInput("pr_number") || "";
   const securefixAppId = core.getInput("securefix_action_app_id");
-  const securefixAppPrivateKey =
-    core.getInput("securefix_action_app_private_key");
+  const securefixAppPrivateKey = core.getInput(
+    "securefix_action_app_private_key",
+  );
 
   const octokit = github.getOctokit(githubToken);
   const actionPath = lib.GitHubActionPath;
