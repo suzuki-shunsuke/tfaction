@@ -7,7 +7,7 @@ import * as path from "path";
 
 import * as lib from "../lib";
 import * as ciinfo from "../ci-info";
-import {getTargetConfig} from "../get-target-config";
+import { getTargetConfig } from "../get-target-config";
 import * as aquaUpdateChecksum from "../aqua-update-checksum";
 import * as exportAWSSecretsManager from "../export-aws-secrets-manager";
 
