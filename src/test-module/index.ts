@@ -5,7 +5,6 @@ import * as path from "path";
 
 import * as lib from "../lib";
 import { run as runTrivy } from "../trivy/run";
-import { run as runTfsec } from "../tfsec/run";
 import { run as runTflint } from "../tflint/run";
 import { run as runTerraformDocs } from "../terraform-docs/run";
 import { create as createCommit } from "../commit";
@@ -24,7 +23,6 @@ export const main = async () => {
   }
 
   const enableTrivy = config.trivy?.enabled ?? true;
-  const enableTfsec = config.tfsec?.enabled ?? false;
   const enableTflint = config.tflint?.enabled ?? true;
   const tflintFix = config.tflint?.fix ?? false;
   const terraformCommand = config.terraform_command;
@@ -65,17 +63,6 @@ export const main = async () => {
       githubToken,
       githubComment: true,
       configPath: "",
-    });
-  }
-
-  // Run tfsec
-  if (enableTfsec) {
-    core.info("Running tfsec");
-    await runTfsec({
-      workingDirectory: target,
-      githubToken,
-      githubComment: true,
-      ignoreHCLErrors: true,
     });
   }
 

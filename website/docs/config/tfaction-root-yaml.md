@@ -126,8 +126,6 @@ env:
   FOO: foo
 
 # https://github.com/suzuki-shunsuke/tfaction/pull/1106
-# tfsec:
-#   enabled: true
 # tflint:
 #   enabled: true
 #   fix: true # tfaction >= v1.13.0

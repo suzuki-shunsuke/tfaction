@@ -119,8 +119,6 @@ outputs:
     description: Template Directory path for scaffolding a working directory
   providers_lock_opts:
     description: terraform providers lock options
-  enable_tfsec:
-    description: If true, tfsec is enabled in test action
   enable_tflint:
     description: If true, tflint is enabled in test action
   tflint_fix:

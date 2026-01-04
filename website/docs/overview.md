@@ -33,7 +33,6 @@ You can ask any questions about tfaction to the notebook and DeepWiki!
 - [Create a pull request automatically to follow up the apply failure](/tfaction/docs/feature/follow-up-pr)
 - Support linters
   - terraform validate
-  - [tfsec](https://github.com/aquasecurity/tfsec)
   - [trivy](https://github.com/aquasecurity/trivy)
   - [tflint](https://github.com/terraform-linters/tflint)
   - [conftest](https://www.conftest.dev/)
@@ -65,10 +64,6 @@ Notify the result of CI to pull requests with [tfcmt](https://github.com/suzuki-
 Result of `terraform plan`
 
 ![image](https://user-images.githubusercontent.com/13323303/147400233-8b9411d6-0255-4c36-9e9f-35e44223c979.png)
-
-Result of `tfsec`
-
-![image](https://user-images.githubusercontent.com/13323303/153747798-0e6ac3d4-e335-4c20-8e2a-1f5b43205ff3.png)
 
 Result of `trivy`
 

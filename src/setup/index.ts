@@ -7,8 +7,7 @@ import * as path from "path";
 
 import * as lib from "../lib";
 import * as ciinfo from "../ci-info";
-import * as getTargetConfig from "../get-target-config";
-import * as getGlobalConfig from "../get-global-config";
+import {getTargetConfig} from "../get-target-config";
 import * as aquaUpdateChecksum from "../aqua-update-checksum";
 import * as exportAWSSecretsManager from "../export-aws-secrets-manager";
 
@@ -100,7 +99,6 @@ export const main = async () => {
   const octokit = github.getOctokit(githubToken);
 
   if (!shouldSkipCIInfo()) {
-    core.info("Running ci-info action...");
     await ciinfo.main();
   }
 
@@ -110,7 +108,7 @@ export const main = async () => {
   }
 
   const config = lib.getConfig();
-  const targetConfig = await getTargetConfig.getTargetConfig(
+  const targetConfig = await getTargetConfig(
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,

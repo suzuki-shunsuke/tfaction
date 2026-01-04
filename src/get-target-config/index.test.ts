@@ -17,7 +17,6 @@ test("default", async () => {
       ],
       ["template_dir", "templates/aws"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
-      ["enable_tfsec", false],
       ["enable_tflint", true],
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
@@ -61,7 +60,6 @@ test("config", async () => {
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
       ["template_dir", "templates/aws"],
-      ["enable_tfsec", true],
       ["enable_tflint", false],
       ["enable_trivy", false],
       ["tflint_fix", false],
@@ -83,9 +81,6 @@ test("config", async () => {
       lib.applyConfigDefaults({
         plan_workflow_name: "plan.yaml",
         terraform_command: "tofu",
-        tfsec: {
-          enabled: true,
-        },
         tflint: {
           enabled: false,
         },
@@ -119,7 +114,6 @@ test("scaffold_working_dir", async () => {
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
       ["template_dir", "templates/aws"],
-      ["enable_tfsec", false],
       ["enable_tflint", true],
       ["enable_trivy", true],
       ["tflint_fix", false],

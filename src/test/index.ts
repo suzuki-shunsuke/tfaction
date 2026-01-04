@@ -3,10 +3,8 @@ import * as exec from "@actions/exec";
 
 import * as lib from "../lib";
 import { getTargetConfig } from "../get-target-config";
-import * as getGlobalConfig from "../get-global-config";
 import { run as runConftest } from "../conftest";
 import { run as runTrivy } from "../trivy/run";
-import { run as runTfsec } from "../tfsec/run";
 import { run as runTflint } from "../tflint/run";
 import { run as runTerraformDocs } from "../terraform-docs/run";
 import { create as createCommit } from "../commit";
@@ -80,16 +78,6 @@ export const main = async () => {
       githubToken,
       githubComment: true,
       configPath: "",
-    });
-  }
-
-  // Step 6: tfsec (conditional)
-  if (!destroy && targetConfig.enable_tfsec) {
-    await runTfsec({
-      workingDirectory: workingDir,
-      githubToken,
-      githubComment: true,
-      ignoreHCLErrors: false,
     });
   }
 
