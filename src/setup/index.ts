@@ -97,14 +97,8 @@ const setupSSHKey = async (sshKey: string): Promise<void> => {
 export const main = async () => {
   const githubToken = core.getInput("github_token", { required: true });
   const sshKey = core.getInput("ssh_key");
-  const securefixAppId = core.getInput("securefix_action_app_id");
-  const securefixAppPrivateKey = core.getInput("securefix_action_app_private_key");
 
   const octokit = github.getOctokit(githubToken);
-
-  // 1. Install
-  core.info("Running install action...");
-  await install.main();
 
   // 2. CI Info (skip for workflow_dispatch and schedule)
   if (!shouldSkipCIInfo()) {
@@ -184,11 +178,11 @@ export const main = async () => {
     env: {
       ...process.env,
       AQUA_GITHUB_TOKEN: githubToken,
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
 
   // 9. Export AWS Secrets Manager
-  core.info("Running export-aws-secrets-manager action...");
   await exportAWSSecretsManager.main();
 
   // 10. Set up SSH key
