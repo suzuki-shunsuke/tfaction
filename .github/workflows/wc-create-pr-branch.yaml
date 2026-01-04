@@ -332,6 +332,7 @@ jobs:
           permission-contents: write
 
       - name: Test setup
+        id: setup
         uses: ./
         with:
           action: setup
