@@ -6,7 +6,6 @@ import * as os from "os";
 import * as path from "path";
 
 import * as lib from "../lib";
-import * as install from "../install";
 import * as ciinfo from "../ci-info";
 import * as getTargetConfig from "../get-target-config";
 import * as getGlobalConfig from "../get-global-config";
@@ -100,20 +99,16 @@ export const main = async () => {
 
   const octokit = github.getOctokit(githubToken);
 
-  // 2. CI Info (skip for workflow_dispatch and schedule)
   if (!shouldSkipCIInfo()) {
     core.info("Running ci-info action...");
     await ciinfo.main();
   }
 
-  // 3. Check if PR head SHA is latest (only for PRs)
   if (isPullRequestEvent()) {
     core.info("Checking if commit is latest...");
     await checkLatestCommit();
   }
 
-  // 4. Get target config
-  core.info("Running get-target-config action...");
   const config = lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
@@ -146,15 +141,9 @@ export const main = async () => {
     await addLabelToPR(octokit, targetConfig.target);
   }
 
-  // 6. Get global config
-  core.info("Running get-global-config action...");
-  await getGlobalConfig.main();
-
-  // Log configs (for debugging)
   core.info(`TFACTION_TARGET: ${targetConfig.target}`);
   core.info(`TFACTION_WORKING_DIR: ${targetConfig.working_directory}`);
 
-  // 7. Aqua update checksum (if enabled)
   if (config.aqua?.update_checksum?.enabled) {
     core.info("Running aqua-update-checksum action...");
     try {
@@ -171,7 +160,6 @@ export const main = async () => {
     }
   }
 
-  // 8. Run aqua install
   core.info("Running aqua install...");
   await exec.exec("aqua", ["i", "-l", "-a"], {
     cwd: targetConfig.working_directory || undefined,
@@ -182,16 +170,13 @@ export const main = async () => {
     },
   });
 
-  // 9. Export AWS Secrets Manager
   await exportAWSSecretsManager.main();
 
-  // 10. Set up SSH key
   if (sshKey) {
     core.info("Setting up SSH key...");
     await setupSSHKey(sshKey);
   }
 
-  // Set outputs
   core.setOutput("working_directory", targetConfig.working_directory);
   core.setOutput(
     "s3_bucket_name_tfmigrate_history",
