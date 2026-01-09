@@ -15,10 +15,10 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@7b69a7e89ffc9d0b67a370a97bf3ceed2d4b5384
       with:
         action: install
-    - uses: suzuki-shunsuke/tfaction@main
+    - uses: suzuki-shunsuke/tfaction@7b69a7e89ffc9d0b67a370a97bf3ceed2d4b5384
       id: scaffold-working-dir
       with:
         action: scaffold-working-dir
