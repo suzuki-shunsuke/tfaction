@@ -174,14 +174,14 @@ jobs:
           action: test-action
         env:
           TFACTION_TEST_ACTION: "true"
-          JS_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
-          JS_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
+          TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
+          GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
 
       - name: Outputs actions' outputs
         run: "true"
         env:
-          JS_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
-          JS_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
+          TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
+          GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
 
   test-drift-detection:
     timeout-minutes: 15
