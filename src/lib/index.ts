@@ -53,12 +53,6 @@ export const getJobType = (): JobType => {
   return JobType.parse(process.env.TFACTION_JOB_TYPE);
 };
 
-const TfsecConfig = z.object({
-  enabled: z.optional(z.boolean()),
-});
-
-type TfsecConfig = z.infer<typeof TfsecConfig>;
-
 const TflintReviewdogConfig = z.object({
   filter_mode: z.optional(
     z.enum(["added", "diff_context", "file", "nofilter"]),
@@ -278,7 +272,6 @@ const RawConfig = z.object({
   skip_terraform_by_renovate: z.optional(z.boolean()),
   target_groups: z.array(TargetGroup),
   tflint: z.optional(TflintConfig),
-  tfsec: z.optional(TfsecConfig),
   trivy: z.optional(TrivyConfig),
   terraform_docs: z.optional(TerraformDocsConfig),
   update_local_path_module_caller: z.optional(
@@ -326,7 +319,6 @@ export interface Config extends Omit<
   | "skip_create_pr"
   | "terraform_command"
   | "label_prefixes"
-  | "tfsec"
   | "tflint"
   | "trivy"
   | "follow_up_pr_group_label"
@@ -343,9 +335,6 @@ export interface Config extends Omit<
     target: string;
     tfmigrate: string;
     skip: string;
-  };
-  tfsec: {
-    enabled: boolean;
   };
   tflint: {
     enabled: boolean;
@@ -390,9 +379,6 @@ export const applyConfigDefaults = (raw: RawConfig): Config => {
       target: raw.label_prefixes?.target ?? "target:",
       tfmigrate: raw.label_prefixes?.tfmigrate ?? "tfmigrate:",
       skip: raw.label_prefixes?.skip ?? "skip:",
-    },
-    tfsec: {
-      enabled: raw.tfsec?.enabled ?? false,
     },
     tflint: {
       enabled: raw.tflint?.enabled ?? true,

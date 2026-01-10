@@ -21,8 +21,6 @@ update_local_path_module_caller:
 
 trivy:
   enabled: true
-tfsec:
-  enabled: false
 tflint:
   enabled: true
   fix: true

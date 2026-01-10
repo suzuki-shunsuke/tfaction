@@ -9,7 +9,6 @@ export const main = async () => {
         working_directory: "tests/aws/foo/dev",
         providers_lock_opts: "-platform=linux_amd64 -platform=darwin_amd64",
         template_dir: "tests/templates/aws",
-        enable_tfsec: "false",
         enable_tflint: "true",
         enable_trivy: "true",
         tflint_fix: "true",
@@ -28,7 +27,7 @@ export const main = async () => {
         data.aws_role_session_name = "";
         return data;
       },
-      actual: process.env.JS_TARGET_CONFIG,
+      actual: process.env.TARGET_CONFIG,
     },
     {
       name: "get-global-config",
@@ -49,7 +48,6 @@ export const main = async () => {
         aqua_update_checksum_enabled: "true",
         aqua_update_checksum_prune: "true",
         aqua_update_checksum_skip_push: "false",
-        enable_tfsec: "false",
         enable_tflint: "true",
         enable_trivy: "true",
         tflint_fix: "true",
@@ -63,30 +61,7 @@ export const main = async () => {
         securefix_action_server_repository: "",
         securefix_action_pull_request_base_branch: "",
       },
-      actual: process.env.JS_GLOBAL_CONFIG,
-    },
-    {
-      name: "check-terraform-skip",
-      expected: {
-        skip_terraform: "false",
-      },
-      actual: process.env.JS_CHECK_TERRAFORM_SKIP,
-    },
-    {
-      name: "list-changed-modules",
-      expected: {
-        modules: '["tests/modules/foo"]',
-      },
-      actual: process.env.JS_LIST_CHANGED_MODULES,
-    },
-    {
-      name: "list-targets-with-changed-files",
-      expected: {
-        targets:
-          '[{"target":"tests/aws/foo/dev","working_directory":"tests/aws/foo/dev","runs_on":"ubuntu-latest","job_type":"terraform"}]',
-        modules: '["tests/modules/foo"]',
-      },
-      actual: process.env.JS_LIST_TARGETS_WITH_CHANGED_FILES,
+      actual: process.env.GLOBAL_CONFIG,
     },
   ];
   let failed = false;

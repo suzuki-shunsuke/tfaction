@@ -19,7 +19,6 @@ export interface TargetConfig {
   working_directory: string;
   target: string;
   providers_lock_opts: string;
-  enable_tfsec: boolean;
   enable_tflint: boolean;
   enable_trivy: boolean;
   tflint_fix: boolean;
@@ -62,7 +61,6 @@ export const getTargetConfig = async (
     target: target,
     providers_lock_opts:
       "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
-    enable_tfsec: config.tfsec.enabled,
     enable_tflint: config.tflint.enabled,
     enable_trivy: config.trivy.enabled,
     tflint_fix: config.tflint.fix,

@@ -101,6 +101,8 @@ outputs:
     description: working directory
   aws_assume_role_arn:
     description: AWS Assume Role ARN
+  aws_role_session_name:
+    description: AWS Role Session Name
   aws_region:
     description: AWS Region
   gcp_service_account:
@@ -117,8 +119,6 @@ outputs:
     description: Template Directory path for scaffolding a working directory
   providers_lock_opts:
     description: terraform providers lock options
-  enable_tfsec:
-    description: If true, tfsec is enabled in test action
   enable_tflint:
     description: If true, tflint is enabled in test action
   tflint_fix:

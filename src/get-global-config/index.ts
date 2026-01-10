@@ -49,7 +49,6 @@ export const main = async () => {
       ? true
       : (config.aqua?.update_checksum?.skip_push ?? false),
   );
-  core.setOutput("enable_tfsec", config.tfsec?.enabled ?? false);
   core.setOutput("enable_tflint", config.tflint?.enabled ?? true);
   core.setOutput("enable_trivy", config.trivy?.enabled ?? true);
   core.setOutput("tflint_fix", config.tflint?.fix ?? false);

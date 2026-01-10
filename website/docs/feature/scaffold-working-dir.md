@@ -65,27 +65,3 @@ terraform {
 ## :bulb: Skip creating pull requests
 
 If you don't want to create pull requests by GitHub App, please see [Support skipping creating pull requests](skip-creating-pr.md).
-
-## :bulb: Skip creating aqua.yaml and adding packages
-
-tfaction >= v0.5.25
-
-[#910](https://github.com/suzuki-shunsuke/tfaction/pull/910)
-
-By default scaffold-working-directory creates `aqua.yaml` and add some packages.
-
-```sh
-aqua init
-aqua g -i open-policy-agent/conftest terraform-linters/tflint aquasecurity/tfsec hashicorp/terraform
-```
-
-You can skip this.
-
-tfaction-root.yaml
-
-```yaml
-scaffold_working_directory:
-  skip_adding_aqua_packages: true
-```
-
-By skipping this, you can configure packages and their versions in your template or you can also manage them in repository root's aqua.yaml.
