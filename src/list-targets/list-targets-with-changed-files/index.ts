@@ -5,7 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../../lib";
 import { listFiles } from "./list_files";
-import { list as listModuleCallers } from "../list-module-callers";
+import { list as listModuleCallers } from "./list-module-callers";
 
 type TargetConfig = {
   target: string;
