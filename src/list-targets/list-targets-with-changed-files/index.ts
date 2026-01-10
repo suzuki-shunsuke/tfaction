@@ -4,7 +4,7 @@ import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../../lib";
-import { listFiles } from "../list-working-dirs";
+import { listFiles } from "./list_files";
 import { list as listModuleCallers } from "../list-module-callers";
 
 type TargetConfig = {
