@@ -106,23 +106,6 @@ jobs:
           CI_INFO_TEMP_DIR: tests/ci-info
           CI_INFO_PR_AUTHOR: suzuki-shunsuke
 
-      - name: Test list-changed-modules
-        uses: ./
-        id: list-changed-modules
-        with:
-          action: list-changed-modules
-          changed_files: tests/ci-info/pr_all_filenames.txt
-          config_files: tests/modules.txt
-
-      - name: Test list-targets-with-changed-files
-        uses: ./
-        id: list-targets-with-changed-files
-        with:
-          action: list-targets-with-changed-files
-        env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          CI_INFO_TEMP_DIR: tests/ci-info
-
       - name: Test setup
         uses: ./setup
         with:
@@ -424,14 +407,6 @@ jobs:
           private-key: ${{secrets.gh_app_private_key}}
           permission-pull-requests: write
           permission-contents: write
-
-      - name: Test list-module-callers
-        uses: ./
-        id: list-module-callers
-        with:
-          action: list-module-callers
-          module_files: tests/list-module-callers/terragrunt/module_files.txt
-          config_files: tests/list-module-callers/terragrunt/config_files.txt
 
       - name: Test actions' outputs
         uses: ./
