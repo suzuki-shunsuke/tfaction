@@ -76,11 +76,6 @@ jobs:
         with:
           action: install
 
-      - name: ci-info
-        uses: ./
-        with:
-          action: ci-info
-
       - name: Test get-target-config
         uses: ./
         id: target-config
