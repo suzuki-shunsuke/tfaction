@@ -4,6 +4,7 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
 
+import { getTargetConfig } from "../get-target-config";
 import * as lib from "../lib";
 import * as commit from "../commit";
 
@@ -23,9 +24,21 @@ const hasFileChanged = async (file: string): Promise<boolean> => {
 
 export const main = async () => {
   const githubToken = core.getInput("github_token", { required: true });
-  const workingDir = process.env.TFACTION_WORKING_DIR ?? "";
-  const tfCommand = process.env.TFACTION_TERRAFORM_COMMAND ?? "terraform";
-  const providersLockOpts = process.env.TFACTION_PROVIDERS_LOCK_OPTS ?? "";
+  const config = lib.getConfig();
+
+  const targetConfig = await getTargetConfig(
+    {
+      target: process.env.TFACTION_TARGET,
+      workingDir: process.env.TFACTION_WORKING_DIR,
+      isApply: lib.getIsApply(),
+      jobType: lib.getJobType(),
+    },
+    config,
+  );
+
+  const workingDir = targetConfig.working_directory;
+  const tfCommand = targetConfig.terraform_command;
+  const providersLockOpts = targetConfig.providers_lock_opts;
 
   const execEnv = {
     ...process.env,
