@@ -47,6 +47,7 @@ export const main = async () => {
 
   // Step 4: terraform validate (skip if destroy)
   if (!destroy) {
+    core.startGroup("terraform validate");
     await exec.exec(
       "github-comment",
       [
@@ -69,6 +70,7 @@ export const main = async () => {
         },
       },
     );
+    core.endGroup();
   }
 
   // Step 5: trivy (conditional)

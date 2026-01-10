@@ -83,7 +83,6 @@ const getURL = (result: any): string => {
 };
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  core.info("Running trivy config");
   const args = inputs.configPath
     ? ["config", "--format", "json", "--config", inputs.configPath, "."]
     : ["config", "--format", "json", "."];

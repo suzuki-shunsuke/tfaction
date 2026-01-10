@@ -233,6 +233,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
   const policies = buildPolicies(config, t.group, wdConfig, inputs.plan);
 
   if (policies.length !== 0) {
+    core.startGroup("conftest -v");
     await exec.exec(
       "github-comment",
       ["exec", "-var", `tfaction_target:${t.target}`, "--", "conftest", "-v"],
@@ -246,13 +247,13 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
         },
       },
     );
+    core.endGroup();
   }
 
   for (const policy of policies) {
     if (!policy.policy) {
       continue;
     }
-    core.info("Running conftest");
     const paths = getConftestPaths(policy, t.workingDir, inputs.planJsonPath);
     const args = buildConftestArgs(
       policy,
@@ -261,7 +262,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       t.workingDir,
       paths,
     );
-    core.info("github-comment " + args.join(" "));
+    core.startGroup("conftest");
     await exec.exec("github-comment", args, {
       cwd: t.workingDir,
       env: {
@@ -271,5 +272,6 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
         AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
+    core.endGroup();
   }
 };
