@@ -81,7 +81,6 @@ export const main = async () => {
     }
     core.endGroup();
 
-    // terraform providers lock
     core.startGroup(`${tfCommand} providers lock`);
     const lockArgs = providersLockOpts.split(/\s+/).filter((s) => s.length > 0);
     await exec.exec(
@@ -108,8 +107,9 @@ export const main = async () => {
     }
   }
 
-  // Show providers
+  core.startGroup(`${tfCommand} providers`);
   await exec.exec(tfCommand, ["providers"], {
     cwd: workingDir || undefined,
   });
+  core.endGroup();
 };
