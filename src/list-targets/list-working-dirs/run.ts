@@ -3,7 +3,7 @@ import * as core from "@actions/core";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import * as lib from "../lib";
+import * as lib from "../../lib";
 
 export const listFiles = async (
   baseDir: string,

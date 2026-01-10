@@ -9,7 +9,7 @@ import {
   resolveRelativeCallTree,
   ModuleToCallers,
 } from "./lib";
-import * as lib from "../lib";
+import * as lib from "../../lib";
 
 export const main = async () => {
   const configFiles = fs

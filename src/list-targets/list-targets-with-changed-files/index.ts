@@ -3,7 +3,7 @@ import * as github from "@actions/github";
 import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
-import * as lib from "../lib";
+import * as lib from "../../lib";
 import { listFiles } from "../list-working-dirs";
 import { list as listModuleCallers } from "../list-module-callers";
 
