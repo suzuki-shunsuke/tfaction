@@ -1,6 +1,6 @@
 import * as checkTerraformSkip from "../check-terraform-skip";
-import * as terraformApply from "../terraform-apply";
-import * as tfmigrateApply from "../tfmigrate-apply";
+import * as terraformApply from "./terraform-apply";
+import * as tfmigrateApply from "./tfmigrate-apply";
 
 export const main = async () => {
   const jobType = process.env.TFACTION_JOB_TYPE;

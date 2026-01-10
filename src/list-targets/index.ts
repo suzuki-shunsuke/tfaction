@@ -1,10 +1,9 @@
-import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
 
 import * as install from "../install";
 import * as ciInfo from "../ci-info";
-import * as listTargetsWithChangedFiles from "../list-targets-with-changed-files";
+import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 
 export const main = async () => {
   // Step 1: Install dependencies

@@ -4,8 +4,8 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import * as lib from "../lib";
-import * as getTargetConfig from "../get-target-config";
+import * as lib from "../../lib";
+import * as getTargetConfig from "../../get-target-config";
 import {
   listRelatedPullRequests,
   updateBranchBySecurefix,
