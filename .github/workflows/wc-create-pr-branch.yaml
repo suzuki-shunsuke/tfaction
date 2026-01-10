@@ -109,12 +109,6 @@ jobs:
           TFACTION_WORKING_DIR: setup/test/foo
           TFACTION_JOB_TYPE: terraform
 
-      - uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
-        with:
-          role-to-assume: ${{ steps.setup.outputs.aws_assume_role_arn }}
-          role-session-name: ${{ steps.setup.outputs.aws_role_session_name }}
-          aws-region: ${{ steps.setup.outputs.aws_region }}
-
       - name: Test terraform init
         uses: ./
         with:
@@ -325,12 +319,6 @@ jobs:
           TFACTION_TARGET: setup/test/opentofu/foo
           TFACTION_WORKING_DIR: setup/test/opentofu/foo
           TFACTION_JOB_TYPE: terraform
-
-      - uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
-        with:
-          role-to-assume: ${{ steps.setup.outputs.aws_assume_role_arn }}
-          role-session-name: ${{ steps.setup.outputs.aws_role_session_name }}
-          aws-region: ${{ steps.setup.outputs.aws_region }}
 
       - name: Test terraform init
         uses: ./
