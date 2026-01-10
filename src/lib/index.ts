@@ -412,7 +412,9 @@ export const createWDTargetMap = (
   for (const wd of wds) {
     let target = wd;
     for (const tg of config.target_groups) {
-      if (!wd.startsWith(tg.working_directory)) {
+      const rel = path.relative(tg.working_directory, wd);
+      // path.isAbsolute check handles Windows edge case where different drive letters result in absolute path
+      if (rel.startsWith("..") || path.isAbsolute(rel)) {
         continue;
       }
       for (const pattern of config.replace?.patterns ?? []) {
@@ -445,7 +447,9 @@ export const getTargetFromTargetGroupsByWorkingDir = (
   wd: string,
 ): TargetGroup | undefined => {
   for (const targetConfig of targetGroups) {
-    if (wd.startsWith(targetConfig.working_directory)) {
+    const rel = path.relative(targetConfig.working_directory, wd);
+    // path.isAbsolute check handles Windows edge case where different drive letters result in absolute path
+    if (!rel.startsWith("..") && !path.isAbsolute(rel)) {
       return targetConfig;
     }
   }
