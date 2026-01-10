@@ -95,17 +95,6 @@ jobs:
           TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
 
-      - name: Test check-terraform-skip
-        uses: ./
-        id: check-terraform-skip
-        with:
-          action: check-terraform-skip
-        env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
-          CI_INFO_TEMP_DIR: tests/ci-info
-          CI_INFO_PR_AUTHOR: suzuki-shunsuke
-
       - name: Test setup
         uses: ./setup
         with:
@@ -173,14 +162,12 @@ jobs:
           TFACTION_TEST_ACTION: "true"
           JS_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
-          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
 
       - name: Outputs actions' outputs
         run: "true"
         env:
           JS_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
-          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
 
   test-drift-detection:
     timeout-minutes: 15
@@ -405,8 +392,9 @@ jobs:
           permission-contents: write
 
       - name: Test setup
-        uses: ./setup
+        uses: ./
         with:
+          action: setup
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
