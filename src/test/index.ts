@@ -83,7 +83,6 @@ export const main = async () => {
     });
   }
 
-  // Step 7: tflint (conditional)
   if (!destroy && targetConfig.enable_tflint) {
     await runTflint({
       workingDirectory: workingDir,
@@ -100,6 +99,7 @@ export const main = async () => {
 
   // Step 8-9: terraform fmt & commit
   if (!destroy) {
+    core.startGroup(`${tfCommand} fmt`);
     const fmtResult = await exec.getExecOutput(
       tfCommand,
       ["fmt", "-recursive"],
@@ -107,6 +107,7 @@ export const main = async () => {
         cwd: workingDir,
       },
     );
+    core.endGroup();
 
     const fmtOutput = fmtResult.stdout.trim();
     if (fmtOutput) {

@@ -126,6 +126,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     args.push("--fix");
   }
 
+  core.startGroup("tflint");
   const out = await exec.getExecOutput("tflint", args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
@@ -134,7 +135,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
       AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
-  core.info("Parsing tflint result");
+  core.endGroup();
   const outJSON = JSON.parse(out.stdout);
   const diagnostics = new Array<Diagnostic>();
   if (outJSON.issues) {
