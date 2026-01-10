@@ -96,8 +96,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test setup
-        uses: ./setup
+        uses: ./
         with:
+          action: setup
           github_token: ${{steps.token.outputs.token}}
         id: setup
         if: |
