@@ -174,8 +174,6 @@ jobs:
           JS_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
           JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
-          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
-          JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
 
       - name: Outputs actions' outputs
         run: "true"
@@ -183,8 +181,6 @@ jobs:
           JS_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           JS_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
           JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
-          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
-          JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
 
   test-drift-detection:
     timeout-minutes: 15
@@ -407,14 +403,6 @@ jobs:
           private-key: ${{secrets.gh_app_private_key}}
           permission-pull-requests: write
           permission-contents: write
-
-      - name: Test actions' outputs
-        uses: ./
-        with:
-          action: test-action
-        env:
-          TFACTION_TEST_ACTION_TERRAGRUNT: "true"
-          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
 
       - name: Test setup
         uses: ./setup
