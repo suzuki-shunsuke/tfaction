@@ -56,6 +56,10 @@ export const list = async (
       {
         cwd: tfDir,
         silent: true,
+        env: {
+          ...process.env,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+        },
       },
     );
     let terragruntVersion = "";
@@ -83,6 +87,10 @@ export const list = async (
 
     await exec.exec("terragrunt", terragruntArgs.concat(tmpobj.name), {
       cwd: tfDir,
+      env: {
+        ...process.env,
+        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+      },
     });
     const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
       ?.source;

@@ -249,6 +249,8 @@ const validateChangeLimits = async (
         env: {
           ...process.env,
           GITHUB_TOKEN: githubToken,
+          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );
@@ -270,6 +272,8 @@ const validateChangeLimits = async (
         env: {
           ...process.env,
           GITHUB_TOKEN: githubToken,
+          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );
