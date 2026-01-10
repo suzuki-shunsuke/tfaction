@@ -8,7 +8,6 @@ test("normal", async () => {
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
-            target: "foo/",
             working_directory: "foo/",
           },
         ],
@@ -51,7 +50,6 @@ test("job config", async () => {
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
-            target: "foo/",
             working_directory: "foo/",
             runs_on: "macos-latest",
             secrets: [
@@ -102,9 +100,16 @@ test("job config", async () => {
 
 const prCommentConfig = {
   plan_workflow_name: "plan.yaml",
+  replace: {
+    patterns: [
+      {
+        regexp: "^yoo/services/",
+        replace: "yoo/",
+      },
+    ],
+  },
   target_groups: [
     {
-      target: "foo/",
       working_directory: "foo/",
       runs_on: "macos-latest",
       secrets: [
@@ -116,17 +121,16 @@ const prCommentConfig = {
       environment: "dev",
     },
     {
-      target: "yoo/",
       working_directory: "yoo/services/",
       runs_on: "ubuntu-latest",
       environment: "yoo",
     },
     {
-      target: "zoo/",
       working_directory: "zoo/",
     },
   ],
 };
+
 const prCommentExpected = {
   modules: [],
   targetConfigs: [
@@ -209,7 +213,6 @@ test("module callers", async () => {
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
-            target: "foo/",
             working_directory: "foo/",
           },
         ],
@@ -275,7 +278,6 @@ test("nest", async () => {
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
-            target: "foo/",
             working_directory: "foo/",
           },
         ],

@@ -165,7 +165,6 @@ const TargetGroup = z.object({
   runs_on: z.optional(z.union([z.string(), z.array(z.string())])),
   secrets: z.optional(GitHubSecrets),
   s3_bucket_name_tfmigrate_history: z.optional(z.string()),
-  target: z.optional(z.string()),
   template_dir: z.optional(z.string()),
   terraform_apply_config: z.optional(JobConfig),
   terraform_plan_config: z.optional(JobConfig),
@@ -416,9 +415,6 @@ export const createWDTargetMap = (
       if (!wd.startsWith(tg.working_directory)) {
         continue;
       }
-      if (tg.target !== undefined) {
-        target = tg.target + wd.slice(tg.working_directory.length);
-      }
       for (const pattern of config.replace?.patterns ?? []) {
         target = target.replace(
           new RegExp(pattern.regexp, pattern.flags),
@@ -551,12 +547,6 @@ export const getTargetGroup = async (
       };
     }
     target = workingDir;
-    if (targetConfig?.target !== undefined) {
-      target = workingDir.replace(
-        targetConfig.working_directory,
-        targetConfig.target,
-      );
-    }
     for (const pattern of config.replace?.patterns ?? []) {
       target = target.replace(new RegExp(pattern.regexp), pattern.replace);
     }
@@ -632,7 +622,7 @@ export const createIssue = async (
   const octokit = github.getOctokit(ghToken);
   const body = `
   This issues was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
-  
+
   About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
   `;
 

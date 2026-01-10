@@ -168,12 +168,12 @@ const getRunsOn = (
 // Get target name from working directory path
 const getTargetByWorkingDirectory = (
   workingDirectoryPath: string,
-  targetGroup: lib.TargetGroup,
+  config: lib.Config,
 ): string => {
-  if (targetGroup.target !== undefined) {
-    return (
-      targetGroup.target +
-      workingDirectoryPath.slice(targetGroup.working_directory.length)
+  for (const pattern of config.replace?.patterns ?? []) {
+    workingDirectoryPath = workingDirectoryPath.replace(
+      new RegExp(pattern.regexp),
+      pattern.replace,
     );
   }
   return workingDirectoryPath;
@@ -238,10 +238,7 @@ const listTargets = async (
     }
 
     // Get target and runs_on
-    const target = getTargetByWorkingDirectory(
-      workingDirectoryPath,
-      targetGroup,
-    );
+    const target = getTargetByWorkingDirectory(workingDirectoryPath, config);
     const runsOn = getRunsOn(config, targetGroup, wdConfig);
 
     targets.set(target, runsOn);
