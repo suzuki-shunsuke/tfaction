@@ -140,6 +140,7 @@ export const main = async () => {
     await addLabelToPR(octokit, targetConfig.target);
   }
 
+  core.info("new executor");
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
     cwd: targetConfig.working_directory,
@@ -147,8 +148,10 @@ export const main = async () => {
 
   if (config.aqua?.update_checksum?.enabled) {
     try {
+      core.info("updating checksum");
       await aquaUpdateChecksum.main(executor);
     } catch (error) {
+      core.info("updating checksum throw error");
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {
         throw error;
@@ -160,6 +163,7 @@ export const main = async () => {
     }
   }
 
+  core.info("export aws secrets manager");
   await exportAWSSecretsManager.main();
 
   if (sshKey) {

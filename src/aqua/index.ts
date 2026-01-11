@@ -183,8 +183,9 @@ export class Executor {
  * @returns The installation directory of aqua
  */
 export const install = async (): Promise<string> => {
+  core.info("installing aqua");
   const exitCode = await exec.exec("aqua", ["--version"], {
-    // silent: true,
+    silent: true,
     ignoreReturnCode: true,
   });
   if (!exitCode) {
