@@ -183,14 +183,14 @@ export class Executor {
  * @returns The installation directory of aqua
  */
 export const install = async (): Promise<string> => {
-  core.info("installing aqua");
-  const exitCode = await exec.exec("command", ["-v", "aqua"], {
-    silent: true,
-    ignoreReturnCode: true,
-  });
-  if (!exitCode) {
+  try {
+    await exec.exec("aqua", ["--version"], {
+      silent: true,
+    });
     core.info("Installing aqua is skipped");
     return "";
+  } catch {
+    // aqua is not installed, continue with installation
   }
 
   const os = getOS();
@@ -206,6 +206,7 @@ export const install = async (): Promise<string> => {
     return installDir;
   }
 
+  core.info("installing aqua");
   const isWindows = os === "windows";
   const ext = isWindows ? "zip" : "tar.gz";
   const filename = `aqua_${os}_${architecture}.${ext}`;
