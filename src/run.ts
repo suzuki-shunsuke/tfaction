@@ -1,4 +1,3 @@
-import * as conftest from "./conftest";
 import * as createFollowUpPR from "./create-follow-up-pr";
 import * as createScaffoldModulePR from "./create-scaffold-module-pr";
 import * as createScaffoldPR from "./create-scaffold-pr";
@@ -11,7 +10,6 @@ import * as exportSecrets from "./export-secrets";
 import * as generateConfigOut from "./generate-config-out";
 import * as getGlobalConfig from "./get-global-config";
 import * as getTargetConfig from "./get-target-config";
-import * as install from "./install";
 import * as pickOutDriftIssues from "./pick-out-drift-issues";
 import * as listTargets from "./list-targets";
 import * as createDriftIssues from "./create-drift-issues";
@@ -19,7 +17,6 @@ import * as getOrCreateDriftIssue from "./get-or-create-drift-issue";
 import * as updateDriftIssue from "./update-drift-issue";
 import * as setDriftEnv from "./set-drift-env";
 import * as syncDriftIssueDescription from "./sync-drift-issue-description";
-import * as terraformDocs from "./terraform-docs";
 import * as apply from "./apply";
 import * as plan from "./plan";
 import * as releaseModule from "./release-module";
@@ -48,7 +45,6 @@ export const main = async (inputs: Inputs) => {
     ["get-global-config", getGlobalConfig],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
     ["get-target-config", getTargetConfig],
-    ["install", install],
     ["list-targets", listTargets],
     ["pick-out-drift-issues", pickOutDriftIssues],
     ["plan", plan],

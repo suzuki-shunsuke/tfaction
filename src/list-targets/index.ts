@@ -2,14 +2,17 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 import * as fs from "fs";
 
-import * as install from "../install";
 import * as ciInfo from "../ci-info";
 import * as aqua from "../aqua";
+import * as lib from "../lib";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 
 export const main = async () => {
-  // Step 1: Install dependencies
-  await install.main();
+  core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
+  core.exportVariable(
+    "TFACTION_GITHUB_COMMENT_CONFIG",
+    lib.GitHubCommentConfig,
+  );
   const executor = await aqua.NewExecutor({
     githubToken: core.getInput("github_token"),
   });
