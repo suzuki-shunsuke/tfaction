@@ -1,5 +1,5 @@
 ---
-plan_workflow_name: test
+plan_workflow_name: test.yaml
 
 label_prefixes:
   tfmigrate: "migrate:"
@@ -8,13 +8,10 @@ renovate_terraform_labels:
   - terraform
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_arm64
 tfcmt_plan_patch: true
-# conftest_policy_directory: conftest-policy
-
-# skip_create_pr: true
 
 conftest:
   policies:
-    - policy: js/test/conftest/policy
+    - policy: tests/conftest/policy
       tf: true
 
 update_local_path_module_caller:
@@ -22,8 +19,6 @@ update_local_path_module_caller:
 
 trivy:
   enabled: true
-tfsec:
-  enabled: false
 tflint:
   enabled: true
   fix: true
@@ -56,4 +51,4 @@ replace:
 target_groups:
   - working_directory: setup/test/
     target: setup/test/
-    template_dir: js/test/templates/aws
+    template_dir: tests/templates/aws

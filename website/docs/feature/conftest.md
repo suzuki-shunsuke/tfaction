@@ -32,30 +32,6 @@ policy/
 
 ## Settings
 
-By default, tfaction runs Conftest if the directory `policy` exists in the repository root directory.
-
-### conftest_policy_directory
-
-tfaction >= [v1.1.0](https://github.com/suzuki-shunsuke/tfaction/releases/tag/v1.1.0):
-
-You can change the directory by the setting `conftest_policy_directory` in `tfaction-root.yaml`.
-
-```yaml
-conftest_policy_directory: terraform/policy
-```
-
-:::info
-If you configure the `conftest` field, `conftest_policy_directory` is ignored.
-You should migrate `conftest_policy_directory` to `conftest`.
-
-```yaml
-conftest:
-  - policy: terraform/policy
-    plan: true
-```
-
-:::
-
 ### conftest
 
 tfaction >= [v1.8.0](https://github.com/suzuki-shunsuke/tfaction/releases/tag/v1.8.0):

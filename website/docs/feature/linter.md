@@ -7,35 +7,26 @@ sidebar_position: 900
 tfaction runs some linters in [test](https://github.com/suzuki-shunsuke/tfaction/blob/main/test/action.yaml) and [test-module](https://github.com/suzuki-shunsuke/tfaction/blob/main/test-module/action.yaml) actions.
 
 - terraform validate
-- [suzuki-shunsuke/github-action-tflint](https://github.com/suzuki-shunsuke/github-action-tflint)
-- [suzuki-shunsuke/github-action-tfsec](https://github.com/suzuki-shunsuke/github-action-tfsec)
-- [suzuki-shunsuke/trivy-config-action](https://github.com/suzuki-shunsuke/trivy-config-action)
+- tflint
+- trivy
 
 ## Enable or disable linters
 
 You can enable or disable the following linters
 
 - tflint
-- tfsec
 - Trivy
 
 You can configure them at `tfaction-root.yaml`.
 
-By default, tflint and tfsec are enabled and Trivy is disabled.
+By default, tflint and Trivy is enabled.
 
-If you want to migrate tfsec to Trivy, please disable tfsec and enable Trivy.
-
-```yaml
-tfsec:
-  enabled: false
-trivy:
-  enabled: true
-```
-
-You can also disable tflint.
+You can disable tflint and trivy.
 
 ```yaml
 tflint:
+  enabled: false
+trivy:
   enabled: false
 ```
 
@@ -65,16 +56,6 @@ tflint:
   enabled: true
   fix: true # Enable `tflint --fix`
 ```
-
-## tfsec
-
-tfaction runs [tfsec](https://github.com/aquasecurity/tfsec) and notifies the result.
-
-![image](https://user-images.githubusercontent.com/13323303/153747798-0e6ac3d4-e335-4c20-8e2a-1f5b43205ff3.png)
-
---
-
-![mage](https://user-images.githubusercontent.com/13323303/153747838-ccbd4fba-6654-4589-84c8-7ae833644426.png)
 
 ## Trivy
 

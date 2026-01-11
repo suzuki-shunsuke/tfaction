@@ -10,27 +10,24 @@ on:
 jobs:
   hide-comments:
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions: {}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
 
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
           # pull_requests:write - Post and hide comments
-          permissions: >-
-            {"pull_requests": "write"}
-          repositories: >-
-            ["${{github.event.repository.name}}"]
+          permission-pull-requests: write
 
-      - uses: aquaproj/aqua-installer@ea518c135a02fc11ff8024364510c181a5c6b342 # v4.0.3
+      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
         with:
-          aqua_version: v2.55.0
+          aqua_version: v2.56.2
         env:
           AQUA_GITHUB_TOKEN: ${{github.token}}
 

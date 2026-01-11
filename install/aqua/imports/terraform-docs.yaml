@@ -1,0 +1,2 @@
+packages:
+  - name: terraform-docs/terraform-docs@v0.21.0

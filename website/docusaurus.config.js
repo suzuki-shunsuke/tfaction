@@ -38,11 +38,10 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // announcementBar: {
-      //   id: 'support_local_path_module',
-      //   content:
-      //     '<a href="/tfaction/docs/feature/local-path-module">Support running CI on working directories that depend on a updated local path Module (2024-03-16)</a>',
-      //   backgroundColor: '#7FFF00',
-      //   textColor: '#091E42',
+      //   id: "notebooklm",
+      //   content: `<a href="https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451">Google NotebookLM for tfaction (2025-11-15)</a>`,
+      //   backgroundColor: "#7FFF00",
+      //   textColor: "#091E42",
       //   isCloseable: true,
       // },
       navbar: {
@@ -51,6 +50,16 @@ const config = {
           {
             href: "https://github.com/suzuki-shunsuke/tfaction",
             label: "GitHub",
+            position: "right",
+          },
+          {
+            href: "https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451",
+            label: "NotebookLM",
+            position: "right",
+          },
+          {
+            href: "https://deepwiki.com/suzuki-shunsuke/tfaction",
+            label: "DeepWiki",
             position: "right",
           },
         ],

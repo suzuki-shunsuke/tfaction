@@ -1,2 +1,2 @@
 packages:
-  - name: opentofu/opentofu@v1.10.6
+  - name: opentofu/opentofu@v1.11.2

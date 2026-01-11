@@ -32,14 +32,14 @@ jobs:
 
   test-terraform:
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [create-pr-branch]
     permissions:
       contents: write
       pull-requests: write
       issues: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
       - run: gh pr checkout "$PR"
@@ -47,154 +47,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@ea518c135a02fc11ff8024364510c181a5c6b342 # v4.0.3
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          aqua_version: v2.55.0
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          path: js/dist
+          path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction/(.*)@main|uses: ./\1|'
-      - name: Install dependencies
-        uses: ./install
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "contents": "write"
-            }
-          repositories: >-
-            ["${{github.event.repository.name}}"]
-
-      - name: Install dependencies
-        uses: ./install
-
-      - name: Test js/get-target-config
-        uses: ./js
-        id: js-target-config
-        with:
-          action: get-target-config
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev
-          TFACTION_JOB_TYPE: terraform
-      - name: Test get-target-config
-        uses: ./get-target-config
-        id: target-config
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev
-          TFACTION_JOB_TYPE: terraform
-
-      - name: Test js/get-global-config
-        uses: ./js
-        id: js-global-config
-        with:
-          action: get-global-config
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
-      - name: Test get-global-config
-        uses: ./get-global-config
-        id: global-config
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
-
-      - name: Test js/check-terraform-skip
-        uses: ./js
-        id: js-check-terraform-skip
-        with:
-          action: check-terraform-skip
-          labels: js/test/labels.txt
-          skip_label_prefix: "skip:"
-          pr_author: suzuki-shunsuke
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
-      - name: Test check-terraform-skip
-        uses: ./check-terraform-skip
-        id: check-terraform-skip
-        with:
-          labels: js/test/labels.txt
-          skip_label_prefix: "skip:"
-          pr_author: suzuki-shunsuke
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
-
-      - name: Test js/list-changed-modules
-        uses: ./js
-        id: js-list-changed-modules
-        with:
-          action: list-changed-modules
-          changed_files: js/test/changed_files.txt
-          config_files: js/test/modules.txt
-      - name: Test list-changed-modules
-        uses: ./list-changed-modules
-        id: list-changed-modules
-        with:
-          changed_files: js/test/changed_files.txt
-          config_files: js/test/modules.txt
-
-      - name: Test js/list-module-callers
-        uses: ./js
-        id: js-list-module-callers
-        with:
-          action: list-module-callers
-          module_files: js/test/list-module-callers/module_files.txt
-          config_files: js/test/list-module-callers/config_files.txt
-      - name: Test list-module-callers
-        uses: ./list-module-callers
-        id: list-module-callers
-        with:
-          module_files: js/test/list-module-callers/module_files.txt
-          config_files: js/test/list-module-callers/config_files.txt
-
-      - name: Test js/list-targets-with-changed-files
-        uses: ./js
-        id: js-list-targets-with-changed-files
-        with:
-          action: list-targets-with-changed-files
-          changed_files: js/test/changed_files.txt
-          labels: js/test/labels.txt
-          module_files: js/test/list-module-callers/module_files.txt
-          config_files: js/test/list-module-callers/config_files.txt
-          pull_request: "" # A path to ci-info's pr.json
-          module_callers: ""
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-      - name: Test list-targets-with-changed-files
-        uses: ./list-targets-with-changed-files
-        id: list-targets-with-changed-files
-        with:
-          changed_files: js/test/changed_files.txt
-          labels: js/test/labels.txt
-          module_files: js/test/list-module-callers/module_files.txt
-          config_files: js/test/list-module-callers/config_files.txt
-          pull_request: "" # A path to ci-info's pr.json
-          module_callers: ""
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-
-      - name: Test conftest
-        uses: ./conftest
-        id: conftest
-        env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
 
       - name: Test setup
-        uses: ./setup
+        uses: ./
         with:
+          action: setup
           github_token: ${{steps.token.outputs.token}}
         id: setup
         if: |
@@ -205,9 +76,23 @@ jobs:
           TFACTION_WORKING_DIR: setup/test/foo
           TFACTION_JOB_TYPE: terraform
 
-      - name: Test test
-        uses: ./test
+      - name: Test terraform init
+        uses: ./
         with:
+          action: terraform-init
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          TFACTION_JOB_TYPE: terraform
+          TFACTION_CONFIG: setup/test/tfaction-root.yaml
+          TFACTION_TARGET: setup/test/foo
+          TFACTION_WORKING_DIR: setup/test/foo
+
+      - name: Test test
+        uses: ./
+        with:
+          action: test
           github_token: ${{steps.token.outputs.token}}
         id: test
         if: |
@@ -219,9 +104,10 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
-        uses: ./plan
+        uses: ./
         id: plan
         with:
+          action: plan
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -232,64 +118,26 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test-module
-        uses: ./test-module
+        uses: ./
         with:
+          action: test-module
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/modules/foo
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_TARGET: tests/modules/foo
 
-      - name: Outputs actions' outputs (Not Fork)
-        run: "true"
-        if: |
-          ! github.event.pull_request.head.repo.fork
-        env:
-          SETUP: ${{ toJSON(steps.setup.outputs) }}
-
-      - name: Test actions' outputs
-        uses: ./js
-        with:
-          action: test-action
-        env:
-          TFACTION_TEST_ACTION: "true"
-          GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
-          JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
-          GET_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
-          JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
-          CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
-          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
-          LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
-          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
-          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
-          JS_LIST_MODULE_CALLERS: ${{ toJSON(steps.js-list-module-callers.outputs) }}
-          LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
-          JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.js-list-targets-with-changed-files.outputs) }}
-
-      - name: Outputs actions' outputs
-        run: "true"
-        env:
-          GET_TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
-          JS_TARGET_CONFIG: ${{ toJSON(steps.js-target-config.outputs) }}
-          GET_GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
-          JS_GLOBAL_CONFIG: ${{ toJSON(steps.js-global-config.outputs) }}
-          CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.check-terraform-skip.outputs) }}
-          JS_CHECK_TERRAFORM_SKIP: ${{ toJSON(steps.js-check-terraform-skip.outputs) }}
-          LIST_CHANGED_MODULES: ${{ toJSON(steps.list-changed-modules.outputs) }}
-          JS_LIST_CHANGED_MODULES: ${{ toJSON(steps.js-list-changed-modules.outputs) }}
-          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
-          JS_LIST_MODULE_CALLERS: ${{ toJSON(steps.js-list-module-callers.outputs) }}
-          LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.list-targets-with-changed-files.outputs) }}
-          JS_LIST_TARGETS_WITH_CHANGED_FILES: ${{ toJSON(steps.js-list-targets-with-changed-files.outputs) }}
-
-  test-drift-detection:
+  test-get-target-config:
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [create-pr-branch]
-    permissions: {}
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
       - run: gh pr checkout "$PR"
@@ -297,63 +145,106 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@ea518c135a02fc11ff8024364510c181a5c6b342 # v4.0.3
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          aqua_version: v2.55.0
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          path: js/dist
+          path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction/(.*)@main|uses: ./\1|'
-      - name: Install dependencies
-        uses: ./install
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "contents": "write",
-              "issues": "write"
-            }
-          repositories: >-
-            ["test-tfaction"]
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
 
-      - name: Install dependencies
-        uses: ./install
+      - name: Test get-target-config
+        uses: ./
+        id: target-config
+        with:
+          action: get-target-config
+        env:
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_TARGET: tests/aws/foo/dev
+          TFACTION_JOB_TYPE: terraform
+
+      - name: Test get-global-config
+        uses: ./
+        id: global-config
+        with:
+          action: get-global-config
+        env:
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_JOB_TYPE: terraform
+
+      - name: Test actions' outputs
+        uses: ./
+        with:
+          action: test-action
+        env:
+          TFACTION_TEST_ACTION: "true"
+          TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
+          GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
+
+  test-drift-detection:
+    timeout-minutes: 15
+    runs-on: ubuntu-24.04
+    needs: [create-pr-branch]
+    permissions: {}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+      - run: gh pr checkout "$PR"
+        if: inputs.pr != ''
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+          PR: ${{inputs.pr}}
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: dist
+          name: js
+      - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
+        run: |
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
+      - id: token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        with:
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
+          permission-issues: write
+          repositories: test-tfaction
 
       - name: Create a dummy working directory
-        run: mkdir -p "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+        run: mkdir -p "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Create a dummy tfaction.yaml
-        run: echo '{}' > "js/test/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
-      - run: git add "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+        run: echo '{}' > "tests/aws/foo/dev-${GITHUB_RUN_ID}/tfaction.yaml"
+      - run: git add "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Test get-or-create-drift-issue
-        uses: ./js
+        uses: ./
         id: get-or-create-drift-issue
         with:
           github_token: ${{steps.token.outputs.token}}
           action: get-or-create-drift-issue
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
-          TFACTION_TARGET: js/test/aws/foo/dev-${{github.run_id}}
-      - run: git reset HEAD "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_TARGET: tests/aws/foo/dev-${{github.run_id}}
+      - run: git reset HEAD "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Remove a dummy working directory
-        run: rm -R "js/test/aws/foo/dev-${GITHUB_RUN_ID}"
+        run: rm -R "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - run: sleep 5
       - name: Test create-drift-issues
-        uses: ./js
+        uses: ./
         id: create-drift-issues
         with:
           github_token: ${{steps.token.outputs.token}}
           action: create-drift-issues
         env:
-          TFACTION_CONFIG: js/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
 
       - name: Test env
         run: |
@@ -368,13 +259,13 @@ jobs:
 
   test-opentofu:
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [create-pr-branch]
     permissions:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
       - run: gh pr checkout "$PR"
@@ -382,36 +273,39 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@ea518c135a02fc11ff8024364510c181a5c6b342 # v4.0.3
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          aqua_version: v2.55.0
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          path: js/dist
+          path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction/(.*)@main|uses: ./\1|'
-      - name: Install dependencies
-        uses: ./install
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "contents": "write"
-            }
-          repositories: >-
-            ["${{github.event.repository.name}}"]
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
 
       - name: Test setup
-        uses: ./setup
+        id: setup
+        uses: ./
         with:
+          action: setup
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          TFACTION_CONFIG: setup/test/opentofu/tfaction-root.yaml
+          TFACTION_TARGET: setup/test/opentofu/foo
+          TFACTION_WORKING_DIR: setup/test/opentofu/foo
+          TFACTION_JOB_TYPE: terraform
+
+      - name: Test terraform init
+        uses: ./
+        with:
+          action: terraform-init
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -422,8 +316,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test
-        uses: ./test
+        uses: ./
         with:
+          action: test
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -434,8 +329,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
-        uses: ./plan
+        uses: ./
         with:
+          action: plan
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -447,13 +343,13 @@ jobs:
 
   test-terragrunt:
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [create-pr-branch]
     permissions:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
       - run: gh pr checkout "$PR"
@@ -461,52 +357,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@ea518c135a02fc11ff8024364510c181a5c6b342 # v4.0.3
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          aqua_version: v2.55.0
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          path: js/dist
+          path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction/(.*)@main|uses: ./\1|'
-      - name: Install dependencies
-        uses: ./install
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
-          app_id: ${{secrets.gh_app_id}}
-          private_key: ${{secrets.gh_app_private_key}}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "contents": "write"
-            }
-          repositories: >-
-            ["${{github.event.repository.name}}"]
-
-      - name: Test list-module-callers
-        uses: ./js
-        id: list-module-callers
-        with:
-          action: list-module-callers
-          module_files: js/test/list-module-callers/terragrunt/module_files.txt
-          config_files: js/test/list-module-callers/terragrunt/config_files.txt
-
-      - name: Test actions' outputs
-        uses: ./js
-        with:
-          action: test-action
-        env:
-          TFACTION_TEST_ACTION_TERRAGRUNT: "true"
-          LIST_MODULE_CALLERS: ${{ toJSON(steps.list-module-callers.outputs) }}
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
 
       - name: Test setup
-        uses: ./setup
+        uses: ./
         with:
+          action: setup
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -517,8 +386,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test
-        uses: ./test
+        uses: ./
         with:
+          action: test
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -529,8 +399,9 @@ jobs:
           TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
-        uses: ./plan
+        uses: ./
         with:
+          action: plan
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -542,11 +413,12 @@ jobs:
 
       # TODO: https://github.com/suzuki-shunsuke/tfaction/actions/runs/12452038055/job/34760573474?pr=2138
       # - name: Test test-module
-      #   uses: ./test-module
+      #   uses: ./
       #   with:
+      #     action: test-module
       #     github_token: ${{steps.token.outputs.token}}
       #   if: |
       #     ! github.event.pull_request.head.repo.fork
       #   env:
       #     TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
-      #     TFACTION_TARGET: js/test/modules/foo
+      #     TFACTION_TARGET: tests/modules/foo
