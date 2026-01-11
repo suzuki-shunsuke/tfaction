@@ -184,7 +184,7 @@ export class Executor {
  */
 export const install = async (): Promise<string> => {
   core.info("installing aqua");
-  const exitCode = await exec.exec("aqua", ["--version"], {
+  const exitCode = await exec.exec("command", ["-v", "aqua"], {
     silent: true,
     ignoreReturnCode: true,
   });
