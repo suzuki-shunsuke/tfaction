@@ -46,18 +46,16 @@ const getAquaGitHubToken = (inputs: Inputs): string => {
   return process.env.AQUA_GITHUB_TOKEN || "";
 };
 
-const runAquaUpdateChecksum = async (inputs: Inputs): Promise<void> => {
+const runAquaUpdateChecksum = async (
+  inputs: Inputs,
+  executor: aqua.Executor,
+): Promise<void> => {
   const args = ["update-checksum"];
   if (inputs.prune) {
     args.push("-prune");
   }
 
   const aquaToken = getAquaGitHubToken(inputs);
-
-  const executor = await aqua.NewExecutor({
-    githubToken: aquaToken,
-    cwd: inputs.workingDirectory,
-  });
 
   await executor.exec("aqua", args, {
     cwd: inputs.workingDirectory || undefined,
@@ -160,11 +158,11 @@ const createCommitIfNeeded = async (
   });
 };
 
-export const main = async () => {
+export const main = async (executor: aqua.Executor) => {
   const inputs = getInputs();
 
   // Run aqua update-checksum
-  await runAquaUpdateChecksum(inputs);
+  await runAquaUpdateChecksum(inputs, executor);
 
   // Find checksum file
   const workingDir = inputs.workingDirectory || process.cwd();

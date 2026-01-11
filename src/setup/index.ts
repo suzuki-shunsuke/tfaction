@@ -143,10 +143,15 @@ export const main = async () => {
   core.info(`TFACTION_TARGET: ${targetConfig.target}`);
   core.info(`TFACTION_WORKING_DIR: ${targetConfig.working_directory}`);
 
+  const executor = await aqua.NewExecutor({
+    githubToken: githubToken,
+    cwd: targetConfig.working_directory,
+  });
+
   if (config.aqua?.update_checksum?.enabled) {
     core.info("Running aqua-update-checksum action...");
     try {
-      await aquaUpdateChecksum.main();
+      await aquaUpdateChecksum.main(executor);
     } catch (error) {
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {
@@ -158,11 +163,6 @@ export const main = async () => {
       throw error;
     }
   }
-
-  const executor = await aqua.NewExecutor({
-    githubToken: githubToken,
-    cwd: targetConfig.working_directory,
-  });
 
   await exportAWSSecretsManager.main();
 
