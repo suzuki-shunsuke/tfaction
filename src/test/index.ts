@@ -10,6 +10,35 @@ import { run as runTflint } from "../tflint";
 import { run as runTerraformDocs } from "../terraform-docs";
 import { create as createCommit } from "../commit";
 
+const fmt = async (
+  tfCommand: string,
+  workingDir: string,
+  executor: aqua.Executor,
+): Promise<exec.ExecOutput> => {
+  if (tfCommand === "terragrunt") {
+    core.startGroup(`terragrunt run -- fmt`);
+    const fmtResult = await executor.getExecOutput(
+      tfCommand,
+      ["run", "--", "fmt", "-recursive"],
+      {
+        cwd: workingDir,
+      },
+    );
+    core.endGroup();
+    return fmtResult;
+  }
+  core.startGroup(`${tfCommand} fmt`);
+  const fmtResult = await executor.getExecOutput(
+    tfCommand,
+    ["fmt", "-recursive"],
+    {
+      cwd: workingDir,
+    },
+  );
+  core.endGroup();
+  return fmtResult;
+};
+
 export const main = async () => {
   const config = lib.getConfig();
   const githubToken = core.getInput("github_token");
@@ -104,17 +133,9 @@ export const main = async () => {
 
   // Step 8-9: terraform fmt & commit
   if (!destroy) {
-    core.startGroup(`${tfCommand} fmt`);
-    const fmtResult = await executor.getExecOutput(
-      tfCommand,
-      ["fmt", "-recursive"],
-      {
-        cwd: workingDir,
-      },
-    );
-    core.endGroup();
-
-    const fmtOutput = fmtResult.stdout.trim();
+    const fmtOutput = (
+      await fmt(tfCommand, workingDir, executor)
+    ).stdout.trim();
     if (fmtOutput) {
       // Add working directory prefix to file paths
       const files = fmtOutput
@@ -136,7 +157,6 @@ export const main = async () => {
     }
   }
 
-  // Step 10: terraform-docs (conditional)
   if (!destroy && targetConfig.enable_terraform_docs) {
     await runTerraformDocs({
       workingDirectory: workingDir,
