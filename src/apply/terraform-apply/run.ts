@@ -120,6 +120,7 @@ export const main = async (): Promise<void> => {
           ignoreReturnCode: true,
           env: {
             GITHUB_TOKEN: githubToken,
+            TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
           },
           listeners: {
             stdout: (data: Buffer) => {
