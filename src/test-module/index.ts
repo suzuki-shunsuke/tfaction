@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import { run as runTrivy } from "../trivy/run";
 import { run as runTflint } from "../tflint/run";
 import { run as runTerraformDocs } from "../terraform-docs/run";
@@ -29,46 +30,36 @@ export const main = async () => {
   const securefixServerRepository =
     config.securefix_action?.server_repository ?? "";
 
-  core.startGroup("aqua i -l -a");
-  await exec.exec("aqua", ["i", "-l", "-a"], {
+  const executor = await aqua.NewExecutor({
+    githubToken,
     cwd: target,
-    env: {
-      ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    },
   });
-  core.endGroup();
 
   core.startGroup("terraform init");
-  await exec.exec(
+  await executor.exec(
     "github-comment",
     ["exec", "-var", `tfaction_target:${target}`, "--", "terraform", "init"],
     {
       cwd: target,
       env: {
-        ...process.env,
         GITHUB_TOKEN: githubToken,
         GH_COMMENT_CONFIG: process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "",
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     },
   );
   core.endGroup();
 
-  // Run trivy
   if (enableTrivy) {
-    core.info("Running trivy");
     await runTrivy({
       workingDirectory: target,
       githubToken,
       githubComment: true,
       configPath: "",
+      executor,
     });
   }
 
-  // Run tflint
   if (enableTflint) {
-    core.info("Running tflint");
     await runTflint({
       workingDirectory: target,
       githubToken,
@@ -79,6 +70,7 @@ export const main = async () => {
       serverRepository: securefixServerRepository,
       securefixActionAppId: securefixAppId,
       securefixActionAppPrivateKey: securefixAppPrivateKey,
+      executor,
     });
   }
 
@@ -89,20 +81,17 @@ export const main = async () => {
     core.info("Removed .terraform.lock.hcl");
   }
 
-  // Run terraform-docs
-  core.info("Running terraform-docs");
   await runTerraformDocs({
     workingDirectory: target,
     githubToken,
     securefixActionAppId: securefixAppId,
     securefixActionAppPrivateKey: securefixAppPrivateKey,
     securefixActionServerRepository: securefixServerRepository,
+    executor,
   });
 
-  // Run terraform fmt
-  core.info("Running terraform fmt");
   let fmtOutput = "";
-  await exec.exec(terraformCommand, ["fmt", "-recursive"], {
+  await executor.exec(terraformCommand, ["fmt", "-recursive"], {
     cwd: target,
     listeners: {
       stdout: (data: Buffer) => {

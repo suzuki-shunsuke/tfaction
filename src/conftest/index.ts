@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import * as path from "path";
 import fs from "fs";
 import tmp from "tmp";
@@ -13,6 +14,7 @@ type Inputs = {
   githubToken: string;
   plan: boolean;
   planJsonPath?: string;
+  executor: aqua.Executor;
 };
 
 const getConftestPaths = (
@@ -204,21 +206,22 @@ const buildPolicies = (
   return policies;
 };
 
-export const main = async () => {
-  run(
-    {
-      workingDir: process.env.TFACTION_WORKING_DIR,
-      target: process.env.TFACTION_TARGET,
-      rootDir: process.env.GITHUB_WORKSPACE ?? "",
-      plan: core.getBooleanInput("plan", { required: true }),
-      githubToken: core.getInput("github_token", { required: true }),
-    },
-    lib.getConfig(),
-  );
-};
+// export const main = async () => {
+//   run(
+//     {
+//       workingDir: process.env.TFACTION_WORKING_DIR,
+//       target: process.env.TFACTION_TARGET,
+//       rootDir: process.env.GITHUB_WORKSPACE ?? "",
+//       plan: core.getBooleanInput("plan", { required: true }),
+//       githubToken: core.getInput("github_token", { required: true }),
+//     },
+//     lib.getConfig(),
+//   );
+// };
 
 export const run = async (inputs: Inputs, config: lib.Config) => {
   const workingDirectoryFile = config.working_directory_file;
+  const executor = inputs.executor;
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
 
@@ -234,16 +237,14 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
 
   if (policies.length !== 0) {
     core.startGroup("conftest -v");
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       ["exec", "-var", `tfaction_target:${t.target}`, "--", "conftest", "-v"],
       {
         cwd: t.workingDir,
         env: {
-          ...process.env,
           GITHUB_TOKEN: inputs.githubToken,
           GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );
@@ -263,13 +264,11 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       paths,
     );
     core.startGroup("conftest");
-    await exec.exec("github-comment", args, {
+    await executor.exec("github-comment", args, {
       cwd: t.workingDir,
       env: {
-        ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
     core.endGroup();

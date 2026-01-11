@@ -6,9 +6,10 @@ import * as os from "os";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import * as ciinfo from "../ci-info";
 import { getTargetConfig } from "../get-target-config";
-import * as aquaUpdateChecksum from "../aqua-update-checksum";
+import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as exportAWSSecretsManager from "../export-aws-secrets-manager";
 
 // Check if this is a pull request event
@@ -158,14 +159,9 @@ export const main = async () => {
     }
   }
 
-  core.info("Running aqua install...");
-  await exec.exec("aqua", ["i", "-l", "-a"], {
-    cwd: targetConfig.working_directory || undefined,
-    env: {
-      ...process.env,
-      AQUA_GITHUB_TOKEN: githubToken,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    },
+  const executor = await aqua.NewExecutor({
+    githubToken: githubToken,
+    cwd: targetConfig.working_directory,
   });
 
   await exportAWSSecretsManager.main();

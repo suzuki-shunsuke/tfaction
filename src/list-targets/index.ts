@@ -1,13 +1,18 @@
 import * as github from "@actions/github";
+import * as core from "@actions/core";
 import * as fs from "fs";
 
 import * as install from "../install";
 import * as ciInfo from "../ci-info";
+import * as aqua from "../aqua";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 
 export const main = async () => {
   // Step 1: Install dependencies
   await install.main();
+  const executor = await aqua.NewExecutor({
+    githubToken: core.getInput("github_token"),
+  });
 
   // Step 2: Run ci-info (skip for workflow_dispatch and schedule events)
   const eventName = github.context.eventName;
@@ -43,5 +48,5 @@ export const main = async () => {
 
   // Step 4: Run list-targets-with-changed-files
   // The outputs (modules, targets) are set by listTargetsWithChangedFiles.main()
-  await listTargetsWithChangedFiles.main();
+  await listTargetsWithChangedFiles.main(executor);
 };

@@ -8,6 +8,7 @@ import * as path from "path";
 import { z } from "zod";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import * as getTargetConfig from "../get-target-config";
 
 const PRData = z.object({
@@ -310,6 +311,7 @@ interface GitHubAPIParams {
   target: string;
   mentions: string;
   configPath: string;
+  executor: aqua.Executor;
 }
 
 const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
@@ -388,8 +390,10 @@ const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
     core.info(`Added assignees ${assignees.join(", ")} to PR #${pr.number}`);
   }
 
+  const executor = params.executor;
+
   if (configPath) {
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       [
         "post",
@@ -406,7 +410,6 @@ const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
       ],
       {
         env: {
-          ...process.env,
           GITHUB_TOKEN: githubToken,
         },
       },
@@ -431,6 +434,7 @@ interface SkipCreateCommentParams {
   groupLabel: string;
   target: string;
   mentions: string;
+  executor: aqua.Executor;
 }
 
 const postSkipCreateComment = async (
@@ -471,8 +475,10 @@ const postSkipCreateComment = async (
 
   const optsString = createOpts.join(" ");
 
+  const executor = params.executor;
+
   if (configPath) {
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       [
         "post",
@@ -489,7 +495,6 @@ const postSkipCreateComment = async (
       ],
       {
         env: {
-          ...process.env,
           GITHUB_TOKEN: githubToken,
         },
       },
@@ -523,7 +528,7 @@ export const main = async () => {
     config.securefix_action?.pull_request?.base_branch ?? "";
 
   // Get target config
-  const targetConfigResult = await getTargetConfig.getTargetConfig(
+  const targetConfig = await getTargetConfig.getTargetConfig(
     {
       target: process.env.TFACTION_TARGET,
       workingDir: process.env.TFACTION_WORKING_DIR,
@@ -534,10 +539,8 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfigResult.working_directory ||
-    process.env.TFACTION_WORKING_DIR ||
-    "";
-  const target = targetConfigResult.target || process.env.TFACTION_TARGET || "";
+    targetConfig.working_directory || process.env.TFACTION_WORKING_DIR || "";
+  const target = targetConfig.target || process.env.TFACTION_TARGET || "";
 
   const prNumber = process.env.CI_INFO_PR_NUMBER || "";
   const tempDir = process.env.CI_INFO_TEMP_DIR || "";
@@ -545,6 +548,11 @@ export const main = async () => {
   const repository = process.env.GITHUB_REPOSITORY ?? "";
   const runId = process.env.GITHUB_RUN_ID ?? "";
   const configPath = process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "";
+
+  const executor = await aqua.NewExecutor({
+    githubToken,
+    cwd: workingDir,
+  });
 
   // Get or create group label
   const groupLabel = await getOrCreateGroupLabel({
@@ -615,6 +623,7 @@ export const main = async () => {
       target,
       mentions: prParams.mentions,
       configPath,
+      executor,
     });
   }
 
@@ -632,6 +641,7 @@ export const main = async () => {
       groupLabel,
       target,
       mentions: prParams.mentions,
+      executor,
     });
   }
 };

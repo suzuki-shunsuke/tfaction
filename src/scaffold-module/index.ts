@@ -5,6 +5,7 @@ import * as path from "path";
 import Handlebars from "handlebars";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 
 const copyDirectory = (src: string, dest: string): void => {
   if (!fs.existsSync(dest)) {
@@ -110,25 +111,18 @@ export const main = async () => {
     ref: ref,
   });
 
-  core.startGroup("aqua i -l -a");
-  await exec.exec("aqua", ["i", "-l", "-a"], {
+  const executor = await aqua.NewExecutor({
+    githubToken,
     cwd: modulePath,
-    env: {
-      ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    },
   });
-  core.endGroup();
 
   // Run terraform-docs
   core.info("Running terraform-docs");
   let docsOutput = "";
-  await exec.exec("terraform-docs", ["."], {
+  await executor.exec("terraform-docs", ["."], {
     cwd: modulePath,
     env: {
-      ...process.env,
       GITHUB_TOKEN: githubToken,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
     listeners: {
       stdout: (data: Buffer) => {

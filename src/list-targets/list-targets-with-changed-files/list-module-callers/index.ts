@@ -10,8 +10,9 @@ import {
   ModuleToCallers,
 } from "./lib";
 import * as lib from "../../../lib";
+import * as aqua from "../../../aqua";
 
-export const main = async () => {
+export const main = async (executor: aqua.Executor) => {
   const configFiles = fs
     .readFileSync(core.getInput("config_files"), "utf8")
     .trim()
@@ -21,7 +22,7 @@ export const main = async () => {
     .trim()
     .split("\n");
 
-  const moduleCallers = await list(configFiles, moduleFiles);
+  const moduleCallers = await list(configFiles, moduleFiles, executor);
 
   const json = JSON.stringify(moduleCallers);
   core.info(`file: ${json}`);
@@ -33,6 +34,7 @@ export const main = async () => {
 export const list = async (
   configFiles: string[],
   moduleFiles: string[],
+  executor: aqua.Executor,
 ): Promise<ModuleToCallers> => {
   // directory where uses modules => used modules
   const rawModuleCalls: Record<string, Array<string>> = {};
@@ -45,21 +47,17 @@ export const list = async (
       continue;
     }
     const tmpobj = tmp.fileSync();
-    await exec.exec("aqua", ["i", "-l", "-a"], {
+    await executor.exec("aqua", ["i", "-l", "-a"], {
       cwd: tfDir,
     });
 
     // Check terragrunt version
-    const terragruntVersionOut = await exec.getExecOutput(
+    const terragruntVersionOut = await executor.getExecOutput(
       "terragrunt",
       ["--version"],
       {
         cwd: tfDir,
         silent: true,
-        env: {
-          ...process.env,
-          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-        },
       },
     );
     let terragruntVersion = "";
@@ -85,12 +83,8 @@ export const list = async (
       terragruntArgs.push("render-json", "--terragrunt-json-out");
     }
 
-    await exec.exec("terragrunt", terragruntArgs.concat(tmpobj.name), {
+    await executor.exec("terragrunt", terragruntArgs.concat(tmpobj.name), {
       cwd: tfDir,
-      env: {
-        ...process.env,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-      },
     });
     const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
       ?.source;
@@ -117,15 +111,9 @@ export const list = async (
 
     const tfDir = path.dirname(tfFile);
 
-    const outInspect = await exec.getExecOutput(
+    const outInspect = await executor.getExecOutput(
       "terraform-config-inspect",
       ["--json", tfDir],
-      {
-        env: {
-          ...process.env,
-          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-        },
-      },
     );
     const inspection = JSON.parse(outInspect.stdout);
 

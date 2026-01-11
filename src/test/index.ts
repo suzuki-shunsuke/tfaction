@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
 import { run as runConftest } from "../conftest";
 import { run as runTrivy } from "../trivy/run";
@@ -33,7 +34,11 @@ export const main = async () => {
   const target = targetConfig.target;
   const serverRepository = config.securefix_action?.server_repository ?? "";
 
-  // Step 3: Conftest
+  const executor = await aqua.NewExecutor({
+    githubToken,
+    cwd: workingDir,
+  });
+
   await runConftest(
     {
       workingDir,
@@ -41,14 +46,14 @@ export const main = async () => {
       rootDir: process.env.GITHUB_WORKSPACE ?? "",
       githubToken,
       plan: false,
+      executor,
     },
     config,
   );
 
-  // Step 4: terraform validate (skip if destroy)
   if (!destroy) {
     core.startGroup(`${tfCommand} validate`);
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       [
         "exec",
@@ -63,10 +68,8 @@ export const main = async () => {
       {
         cwd: workingDir,
         env: {
-          ...process.env,
           GITHUB_TOKEN: githubToken,
           GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );
@@ -80,6 +83,7 @@ export const main = async () => {
       githubToken,
       githubComment: true,
       configPath: "",
+      executor,
     });
   }
 
@@ -94,13 +98,14 @@ export const main = async () => {
       serverRepository,
       securefixActionAppId: securefixAppId,
       securefixActionAppPrivateKey: securefixAppPrivateKey,
+      executor,
     });
   }
 
   // Step 8-9: terraform fmt & commit
   if (!destroy) {
     core.startGroup(`${tfCommand} fmt`);
-    const fmtResult = await exec.getExecOutput(
+    const fmtResult = await executor.getExecOutput(
       tfCommand,
       ["fmt", "-recursive"],
       {
@@ -139,6 +144,7 @@ export const main = async () => {
       securefixActionAppId: securefixAppId,
       securefixActionAppPrivateKey: securefixAppPrivateKey,
       securefixActionServerRepository: serverRepository,
+      executor,
     });
   }
 };

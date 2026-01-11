@@ -4,6 +4,7 @@ import * as github from "@actions/github";
 import * as path from "path";
 import * as commit from "../commit";
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 
 type Inputs = {
   workingDirectory: string;
@@ -15,6 +16,7 @@ type Inputs = {
   serverRepository: string;
   securefixActionAppId: string;
   securefixActionAppPrivateKey: string;
+  executor: aqua.Executor;
 };
 
 const getSeverity = (s: string): string => {
@@ -95,27 +97,22 @@ export const run = async (inputs: Inputs): Promise<void> => {
   if (!inputs.githubTokenForFix) {
     inputs.githubTokenForFix = inputs.githubToken;
   }
+  const executor = inputs.executor;
 
   core.startGroup("tflint --init");
-  await exec.exec("tflint", ["--init"], {
+  await executor.exec("tflint", ["--init"], {
     cwd: inputs.workingDirectory,
     env: {
-      ...process.env,
       GITHUB_TOKEN: inputs.githubTokenForTflintInit,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   core.endGroup();
 
   const args = ["--format", "json"];
 
-  const help = await exec.getExecOutput("tflint", ["--help"], {
+  const help = await executor.getExecOutput("tflint", ["--help"], {
     cwd: inputs.workingDirectory,
     silent: true,
-    env: {
-      ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    },
   });
   if (help.stdout.includes("--call-module-type")) {
     args.push("--call-module-type=all");
@@ -127,13 +124,9 @@ export const run = async (inputs: Inputs): Promise<void> => {
   }
 
   core.startGroup("tflint");
-  const out = await exec.getExecOutput("tflint", args, {
+  const out = await executor.getExecOutput("tflint", args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
-    env: {
-      ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    },
   });
   core.endGroup();
   const outJSON = JSON.parse(out.stdout);
@@ -214,13 +207,11 @@ export const run = async (inputs: Inputs): Promise<void> => {
 Working Directory: \`${inputs.workingDirectory}\`
 
 ${table}`;
-    await exec.exec("github-comment", ["post", "-stdin-template"], {
+    await executor.exec("github-comment", ["post", "-stdin-template"], {
       input: Buffer.from(githubCommentTemplate),
       env: {
-        ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
   }
@@ -254,14 +245,10 @@ ${table}`;
     "warning",
   ];
   const failLevel = config.tflint?.reviewdog?.fail_level ?? "any";
-  const reviewdogHelp = await exec.getExecOutput("reviewdog", ["--help"], {
+  const reviewdogHelp = await executor.getExecOutput("reviewdog", ["--help"], {
     cwd: inputs.workingDirectory,
     silent: true,
     ignoreReturnCode: true,
-    env: {
-      ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    },
   });
   if (
     reviewdogHelp.stdout.includes("-fail-level") ||
@@ -273,13 +260,11 @@ ${table}`;
   }
 
   core.startGroup("reviewdog");
-  await exec.exec("reviewdog", reviewdogArgs, {
+  await executor.exec("reviewdog", reviewdogArgs, {
     input: Buffer.from(reviewDogInput),
     cwd: inputs.workingDirectory,
     env: {
-      ...process.env,
       REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
   });
   core.endGroup();

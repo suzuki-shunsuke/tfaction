@@ -8,6 +8,7 @@ import * as path from "path";
 import Handlebars from "handlebars";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
@@ -395,10 +396,14 @@ export const main = async () => {
   const repository = process.env.GITHUB_REPOSITORY ?? "";
   const runId = process.env.GITHUB_RUN_ID ?? "";
 
+  const executor = await aqua.NewExecutor({
+    githubToken,
+  });
+
   // Checkout PR if pr_number is provided
   let branch = generateBranchName(target, prNumber);
   if (prNumber) {
-    await exec.exec("gh", ["pr", "checkout", prNumber], {
+    await executor.exec("gh", ["pr", "checkout", prNumber], {
       env: {
         ...process.env,
         GITHUB_TOKEN: githubToken,

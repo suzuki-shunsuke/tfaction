@@ -38,7 +38,6 @@ interface API {
 export const main = async (inputs: Inputs) => {
   const actions = new Map<string, API>([
     ["apply", apply],
-    ["conftest", conftest],
     ["create-drift-issues", createDriftIssues],
     ["create-follow-up-pr", createFollowUpPR],
     ["create-scaffold-module-pr", createScaffoldModulePR],
@@ -59,7 +58,6 @@ export const main = async (inputs: Inputs) => {
     ["scaffold-working-dir", scaffoldWorkingDir],
     ["setup", setup],
     ["terraform-init", terraformInit],
-    ["terraform-docs", terraformDocs],
     ["test", test],
     ["test-module", testModule],
     ["update-drift-issue", updateDriftIssue],

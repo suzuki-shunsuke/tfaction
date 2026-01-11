@@ -5,6 +5,7 @@ import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
+import * as aqua from "../../aqua";
 
 type Inputs = {
   workingDirectory: string;
@@ -52,18 +53,15 @@ const runAquaUpdateChecksum = async (inputs: Inputs): Promise<void> => {
   }
 
   const aquaToken = getAquaGitHubToken(inputs);
-  const options: exec.ExecOptions = {
-    cwd: inputs.workingDirectory || process.cwd(),
-  };
 
-  if (aquaToken) {
-    options.env = {
-      ...process.env,
-      AQUA_GITHUB_TOKEN: aquaToken,
-    } as { [key: string]: string };
-  }
+  const executor = await aqua.NewExecutor({
+    githubToken: aquaToken,
+    cwd: inputs.workingDirectory,
+  });
 
-  await exec.exec("aqua", args, options);
+  await executor.exec("aqua", args, {
+    cwd: inputs.workingDirectory || undefined,
+  });
 };
 
 const findChecksumFile = (workingDir: string): string | null => {
@@ -90,17 +88,14 @@ const checkIfChanged = async (
   checksumFile: string,
   workingDir: string,
 ): Promise<boolean> => {
-  // Check if file is tracked by git
-  const lsFilesOptions: exec.ExecOptions = {
-    cwd: workingDir,
-    ignoreReturnCode: true,
-    silent: true,
-  };
-
   const lsFilesExitCode = await exec.exec(
     "git",
     ["ls-files", "--error-unmatch", "--", checksumFile],
-    lsFilesOptions,
+    {
+      cwd: workingDir,
+      ignoreReturnCode: true,
+      silent: true,
+    },
   );
 
   if (lsFilesExitCode !== 0) {
@@ -109,16 +104,14 @@ const checkIfChanged = async (
   }
 
   // Check if file has changes
-  const diffOptions: exec.ExecOptions = {
-    cwd: workingDir,
-    ignoreReturnCode: true,
-    silent: true,
-  };
-
   const diffExitCode = await exec.exec(
     "git",
     ["diff", "--quiet", "--", checksumFile],
-    diffOptions,
+    {
+      cwd: workingDir,
+      ignoreReturnCode: true,
+      silent: true,
+    },
   );
 
   // git diff --quiet returns 0 if no changes, 1 if there are changes

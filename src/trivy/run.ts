@@ -3,12 +3,14 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 
 type Inputs = {
   workingDirectory: string;
   githubToken: string;
   githubComment: boolean;
   configPath: string;
+  executor: aqua.Executor;
 };
 
 class DiagnosticCode {
@@ -86,14 +88,11 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const args = inputs.configPath
     ? ["config", "--format", "json", "--config", inputs.configPath, "."]
     : ["config", "--format", "json", "."];
+  const executor = inputs.executor;
   core.startGroup("trivy");
-  const out = await exec.getExecOutput("trivy", args, {
+  const out = await executor.getExecOutput("trivy", args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
-    env: {
-      ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    },
   });
   core.endGroup();
   core.info("Parsing trivy config result");
@@ -139,13 +138,11 @@ export const run = async (inputs: Inputs): Promise<void> => {
 Working Directory: \`${inputs.workingDirectory}\`
 
 ${table}`;
-    await exec.exec("github-comment", ["post", "-stdin-template"], {
+    await executor.exec("github-comment", ["post", "-stdin-template"], {
       input: Buffer.from(githubCommentTemplate),
       env: {
-        ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
   }
@@ -155,7 +152,7 @@ ${table}`;
       ? "github-pr-review"
       : "github-check";
   core.startGroup("reviewdog -name trivy");
-  await exec.exec(
+  await executor.exec(
     "reviewdog",
     [
       "-f",
@@ -183,9 +180,7 @@ ${table}`;
       ),
       cwd: inputs.workingDirectory,
       env: {
-        ...process.env,
         REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     },
   );

@@ -6,6 +6,7 @@ import * as fs from "fs";
 import * as tmp from "tmp";
 import * as commit from "../commit";
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 
 type Inputs = {
   workingDirectory: string;
@@ -13,6 +14,7 @@ type Inputs = {
   securefixActionAppId: string;
   securefixActionAppPrivateKey: string;
   securefixActionServerRepository: string;
+  executor: aqua.Executor;
 };
 
 const findConfigFile = (
@@ -48,6 +50,7 @@ const findConfigFile = (
 export const run = async (inputs: Inputs): Promise<void> => {
   const pwd = process.env.GITHUB_WORKSPACE ?? process.cwd();
   const readmePath = path.join(inputs.workingDirectory, "README.md");
+  const executor = inputs.executor;
 
   // Check if README.md exists
   const created = !fs.existsSync(readmePath);
@@ -56,12 +59,8 @@ export const run = async (inputs: Inputs): Promise<void> => {
   const tempFile = tmp.fileSync();
   try {
     // Check terraform-docs version
-    await exec.exec("terraform-docs", ["-v"], {
+    await executor.exec("terraform-docs", ["-v"], {
       cwd: inputs.workingDirectory,
-      env: {
-        ...process.env,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-      },
     });
 
     // Search for config file
@@ -85,14 +84,12 @@ export const run = async (inputs: Inputs): Promise<void> => {
     args.push("--", "terraform-docs", ...opts, ".");
 
     // Execute terraform-docs via github-comment
-    const result = await exec.getExecOutput("github-comment", args, {
+    const result = await executor.getExecOutput("github-comment", args, {
       cwd: inputs.workingDirectory,
       ignoreReturnCode: true,
       env: {
-        ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
 
