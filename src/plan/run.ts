@@ -269,6 +269,7 @@ export const runTerraformPlan = async (
     env: {
       GITHUB_TOKEN: inputs.githubToken,
       AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+      TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
     },
   });
 
