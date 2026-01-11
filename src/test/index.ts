@@ -5,9 +5,9 @@ import * as lib from "../lib";
 import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
 import { run as runConftest } from "../conftest";
-import { run as runTrivy } from "../trivy/run";
-import { run as runTflint } from "../tflint/run";
-import { run as runTerraformDocs } from "../terraform-docs/run";
+import { run as runTrivy } from "../trivy";
+import { run as runTflint } from "../tflint";
+import { run as runTerraformDocs } from "../terraform-docs";
 import { create as createCommit } from "../commit";
 
 export const main = async () => {

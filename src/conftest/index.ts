@@ -206,19 +206,6 @@ const buildPolicies = (
   return policies;
 };
 
-// export const main = async () => {
-//   run(
-//     {
-//       workingDir: process.env.TFACTION_WORKING_DIR,
-//       target: process.env.TFACTION_TARGET,
-//       rootDir: process.env.GITHUB_WORKSPACE ?? "",
-//       plan: core.getBooleanInput("plan", { required: true }),
-//       githubToken: core.getInput("github_token", { required: true }),
-//     },
-//     lib.getConfig(),
-//   );
-// };
-
 export const run = async (inputs: Inputs, config: lib.Config) => {
   const workingDirectoryFile = config.working_directory_file;
   const executor = inputs.executor;
