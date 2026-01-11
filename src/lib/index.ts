@@ -52,7 +52,7 @@ export const getJobType = (): JobType => {
   return JobType.parse(process.env.TFACTION_JOB_TYPE);
 };
 
-const TflintReviewdogConfig = z.object({
+const ReviewdogConfig = z.object({
   filter_mode: z.enum(["added", "diff_context", "file", "nofilter"]).optional(),
   fail_level: z.enum(["none", "any", "info", "warning", "error"]).optional(),
 });
@@ -60,12 +60,13 @@ const TflintReviewdogConfig = z.object({
 const TflintConfig = z.object({
   enabled: z.boolean().optional(),
   fix: z.boolean().optional(),
-  reviewdog: TflintReviewdogConfig.optional(),
+  reviewdog: ReviewdogConfig.optional(),
 });
 type TflintConfig = z.infer<typeof TflintConfig>;
 
 const TrivyConfig = z.object({
   enabled: z.boolean().optional(),
+  reviewdog: ReviewdogConfig.optional(),
 });
 type TrivyConfig = z.infer<typeof TrivyConfig>;
 
@@ -334,10 +335,11 @@ export interface Config extends Omit<
   tflint: {
     enabled: boolean;
     fix: boolean;
-    reviewdog?: z.infer<typeof TflintReviewdogConfig>;
+    reviewdog?: z.infer<typeof ReviewdogConfig>;
   };
   trivy: {
     enabled: boolean;
+    reviewdog?: z.infer<typeof ReviewdogConfig>;
   };
   follow_up_pr_group_label: {
     enabled: boolean;
@@ -382,6 +384,7 @@ export const applyConfigDefaults = (raw: RawConfig): Config => {
     },
     trivy: {
       enabled: raw.trivy?.enabled ?? true,
+      reviewdog: raw.trivy?.reviewdog,
     },
     follow_up_pr_group_label: {
       enabled: raw.follow_up_pr_group_label?.enabled ?? false,

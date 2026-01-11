@@ -151,39 +151,52 @@ ${table}`;
     github.context.eventName == "pull_request"
       ? "github-pr-review"
       : "github-check";
+
+  const config = lib.getConfig();
+  const filterMode = config.trivy?.reviewdog?.filter_mode ?? "nofilter";
+  const reviewdogArgs = [
+    "-f",
+    "rdjson",
+    "-name",
+    "trivy",
+    "-filter-mode",
+    filterMode,
+    "-reporter",
+    reporter,
+    "-level",
+    "warning",
+  ];
+  const failLevel = config.trivy?.reviewdog?.fail_level ?? "any";
+  const reviewdogHelp = await executor.getExecOutput("reviewdog", ["--help"], {
+    cwd: inputs.workingDirectory,
+    silent: true,
+    ignoreReturnCode: true,
+  });
+  if (
+    reviewdogHelp.stdout.includes("-fail-level") ||
+    reviewdogHelp.stderr.includes("-fail-level")
+  ) {
+    reviewdogArgs.push("-fail-level", failLevel);
+  } else {
+    reviewdogArgs.push("-fail-on-error", "1");
+  }
+
   core.startGroup("reviewdog -name trivy");
-  await executor.exec(
-    "reviewdog",
-    [
-      "-f",
-      "rdjson",
-      "-name",
-      "trivy",
-      "-filter-mode",
-      "nofilter",
-      "-reporter",
-      reporter,
-      "-level",
-      "warning",
-      "-fail-on-error",
-      "1",
-    ],
-    {
-      input: Buffer.from(
-        JSON.stringify({
-          source: {
-            name: "trivy",
-            url: "https://github.com/aquasecurity/trivy",
-          },
-          diagnostics: diagnostics,
-        }),
-      ),
-      cwd: inputs.workingDirectory,
-      env: {
-        REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
-      },
+  await executor.exec("reviewdog", reviewdogArgs, {
+    input: Buffer.from(
+      JSON.stringify({
+        source: {
+          name: "trivy",
+          url: "https://github.com/aquasecurity/trivy",
+        },
+        diagnostics: diagnostics,
+      }),
+    ),
+    cwd: inputs.workingDirectory,
+    env: {
+      REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
     },
-  );
+  });
   core.endGroup();
   if (out.exitCode != 0) {
     throw new Error("trivy failed");
