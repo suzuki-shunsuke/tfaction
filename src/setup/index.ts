@@ -140,16 +140,12 @@ export const main = async () => {
     await addLabelToPR(octokit, targetConfig.target);
   }
 
-  core.info(`TFACTION_TARGET: ${targetConfig.target}`);
-  core.info(`TFACTION_WORKING_DIR: ${targetConfig.working_directory}`);
-
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
     cwd: targetConfig.working_directory,
   });
 
   if (config.aqua?.update_checksum?.enabled) {
-    core.info("Running aqua-update-checksum action...");
     try {
       await aquaUpdateChecksum.main(executor);
     } catch (error) {
