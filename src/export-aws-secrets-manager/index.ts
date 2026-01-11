@@ -68,7 +68,7 @@ async function exportSecrets(
   }
 }
 
-export const run = async (): Promise<void> => {
+export const main = async (): Promise<void> => {
   const config = lib.getConfig();
   const targetS = lib.getTarget();
   const wd = lib.getWorkingDir();
