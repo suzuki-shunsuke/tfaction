@@ -5,7 +5,6 @@ import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 import { fileURLToPath } from "node:url";
 
 export const GitHubActionPath = path.join(
@@ -145,7 +144,7 @@ const JobConfig = z.object({
   environment: z.optional(GitHubEnvironment),
   secrets: z.optional(GitHubSecrets),
   runs_on: z.optional(z.union([z.string(), z.array(z.string())])),
-  env: z.optional(z.record(z.string())),
+  env: z.optional(z.record(z.string(), z.string())),
   aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
 });
 export type JobConfig = z.infer<typeof JobConfig>;
@@ -155,7 +154,7 @@ const TargetGroup = z.object({
   aws_assume_role_arn: z.optional(z.string()),
   aws_role_session_name: z.optional(z.string()),
   destroy: z.optional(z.boolean()),
-  env: z.optional(z.record(z.string())),
+  env: z.record(z.string(), z.string()).optional(),
   environment: z.optional(GitHubEnvironment),
   gcp_service_account: z.optional(z.string()),
   gcp_workload_identity_provider: z.optional(z.string()),
@@ -191,7 +190,7 @@ const TargetConfig = z.object({
       enabled: z.optional(z.boolean()),
     }),
   ),
-  env: z.optional(z.record(z.string())),
+  env: z.record(z.string(), z.string()).optional(),
   gcs_bucket_name_tfmigrate_history: z.optional(z.string()),
   gcp_service_account: z.optional(z.string()),
   gcp_workload_identity_provider: z.optional(z.string()),
@@ -249,7 +248,7 @@ const RawConfig = z.object({
       enabled: z.optional(z.boolean()),
     }),
   ),
-  env: z.optional(z.record(z.string())),
+  env: z.record(z.string(), z.string()).optional(),
   label_prefixes: z.optional(
     z.object({
       target: z.optional(z.string()),
@@ -350,13 +349,13 @@ export interface Config extends Omit<
 }
 
 export const generateJSONSchema = (dir: string) => {
-  const configJSONSchema = zodToJsonSchema(RawConfig, "config");
+  const configJSONSchema = z.toJSONSchema(RawConfig);
   fs.writeFileSync(
     path.join(dir, "tfaction-root.json"),
     JSON.stringify(configJSONSchema, null, 2),
   );
 
-  const targetConfigJSONSchema = zodToJsonSchema(TargetConfig, "config");
+  const targetConfigJSONSchema = z.toJSONSchema(TargetConfig);
   fs.writeFileSync(
     path.join(dir, "tfaction.json"),
     JSON.stringify(targetConfigJSONSchema, null, 2),
