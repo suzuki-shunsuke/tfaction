@@ -79,8 +79,8 @@ const ConftestPolicyConfig = z.object({
   plan: z.boolean().optional(),
   id: z.string().optional(),
   enabled: z.boolean().optional(),
-  policy: z.union([z.string(), z.array(z.string())]),
-  data: z.union([z.string(), z.array(z.string())]).optional(),
+  policy: z.union([z.string(), z.string().array()]),
+  data: z.union([z.string(), z.string().array()]).optional(),
   fail_on_warn: z.boolean().optional(),
   no_fail: z.boolean().optional(),
   all_namespaces: z.boolean().optional(),
@@ -96,24 +96,24 @@ const ConftestPolicyConfig = z.object({
   parser: z.string().optional(),
   capabilities: z.string().optional(),
   output: z.string().optional(),
-  namespaces: z.array(z.string()).optional(),
-  proto_file_dirs: z.array(z.string()).optional(),
-  paths: z.array(z.string()).optional(),
+  namespaces: z.string().array().optional(),
+  proto_file_dirs: z.string().array().optional(),
+  paths: z.string().array().optional(),
 });
 export type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;
 
 const ConftestConfig = z.object({
   disable_all: z.boolean().optional(),
-  policies: z.array(ConftestPolicyConfig).optional(),
+  policies: ConftestPolicyConfig.array().optional(),
 });
 type ConftestConfig = z.infer<typeof ConftestConfig>;
 
-const GitHubSecrets = z.array(
-  z.object({
+const GitHubSecrets = z
+  .object({
     env_name: z.string(),
     secret_name: z.string(),
-  }),
-);
+  })
+  .array();
 export type GitHubSecrets = z.infer<typeof GitHubSecrets>;
 
 const AWSSecretsManagerSecretEnv = z.object({
@@ -123,7 +123,7 @@ const AWSSecretsManagerSecretEnv = z.object({
 type AWSSecretsManagerSecretEnv = z.infer<typeof AWSSecretsManagerSecretEnv>;
 
 const AWSSecretsManagerSecret = z.object({
-  envs: z.array(AWSSecretsManagerSecretEnv),
+  envs: AWSSecretsManagerSecretEnv.array(),
   secret_id: z.string(),
   version_id: z.string().optional(),
   version_stage: z.string().optional(),
@@ -141,9 +141,9 @@ const JobConfig = z.object({
   gcp_remote_backend_workload_identity_provider: z.string().optional(),
   environment: GitHubEnvironment.optional(),
   secrets: GitHubSecrets.optional(),
-  runs_on: z.union([z.string(), z.array(z.string())]).optional(),
+  runs_on: z.union([z.string(), z.string().array()]).optional(),
   env: z.record(z.string(), z.string()).optional(),
-  aws_secrets_manager: z.array(AWSSecretsManagerSecret).optional(),
+  aws_secrets_manager: AWSSecretsManagerSecret.array().optional(),
 });
 export type JobConfig = z.infer<typeof JobConfig>;
 
@@ -159,7 +159,7 @@ const TargetGroup = z.object({
   gcp_remote_backend_service_account: z.string().optional(),
   gcp_remote_backend_workload_identity_provider: z.string().optional(),
   gcs_bucket_name_tfmigrate_history: z.string().optional(),
-  runs_on: z.union([z.string(), z.array(z.string())]).optional(),
+  runs_on: z.union([z.string(), z.string().array()]).optional(),
   secrets: GitHubSecrets.optional(),
   s3_bucket_name_tfmigrate_history: z.string().optional(),
   template_dir: z.string().optional(),
@@ -168,7 +168,7 @@ const TargetGroup = z.object({
   tfmigrate_apply_config: JobConfig.optional(),
   tfmigrate_plan_config: JobConfig.optional(),
   working_directory: z.string(),
-  aws_secrets_manager: z.array(AWSSecretsManagerSecret).optional(),
+  aws_secrets_manager: AWSSecretsManagerSecret.array().optional(),
   terraform_command: z.string().optional(),
   conftest: ConftestConfig.optional(),
   drift_detection: z
@@ -206,13 +206,13 @@ const TargetConfig = z.object({
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
 const Replace = z.object({
-  patterns: z.array(
-    z.object({
+  patterns: z
+    .object({
       regexp: z.string(),
       replace: z.string(),
       flags: z.string().optional(),
-    }),
-  ),
+    })
+    .array(),
 });
 type Replace = z.infer<typeof Replace>;
 
@@ -258,7 +258,7 @@ const RawConfig = z.object({
   module_file: z.string().optional(),
   plan_workflow_name: z.string(),
   renovate_login: z.string().optional(),
-  renovate_terraform_labels: z.array(z.string()).optional(),
+  renovate_terraform_labels: z.string().array().optional(),
   scaffold_working_directory: z
     .object({
       skip_adding_aqua_packages: z.boolean().optional(),
@@ -266,7 +266,7 @@ const RawConfig = z.object({
     .optional(),
   skip_create_pr: z.boolean().optional(),
   skip_terraform_by_renovate: z.boolean().optional(),
-  target_groups: z.array(TargetGroup),
+  target_groups: TargetGroup.array(),
   tflint: TflintConfig.optional(),
   trivy: TrivyConfig.optional(),
   terraform_docs: TerraformDocsConfig.optional(),
