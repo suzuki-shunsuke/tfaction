@@ -53,60 +53,58 @@ export const getJobType = (): JobType => {
 };
 
 const TflintReviewdogConfig = z.object({
-  filter_mode: z.optional(
-    z.enum(["added", "diff_context", "file", "nofilter"]),
-  ),
-  fail_level: z.optional(z.enum(["none", "any", "info", "warning", "error"])),
+  filter_mode: z.enum(["added", "diff_context", "file", "nofilter"]).optional(),
+  fail_level: z.enum(["none", "any", "info", "warning", "error"]).optional(),
 });
 
 const TflintConfig = z.object({
-  enabled: z.optional(z.boolean()),
-  fix: z.optional(z.boolean()),
-  reviewdog: z.optional(TflintReviewdogConfig),
+  enabled: z.boolean().optional(),
+  fix: z.boolean().optional(),
+  reviewdog: TflintReviewdogConfig.optional(),
 });
 type TflintConfig = z.infer<typeof TflintConfig>;
 
 const TrivyConfig = z.object({
-  enabled: z.optional(z.boolean()),
+  enabled: z.boolean().optional(),
 });
 type TrivyConfig = z.infer<typeof TrivyConfig>;
 
 const TerraformDocsConfig = z.object({
-  enabled: z.optional(z.boolean()),
+  enabled: z.boolean().optional(),
 });
 type TerraformDocsConfig = z.infer<typeof TerraformDocsConfig>;
 
 const ConftestPolicyConfig = z.object({
-  tf: z.optional(z.boolean()),
-  plan: z.optional(z.boolean()),
-  id: z.optional(z.string()),
-  enabled: z.optional(z.boolean()),
+  tf: z.boolean().optional(),
+  plan: z.boolean().optional(),
+  id: z.string().optional(),
+  enabled: z.boolean().optional(),
   policy: z.union([z.string(), z.array(z.string())]),
-  data: z.optional(z.union([z.string(), z.array(z.string())])),
-  fail_on_warn: z.optional(z.boolean()),
-  no_fail: z.optional(z.boolean()),
-  all_namespaces: z.optional(z.boolean()),
-  quiet: z.optional(z.boolean()),
-  trace: z.optional(z.boolean()),
-  strict: z.optional(z.boolean()),
-  show_builtin_errors: z.optional(z.boolean()),
-  junit_hide_message: z.optional(z.boolean()),
-  suppress_exceptions: z.optional(z.boolean()),
-  combine: z.optional(z.boolean()),
-  tls: z.optional(z.boolean()),
-  ignore: z.optional(z.string()),
-  parser: z.optional(z.string()),
-  capabilities: z.optional(z.string()),
-  output: z.optional(z.string()),
-  namespaces: z.optional(z.array(z.string())),
-  proto_file_dirs: z.optional(z.array(z.string())),
-  paths: z.optional(z.array(z.string())),
+  data: z.union([z.string(), z.array(z.string())]).optional(),
+  fail_on_warn: z.boolean().optional(),
+  no_fail: z.boolean().optional(),
+  all_namespaces: z.boolean().optional(),
+  quiet: z.boolean().optional(),
+  trace: z.boolean().optional(),
+  strict: z.boolean().optional(),
+  show_builtin_errors: z.boolean().optional(),
+  junit_hide_message: z.boolean().optional(),
+  suppress_exceptions: z.boolean().optional(),
+  combine: z.boolean().optional(),
+  tls: z.boolean().optional(),
+  ignore: z.string().optional(),
+  parser: z.string().optional(),
+  capabilities: z.string().optional(),
+  output: z.string().optional(),
+  namespaces: z.array(z.string()).optional(),
+  proto_file_dirs: z.array(z.string()).optional(),
+  paths: z.array(z.string()).optional(),
 });
 export type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;
 
 const ConftestConfig = z.object({
-  disable_all: z.optional(z.boolean()),
-  policies: z.optional(z.array(ConftestPolicyConfig)),
+  disable_all: z.boolean().optional(),
+  policies: z.array(ConftestPolicyConfig).optional(),
 });
 type ConftestConfig = z.infer<typeof ConftestConfig>;
 
@@ -120,90 +118,90 @@ export type GitHubSecrets = z.infer<typeof GitHubSecrets>;
 
 const AWSSecretsManagerSecretEnv = z.object({
   env_name: z.string(),
-  secret_key: z.optional(z.string()),
+  secret_key: z.string().optional(),
 });
 type AWSSecretsManagerSecretEnv = z.infer<typeof AWSSecretsManagerSecretEnv>;
 
 const AWSSecretsManagerSecret = z.object({
   envs: z.array(AWSSecretsManagerSecretEnv),
   secret_id: z.string(),
-  version_id: z.optional(z.string()),
-  version_stage: z.optional(z.string()),
-  aws_region: z.optional(z.string()),
+  version_id: z.string().optional(),
+  version_stage: z.string().optional(),
+  aws_region: z.string().optional(),
 });
 export type AWSSecretsManagerSecret = z.infer<typeof AWSSecretsManagerSecret>;
 
 const JobConfig = z.object({
-  aws_assume_role_arn: z.optional(z.string()),
-  aws_role_session_name: z.optional(z.string()),
-  gcp_service_account: z.optional(z.string()),
-  gcp_workload_identity_provider: z.optional(z.string()),
-  gcp_access_token_scopes: z.optional(z.string()),
-  gcp_remote_backend_service_account: z.optional(z.string()),
-  gcp_remote_backend_workload_identity_provider: z.optional(z.string()),
-  environment: z.optional(GitHubEnvironment),
-  secrets: z.optional(GitHubSecrets),
-  runs_on: z.optional(z.union([z.string(), z.array(z.string())])),
-  env: z.optional(z.record(z.string(), z.string())),
-  aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
+  aws_assume_role_arn: z.string().optional(),
+  aws_role_session_name: z.string().optional(),
+  gcp_service_account: z.string().optional(),
+  gcp_workload_identity_provider: z.string().optional(),
+  gcp_access_token_scopes: z.string().optional(),
+  gcp_remote_backend_service_account: z.string().optional(),
+  gcp_remote_backend_workload_identity_provider: z.string().optional(),
+  environment: GitHubEnvironment.optional(),
+  secrets: GitHubSecrets.optional(),
+  runs_on: z.union([z.string(), z.array(z.string())]).optional(),
+  env: z.record(z.string(), z.string()).optional(),
+  aws_secrets_manager: z.array(AWSSecretsManagerSecret).optional(),
 });
 export type JobConfig = z.infer<typeof JobConfig>;
 
 const TargetGroup = z.object({
-  aws_region: z.optional(z.string()),
-  aws_assume_role_arn: z.optional(z.string()),
-  aws_role_session_name: z.optional(z.string()),
-  destroy: z.optional(z.boolean()),
+  aws_region: z.string().optional(),
+  aws_assume_role_arn: z.string().optional(),
+  aws_role_session_name: z.string().optional(),
+  destroy: z.boolean().optional(),
   env: z.record(z.string(), z.string()).optional(),
-  environment: z.optional(GitHubEnvironment),
-  gcp_service_account: z.optional(z.string()),
-  gcp_workload_identity_provider: z.optional(z.string()),
-  gcp_remote_backend_service_account: z.optional(z.string()),
-  gcp_remote_backend_workload_identity_provider: z.optional(z.string()),
-  gcs_bucket_name_tfmigrate_history: z.optional(z.string()),
-  runs_on: z.optional(z.union([z.string(), z.array(z.string())])),
-  secrets: z.optional(GitHubSecrets),
-  s3_bucket_name_tfmigrate_history: z.optional(z.string()),
-  template_dir: z.optional(z.string()),
-  terraform_apply_config: z.optional(JobConfig),
-  terraform_plan_config: z.optional(JobConfig),
-  tfmigrate_apply_config: z.optional(JobConfig),
-  tfmigrate_plan_config: z.optional(JobConfig),
+  environment: GitHubEnvironment.optional(),
+  gcp_service_account: z.string().optional(),
+  gcp_workload_identity_provider: z.string().optional(),
+  gcp_remote_backend_service_account: z.string().optional(),
+  gcp_remote_backend_workload_identity_provider: z.string().optional(),
+  gcs_bucket_name_tfmigrate_history: z.string().optional(),
+  runs_on: z.union([z.string(), z.array(z.string())]).optional(),
+  secrets: GitHubSecrets.optional(),
+  s3_bucket_name_tfmigrate_history: z.string().optional(),
+  template_dir: z.string().optional(),
+  terraform_apply_config: JobConfig.optional(),
+  terraform_plan_config: JobConfig.optional(),
+  tfmigrate_apply_config: JobConfig.optional(),
+  tfmigrate_plan_config: JobConfig.optional(),
   working_directory: z.string(),
-  aws_secrets_manager: z.optional(z.array(AWSSecretsManagerSecret)),
-  terraform_command: z.optional(z.string()),
-  conftest: z.optional(ConftestConfig),
-  drift_detection: z.optional(
-    z.object({
-      enabled: z.optional(z.boolean()),
-    }),
-  ),
+  aws_secrets_manager: z.array(AWSSecretsManagerSecret).optional(),
+  terraform_command: z.string().optional(),
+  conftest: ConftestConfig.optional(),
+  drift_detection: z
+    .object({
+      enabled: z.boolean().optional(),
+    })
+    .optional(),
 });
 export type TargetGroup = z.infer<typeof TargetGroup>;
 
 const TargetConfig = z.object({
-  aws_assume_role_arn: z.optional(z.string()),
-  aws_region: z.optional(z.string()),
-  destroy: z.optional(z.boolean()),
-  drift_detection: z.optional(
-    z.object({
-      enabled: z.optional(z.boolean()),
-    }),
-  ),
+  aws_assume_role_arn: z.string().optional(),
+  aws_region: z.string().optional(),
+  destroy: z.boolean().optional(),
+  drift_detection: z
+    .object({
+      enabled: z.boolean().optional(),
+    })
+    .optional(),
   env: z.record(z.string(), z.string()).optional(),
-  gcs_bucket_name_tfmigrate_history: z.optional(z.string()),
-  gcp_service_account: z.optional(z.string()),
-  gcp_workload_identity_provider: z.optional(z.string()),
-  providers_lock_opts: z.optional(z.string()),
-  s3_bucket_name_tfmigrate_history: z.optional(z.string()),
-  secrets: z.optional(GitHubSecrets),
-  terraform_apply_config: z.optional(JobConfig),
-  terraform_plan_config: z.optional(JobConfig),
-  tfmigrate_apply_config: z.optional(JobConfig),
-  tfmigrate_plan_config: z.optional(JobConfig),
-  terraform_command: z.optional(z.string()),
-  terraform_docs: z.optional(TerraformDocsConfig),
-  conftest: z.optional(ConftestConfig),
+  gcs_bucket_name_tfmigrate_history: z.string().optional(),
+  gcp_service_account: z.string().optional(),
+  gcp_workload_identity_provider: z.string().optional(),
+  providers_lock_opts: z.string().optional(),
+  s3_bucket_name_tfmigrate_history: z.string().optional(),
+  secrets: GitHubSecrets.optional(),
+  terraform_apply_config: JobConfig.optional(),
+  terraform_plan_config: JobConfig.optional(),
+  tfmigrate_apply_config: JobConfig.optional(),
+  tfmigrate_plan_config: JobConfig.optional(),
+  terraform_command: z.string().optional(),
+  terraform_docs: TerraformDocsConfig.optional(),
+  conftest: ConftestConfig.optional(),
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
@@ -212,96 +210,95 @@ const Replace = z.object({
     z.object({
       regexp: z.string(),
       replace: z.string(),
-      flags: z.optional(z.string()),
+      flags: z.string().optional(),
     }),
   ),
 });
 type Replace = z.infer<typeof Replace>;
 
 const FollowUpPRGroupLabel = z.object({
-  enabled: z.optional(z.boolean()),
-  prefix: z.optional(z.string()),
+  enabled: z.boolean().optional(),
+  prefix: z.string().optional(),
 });
 type FollowUpPRGroupLabel = z.infer<typeof FollowUpPRGroupLabel>;
 
 const RawConfig = z.object({
-  aqua: z.optional(
-    z.object({
-      update_checksum: z.optional(
-        z.object({
-          enabled: z.optional(z.boolean()),
-          skip_push: z.optional(z.boolean()),
-          prune: z.optional(z.boolean()),
-        }),
-      ),
-    }),
-  ),
-  base_working_directory: z.optional(z.string()),
-  conftest: z.optional(ConftestConfig),
-  draft_pr: z.optional(z.boolean()),
-  drift_detection: z.optional(
-    z.object({
-      issue_repo_owner: z.optional(z.string()),
-      issue_repo_name: z.optional(z.string()),
-      num_of_issues: z.optional(z.number()),
-      minimum_detection_interval: z.optional(z.number()),
-      enabled: z.optional(z.boolean()),
-    }),
-  ),
+  aqua: z
+    .object({
+      update_checksum: z
+        .object({
+          enabled: z.boolean().optional(),
+          skip_push: z.boolean().optional(),
+          prune: z.boolean().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+  base_working_directory: z.string().optional(),
+  conftest: ConftestConfig.optional(),
+  draft_pr: z.boolean().optional(),
+  drift_detection: z
+    .object({
+      issue_repo_owner: z.string().optional(),
+      issue_repo_name: z.string().optional(),
+      num_of_issues: z.number().optional(),
+      minimum_detection_interval: z.number().optional(),
+      enabled: z.boolean().optional(),
+    })
+    .optional(),
   env: z.record(z.string(), z.string()).optional(),
-  label_prefixes: z.optional(
-    z.object({
-      target: z.optional(z.string()),
-      tfmigrate: z.optional(z.string()),
-      skip: z.optional(z.string()),
-    }),
-  ),
-  module_base_directory: z.optional(z.string()),
-  module_file: z.optional(z.string()),
+  label_prefixes: z
+    .object({
+      target: z.string().optional(),
+      tfmigrate: z.string().optional(),
+      skip: z.string().optional(),
+    })
+    .optional(),
+  module_base_directory: z.string().optional(),
+  module_file: z.string().optional(),
   plan_workflow_name: z.string(),
-  renovate_login: z.optional(z.string()),
-  renovate_terraform_labels: z.optional(z.array(z.string())),
-  scaffold_working_directory: z.optional(
-    z.object({
-      skip_adding_aqua_packages: z.optional(z.boolean()),
-    }),
-  ),
-  skip_create_pr: z.optional(z.boolean()),
-  skip_terraform_by_renovate: z.optional(z.boolean()),
+  renovate_login: z.string().optional(),
+  renovate_terraform_labels: z.array(z.string()).optional(),
+  scaffold_working_directory: z
+    .object({
+      skip_adding_aqua_packages: z.boolean().optional(),
+    })
+    .optional(),
+  skip_create_pr: z.boolean().optional(),
+  skip_terraform_by_renovate: z.boolean().optional(),
   target_groups: z.array(TargetGroup),
-  tflint: z.optional(TflintConfig),
-  trivy: z.optional(TrivyConfig),
-  terraform_docs: z.optional(TerraformDocsConfig),
-  update_local_path_module_caller: z.optional(
-    z.object({
-      enabled: z.optional(z.boolean()),
-    }),
-  ),
-  terraform_command: z.optional(z.string()),
-  update_related_pull_requests: z.optional(
-    z.object({
-      enabled: z.optional(z.boolean()),
-    }),
-  ),
-  working_directory_file: z.optional(z.string()),
-  replace: z.optional(Replace),
-  providers_lock_opts: z.optional(z.string()),
-  follow_up_pr_group_label: z.optional(FollowUpPRGroupLabel),
-  securefix_action: z.optional(
-    z.object({
+  tflint: TflintConfig.optional(),
+  trivy: TrivyConfig.optional(),
+  terraform_docs: TerraformDocsConfig.optional(),
+  update_local_path_module_caller: z
+    .object({
+      enabled: z.boolean().optional(),
+    })
+    .optional(),
+  terraform_command: z.string().optional(),
+  update_related_pull_requests: z
+    .object({
+      enabled: z.boolean().optional(),
+    })
+    .optional(),
+  working_directory_file: z.string().optional(),
+  replace: Replace.optional(),
+  providers_lock_opts: z.string().optional(),
+  follow_up_pr_group_label: FollowUpPRGroupLabel.optional(),
+  securefix_action: z
+    .object({
       server_repository: z.string(),
       pull_request: z.object({
         base_branch: z.string(),
       }),
-    }),
-  ),
-
-  limit_changed_dirs: z.optional(
-    z.object({
-      working_dirs: z.optional(z.number()),
-      modules: z.optional(z.number()),
-    }),
-  ),
+    })
+    .optional(),
+  limit_changed_dirs: z
+    .object({
+      working_dirs: z.number().optional(),
+      modules: z.number().optional(),
+    })
+    .optional(),
 });
 export type RawConfig = z.infer<typeof RawConfig>;
 
