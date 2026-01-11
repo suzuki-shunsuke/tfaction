@@ -6,7 +6,7 @@
     "fmt": "prettier -w ."
   },
   "dependencies": {
-    "@actions/core": "2.0.1",
+    "@actions/core": "2.0.2",
     "@actions/exec": "^2.0.0",
     "@actions/github": "6.0.1",
     "@actions/tool-cache": "^3.0.0",
