@@ -143,6 +143,7 @@ export class Executor {
     return await exec.exec(command, args, {
       ...options,
       env: {
+        ...process.env,
         ...options?.env,
         AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         ...(this.githubToken && {
