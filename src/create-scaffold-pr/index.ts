@@ -5,6 +5,7 @@ import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import * as getTargetConfig from "../get-target-config";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
@@ -249,10 +250,9 @@ export const main = async () => {
     throw new Error("TFACTION_TARGET is required");
   }
 
-  // Run aqua i -l -a (install)
-  core.info(`Installing dependencies with aqua in ${workingDir}`);
-  await exec.exec("aqua", ["i", "-l", "-a"], {
+  await aqua.NewExecutor({
     cwd: workingDir,
+    githubToken,
   });
 
   // Generate branch name

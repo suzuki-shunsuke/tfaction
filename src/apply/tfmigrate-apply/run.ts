@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../../lib";
+import * as aqua from "../../aqua";
 import * as getTargetConfig from "../../get-target-config";
 import {
   listRelatedPullRequests,
@@ -52,12 +53,16 @@ export const main = async (): Promise<void> => {
   const applyOutput = path.join(tempDir, "apply_output.txt");
   const outputStream = fs.createWriteStream(applyOutput);
 
-  core.startGroup("tfmigrate apply");
+  const executor = await aqua.NewExecutor({
+    githubToken: githubToken,
+    cwd: targetConfig.working_directory,
+  });
 
+  core.startGroup("tfmigrate apply");
   // Run tfmigrate apply with github-comment
   let exitCode = 0;
   try {
-    await exec
+    await executor
       .exec(
         "github-comment",
         [
@@ -101,13 +106,8 @@ export const main = async (): Promise<void> => {
   // If this is a drift issue, post the result to the drift issue
   if (driftIssueNumber) {
     const prUrl = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/pull/${ciInfoPrNumber}`;
-    const githubCommentConfig = path.join(
-      installDir,
-      "tfmigrate-apply/github-comment.yaml",
-    );
-
     try {
-      await exec.exec(
+      await executor.exec(
         "github-comment",
         [
           "exec",

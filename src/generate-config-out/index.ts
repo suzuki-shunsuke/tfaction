@@ -7,9 +7,8 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import * as getTargetConfig from "../get-target-config";
-
-type Octokit = ReturnType<typeof github.getOctokit>;
 
 export const main = async () => {
   const githubToken = core.getInput("github_token") || "";
@@ -51,14 +50,9 @@ export const main = async () => {
   }
 
   // Run aqua i -l -a (install)
-  core.info(`Installing dependencies with aqua in ${workingDir}`);
-  await exec.exec("aqua", ["i", "-l", "-a"], {
+  const executor = await aqua.NewExecutor({
     cwd: workingDir,
-    env: {
-      ...process.env,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-      AQUA_GITHUB_TOKEN: githubToken,
-    },
+    githubToken,
   });
 
   // Generate temp file name
@@ -73,9 +67,7 @@ export const main = async () => {
 
   // Run terraform plan -generate-config-out with tfcmt
   const stepSummaryPath = process.env.GITHUB_STEP_SUMMARY ?? "";
-  core.info(`Running terraform plan -generate-config-out ${tempFile}`);
-
-  await exec.exec(
+  await executor.exec(
     "tfcmt",
     [
       "-output",
@@ -91,11 +83,6 @@ export const main = async () => {
     ],
     {
       cwd: workingDir,
-      env: {
-        ...process.env,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-        AQUA_GITHUB_TOKEN: githubToken,
-      },
     },
   );
 

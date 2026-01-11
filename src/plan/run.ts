@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
+import * as aqua from "../aqua";
 import * as lib from "../lib";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../conftest";
@@ -20,6 +21,7 @@ type Inputs = {
   ciInfoTempDir?: string;
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
+  executor: aqua.Executor;
 };
 
 type TerraformPlanOutputs = {
@@ -57,7 +59,9 @@ const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
     return;
   }
 
-  await exec.exec(
+  const executor = inputs.executor;
+
+  await executor.exec(
     "github-comment",
     [
       "post",
@@ -68,10 +72,8 @@ const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
     ],
     {
       env: {
-        ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     },
   );
@@ -93,6 +95,8 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   let templatePath = "";
   let content = "";
 
+  const executor = inputs.executor;
+
   // Generate from S3 template
   if (inputs.s3BucketNameTfmigrateHistory) {
     templatePath = path.join(installDir, "tfmigrate.hcl");
@@ -112,10 +116,9 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
       /%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%/g,
       inputs.gcsBucketNameTfmigrateHistory,
     );
-  }
-  // Error: neither S3 nor GCS bucket is configured
-  else {
-    await exec.exec(
+  } else {
+    // Error: neither S3 nor GCS bucket is configured
+    await executor.exec(
       "github-comment",
       [
         "post",
@@ -126,10 +129,8 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
       ],
       {
         env: {
-          ...process.env,
           GITHUB_TOKEN: inputs.githubToken,
           GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-          AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
         },
       },
     );
@@ -163,17 +164,17 @@ export const runTfmigratePlan = async (
   core.startGroup("tfmigrate plan");
 
   const env: { [key: string]: string } = {
-    ...process.env,
     GITHUB_TOKEN: inputs.githubToken,
     GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-    AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
   };
   // Set TFMIGRATE_EXEC_PATH if TF_COMMAND is not "terraform"
   if (!process.env.TFMIGRATE_EXEC_PATH && inputs.tfCommand !== "terraform") {
     env.TFMIGRATE_EXEC_PATH = inputs.tfCommand;
   }
 
-  await exec.exec(
+  const executor = inputs.executor;
+
+  await executor.exec(
     "github-comment",
     [
       "exec",
@@ -197,16 +198,14 @@ export const runTfmigratePlan = async (
   // Run terraform show to convert plan to JSON
   core.startGroup(`${inputs.tfCommand} show`);
 
-  const showResult = await exec.getExecOutput(
+  const showResult = await executor.getExecOutput(
     "github-comment",
     ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
       env: {
-        ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
       silent: true,
     },
@@ -262,11 +261,12 @@ export const runTerraformPlan = async (
     core.warning("The destroy option is enabled");
   }
 
-  const planResult = await exec.getExecOutput("tfcmt", planArgs, {
+  const executor = inputs.executor;
+
+  const planResult = await executor.getExecOutput("tfcmt", planArgs, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
     env: {
-      ...process.env,
       GITHUB_TOKEN: inputs.githubToken,
       AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
     },
@@ -289,16 +289,14 @@ export const runTerraformPlan = async (
   // Run terraform show to convert plan to JSON
   core.startGroup(`${inputs.tfCommand} show`);
 
-  const showResult = await exec.getExecOutput(
+  const showResult = await executor.getExecOutput(
     "github-comment",
     ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
       env: {
-        ...process.env,
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
       silent: true,
     },
@@ -358,19 +356,26 @@ export const main = async (): Promise<void> => {
     config,
   );
 
+  const githubToken = core.getInput("github_token");
+  const executor = await aqua.NewExecutor({
+    githubToken,
+    cwd: targetConfig.working_directory,
+  });
+
   const inputs: Inputs = {
-    githubToken: core.getInput("github_token"),
-    workingDirectory: lib.getWorkingDir() ?? "",
+    githubToken,
+    workingDirectory: targetConfig.working_directory,
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.destroy || false,
     tfCommand: targetConfig.terraform_command || "terraform",
-    target: process.env.TFACTION_TARGET || "",
+    target: targetConfig.target,
     driftIssueNumber: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
     prAuthor: process.env.CI_INFO_PR_AUTHOR,
     ciInfoTempDir: process.env.CI_INFO_TEMP_DIR,
     s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
+    executor,
   };
 
   const jobType = process.env.TFACTION_JOB_TYPE;
@@ -407,9 +412,10 @@ export const main = async (): Promise<void> => {
         workingDir: inputs.workingDirectory,
         target: inputs.target,
         rootDir: process.env.GITHUB_WORKSPACE ?? "",
-        githubToken: inputs.githubToken,
+        githubToken,
         plan: true,
         planJsonPath: planJsonPath,
+        executor,
       },
       config,
     );

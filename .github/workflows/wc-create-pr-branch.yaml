@@ -47,11 +47,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
-        with:
-          aqua_version: v2.56.2
-        env:
-          GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           path: dist
@@ -59,10 +54,6 @@ jobs:
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
-      - name: Install dependencies
-        uses: ./
-        with:
-          action: install
       - id: token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
@@ -70,30 +61,6 @@ jobs:
           private-key: ${{secrets.gh_app_private_key}}
           permission-pull-requests: write
           permission-contents: write
-
-      - name: Install dependencies
-        uses: ./
-        with:
-          action: install
-
-      - name: Test get-target-config
-        uses: ./
-        id: target-config
-        with:
-          action: get-target-config
-        env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          TFACTION_TARGET: tests/aws/foo/dev
-          TFACTION_JOB_TYPE: terraform
-
-      - name: Test get-global-config
-        uses: ./
-        id: global-config
-        with:
-          action: get-global-config
-        env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test setup
         uses: ./
@@ -161,12 +128,56 @@ jobs:
           TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: tests/modules/foo
 
-      - name: Outputs actions' outputs (Not Fork)
-        run: "true"
-        if: |
-          ! github.event.pull_request.head.repo.fork
+  test-get-target-config:
+    timeout-minutes: 15
+    runs-on: ubuntu-24.04
+    needs: [create-pr-branch]
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+      - run: gh pr checkout "$PR"
+        if: inputs.pr != ''
         env:
-          SETUP: ${{ toJSON(steps.setup.outputs) }}
+          GITHUB_TOKEN: ${{github.token}}
+          PR: ${{inputs.pr}}
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: dist
+          name: js
+      - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
+        run: |
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
+      - id: token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        with:
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
+
+      - name: Test get-target-config
+        uses: ./
+        id: target-config
+        with:
+          action: get-target-config
+        env:
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_TARGET: tests/aws/foo/dev
+          TFACTION_JOB_TYPE: terraform
+
+      - name: Test get-global-config
+        uses: ./
+        id: global-config
+        with:
+          action: get-global-config
+        env:
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_JOB_TYPE: terraform
 
       - name: Test actions' outputs
         uses: ./
@@ -174,12 +185,6 @@ jobs:
           action: test-action
         env:
           TFACTION_TEST_ACTION: "true"
-          TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
-          GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
-
-      - name: Outputs actions' outputs
-        run: "true"
-        env:
           TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
           GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
 
@@ -197,11 +202,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
-        with:
-          aqua_version: v2.56.2
-        env:
-          GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           path: dist
@@ -209,10 +209,6 @@ jobs:
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
-      - name: Install dependencies
-        uses: ./
-        with:
-          action: install
       - id: token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
@@ -222,11 +218,6 @@ jobs:
           permission-contents: write
           permission-issues: write
           repositories: test-tfaction
-
-      - name: Install dependencies
-        uses: ./
-        with:
-          action: install
 
       - name: Create a dummy working directory
         run: mkdir -p "tests/aws/foo/dev-${GITHUB_RUN_ID}"
@@ -282,11 +273,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
-        with:
-          aqua_version: v2.56.2
-        env:
-          GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           path: dist
@@ -294,10 +280,6 @@ jobs:
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
-      - name: Install dependencies
-        uses: ./
-        with:
-          action: install
       - id: token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
@@ -375,11 +357,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
-      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
-        with:
-          aqua_version: v2.56.2
-        env:
-          GITHUB_TOKEN: ${{github.token}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           path: dist
@@ -387,10 +364,6 @@ jobs:
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
-      - name: Install dependencies
-        uses: ./
-        with:
-          action: install
       - id: token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:

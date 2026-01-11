@@ -4,6 +4,7 @@ import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../../lib";
+import * as aqua from "../../aqua";
 import { listFiles } from "./list_files";
 import { list as listModuleCallers } from "./list-module-callers";
 
@@ -231,12 +232,13 @@ const validateChangeLimits = async (
   maxChangedWorkingDirectories: number,
   maxChangedModules: number,
   githubToken: string,
+  executor: aqua.Executor,
 ): Promise<void> => {
   if (
     maxChangedWorkingDirectories > 0 &&
     targetConfigs.length > maxChangedWorkingDirectories
   ) {
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       [
         "post",
@@ -247,8 +249,8 @@ const validateChangeLimits = async (
       ],
       {
         env: {
-          ...process.env,
           GITHUB_TOKEN: githubToken,
+          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
         },
       },
     );
@@ -257,7 +259,7 @@ const validateChangeLimits = async (
     );
   }
   if (maxChangedModules > 0 && modules.length > maxChangedModules) {
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       [
         "post",
@@ -268,8 +270,8 @@ const validateChangeLimits = async (
       ],
       {
         env: {
-          ...process.env,
           GITHUB_TOKEN: githubToken,
+          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
         },
       },
     );
@@ -341,6 +343,7 @@ export const run = async (input: Input): Promise<Result> => {
     input.maxChangedWorkingDirectories,
     input.maxChangedModules,
     input.githubToken,
+    input.executor,
   );
 
   return result;
@@ -359,6 +362,7 @@ type Input = {
   maxChangedWorkingDirectories: number;
   maxChangedModules: number;
   githubToken: string;
+  executor: aqua.Executor;
 };
 
 const listWD = (configFiles: string[]): string[] => {
@@ -463,7 +467,7 @@ const handleLabels = (
   }
 };
 
-export const main = async () => {
+export const main = async (executor: aqua.Executor) => {
   // The path to ci-info's pr.json.
   if (!process.env.CI_INFO_TEMP_DIR) {
     throw new Error("CI_INFO_TEMP_DIR is not set");
@@ -486,7 +490,7 @@ export const main = async () => {
 
   let moduleCallers: any = null;
   if (cfg.update_local_path_module_caller?.enabled) {
-    moduleCallers = await listModuleCallers(configFiles, modules);
+    moduleCallers = await listModuleCallers(configFiles, modules, executor);
   }
 
   const result = await run({
@@ -515,6 +519,7 @@ export const main = async () => {
     }
     */
     moduleCallers,
+    executor,
   });
 
   core.info(`result: ${JSON.stringify(result)}`);

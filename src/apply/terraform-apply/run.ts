@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../../lib";
+import * as aqua from "../../aqua";
 import * as getTargetConfig from "../../get-target-config";
 import * as updateBranchAction from "@csm-actions/update-branch-action";
 import * as githubAppToken from "@suzuki-shunsuke/github-app-token";
@@ -80,7 +81,11 @@ export const main = async (): Promise<void> => {
   const securefixServerRepository =
     cfg.securefix_action?.server_repository ?? "";
   const installDir = process.env.TFACTION_INSTALL_DIR || "";
-  const planFilePath = await downloadPlanFile();
+  const executor = await aqua.NewExecutor({
+    githubToken: githubToken,
+    cwd: targetConfig.working_directory,
+  });
+  const planFilePath = await downloadPlanFile(executor);
   if (!planFilePath) {
     throw new Error("PLAN_FILE_PATH is not set");
   }
@@ -95,7 +100,7 @@ export const main = async (): Promise<void> => {
   // Run terraform apply with tfcmt
   let exitCode = 0;
   try {
-    await exec
+    await executor
       .exec(
         "tfcmt",
         [
@@ -114,7 +119,6 @@ export const main = async (): Promise<void> => {
           cwd: workingDir,
           ignoreReturnCode: true,
           env: {
-            ...process.env,
             GITHUB_TOKEN: githubToken,
           },
           listeners: {
@@ -144,7 +148,7 @@ export const main = async (): Promise<void> => {
     const tfcmtConfig = path.join(installDir, "tfcmt-drift.yaml");
 
     try {
-      await exec.exec(
+      await executor.exec(
         "tfcmt",
         [
           "-config",
@@ -168,7 +172,6 @@ export const main = async (): Promise<void> => {
         {
           ignoreReturnCode: true,
           env: {
-            ...process.env,
             GITHUB_TOKEN: githubToken,
           },
         },
@@ -303,7 +306,7 @@ const downloadArtifact = async (
   await artifact.downloadArtifact(targetArtifact.id, artifactOpts);
 };
 
-const downloadPlanFile = async (): Promise<string> => {
+const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   const cfg = lib.getConfig();
   const githubToken = core.getInput("github_token");
   const target = process.env.TFACTION_TARGET || "";
@@ -330,7 +333,7 @@ const downloadPlanFile = async (): Promise<string> => {
   });
 
   if (workflowRuns.workflow_runs.length === 0) {
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       [
         "post",
@@ -345,7 +348,6 @@ const downloadPlanFile = async (): Promise<string> => {
       ],
       {
         env: {
-          ...process.env,
           GITHUB_TOKEN: githubToken,
         },
       },
@@ -363,7 +365,7 @@ const downloadPlanFile = async (): Promise<string> => {
 
   // Check if headSha matches
   if (headSha !== prHeadSha) {
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       [
         "post",
@@ -378,7 +380,6 @@ const downloadPlanFile = async (): Promise<string> => {
       ],
       {
         env: {
-          ...process.env,
           GITHUB_TOKEN: githubToken,
         },
       },

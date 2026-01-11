@@ -52,7 +52,6 @@ replace:
 
 target_groups:
   - working_directory: tests/aws/
-    target: tests/aws/
     aws_region: ap-northeast-1
     s3_bucket_name_tfmigrate_history: 0000-0000-0000-suzuki-shunsuke-tfmigrate-history
     template_dir: tests/templates/aws

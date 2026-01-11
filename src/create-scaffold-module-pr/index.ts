@@ -5,6 +5,7 @@ import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 
@@ -240,9 +241,8 @@ export const main = async () => {
   const securefixPRBaseBranch =
     config.securefix_action?.pull_request?.base_branch ?? "";
 
-  // Run aqua i -l -a
-  core.info(`Installing dependencies with aqua in ${modulePath}`);
-  await exec.exec("aqua", ["i", "-l", "-a"], {
+  await aqua.NewExecutor({
+    githubToken,
     cwd: modulePath,
   });
 

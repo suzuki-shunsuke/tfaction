@@ -5,6 +5,7 @@ import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
+import * as aqua from "../../aqua";
 
 type Inputs = {
   workingDirectory: string;
@@ -45,25 +46,20 @@ const getAquaGitHubToken = (inputs: Inputs): string => {
   return process.env.AQUA_GITHUB_TOKEN || "";
 };
 
-const runAquaUpdateChecksum = async (inputs: Inputs): Promise<void> => {
+const runAquaUpdateChecksum = async (
+  inputs: Inputs,
+  executor: aqua.Executor,
+): Promise<void> => {
   const args = ["update-checksum"];
   if (inputs.prune) {
     args.push("-prune");
   }
 
   const aquaToken = getAquaGitHubToken(inputs);
-  const options: exec.ExecOptions = {
-    cwd: inputs.workingDirectory || process.cwd(),
-  };
 
-  if (aquaToken) {
-    options.env = {
-      ...process.env,
-      AQUA_GITHUB_TOKEN: aquaToken,
-    } as { [key: string]: string };
-  }
-
-  await exec.exec("aqua", args, options);
+  await executor.exec("aqua", args, {
+    cwd: inputs.workingDirectory || undefined,
+  });
 };
 
 const findChecksumFile = (workingDir: string): string | null => {
@@ -90,17 +86,14 @@ const checkIfChanged = async (
   checksumFile: string,
   workingDir: string,
 ): Promise<boolean> => {
-  // Check if file is tracked by git
-  const lsFilesOptions: exec.ExecOptions = {
-    cwd: workingDir,
-    ignoreReturnCode: true,
-    silent: true,
-  };
-
   const lsFilesExitCode = await exec.exec(
     "git",
     ["ls-files", "--error-unmatch", "--", checksumFile],
-    lsFilesOptions,
+    {
+      cwd: workingDir,
+      ignoreReturnCode: true,
+      silent: true,
+    },
   );
 
   if (lsFilesExitCode !== 0) {
@@ -109,16 +102,14 @@ const checkIfChanged = async (
   }
 
   // Check if file has changes
-  const diffOptions: exec.ExecOptions = {
-    cwd: workingDir,
-    ignoreReturnCode: true,
-    silent: true,
-  };
-
   const diffExitCode = await exec.exec(
     "git",
     ["diff", "--quiet", "--", checksumFile],
-    diffOptions,
+    {
+      cwd: workingDir,
+      ignoreReturnCode: true,
+      silent: true,
+    },
   );
 
   // git diff --quiet returns 0 if no changes, 1 if there are changes
@@ -167,11 +158,11 @@ const createCommitIfNeeded = async (
   });
 };
 
-export const main = async () => {
+export const main = async (executor: aqua.Executor) => {
   const inputs = getInputs();
 
   // Run aqua update-checksum
-  await runAquaUpdateChecksum(inputs);
+  await runAquaUpdateChecksum(inputs, executor);
 
   // Find checksum file
   const workingDir = inputs.workingDirectory || process.cwd();

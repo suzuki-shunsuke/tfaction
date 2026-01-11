@@ -6,6 +6,7 @@ import * as path from "path";
 
 import { getTargetConfig } from "../get-target-config";
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import * as commit from "../commit";
 
 // Check if this is a pull request event
@@ -40,20 +41,21 @@ export const main = async () => {
   const tfCommand = targetConfig.terraform_command;
   const providersLockOpts = targetConfig.providers_lock_opts;
 
-  const execEnv = {
-    ...process.env,
-    GITHUB_TOKEN: githubToken,
-    AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-  };
+  const executor = await aqua.NewExecutor({
+    githubToken,
+    cwd: workingDir,
+  });
 
   if (!isPullRequestEvent()) {
     // Non-PR: just run init with github-comment
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       ["exec", "--", tfCommand, "init", "-input=false"],
       {
         cwd: workingDir || undefined,
-        env: execEnv,
+        env: {
+          GITHUB_TOKEN: githubToken,
+        },
       },
     );
   } else {
@@ -65,17 +67,23 @@ export const main = async () => {
 
     // terraform init (try without upgrade first, then with upgrade on failure)
     core.startGroup(`${tfCommand} init`);
-    const initResult = await exec.exec(tfCommand, ["init", "-input=false"], {
-      cwd: workingDir || undefined,
-      ignoreReturnCode: true,
-    });
+    const initResult = await executor.exec(
+      tfCommand,
+      ["init", "-input=false"],
+      {
+        cwd: workingDir || undefined,
+        ignoreReturnCode: true,
+      },
+    );
     if (initResult !== 0) {
-      await exec.exec(
+      await executor.exec(
         "github-comment",
         ["exec", "--", tfCommand, "init", "-input=false", "-upgrade"],
         {
           cwd: workingDir || undefined,
-          env: execEnv,
+          env: {
+            GITHUB_TOKEN: githubToken,
+          },
         },
       );
     }
@@ -83,12 +91,14 @@ export const main = async () => {
 
     core.startGroup(`${tfCommand} providers lock`);
     const lockArgs = providersLockOpts.split(/\s+/).filter((s) => s.length > 0);
-    await exec.exec(
+    await executor.exec(
       "github-comment",
       ["exec", "--", tfCommand, "providers", "lock", ...lockArgs],
       {
         cwd: workingDir || undefined,
-        env: execEnv,
+        env: {
+          GITHUB_TOKEN: githubToken,
+        },
       },
     );
     core.endGroup();
@@ -108,7 +118,7 @@ export const main = async () => {
   }
 
   core.startGroup(`${tfCommand} providers`);
-  await exec.exec(tfCommand, ["providers"], {
+  await executor.exec(tfCommand, ["providers"], {
     cwd: workingDir || undefined,
   });
   core.endGroup();

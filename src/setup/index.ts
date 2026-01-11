@@ -6,9 +6,10 @@ import * as os from "os";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as aqua from "../aqua";
 import * as ciinfo from "../ci-info";
 import { getTargetConfig } from "../get-target-config";
-import * as aquaUpdateChecksum from "../aqua-update-checksum";
+import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as exportAWSSecretsManager from "../export-aws-secrets-manager";
 
 // Check if this is a pull request event
@@ -139,14 +140,18 @@ export const main = async () => {
     await addLabelToPR(octokit, targetConfig.target);
   }
 
-  core.info(`TFACTION_TARGET: ${targetConfig.target}`);
-  core.info(`TFACTION_WORKING_DIR: ${targetConfig.working_directory}`);
+  core.info("new executor");
+  const executor = await aqua.NewExecutor({
+    githubToken: githubToken,
+    cwd: targetConfig.working_directory,
+  });
 
   if (config.aqua?.update_checksum?.enabled) {
-    core.info("Running aqua-update-checksum action...");
     try {
-      await aquaUpdateChecksum.main();
+      core.info("updating checksum");
+      await aquaUpdateChecksum.main(executor);
     } catch (error) {
+      core.info("updating checksum throw error");
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {
         throw error;
@@ -158,16 +163,7 @@ export const main = async () => {
     }
   }
 
-  core.info("Running aqua install...");
-  await exec.exec("aqua", ["i", "-l", "-a"], {
-    cwd: targetConfig.working_directory || undefined,
-    env: {
-      ...process.env,
-      AQUA_GITHUB_TOKEN: githubToken,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    },
-  });
-
+  core.info("export aws secrets manager");
   await exportAWSSecretsManager.main();
 
   if (sshKey) {
