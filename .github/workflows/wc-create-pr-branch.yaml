@@ -181,6 +181,8 @@ jobs:
 
       - name: Test actions' outputs
         uses: ./
+        with:
+          action: test-action
         env:
           TFACTION_TEST_ACTION: "true"
           TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
