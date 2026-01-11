@@ -5,7 +5,7 @@ import { createHash } from "crypto";
 import { chmod, readFile, rm } from "fs/promises";
 import { join, dirname } from "path";
 import { arch, homedir, platform, tmpdir } from "os";
-import { mkdtempSync, existsSync, renameSync } from "fs";
+import { mkdtempSync, existsSync, renameSync, mkdirSync } from "fs";
 import * as lib from "../lib";
 
 const Version = "v2.56.2";
@@ -230,6 +230,7 @@ export const install = async (): Promise<string> => {
 
     const aquaBinaryPath = join(extractedPath, isWindows ? "aqua.exe" : "aqua");
     await chmod(aquaBinaryPath, 0o755);
+    mkdirSync(installDir, { recursive: true });
     renameSync(aquaBinaryPath, installPath);
     return installDir;
   } finally {
