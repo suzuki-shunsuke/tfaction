@@ -128,6 +128,14 @@ jobs:
           TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: tests/modules/foo
 
+      - name: Test scaffold-working-dir
+        uses: ./
+        with:
+          action: scaffold-working-dir
+        env:
+          TFACTION_CONFIG: setup/test/tfaction-root.yaml
+          TFACTION_WORKING_DIR: setup/test/zoo
+
   test-get-target-config:
     timeout-minutes: 15
     runs-on: ubuntu-24.04
