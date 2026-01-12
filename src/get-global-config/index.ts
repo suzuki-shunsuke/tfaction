@@ -20,7 +20,6 @@ export const main = async () => {
   core.setOutput("draft_pr", config.draft_pr);
   core.setOutput("skip_create_pr", config.skip_create_pr);
   core.setOutput("plan_workflow_name", config.plan_workflow_name);
-  core.setOutput("label_prefix_target", config.label_prefixes.target);
   core.setOutput("label_prefix_tfmigrate", config.label_prefixes.tfmigrate);
   core.setOutput("label_prefix_skip", config.label_prefixes.skip);
   core.setOutput("drift_issue_repo_owner", driftIssueRepo.owner);

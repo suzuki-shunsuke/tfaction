@@ -249,7 +249,6 @@ const RawConfig = z.object({
   env: z.record(z.string(), z.string()).optional(),
   label_prefixes: z
     .object({
-      target: z.string().optional(),
       tfmigrate: z.string().optional(),
       skip: z.string().optional(),
     })
@@ -324,7 +323,6 @@ export interface Config extends Omit<
   skip_create_pr: boolean;
   terraform_command: string;
   label_prefixes: {
-    target: string;
     tfmigrate: string;
     skip: string;
   };
@@ -373,7 +371,6 @@ export const applyConfigDefaults = (
     skip_create_pr: raw.skip_create_pr ?? false,
     terraform_command: raw.terraform_command ?? "terraform",
     label_prefixes: {
-      target: raw.label_prefixes?.target ?? "target:",
       tfmigrate: raw.label_prefixes?.tfmigrate ?? "tfmigrate:",
       skip: raw.label_prefixes?.skip ?? "skip:",
     },
