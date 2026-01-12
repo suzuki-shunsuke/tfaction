@@ -66,10 +66,11 @@ const run = async (
     throw new Error("repo_owner and repo_name are required");
   }
   const tg = await lib.getTargetGroup(cfg, inputs.target, inputs.workingDir);
-  const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
+
+  const configDir = path.dirname(cfg.config_path);
 
   const wdConfig = lib.readTargetConfig(
-    path.join(tg.workingDir, workingDirectoryFile),
+    path.join(configDir, tg.workingDir, cfg.working_directory_file),
   );
 
   if (!lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
