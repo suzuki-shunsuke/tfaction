@@ -10,6 +10,7 @@ import { globSync } from "glob";
 type Inputs = {
   workingDir?: string;
   target?: string;
+  /** A relative path from github.workspace to the directory where tfaction-root.yaml is located */
   rootDir: string;
   githubToken: string;
   plan: boolean;
@@ -53,10 +54,19 @@ const getConftestPaths = (
   return paths;
 };
 
+/**
+ *
+ * @param policy
+ * @param target
+ * @param configDir A relative path from github.workspace to a directory where tfaction-root.yaml is located
+ * @param workingDir A relative path from configDir to a working directory
+ * @param paths
+ * @returns
+ */
 const buildConftestArgs = (
   policy: lib.ConftestPolicyConfig,
   target: string,
-  rootDir: string,
+  configDir: string,
   workingDir: string,
   paths: string[],
 ): string[] => {
@@ -73,10 +83,13 @@ const buildConftestArgs = (
   ];
 
   if (typeof policy.policy === "string") {
-    args.push("-p", path.join(rootDir, policy.policy));
+    // workingDir => policy
+    // policy.policy configDir => policy
+    // workingDir configDir => workingDir
+    args.push("-p", path.relative(workingDir, policy.policy));
   } else if (policy.policy) {
     for (const p of policy.policy) {
-      args.push("-p", path.join(rootDir, p));
+      args.push("-p", path.relative(workingDir, p));
     }
   }
 
@@ -86,10 +99,10 @@ const buildConftestArgs = (
 
   if (policy.data !== undefined) {
     if (typeof policy.data === "string") {
-      args.push("--data", path.join(rootDir, policy.data));
+      args.push("--data", path.relative(workingDir, policy.data));
     } else {
       for (const p of policy.data) {
-        args.push("--data", path.join(rootDir, p));
+        args.push("--data", path.join(workingDir, p));
       }
     }
   }
