@@ -96,7 +96,7 @@ export const main = async () => {
 
   // Create working directory file (e.g., tfaction.yaml)
   const wdFilePath = path.join(workingDir, workingDirectoryFile);
-  fs.writeFileSync(wdFilePath, "{}");
+  fs.writeFileSync(wdFilePath, "{}\n");
   core.info(`Created ${workingDirectoryFile}`);
 
   // Copy tfmigrate.hcl if S3 bucket is configured
