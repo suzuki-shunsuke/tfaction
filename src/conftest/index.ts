@@ -8,10 +8,8 @@ import tmp from "tmp";
 import { globSync } from "glob";
 
 type Inputs = {
-  workingDir?: string;
-  target?: string;
   /** A relative path from github.workspace to the directory where tfaction-root.yaml is located */
-  rootDir: string;
+  configDir: string;
   githubToken: string;
   plan: boolean;
   planJsonPath?: string;
@@ -266,7 +264,7 @@ export const run = async (
     const args = buildConftestArgs(
       policy,
       targetConfig.target,
-      inputs.rootDir,
+      inputs.configDir,
       targetConfig.working_directory,
       paths,
     );

@@ -43,9 +43,7 @@ export const main = async () => {
 
   await runConftest(
     {
-      workingDir,
-      target,
-      rootDir: path.dirname(config.config_path),
+      configDir: path.dirname(config.config_path),
       githubToken,
       plan: false,
       executor,

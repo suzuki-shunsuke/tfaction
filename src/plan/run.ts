@@ -405,12 +405,10 @@ export const main = async (
   if (planJsonPath) {
     await conftest.run(
       {
-        workingDir: inputs.workingDirectory,
-        target: inputs.target,
-        rootDir: path.dirname(config.config_path),
+        configDir,
         githubToken,
         plan: true,
-        planJsonPath: planJsonPath,
+        planJsonPath,
         executor,
       },
       config,
