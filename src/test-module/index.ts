@@ -43,7 +43,7 @@ export const main = async () => {
       cwd: target,
       env: {
         GITHUB_TOKEN: githubToken,
-        GH_COMMENT_CONFIG: process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "",
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
     },
   );

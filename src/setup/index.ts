@@ -94,10 +94,6 @@ const setupSSHKey = async (sshKey: string): Promise<void> => {
 
 export const main = async () => {
   core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
-  core.exportVariable(
-    "TFACTION_GITHUB_COMMENT_CONFIG",
-    lib.GitHubCommentConfig,
-  );
   const githubToken = core.getInput("github_token", { required: true });
   const sshKey = core.getInput("ssh_key");
 

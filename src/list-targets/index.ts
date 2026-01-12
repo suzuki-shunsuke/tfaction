@@ -9,10 +9,6 @@ import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files"
 
 export const main = async () => {
   core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
-  core.exportVariable(
-    "TFACTION_GITHUB_COMMENT_CONFIG",
-    lib.GitHubCommentConfig,
-  );
   const executor = await aqua.NewExecutor({
     githubToken: core.getInput("github_token"),
   });

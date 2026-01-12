@@ -69,14 +69,6 @@ export const run = async (inputs: Inputs): Promise<void> => {
     const opts = config ? ["-c", config] : ["markdown"];
 
     const args = ["exec"];
-    if (process.env.TFACTION_GITHUB_COMMENT_CONFIG) {
-      args.push(
-        "-config",
-        process.env.TFACTION_GITHUB_COMMENT_CONFIG,
-        "-k",
-        "terraform-docs",
-      );
-    }
     if (lib.getTargetFromEnv()) {
       args.push("-var", `tfaction_target:${lib.getTargetFromEnv()}`);
     }
