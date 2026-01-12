@@ -36,8 +36,8 @@ export const listRelatedPullRequests = async (
     };
   } = await octokit.graphql(
     `
-    query($query: String!) {
-      search(query: $query, type: ISSUE, first: 100) {
+    query($q: String!) {
+      search(query: $q, type: ISSUE, first: 100) {
         nodes {
           ... on PullRequest {
             number
@@ -46,7 +46,7 @@ export const listRelatedPullRequests = async (
       }
     }
   `,
-    { query },
+    { q: query },
   );
 
   return result.search.nodes.map((pr) => pr.number);
