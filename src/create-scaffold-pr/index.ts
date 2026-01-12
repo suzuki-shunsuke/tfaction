@@ -241,9 +241,7 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfigResult.working_directory ||
-    lib.getWorkingDirFromEnv() ||
-    "";
+    targetConfigResult.working_directory || lib.getWorkingDirFromEnv() || "";
   const target = targetConfigResult.target || lib.getTargetFromEnv() || "";
 
   if (!target) {
