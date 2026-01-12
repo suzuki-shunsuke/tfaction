@@ -73,7 +73,7 @@ jobs:
         env:
           TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: foo
-          TFACTION_WORKING_DIR: tests/foo
+          TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
 
       - name: Test terraform init
@@ -87,7 +87,7 @@ jobs:
           TFACTION_JOB_TYPE: terraform
           TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: foo
-          TFACTION_WORKING_DIR: tests/foo
+          TFACTION_WORKING_DIR: foo
 
       - name: Test test
         uses: ./
@@ -113,7 +113,7 @@ jobs:
         env:
           TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: foo
-          TFACTION_WORKING_DIR: tests/foo
+          TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
 
       - name: Test test-module

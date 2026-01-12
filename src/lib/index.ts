@@ -445,7 +445,7 @@ export const getIsApply = (): boolean => {
 
 export const getTargetFromTargetGroupsByWorkingDir = (
   targetGroups: Array<TargetGroup>,
-  wd: string,
+  wd: string, // wd is a relative path from tfaction-root.yaml
 ): TargetGroup | undefined => {
   for (const targetConfig of targetGroups) {
     const rel = path.relative(targetConfig.working_directory, wd);
@@ -537,7 +537,7 @@ export type Target = {
 export const getTargetGroup = async (
   config: Config,
   target?: string,
-  workingDir?: string,
+  workingDir?: string, // workingDir is a relative path from tfaction-root.yaml
 ): Promise<Target> => {
   if (workingDir) {
     const targetConfig = getTargetFromTargetGroupsByWorkingDir(
