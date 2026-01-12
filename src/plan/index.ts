@@ -33,7 +33,7 @@ export const main = async () => {
 
   // Step 4: Run plan if not skipped
   if (!skipTerraform) {
-    await runPlan();
+    await runPlan(targetConfig);
 
     // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)
     if (jobType === "tfmigrate") {

@@ -345,22 +345,17 @@ export const runTerraformPlan = async (
   };
 };
 
-export const main = async (): Promise<void> => {
+export const main = async (
+  targetConfig: getTargetConfig.TargetConfig,
+): Promise<void> => {
   const config = lib.getConfig();
-  const targetConfig = await getTargetConfig.getTargetConfig(
-    {
-      isApply: false,
-      jobType: lib.getJobType(),
-      target: lib.getTargetFromEnv(),
-      workingDir: lib.getWorkingDirFromEnv(),
-    },
-    config,
-  );
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
 
   const githubToken = core.getInput("github_token");
   const executor = await aqua.NewExecutor({
     githubToken,
-    cwd: targetConfig.working_directory,
+    cwd: workingDir,
   });
 
   const inputs: Inputs = {
