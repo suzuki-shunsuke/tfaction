@@ -12,7 +12,7 @@
     "@actions/tool-cache": "^3.0.0",
     "@aws-sdk/client-secrets-manager": "3.965.0",
     "@csm-actions/securefix-action": "npm:@jsr/csm-actions__securefix-action@^0.1.0",
-    "@csm-actions/update-branch-action": "npm:@jsr/csm-actions__update-branch-action@^0.0.1",
+    "@csm-actions/update-branch-action": "npm:@jsr/csm-actions__update-branch-action@^0.0.2",
     "@octokit/core": "^7.0.0",
     "@octokit/plugin-paginate-graphql": "^6.0.0",
     "@suzuki-shunsuke/commit-ts": "npm:@jsr/suzuki-shunsuke__commit-ts@^0.1.4",
