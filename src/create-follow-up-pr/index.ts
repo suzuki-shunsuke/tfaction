@@ -415,7 +415,6 @@ const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
 
 interface SkipCreateCommentParams {
   githubToken: string;
-  configPath: string;
   repository: string;
   branch: string;
   prTitle: string;
@@ -433,7 +432,6 @@ const postSkipCreateComment = async (
 ): Promise<void> => {
   const {
     githubToken,
-    configPath,
     repository,
     branch,
     prTitle,
@@ -472,8 +470,6 @@ const postSkipCreateComment = async (
     "github-comment",
     [
       "post",
-      "-config",
-      lib.GitHubCommentConfig,
       "-k",
       "skip-create-follow-up-pr",
       "-var",
@@ -486,6 +482,7 @@ const postSkipCreateComment = async (
     {
       env: {
         GITHUB_TOKEN: githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
     },
   );
@@ -614,7 +611,6 @@ export const main = async () => {
   if (skipCreatePr) {
     await postSkipCreateComment({
       githubToken,
-      configPath,
       repository,
       branch: prParams.branch,
       prTitle: prParams.prTitle,

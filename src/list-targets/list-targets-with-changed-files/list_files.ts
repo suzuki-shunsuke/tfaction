@@ -4,11 +4,13 @@ import * as path from "path";
 export const listFiles = async (
   baseDir: string,
   fileName: string,
+  cwd: string,
 ): Promise<string[]> => {
   // Run git ls-files
   const result = await exec.getExecOutput("git", ["ls-files", baseDir], {
     ignoreReturnCode: true,
     silent: true,
+    cwd,
   });
 
   const arr: string[] = [];

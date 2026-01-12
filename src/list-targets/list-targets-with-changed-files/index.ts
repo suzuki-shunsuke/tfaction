@@ -478,15 +478,17 @@ export const main = async (executor: aqua.Executor) => {
 
   const baseWorkingDirectory = cfg.base_working_directory;
   const workingDirectoryFile = cfg.working_directory_file;
+  const configDir = path.dirname(cfg.config_path);
 
   const configFiles = await listFiles(
     baseWorkingDirectory,
     workingDirectoryFile,
+    configDir,
   );
 
   const moduleBaseDirectory = cfg.module_base_directory;
   const moduleFile = cfg.module_file;
-  const modules = await listFiles(moduleBaseDirectory, moduleFile);
+  const modules = await listFiles(moduleBaseDirectory, moduleFile, configDir);
 
   let moduleCallers: any = null;
   if (cfg.update_local_path_module_caller?.enabled) {
