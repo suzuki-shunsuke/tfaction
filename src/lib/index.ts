@@ -549,10 +549,17 @@ export type Target = {
   group?: TargetGroup;
 };
 
+/**
+ *
+ * @param config
+ * @param target
+ * @param workingDir a relative path from tfaction-root.yaml
+ * @returns
+ */
 export const getTargetGroup = async (
   config: Config,
   target?: string,
-  workingDir?: string, // workingDir is a relative path from tfaction-root.yaml
+  workingDir?: string,
 ): Promise<Target> => {
   if (workingDir) {
     const targetConfig = getTargetFromTargetGroupsByWorkingDir(

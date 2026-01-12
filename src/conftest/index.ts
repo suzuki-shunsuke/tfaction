@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as lib from "../lib";
+import { TargetConfig } from "../get-target-config";
 import * as aqua from "../aqua";
 import * as path from "path";
 import fs from "fs";
@@ -207,29 +207,33 @@ const buildPolicies = (
   return policies;
 };
 
-export const run = async (inputs: Inputs, config: lib.Config) => {
-  const workingDirectoryFile = config.working_directory_file;
+export const run = async (
+  inputs: Inputs,
+  config: lib.Config,
+  targetConfig: TargetConfig,
+) => {
   const executor = inputs.executor;
 
-  const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
-
-  if (!t.group) {
-    throw new Error("target config is not found in target_groups");
-  }
-
   const configDir = path.dirname(config.config_path);
-  const workingDir = path.join(configDir, t.workingDir);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
   const wdConfig = lib.readTargetConfig(
-    path.join(workingDir, workingDirectoryFile),
+    path.join(workingDir, config.working_directory_file),
   );
 
-  const policies = buildPolicies(config, t.group, wdConfig, inputs.plan);
+  const policies = buildPolicies(config, targetConfig, wdConfig, inputs.plan);
 
   if (policies.length !== 0) {
     core.startGroup("conftest -v");
     await executor.exec(
       "github-comment",
-      ["exec", "-var", `tfaction_target:${t.target}`, "--", "conftest", "-v"],
+      [
+        "exec",
+        "-var",
+        `tfaction_target:${targetConfig.target}`,
+        "--",
+        "conftest",
+        "-v",
+      ],
       {
         cwd: workingDir,
         env: {
@@ -245,12 +249,12 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     if (!policy.policy) {
       continue;
     }
-    const paths = getConftestPaths(policy, t.workingDir, inputs.planJsonPath);
+    const paths = getConftestPaths(policy, workingDir, inputs.planJsonPath);
     const args = buildConftestArgs(
       policy,
-      t.target,
+      targetConfig.target,
       inputs.rootDir,
-      t.workingDir,
+      targetConfig.working_directory,
       paths,
     );
     core.startGroup("conftest");

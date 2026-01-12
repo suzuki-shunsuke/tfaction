@@ -419,6 +419,7 @@ export const main = async (): Promise<void> => {
         executor,
       },
       config,
+      targetConfig,
     );
   }
 };

@@ -51,6 +51,7 @@ export const main = async () => {
       executor,
     },
     config,
+    targetConfig,
   );
 
   if (!destroy) {
