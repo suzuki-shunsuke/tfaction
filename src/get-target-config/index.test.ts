@@ -15,7 +15,7 @@ test("default", async () => {
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
-      ["template_dir", "tests/templates/aws"],
+      ["template_dir", "tests/templates/github"],
       ["aws_role_session_name", "tfaction-plan-aws_foo_dev-" + runID],
       ["enable_tflint", true],
       ["enable_trivy", true],
@@ -39,7 +39,7 @@ test("default", async () => {
           target_groups: [
             {
               working_directory: "aws",
-              template_dir: "templates/aws",
+              template_dir: "templates/github",
             },
           ],
         },
@@ -61,7 +61,7 @@ test("config", async () => {
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
-      ["template_dir", "tests/templates/aws"],
+      ["template_dir", "tests/templates/github"],
       ["enable_tflint", false],
       ["enable_trivy", false],
       ["tflint_fix", false],
@@ -93,7 +93,7 @@ test("config", async () => {
           target_groups: [
             {
               working_directory: "aws/",
-              template_dir: "templates/aws",
+              template_dir: "templates/github",
               aws_region: "ap-northeast-1",
               aws_role_session_name: "test",
             },
@@ -117,7 +117,7 @@ test("scaffold_working_dir", async () => {
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
-      ["template_dir", "tests/templates/aws"],
+      ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
       ["enable_trivy", true],
       ["tflint_fix", false],
@@ -138,7 +138,7 @@ test("scaffold_working_dir", async () => {
           target_groups: [
             {
               working_directory: "aws/",
-              template_dir: "templates/aws",
+              template_dir: "templates/github",
             },
           ],
         },
