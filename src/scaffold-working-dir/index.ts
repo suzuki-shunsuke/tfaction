@@ -85,8 +85,8 @@ export const main = async () => {
     core.info(`Created parent directory: ${parentDir}`);
   }
 
-  // Copy template directory if it exists
-  if (templateDir && fs.existsSync(templateDir)) {
+  // Copy template directory
+  if (templateDir) {
     copyDirectory(templateDir, workingDir);
     core.info(`Copied template from ${templateDir} to ${workingDir}`);
   } else if (!fs.existsSync(workingDir)) {
