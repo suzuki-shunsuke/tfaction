@@ -68,9 +68,15 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   if (!repoOwner || !repoName) {
     throw new Error("repo_owner and repo_name are required");
   }
-  const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
+  const workingDirectoryFile = cfg.working_directory_file;
 
-  const files = await lib.listWorkingDirFiles(workingDirectoryFile);
+  const configDir = path.dirname(cfg.config_path);
+  const gitRootDir = await lib.getGitRootDir(configDir);
+  const files = await lib.listWorkingDirFiles(
+    gitRootDir,
+    configDir,
+    workingDirectoryFile,
+  );
   const dirs: string[] = [];
   for (const file of files) {
     dirs.push(path.dirname(file));

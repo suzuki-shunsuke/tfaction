@@ -4,7 +4,6 @@ import * as github from "@actions/github";
 import * as path from "path";
 
 import * as lib from "../lib";
-import * as listFiles from "../list-targets/list-targets-with-changed-files/list_files";
 
 type Issue = {
   number: number;
@@ -205,7 +204,7 @@ const listTargets = async (
 ): Promise<Map<string, string>> => {
   const configDir = path.dirname(config.config_path);
   const gitRootDir = await lib.getGitRootDir(configDir);
-  const files = await listFiles.listFiles(
+  const files = await lib.listWorkingDirFiles(
     gitRootDir,
     configDir,
     config.working_directory_file,

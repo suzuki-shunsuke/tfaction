@@ -574,11 +574,15 @@ export const getTargetGroup = async (
     );
   }
 
-  const out = await exec.getExecOutput("git", ["ls-files"], {
-    silent: true,
-  });
+  const configDir = path.dirname(config.config_path);
+  const gitRootDir = await getGitRootDir(configDir);
+
   const wds: string[] = [];
-  const files = await listWorkingDirFiles(config.working_directory_file);
+  const files = await listWorkingDirFiles(
+    gitRootDir,
+    configDir,
+    config.working_directory_file,
+  );
   for (const file of files) {
     wds.push(path.dirname(file));
   }
@@ -603,17 +607,36 @@ export const getTargetGroup = async (
   };
 };
 
-export const listWorkingDirFiles = async (file: string): Promise<string[]> => {
-  const out = await exec.getExecOutput("git", ["ls-files"], {
-    silent: true,
-  });
-  const files: string[] = [];
-  for (const line of out.stdout.split("\n")) {
-    if (line.endsWith(file)) {
-      files.push(line);
+/**
+ *
+ * @param gitRootDir
+ * @param configDir
+ * @param fileName
+ * @returns A list of files relative to the config directory
+ */
+export const listWorkingDirFiles = async (
+  gitRootDir: string,
+  configDir: string,
+  fileName: string,
+): Promise<string[]> => {
+  const result = await exec.getExecOutput(
+    "git",
+    ["ls-files", `*/${fileName}`],
+    {
+      ignoreReturnCode: true,
+      silent: true,
+      cwd: gitRootDir,
+    },
+  );
+
+  const arr: string[] = [];
+  for (const line of result.stdout.split("\n").map((l) => l.trim())) {
+    if (line === "") {
+      continue;
     }
+    arr.push(path.relative(configDir, line));
   }
-  return files;
+  return arr;
 };
 
 type Issue = {

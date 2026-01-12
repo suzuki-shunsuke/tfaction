@@ -5,7 +5,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../../lib";
 import * as aqua from "../../aqua";
-import { listFiles } from "./list_files";
 import { list as listModuleCallers } from "./list-module-callers";
 
 type TargetConfig = {
@@ -478,12 +477,16 @@ export const main = async (executor: aqua.Executor) => {
 
   const configDir = path.dirname(cfg.config_path);
   const gitRootDir = await lib.getGitRootDir(configDir);
-  const configFiles = await listFiles(
+  const configFiles = await lib.listWorkingDirFiles(
     gitRootDir,
     configDir,
     cfg.working_directory_file,
   );
-  const modules = await listFiles(gitRootDir, configDir, cfg.module_file);
+  const modules = await lib.listWorkingDirFiles(
+    gitRootDir,
+    configDir,
+    cfg.module_file,
+  );
 
   let moduleCallers: any = null;
   if (cfg.update_local_path_module_caller?.enabled) {
