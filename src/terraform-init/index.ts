@@ -37,7 +37,8 @@ export const main = async () => {
     config,
   );
 
-  const workingDir = targetConfig.working_directory;
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
   const tfCommand = targetConfig.terraform_command;
   const providersLockOpts = targetConfig.providers_lock_opts;
 
@@ -52,7 +53,7 @@ export const main = async () => {
       "github-comment",
       ["exec", "--", tfCommand, "init", "-input=false"],
       {
-        cwd: workingDir || undefined,
+        cwd: workingDir,
         env: {
           GITHUB_TOKEN: githubToken,
         },
@@ -71,7 +72,7 @@ export const main = async () => {
       tfCommand,
       ["init", "-input=false"],
       {
-        cwd: workingDir || undefined,
+        cwd: workingDir,
         ignoreReturnCode: true,
       },
     );
@@ -80,7 +81,7 @@ export const main = async () => {
         "github-comment",
         ["exec", "--", tfCommand, "init", "-input=false", "-upgrade"],
         {
-          cwd: workingDir || undefined,
+          cwd: workingDir,
           env: {
             GITHUB_TOKEN: githubToken,
           },
@@ -95,7 +96,7 @@ export const main = async () => {
       "github-comment",
       ["exec", "--", tfCommand, "providers", "lock", ...lockArgs],
       {
-        cwd: workingDir || undefined,
+        cwd: workingDir,
         env: {
           GITHUB_TOKEN: githubToken,
         },
@@ -119,7 +120,7 @@ export const main = async () => {
 
   core.startGroup(`${tfCommand} providers`);
   await executor.exec(tfCommand, ["providers"], {
-    cwd: workingDir || undefined,
+    cwd: workingDir,
   });
   core.endGroup();
 };

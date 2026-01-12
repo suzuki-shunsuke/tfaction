@@ -404,6 +404,12 @@ export const getConfig = (): Config => {
   return applyConfigDefaults(raw, gitRootDir, configFilePath);
 };
 
+/**
+ *
+ * @param wds relative paths from tfaction-root.yaml
+ * @param config
+ * @returns a map of working directory to target name
+ */
 export const createWDTargetMap = (
   wds: string[],
   config: Config,
@@ -446,9 +452,15 @@ export const getIsApply = (): boolean => {
   return process.env.TFACTION_IS_APPLY === "true";
 };
 
+/**
+ *
+ * @param targetGroups
+ * @param wd a relative path from tfaction-root.yaml
+ * @returns
+ */
 export const getTargetFromTargetGroupsByWorkingDir = (
   targetGroups: Array<TargetGroup>,
-  wd: string, // wd is a relative path from tfaction-root.yaml
+  wd: string,
 ): TargetGroup | undefined => {
   for (const targetConfig of targetGroups) {
     const rel = path.relative(targetConfig.working_directory, wd);

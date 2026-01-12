@@ -32,7 +32,7 @@ export const main = async () => {
     return;
   }
 
-  const result = await run({
+  const result = await run(cfg, {
     target: lib.getTargetFromEnv(),
     workingDir: lib.getWorkingDirFromEnv(),
     ghToken: core.getInput("github_token", { required: true }),
@@ -49,8 +49,10 @@ export const main = async () => {
   core.summary.addRaw(`Drift Issue: ${result.url}`, true);
 };
 
-const run = async (inputs: Inputs): Promise<Result | undefined> => {
-  const cfg = lib.getConfig();
+const run = async (
+  cfg: lib.Config,
+  inputs: Inputs,
+): Promise<Result | undefined> => {
   if (!cfg.drift_detection) {
     core.info("drift detection is disabled");
     return undefined;
@@ -79,9 +81,6 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   if (!inputs.ghToken) {
     throw new Error("GITHUB_TOKEN is required");
   }
-
-  const MyOctokit = Octokit.plugin(paginateGraphQL);
-  const octokit = new MyOctokit({ auth: inputs.ghToken });
 
   let issue = await getIssue(
     tg.target,
@@ -131,7 +130,7 @@ const getIssue = async (
   }
 }`;
 
-  const pageIterator = await octokit.graphql.paginate.iterator(query, {
+  const pageIterator = octokit.graphql.paginate.iterator(query, {
     issuesCursor: null,
     searchQuery: `repo:${repo} "${title}" in:title`,
   });
