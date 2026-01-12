@@ -4,6 +4,7 @@ import * as github from "@actions/github";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as listFiles from "../list-targets/list-targets-with-changed-files/list_files";
 
 type Issue = {
   number: number;
@@ -202,15 +203,16 @@ const listWorkingDirectoryFiles = async (
 const listTargets = async (
   config: lib.Config,
 ): Promise<Map<string, string>> => {
+  const configDir = path.dirname(config.config_path);
+  const gitRootDir = await lib.getGitRootDir(configDir);
+  const files = await listFiles.listFiles(
+    gitRootDir,
+    configDir,
+    config.working_directory_file,
+  );
+
   const targets = new Map<string, string>();
   const pwd = process.env.GITHUB_WORKSPACE ?? process.cwd();
-  const workingDirectoryFile = config.working_directory_file;
-
-  // Find all working directory files using git ls-files
-  const files = await listWorkingDirectoryFiles(
-    config.base_working_directory,
-    workingDirectoryFile,
-  );
 
   for (const file of files) {
     const workingDirectoryPath = path.dirname(file);
@@ -247,6 +249,10 @@ const listTargets = async (
   return targets;
 };
 
+/**
+ *
+ * @returns
+ */
 export const main = async () => {
   const githubToken = core.getInput("github_token", { required: true });
   const config = lib.getConfig();
@@ -292,8 +298,9 @@ export const main = async () => {
     if (runsOn !== undefined) {
       result.push({ ...issue, runs_on: runsOn });
     } else {
-      core.info(
-        `Target ${issue.target} not found, archiving issue #${issue.number}`,
+      // If there is no target associated with the issue, archive the issue.
+      core.notice(
+        `Target ${issue.target} not found, archiving issue ${github.context.serverUrl}/${repoOwner}/${repoName}/issues/${issue.number}`,
       );
       await archiveIssue(
         octokit,

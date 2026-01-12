@@ -6,29 +6,18 @@ import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
 import * as aqua from "../../aqua";
+import * as lib from "../../lib";
 
 type Inputs = {
-  workingDirectory: string;
-  prune: boolean;
-  skipPush: boolean;
   githubToken: string;
-  readChecksumToken: string;
-  securefixActionServerRepository: string;
   securefixActionAppId: string;
   securefixActionAppPrivateKey: string;
 };
 
 const getInputs = (): Inputs => {
   return {
-    workingDirectory: core.getInput("working_directory"),
-    prune: core.getInput("prune") === "true",
-    skipPush: core.getInput("skip_push") === "true",
     githubToken:
       core.getInput("github_token") || process.env.GITHUB_TOKEN || "",
-    readChecksumToken: core.getInput("read_checksum_token"),
-    securefixActionServerRepository: core.getInput(
-      "securefix_action_server_repository",
-    ),
     securefixActionAppId: core.getInput("securefix_action_app_id"),
     securefixActionAppPrivateKey: core.getInput(
       "securefix_action_app_private_key",
@@ -36,33 +25,33 @@ const getInputs = (): Inputs => {
   };
 };
 
-const getAquaGitHubToken = (inputs: Inputs): string => {
-  if (inputs.readChecksumToken) {
-    return inputs.readChecksumToken;
-  }
-  if (inputs.githubToken) {
-    return inputs.githubToken;
-  }
-  return process.env.AQUA_GITHUB_TOKEN || "";
-};
-
+/**
+ *
+ * @param executor
+ * @param workingDir a relative path from github.workspace
+ * @param cfg
+ */
 const runAquaUpdateChecksum = async (
-  inputs: Inputs,
   executor: aqua.Executor,
+  workingDir: string,
+  prune: boolean,
 ): Promise<void> => {
   const args = ["update-checksum"];
-  if (inputs.prune) {
+  if (prune) {
     args.push("-prune");
   }
 
-  const aquaToken = getAquaGitHubToken(inputs);
-
   await executor.exec("aqua", args, {
-    cwd: inputs.workingDirectory || undefined,
+    cwd: workingDir,
   });
 };
 
-const findChecksumFile = (workingDir: string): string | null => {
+/**
+ *
+ * @param workingDir a relative path from github.workspace
+ * @returns a relative path from workingDir
+ */
+const findChecksumFile = (workingDir: string): string => {
   const candidates = [
     "aqua-checksums.json",
     ".aqua-checksums.json",
@@ -78,10 +67,15 @@ const findChecksumFile = (workingDir: string): string | null => {
       return candidate;
     }
   }
-
-  return null;
+  throw new Error("aqua checksum json file isn't found");
 };
 
+/**
+ *
+ * @param checksumFile a relative path from workingDir
+ * @param workingDir a relative path from github.workspace
+ * @returns
+ */
 const checkIfChanged = async (
   checksumFile: string,
   workingDir: string,
@@ -116,17 +110,21 @@ const checkIfChanged = async (
   return diffExitCode !== 0;
 };
 
+/**
+ *
+ * @param inputs
+ * @param checksumFile a relative path from git root directory
+ * @param cfg
+ * @returns
+ */
 const createCommitIfNeeded = async (
   inputs: Inputs,
   checksumFile: string,
+  cfg: lib.Config,
 ): Promise<void> => {
-  const fullChecksumFilePath = inputs.workingDirectory
-    ? path.join(inputs.workingDirectory, checksumFile)
-    : checksumFile;
-
   const commitMessage = `chore(aqua): update ${checksumFile}`;
 
-  if (inputs.securefixActionServerRepository) {
+  if (cfg?.securefix_action?.server_repository) {
     if (!inputs.securefixActionAppId || !inputs.securefixActionAppPrivateKey) {
       throw new Error(
         "app_id and app_private_key are required when securefix_action_server_repository is set",
@@ -136,8 +134,8 @@ const createCommitIfNeeded = async (
     await securefix.request({
       appId: inputs.securefixActionAppId,
       privateKey: inputs.securefixActionAppPrivateKey,
-      serverRepository: inputs.securefixActionServerRepository,
-      files: new Set([fullChecksumFilePath]),
+      serverRepository: cfg.securefix_action.server_repository,
+      files: new Set([checksumFile]),
       commitMessage: commitMessage,
       workspace: process.env.GITHUB_WORKSPACE ?? "",
     });
@@ -150,7 +148,7 @@ const createCommitIfNeeded = async (
     repo: github.context.repo.repo,
     branch: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || "",
     message: commitMessage,
-    files: [fullChecksumFilePath],
+    files: [checksumFile],
     deleteIfNotExist: true,
     logger: {
       info: core.info,
@@ -158,29 +156,29 @@ const createCommitIfNeeded = async (
   });
 };
 
-export const main = async (executor: aqua.Executor) => {
+/**
+ *
+ * @param executor
+ * @param workingDir a relative path from github.workspace
+ * @param cfg
+ */
+export const main = async (
+  executor: aqua.Executor,
+  workingDir: string,
+  cfg: lib.Config,
+) => {
   const inputs = getInputs();
-
-  // Run aqua update-checksum
-  await runAquaUpdateChecksum(inputs, executor);
-
-  // Find checksum file
-  const workingDir = inputs.workingDirectory || process.cwd();
+  await runAquaUpdateChecksum(
+    executor,
+    workingDir,
+    cfg.aqua?.update_checksum?.prune ?? false,
+  );
   const checksumFile = findChecksumFile(workingDir);
-
-  if (!checksumFile) {
-    throw new Error("aqua checksum json file isn't found");
-  }
-
-  // Set output for checksum_file
-  const checksumFileOutput = inputs.workingDirectory
-    ? path.join(inputs.workingDirectory, checksumFile)
-    : checksumFile;
-  core.setOutput("checksum_file", checksumFileOutput);
+  // a relative path from github.workspace
+  const checksumFileOutput = path.join(workingDir, checksumFile);
 
   // Check if file has changed
   const changed = await checkIfChanged(checksumFile, workingDir);
-  core.setOutput("changed", changed.toString());
 
   if (!changed) {
     core.info("No changes to checksum file");
@@ -188,11 +186,17 @@ export const main = async (executor: aqua.Executor) => {
   }
 
   // If skip_push is true and there are changes, fail
-  if (inputs.skipPush) {
+  if (cfg?.aqua?.update_checksum?.skip_push) {
     throw new Error(`${checksumFileOutput} isn't latest.`);
   }
 
-  // Create commit
-  await createCommitIfNeeded(inputs, checksumFile);
+  const gitRootDir = await lib.getGitRootDir(workingDir);
+  const workspace = lib.getGitHubWorkspace();
+  const checksumFileFromRootDir = path.relative(
+    gitRootDir,
+    path.join(workspace, checksumFileOutput),
+  );
+
+  await createCommitIfNeeded(inputs, checksumFileFromRootDir, cfg);
   throw new Error(`${checksumFileOutput} is updated.`);
 };

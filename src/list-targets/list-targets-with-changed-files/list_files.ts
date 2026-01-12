@@ -1,26 +1,34 @@
 import * as exec from "@actions/exec";
 import * as path from "path";
 
+/**
+ *
+ * @param gitRootDir
+ * @param configDir
+ * @param fileName
+ * @returns A list of files relative to the config directory
+ */
 export const listFiles = async (
-  baseDir: string,
+  gitRootDir: string,
+  configDir: string,
   fileName: string,
-  cwd: string,
 ): Promise<string[]> => {
-  // Run git ls-files
-  const result = await exec.getExecOutput("git", ["ls-files", baseDir], {
-    ignoreReturnCode: true,
-    silent: true,
-    cwd,
-  });
+  const result = await exec.getExecOutput(
+    "git",
+    ["ls-files", `*/${fileName}`],
+    {
+      ignoreReturnCode: true,
+      silent: true,
+      cwd: gitRootDir,
+    },
+  );
 
   const arr: string[] = [];
   for (const line of result.stdout.split("\n").map((l) => l.trim())) {
     if (line === "") {
       continue;
     }
-    if (path.basename(line) === fileName) {
-      arr.push(line);
-    }
+    arr.push(path.relative(configDir, line));
   }
   return arr;
 };

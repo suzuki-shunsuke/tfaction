@@ -235,7 +235,6 @@ const RawConfig = z.object({
         .optional(),
     })
     .optional(),
-  base_working_directory: z.string().optional(),
   conftest: ConftestConfig.optional(),
   draft_pr: z.boolean().optional(),
   drift_detection: z
@@ -255,7 +254,6 @@ const RawConfig = z.object({
       skip: z.string().optional(),
     })
     .optional(),
-  module_base_directory: z.string().optional(),
   module_file: z.string().optional(),
   plan_workflow_name: z.string(),
   renovate_login: z.string().optional(),
@@ -306,9 +304,7 @@ export type RawConfig = z.infer<typeof RawConfig>;
 // Config with default values applied
 export interface Config extends Omit<
   RawConfig,
-  | "base_working_directory"
   | "working_directory_file"
-  | "module_base_directory"
   | "module_file"
   | "renovate_login"
   | "draft_pr"
@@ -319,10 +315,9 @@ export interface Config extends Omit<
   | "trivy"
   | "follow_up_pr_group_label"
 > {
+  git_root_dir: string;
   config_path: string;
-  base_working_directory: string;
   working_directory_file: string;
-  module_base_directory: string;
   module_file: string;
   renovate_login: string;
   draft_pr: boolean;
@@ -364,14 +359,14 @@ export const generateJSONSchema = (dir: string) => {
 
 export const applyConfigDefaults = (
   raw: RawConfig,
+  gitRootDir: string,
   configPath: string,
 ): Config => {
   return {
     ...raw,
+    git_root_dir: gitRootDir,
     config_path: configPath,
-    base_working_directory: raw.base_working_directory ?? ".",
     working_directory_file: raw.working_directory_file ?? "tfaction.yaml",
-    module_base_directory: raw.module_base_directory ?? ".",
     module_file: raw.module_file ?? "tfaction_module.yaml",
     renovate_login: raw.renovate_login ?? "renovate[bot]",
     draft_pr: raw.draft_pr ?? false,
@@ -404,9 +399,12 @@ export const getConfigPathFromEnv = (): string => {
 };
 
 export const getConfig = (): Config => {
-  const configFilePath = getConfigPathFromEnv();
-  const raw = RawConfig.parse(load(fs.readFileSync(configFilePath, "utf8")));
-  return applyConfigDefaults(raw, configFilePath);
+  const gitRootDir = getGitRootDirFromEnv();
+  const configFilePath = path.join(gitRootDir, getConfigPathFromEnv());
+  const raw = RawConfig.parse(
+    load(fs.readFileSync(path.join(gitRootDir, configFilePath), "utf8")),
+  );
+  return applyConfigDefaults(raw, gitRootDir, configFilePath);
 };
 
 export const createWDTargetMap = (
@@ -435,12 +433,16 @@ export const createWDTargetMap = (
   return m;
 };
 
-export const getTargetFromEnv = (): string | undefined => {
-  return process.env.TFACTION_TARGET;
+export const getGitRootDirFromEnv = (): string => {
+  return process.env.TFACTION_GIT_ROOT_DIR ?? "";
 };
 
-export const getWorkingDirFromEnv = (): string | undefined => {
-  return process.env.TFACTION_WORKING_DIR;
+export const getTargetFromEnv = (): string => {
+  return process.env.TFACTION_TARGET ?? "";
+};
+
+export const getWorkingDirFromEnv = (): string => {
+  return process.env.TFACTION_WORKING_DIR ?? "";
 };
 
 export const getIsApply = (): boolean => {
@@ -674,4 +676,29 @@ export const getDriftIssueRepo = (cfg: Config): DriftIssueRepo => {
     owner: cfg.drift_detection?.issue_repo_owner ?? github.context.repo.owner,
     name: cfg.drift_detection?.issue_repo_name ?? github.context.repo.repo,
   };
+};
+
+/**
+ *
+ * @param cwd a relative path from github.workspace to tfaction-root.yaml
+ * @returns an absolute path to the root directory of the git repository
+ */
+export const getGitRootDir = async (cwd: string): Promise<string> => {
+  const out = await exec.getExecOutput(
+    "git",
+    ["rev-parse", "--show-toplevel"],
+    {
+      silent: true,
+      cwd,
+    },
+  );
+  return out.stdout.trim();
+};
+
+/**
+ *
+ * @returns an absolute path to github.workspace
+ */
+export const getGitHubWorkspace = (): string => {
+  return process.env.GITHUB_WORKSPACE ?? process.cwd();
 };

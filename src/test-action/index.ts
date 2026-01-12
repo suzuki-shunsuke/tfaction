@@ -6,9 +6,9 @@ export const main = async () => {
     {
       name: "get-target-config",
       expected: {
-        working_directory: "tests/aws/foo/dev",
+        working_directory: "aws/foo/dev",
         providers_lock_opts: "-platform=linux_amd64 -platform=darwin_amd64",
-        template_dir: "tests/templates/github",
+        template_dir: "templates/github",
         enable_tflint: "true",
         enable_trivy: "true",
         tflint_fix: "true",
@@ -34,7 +34,6 @@ export const main = async () => {
       expected: {
         base_working_directory: ".",
         working_directory_file: "tfaction.yaml",
-        module_base_directory: ".",
         module_file: "tfaction_module.yaml",
         renovate_login: "renovate[bot]",
         draft_pr: "false",

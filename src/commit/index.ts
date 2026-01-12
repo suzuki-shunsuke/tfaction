@@ -6,6 +6,9 @@ import * as commit from "@suzuki-shunsuke/commit-ts";
 type Inputs = {
   commitMessage: string;
   githubToken: string;
+  /** A relative path from github.workspace to Git Root Directory */
+  rootDir?: string;
+  /** Relative pathes from Git Root Directory */
   files: Set<string>;
   serverRepository: string;
   appId: string;
@@ -43,22 +46,4 @@ export const create = async (inputs: Inputs) => {
       info: core.info,
     },
   });
-};
-
-export const main = async () => {
-  const inputs: Inputs = {
-    commitMessage: core.getInput("commit_message", { required: true }),
-    githubToken: core.getInput("github_token"),
-    files: new Set(
-      core
-        .getInput("files")
-        .split("\n")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0),
-    ),
-    serverRepository: core.getInput("securefix_action_server_repository"),
-    appId: core.getInput("securefix_action_app_id"),
-    appPrivateKey: core.getInput("securefix_action_app_private_key"),
-  };
-  await create(inputs);
 };

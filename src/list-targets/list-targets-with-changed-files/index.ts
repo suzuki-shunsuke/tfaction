@@ -476,19 +476,14 @@ export const main = async (executor: aqua.Executor) => {
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
   const cfg = lib.getConfig();
 
-  const baseWorkingDirectory = cfg.base_working_directory;
-  const workingDirectoryFile = cfg.working_directory_file;
   const configDir = path.dirname(cfg.config_path);
-
+  const gitRootDir = await lib.getGitRootDir(configDir);
   const configFiles = await listFiles(
-    baseWorkingDirectory,
-    workingDirectoryFile,
+    gitRootDir,
     configDir,
+    cfg.working_directory_file,
   );
-
-  const moduleBaseDirectory = cfg.module_base_directory;
-  const moduleFile = cfg.module_file;
-  const modules = await listFiles(moduleBaseDirectory, moduleFile, configDir);
+  const modules = await listFiles(gitRootDir, configDir, cfg.module_file);
 
   let moduleCallers: any = null;
   if (cfg.update_local_path_module_caller?.enabled) {

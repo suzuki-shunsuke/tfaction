@@ -118,6 +118,8 @@ export const main = async () => {
     },
     config,
   );
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
 
   // Set environment variables from target config
   core.exportVariable("TFACTION_WORKING_DIR", targetConfig.working_directory);
@@ -142,13 +144,13 @@ export const main = async () => {
 
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
-    cwd: targetConfig.working_directory,
+    cwd: workingDir,
   });
 
   if (config.aqua?.update_checksum?.enabled) {
     try {
       core.info("updating checksum");
-      await aquaUpdateChecksum.main(executor);
+      await aquaUpdateChecksum.main(executor, workingDir, config);
     } catch (error) {
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {
