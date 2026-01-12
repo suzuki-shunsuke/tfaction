@@ -529,8 +529,8 @@ export const main = async () => {
   // Get target config
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
@@ -538,8 +538,8 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfig.working_directory || process.env.TFACTION_WORKING_DIR || "";
-  const target = targetConfig.target || process.env.TFACTION_TARGET || "";
+    targetConfig.working_directory || lib.getWorkingDirFromEnv() || "";
+  const target = targetConfig.target || lib.getTargetFromEnv() || "";
 
   const prNumber = process.env.CI_INFO_PR_NUMBER || "";
   const tempDir = process.env.CI_INFO_TEMP_DIR || "";

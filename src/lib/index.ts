@@ -399,8 +399,12 @@ export const applyConfigDefaults = (
   };
 };
 
+export const getConfigPathFromEnv = (): string => {
+  return process.env.TFACTION_CONFIG || "tfaction-root.yaml";
+};
+
 export const getConfig = (): Config => {
-  let configFilePath = process.env.TFACTION_CONFIG || "tfaction-root.yaml";
+  const configFilePath = getConfigPathFromEnv();
   const raw = RawConfig.parse(load(fs.readFileSync(configFilePath, "utf8")));
   return applyConfigDefaults(raw, configFilePath);
 };
@@ -431,11 +435,11 @@ export const createWDTargetMap = (
   return m;
 };
 
-export const getTarget = (): string | undefined => {
+export const getTargetFromEnv = (): string | undefined => {
   return process.env.TFACTION_TARGET;
 };
 
-export const getWorkingDir = (): string | undefined => {
+export const getWorkingDirFromEnv = (): string | undefined => {
   return process.env.TFACTION_WORKING_DIR;
 };
 

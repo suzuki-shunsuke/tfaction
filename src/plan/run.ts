@@ -351,8 +351,8 @@ export const main = async (): Promise<void> => {
     {
       isApply: false,
       jobType: lib.getJobType(),
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
     },
     config,
   );

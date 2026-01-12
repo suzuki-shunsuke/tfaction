@@ -69,15 +69,16 @@ export const main = async () => {
   // Step 1: Get target config
   const targetConfig = await getTargetConfig(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
     config,
   );
 
-  const workingDir = targetConfig.working_directory;
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
   const destroy = targetConfig.destroy ?? false;
   const tfCommand = targetConfig.terraform_command;
   const target = targetConfig.target;

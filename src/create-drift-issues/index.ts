@@ -35,8 +35,8 @@ export const main = async () => {
   }
 
   const result = await run({
-    target: process.env.TFACTION_TARGET,
-    workingDir: process.env.TFACTION_WORKING_DIR,
+    target: lib.getTargetFromEnv(),
+    workingDir: lib.getWorkingDirFromEnv(),
     ghToken: core.getInput("github_token", { required: true }),
     repo: process.env.GITHUB_REPOSITORY,
   });

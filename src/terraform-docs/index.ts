@@ -77,8 +77,8 @@ export const run = async (inputs: Inputs): Promise<void> => {
         "terraform-docs",
       );
     }
-    if (process.env.TFACTION_TARGET) {
-      args.push("-var", `tfaction_target:${process.env.TFACTION_TARGET}`);
+    if (lib.getTargetFromEnv()) {
+      args.push("-var", `tfaction_target:${lib.getTargetFromEnv()}`);
     }
     args.push("--", "terraform-docs", ...opts, ".");
 

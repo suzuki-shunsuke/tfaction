@@ -17,18 +17,18 @@ export const main = async (): Promise<void> => {
   const githubToken = core.getInput("github_token");
   const driftIssueNumber = process.env.TFACTION_DRIFT_ISSUE_NUMBER || "";
   const cfg = lib.getConfig();
-  const target = lib.getTarget();
-  if (!target) {
-    throw new Error("TFACTION_TARGET is not set");
-  }
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: target,
-      workingDir: lib.getWorkingDir(),
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: true,
       jobType: lib.getJobType(),
     },
     cfg,
+  );
+  const workingDir = path.join(
+    path.dirname(cfg.config_path),
+    targetConfig.working_directory,
   );
   const tfCommand = targetConfig.terraform_command || "terraform";
   const driftIssueRepo = lib.getDriftIssueRepo(cfg);
@@ -55,7 +55,7 @@ export const main = async (): Promise<void> => {
 
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
-    cwd: targetConfig.working_directory,
+    cwd: workingDir,
   });
 
   core.startGroup("tfmigrate apply");
@@ -68,7 +68,7 @@ export const main = async (): Promise<void> => {
         [
           "exec",
           "-var",
-          `tfaction_target:${target}`,
+          `tfaction_target:${targetConfig.target}`,
           "-k",
           "tfmigrate-apply",
           "--",
@@ -120,7 +120,7 @@ export const main = async (): Promise<void> => {
           "-var",
           `pr_url:${prUrl}`,
           "-var",
-          `tfaction_target:${target}`,
+          `tfaction_target:${targetConfig.target}`,
           "-k",
           "drift-apply",
           "--",
@@ -153,7 +153,10 @@ export const main = async (): Promise<void> => {
   if (disableUpdateRelatedPullRequests) {
     core.notice("Skip updating related pull requests");
   } else {
-    const prNumbers = await listRelatedPullRequests(githubToken, target);
+    const prNumbers = await listRelatedPullRequests(
+      githubToken,
+      targetConfig.target,
+    );
     if (securefixServerRepository) {
       await updateBranchBySecurefix(securefixServerRepository, prNumbers);
     } else {

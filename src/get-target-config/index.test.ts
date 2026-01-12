@@ -6,16 +6,16 @@ test("default", async () => {
   const runID = process.env.GITHUB_RUN_ID ?? "";
   const result: Result = {
     envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
+      ["TFACTION_WORKING_DIR", "aws/foo/dev"],
       ["TFACTION_TARGET", "aws/foo/dev"],
     ]),
     outputs: new Map<string, any>([
-      ["working_directory", "tests/aws/foo/dev"],
+      ["working_directory", "aws/foo/dev"],
       [
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
-      ["template_dir", "tests/templates/github"],
+      ["template_dir", "templates/github"],
       ["aws_role_session_name", "tfaction-plan-aws_foo_dev-" + runID],
       ["enable_tflint", true],
       ["enable_trivy", true],
@@ -52,16 +52,16 @@ test("default", async () => {
 test("config", async () => {
   const result: Result = {
     envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
+      ["TFACTION_WORKING_DIR", "aws/foo/dev"],
       ["TFACTION_TARGET", "aws/foo/dev"],
     ]),
     outputs: new Map<string, any>([
-      ["working_directory", "tests/aws/foo/dev"],
+      ["working_directory", "aws/foo/dev"],
       [
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
-      ["template_dir", "tests/templates/github"],
+      ["template_dir", "templates/github"],
       ["enable_tflint", false],
       ["enable_trivy", false],
       ["tflint_fix", false],
@@ -92,7 +92,7 @@ test("config", async () => {
           },
           target_groups: [
             {
-              working_directory: "aws/",
+              working_directory: "aws",
               template_dir: "templates/github",
               aws_region: "ap-northeast-1",
               aws_role_session_name: "test",
@@ -108,16 +108,16 @@ test("config", async () => {
 test("scaffold_working_dir", async () => {
   const result: Result = {
     envs: new Map<string, any>([
-      ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
+      ["TFACTION_WORKING_DIR", "aws/foo/dev"],
       ["TFACTION_TARGET", "aws/foo/dev"],
     ]),
     outputs: new Map<string, any>([
-      ["working_directory", "tests/aws/foo/dev"],
+      ["working_directory", "aws/foo/dev"],
       [
         "providers_lock_opts",
         "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
       ],
-      ["template_dir", "tests/templates/github"],
+      ["template_dir", "templates/github"],
       ["enable_tflint", true],
       ["enable_trivy", true],
       ["tflint_fix", false],

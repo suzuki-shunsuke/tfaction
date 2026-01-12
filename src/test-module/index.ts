@@ -17,7 +17,7 @@ export const main = async () => {
     core.getInput("securefix_action_app_private_key") || "";
 
   const config = lib.getConfig();
-  const target = process.env.TFACTION_TARGET || "";
+  const target = lib.getTargetFromEnv() || "";
 
   if (!target) {
     throw new Error("TFACTION_TARGET is required");

@@ -217,8 +217,10 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     throw new Error("target config is not found in target_groups");
   }
 
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, t.workingDir);
   const wdConfig = lib.readTargetConfig(
-    path.join(t.workingDir, workingDirectoryFile),
+    path.join(workingDir, workingDirectoryFile),
   );
 
   const policies = buildPolicies(config, t.group, wdConfig, inputs.plan);
@@ -229,7 +231,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
       "github-comment",
       ["exec", "-var", `tfaction_target:${t.target}`, "--", "conftest", "-v"],
       {
-        cwd: t.workingDir,
+        cwd: workingDir,
         env: {
           GITHUB_TOKEN: inputs.githubToken,
           GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
@@ -253,7 +255,7 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     );
     core.startGroup("conftest");
     await executor.exec("github-comment", args, {
-      cwd: t.workingDir,
+      cwd: workingDir,
       env: {
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,

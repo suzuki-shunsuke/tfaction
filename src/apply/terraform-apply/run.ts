@@ -56,19 +56,18 @@ export const main = async (): Promise<void> => {
   const githubToken = core.getInput("github_token");
   const driftIssueNumber = process.env.TFACTION_DRIFT_ISSUE_NUMBER || "";
   const cfg = lib.getConfig();
-  const target = lib.getTarget();
-  if (!target) {
-    throw new Error("TFACTION_TARGET is not set");
-  }
-  const workingDir = lib.getWorkingDir();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: target,
-      workingDir: workingDir,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: true,
       jobType: lib.getJobType(),
     },
     cfg,
+  );
+  const workingDir = path.join(
+    path.dirname(cfg.config_path),
+    targetConfig.working_directory,
   );
   const tfCommand = targetConfig.terraform_command || "terraform";
   const driftIssueRepo = lib.getDriftIssueRepo(cfg);
@@ -83,7 +82,7 @@ export const main = async (): Promise<void> => {
   const installDir = process.env.TFACTION_INSTALL_DIR || "";
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
-    cwd: targetConfig.working_directory,
+    cwd: workingDir,
   });
   const planFilePath = await downloadPlanFile(executor);
   if (!planFilePath) {
@@ -105,7 +104,7 @@ export const main = async (): Promise<void> => {
         "tfcmt",
         [
           "-var",
-          `target:${target}`,
+          `target:${targetConfig.target}`,
           "apply",
           "--",
           tfCommand,
@@ -163,7 +162,7 @@ export const main = async (): Promise<void> => {
           "-var",
           `pr_url:${prUrl}`,
           "-var",
-          `target:${target}`,
+          `target:${targetConfig.target}`,
           "apply",
           "--",
           "bash",
@@ -193,7 +192,10 @@ export const main = async (): Promise<void> => {
   if (disableUpdateRelatedPullRequests) {
     core.notice("Skip updating related pull requests");
   } else {
-    const prNumbers = await listRelatedPullRequests(githubToken, target);
+    const prNumbers = await listRelatedPullRequests(
+      githubToken,
+      targetConfig.target,
+    );
     if (securefixServerRepository) {
       await updateBranchBySecurefix(securefixServerRepository, prNumbers);
     } else {
@@ -310,7 +312,7 @@ const downloadArtifact = async (
 const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   const cfg = lib.getConfig();
   const githubToken = core.getInput("github_token");
-  const target = process.env.TFACTION_TARGET || "";
+  const target = lib.getTargetFromEnv() || "";
   const planWorkflowName = cfg.plan_workflow_name;
   const ciInfoTempDir = process.env.CI_INFO_TEMP_DIR || "";
   const branch = process.env.CI_INFO_HEAD_REF || "";

@@ -53,12 +53,12 @@ export const getTargetConfig = async (
   const configDir = path.dirname(config.config_path);
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
-  const workingDir = path.join(configDir, t.workingDir);
+  const workingDir = t.workingDir;
   const target = t.target;
   const targetGroup = t.group;
 
   const result: TargetConfig = {
-    working_directory: workingDir,
+    working_directory: t.workingDir,
     target: target,
     providers_lock_opts:
       "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
@@ -68,10 +68,6 @@ export const getTargetConfig = async (
     terraform_command: config.terraform_command,
     template_dir: targetGroup?.template_dir,
   };
-
-  if (result.template_dir) {
-    result.template_dir = path.join(configDir, result.template_dir);
-  }
 
   if (inputs.jobType === "scaffold_working_dir") {
     const m = lib.setOutputs(
@@ -115,7 +111,7 @@ export const getTargetConfig = async (
     );
 
     const wdConfig = lib.readTargetConfig(
-      path.join(workingDir, workingDirectoryFile),
+      path.join(configDir, workingDir, workingDirectoryFile),
     );
     const jobConfig = lib.getJobConfig(
       wdConfig,
@@ -221,8 +217,8 @@ export const getTargetConfig = async (
 export const main = async () => {
   const result = await run(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
