@@ -67,7 +67,7 @@ const findChecksumFile = (workingDir: string): string => {
       return candidate;
     }
   }
-  throw new Error("aqua checksum json file isn't found");
+  return "";
 };
 
 /**
@@ -174,6 +174,9 @@ export const main = async (
     cfg.aqua?.update_checksum?.prune ?? false,
   );
   const checksumFile = findChecksumFile(workingDir);
+  if (!checksumFile) {
+    return;
+  }
   // a relative path from github.workspace
   const checksumFileOutput = path.join(workingDir, checksumFile);
 
