@@ -87,8 +87,9 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   const targetWDMap = new Map<string, string>();
   for (const [wd, target] of m) {
     const tg = await lib.getTargetGroup(cfg, target, wd);
-    const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
-    const wdConfig = lib.readTargetConfig(path.join(wd, workingDirectoryFile));
+    const wdConfig = lib.readTargetConfig(
+      path.join(configDir, wd, cfg.working_directory_file),
+    );
     if (lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
       targetWDMap.set(target, wd);
     }
