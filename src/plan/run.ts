@@ -360,7 +360,7 @@ export const main = async (
 
   const inputs: Inputs = {
     githubToken,
-    workingDirectory: targetConfig.working_directory,
+    workingDirectory: workingDir,
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.destroy || false,
     tfCommand: targetConfig.terraform_command || "terraform",
