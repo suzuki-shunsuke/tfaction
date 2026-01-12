@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
+import * as path from "path";
 
 import * as lib from "../lib";
 import * as aqua from "../aqua";
@@ -91,7 +92,7 @@ export const main = async () => {
     {
       workingDir,
       target,
-      rootDir: process.env.GITHUB_WORKSPACE ?? "",
+      rootDir: path.dirname(config.config_path),
       githubToken,
       plan: false,
       executor,

@@ -24,6 +24,7 @@ const getConftestPaths = (
 ): string[] => {
   const paths: string[] = [];
   if (policy.tf) {
+    // TODO support .tofu and .tofu.json if tfcommand is tofu
     const tfFiles = globSync(path.join(workingDir, "*.tf"), {
       ignore: ".terraform/**",
     });

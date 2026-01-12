@@ -412,7 +412,7 @@ export const main = async (): Promise<void> => {
       {
         workingDir: inputs.workingDirectory,
         target: inputs.target,
-        rootDir: process.env.GITHUB_WORKSPACE ?? "",
+        rootDir: path.dirname(config.config_path),
         githubToken,
         plan: true,
         planJsonPath: planJsonPath,
