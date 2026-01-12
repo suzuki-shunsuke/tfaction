@@ -52,7 +52,7 @@ export const getTargetConfig = async (
   const workingDirectoryFile = config.working_directory_file;
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
-  const workingDir = t.workingDir;
+  const workingDir = path.join(path.dirname(config.config_path), t.workingDir);
   const target = t.target;
   const targetGroup = t.group;
 

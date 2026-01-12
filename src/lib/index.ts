@@ -319,6 +319,7 @@ export interface Config extends Omit<
   | "trivy"
   | "follow_up_pr_group_label"
 > {
+  config_path: string;
   base_working_directory: string;
   working_directory_file: string;
   module_base_directory: string;
@@ -361,9 +362,13 @@ export const generateJSONSchema = (dir: string) => {
   );
 };
 
-export const applyConfigDefaults = (raw: RawConfig): Config => {
+export const applyConfigDefaults = (
+  raw: RawConfig,
+  configPath: string,
+): Config => {
   return {
     ...raw,
+    config_path: configPath,
     base_working_directory: raw.base_working_directory ?? ".",
     working_directory_file: raw.working_directory_file ?? "tfaction.yaml",
     module_base_directory: raw.module_base_directory ?? ".",
@@ -395,12 +400,9 @@ export const applyConfigDefaults = (raw: RawConfig): Config => {
 };
 
 export const getConfig = (): Config => {
-  let configFilePath = process.env.TFACTION_CONFIG;
-  if (!configFilePath) {
-    configFilePath = "tfaction-root.yaml";
-  }
+  let configFilePath = process.env.TFACTION_CONFIG || "tfaction-root.yaml";
   const raw = RawConfig.parse(load(fs.readFileSync(configFilePath, "utf8")));
-  return applyConfigDefaults(raw);
+  return applyConfigDefaults(raw, configFilePath);
 };
 
 export const createWDTargetMap = (
