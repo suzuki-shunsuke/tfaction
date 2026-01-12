@@ -32,9 +32,9 @@ export const main = async () => {
     return;
   }
 
-  const result = await run({
-    target: process.env.TFACTION_TARGET,
-    workingDir: process.env.TFACTION_WORKING_DIR,
+  const result = await run(cfg, {
+    target: lib.getTargetFromEnv(),
+    workingDir: lib.getWorkingDirFromEnv(),
     ghToken: core.getInput("github_token", { required: true }),
     repo: process.env.GITHUB_REPOSITORY,
   });
@@ -49,8 +49,10 @@ export const main = async () => {
   core.summary.addRaw(`Drift Issue: ${result.url}`, true);
 };
 
-const run = async (inputs: Inputs): Promise<Result | undefined> => {
-  const cfg = lib.getConfig();
+const run = async (
+  cfg: lib.Config,
+  inputs: Inputs,
+): Promise<Result | undefined> => {
   if (!cfg.drift_detection) {
     core.info("drift detection is disabled");
     return undefined;
@@ -64,10 +66,11 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
     throw new Error("repo_owner and repo_name are required");
   }
   const tg = await lib.getTargetGroup(cfg, inputs.target, inputs.workingDir);
-  const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
+
+  const configDir = path.dirname(cfg.config_path);
 
   const wdConfig = lib.readTargetConfig(
-    path.join(tg.workingDir, workingDirectoryFile),
+    path.join(configDir, tg.workingDir, cfg.working_directory_file),
   );
 
   if (!lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
@@ -79,9 +82,6 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   if (!inputs.ghToken) {
     throw new Error("GITHUB_TOKEN is required");
   }
-
-  const MyOctokit = Octokit.plugin(paginateGraphQL);
-  const octokit = new MyOctokit({ auth: inputs.ghToken });
 
   let issue = await getIssue(
     tg.target,
@@ -131,7 +131,7 @@ const getIssue = async (
   }
 }`;
 
-  const pageIterator = await octokit.graphql.paginate.iterator(query, {
+  const pageIterator = octokit.graphql.paginate.iterator(query, {
     issuesCursor: null,
     searchQuery: `repo:${repo} "${title}" in:title`,
   });

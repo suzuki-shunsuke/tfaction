@@ -94,10 +94,6 @@ const setupSSHKey = async (sshKey: string): Promise<void> => {
 
 export const main = async () => {
   core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
-  core.exportVariable(
-    "TFACTION_GITHUB_COMMENT_CONFIG",
-    lib.GitHubCommentConfig,
-  );
   const githubToken = core.getInput("github_token", { required: true });
   const sshKey = core.getInput("ssh_key");
 
@@ -115,13 +111,15 @@ export const main = async () => {
   const config = lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
     config,
   );
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
 
   // Set environment variables from target config
   core.exportVariable("TFACTION_WORKING_DIR", targetConfig.working_directory);
@@ -146,13 +144,13 @@ export const main = async () => {
 
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
-    cwd: targetConfig.working_directory,
+    cwd: workingDir,
   });
 
   if (config.aqua?.update_checksum?.enabled) {
     try {
       core.info("updating checksum");
-      await aquaUpdateChecksum.main(executor);
+      await aquaUpdateChecksum.main(executor, workingDir, config);
     } catch (error) {
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {

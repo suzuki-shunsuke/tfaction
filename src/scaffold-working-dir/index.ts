@@ -62,8 +62,8 @@ export const main = async () => {
   const config = lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: false,
       jobType: "scaffold_working_dir",
     },
@@ -76,7 +76,7 @@ export const main = async () => {
   const s3Bucket = targetConfig.s3_bucket_name_tfmigrate_history;
   const gcsBucket = targetConfig.gcs_bucket_name_tfmigrate_history;
   const workingDirectoryFile = config.working_directory_file;
-  const actionPath = path.join(lib.GitHubActionPath, "scaffold-working-dir");
+  const actionPath = lib.GitHubActionPath;
 
   // Create parent directory
   const parentDir = path.dirname(workingDir);
@@ -85,8 +85,8 @@ export const main = async () => {
     core.info(`Created parent directory: ${parentDir}`);
   }
 
-  // Copy template directory if it exists
-  if (templateDir && fs.existsSync(templateDir)) {
+  // Copy template directory
+  if (templateDir) {
     copyDirectory(templateDir, workingDir);
     core.info(`Copied template from ${templateDir} to ${workingDir}`);
   } else if (!fs.existsSync(workingDir)) {
@@ -102,7 +102,10 @@ export const main = async () => {
   // Copy tfmigrate.hcl if S3 bucket is configured
   if (s3Bucket) {
     const tfmigrateHclPath = path.join(workingDir, ".tfmigrate.hcl");
-    fs.copyFileSync(path.join(actionPath, "tfmigrate.hcl"), tfmigrateHclPath);
+    fs.copyFileSync(
+      path.join(actionPath, "install", "tfmigrate.hcl"),
+      tfmigrateHclPath,
+    );
     core.info("Copied tfmigrate.hcl for S3 backend");
   }
 
@@ -110,7 +113,7 @@ export const main = async () => {
   if (gcsBucket) {
     const tfmigrateHclPath = path.join(workingDir, ".tfmigrate.hcl");
     fs.copyFileSync(
-      path.join(actionPath, "tfmigrate-gcs.hcl"),
+      path.join(actionPath, "install", "tfmigrate-gcs.hcl"),
       tfmigrateHclPath,
     );
     core.info("Copied tfmigrate.hcl for GCS backend");

@@ -345,27 +345,22 @@ export const runTerraformPlan = async (
   };
 };
 
-export const main = async (): Promise<void> => {
+export const main = async (
+  targetConfig: getTargetConfig.TargetConfig,
+): Promise<void> => {
   const config = lib.getConfig();
-  const targetConfig = await getTargetConfig.getTargetConfig(
-    {
-      isApply: false,
-      jobType: lib.getJobType(),
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
-    },
-    config,
-  );
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
 
   const githubToken = core.getInput("github_token");
   const executor = await aqua.NewExecutor({
     githubToken,
-    cwd: targetConfig.working_directory,
+    cwd: workingDir,
   });
 
   const inputs: Inputs = {
     githubToken,
-    workingDirectory: targetConfig.working_directory,
+    workingDirectory: workingDir,
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.destroy || false,
     tfCommand: targetConfig.terraform_command || "terraform",
@@ -410,15 +405,14 @@ export const main = async (): Promise<void> => {
   if (planJsonPath) {
     await conftest.run(
       {
-        workingDir: inputs.workingDirectory,
-        target: inputs.target,
-        rootDir: process.env.GITHUB_WORKSPACE ?? "",
+        configDir,
         githubToken,
         plan: true,
-        planJsonPath: planJsonPath,
+        planJsonPath,
         executor,
       },
       config,
+      targetConfig,
     );
   }
 };

@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as lib from "../lib";
+import { TargetConfig } from "../get-target-config";
 import * as aqua from "../aqua";
 import * as path from "path";
 import fs from "fs";
@@ -8,9 +8,8 @@ import tmp from "tmp";
 import { globSync } from "glob";
 
 type Inputs = {
-  workingDir?: string;
-  target?: string;
-  rootDir: string;
+  /** A relative path from github.workspace to the directory where tfaction-root.yaml is located */
+  configDir: string;
   githubToken: string;
   plan: boolean;
   planJsonPath?: string;
@@ -24,6 +23,7 @@ const getConftestPaths = (
 ): string[] => {
   const paths: string[] = [];
   if (policy.tf) {
+    // TODO support .tofu and .tofu.json if tfcommand is tofu
     const tfFiles = globSync(path.join(workingDir, "*.tf"), {
       ignore: ".terraform/**",
     });
@@ -52,10 +52,19 @@ const getConftestPaths = (
   return paths;
 };
 
+/**
+ *
+ * @param policy
+ * @param target
+ * @param configDir A relative path from github.workspace to a directory where tfaction-root.yaml is located
+ * @param workingDir A relative path from configDir to a working directory
+ * @param paths
+ * @returns
+ */
 const buildConftestArgs = (
   policy: lib.ConftestPolicyConfig,
   target: string,
-  rootDir: string,
+  configDir: string,
   workingDir: string,
   paths: string[],
 ): string[] => {
@@ -72,10 +81,13 @@ const buildConftestArgs = (
   ];
 
   if (typeof policy.policy === "string") {
-    args.push("-p", path.join(rootDir, policy.policy));
+    // workingDir => policy
+    // policy.policy configDir => policy
+    // workingDir configDir => workingDir
+    args.push("-p", path.relative(workingDir, policy.policy));
   } else if (policy.policy) {
     for (const p of policy.policy) {
-      args.push("-p", path.join(rootDir, p));
+      args.push("-p", path.relative(workingDir, p));
     }
   }
 
@@ -85,10 +97,10 @@ const buildConftestArgs = (
 
   if (policy.data !== undefined) {
     if (typeof policy.data === "string") {
-      args.push("--data", path.join(rootDir, policy.data));
+      args.push("--data", path.relative(workingDir, policy.data));
     } else {
       for (const p of policy.data) {
-        args.push("--data", path.join(rootDir, p));
+        args.push("--data", path.join(workingDir, p));
       }
     }
   }
@@ -206,29 +218,35 @@ const buildPolicies = (
   return policies;
 };
 
-export const run = async (inputs: Inputs, config: lib.Config) => {
-  const workingDirectoryFile = config.working_directory_file;
+export const run = async (
+  inputs: Inputs,
+  config: lib.Config,
+  targetConfig: TargetConfig,
+) => {
   const executor = inputs.executor;
 
-  const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
-
-  if (!t.group) {
-    throw new Error("target config is not found in target_groups");
-  }
-
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
   const wdConfig = lib.readTargetConfig(
-    path.join(t.workingDir, workingDirectoryFile),
+    path.join(workingDir, config.working_directory_file),
   );
 
-  const policies = buildPolicies(config, t.group, wdConfig, inputs.plan);
+  const policies = buildPolicies(config, targetConfig, wdConfig, inputs.plan);
 
   if (policies.length !== 0) {
     core.startGroup("conftest -v");
     await executor.exec(
       "github-comment",
-      ["exec", "-var", `tfaction_target:${t.target}`, "--", "conftest", "-v"],
+      [
+        "exec",
+        "-var",
+        `tfaction_target:${targetConfig.target}`,
+        "--",
+        "conftest",
+        "-v",
+      ],
       {
-        cwd: t.workingDir,
+        cwd: workingDir,
         env: {
           GITHUB_TOKEN: inputs.githubToken,
           GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
@@ -242,17 +260,17 @@ export const run = async (inputs: Inputs, config: lib.Config) => {
     if (!policy.policy) {
       continue;
     }
-    const paths = getConftestPaths(policy, t.workingDir, inputs.planJsonPath);
+    const paths = getConftestPaths(policy, workingDir, inputs.planJsonPath);
     const args = buildConftestArgs(
       policy,
-      t.target,
-      inputs.rootDir,
-      t.workingDir,
+      targetConfig.target,
+      inputs.configDir,
+      targetConfig.working_directory,
       paths,
     );
     core.startGroup("conftest");
     await executor.exec("github-comment", args, {
-      cwd: t.workingDir,
+      cwd: workingDir,
       env: {
         GITHUB_TOKEN: inputs.githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,

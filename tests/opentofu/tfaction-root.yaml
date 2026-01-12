@@ -9,11 +9,11 @@ renovate_terraform_labels:
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_arm64
 tfcmt_plan_patch: true
 
-terraform_command: terragrunt
+terraform_command: tofu
 
 conftest:
   policies:
-    - policy: tests/conftest/policy
+    - policy: ../conftest/policy
       tf: true
 
 update_local_path_module_caller:
@@ -51,6 +51,4 @@ replace:
       replace: /
 
 target_groups:
-  - working_directory: setup/test/
-    target: setup/test/
-    template_dir: tests/templates/aws
+  - working_directory: bar

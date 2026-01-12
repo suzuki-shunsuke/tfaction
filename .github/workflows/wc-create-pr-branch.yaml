@@ -38,6 +38,10 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+    env:
+      TFACTION_CONFIG: tests/tfaction-root.yaml
+      TFACTION_WORKING_DIR: foo
+      TFACTION_JOB_TYPE: terraform
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -70,11 +74,6 @@ jobs:
         id: setup
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/foo
-          TFACTION_WORKING_DIR: setup/test/foo
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test terraform init
         uses: ./
@@ -83,11 +82,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_JOB_TYPE: terraform
-          TFACTION_CONFIG: setup/test/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/foo
-          TFACTION_WORKING_DIR: setup/test/foo
 
       - name: Test test
         uses: ./
@@ -97,11 +91,6 @@ jobs:
         id: test
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/foo
-          TFACTION_WORKING_DIR: setup/test/foo
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
         uses: ./
@@ -111,11 +100,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/foo
-          TFACTION_WORKING_DIR: setup/test/foo
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test test-module
         uses: ./
@@ -125,8 +109,15 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          TFACTION_TARGET: tests/modules/foo
+          TFACTION_WORKING_DIR: modules/foo
+          TFACTION_TARGET: modules/foo
+
+      - name: Test scaffold-working-dir
+        uses: ./
+        with:
+          action: scaffold-working-dir
+        env:
+          TFACTION_WORKING_DIR: zoo
 
   test-get-target-config:
     timeout-minutes: 15
@@ -136,6 +127,10 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+    env:
+      TFACTION_CONFIG: tests/tfaction-root.yaml
+      TFACTION_JOB_TYPE: terraform
+      TFACTION_WORKING_DIR: aws/foo/dev
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -165,19 +160,12 @@ jobs:
         id: target-config
         with:
           action: get-target-config
-        env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          TFACTION_TARGET: tests/aws/foo/dev
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test get-global-config
         uses: ./
         id: global-config
         with:
           action: get-global-config
-        env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test actions' outputs
         uses: ./
@@ -193,6 +181,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [create-pr-branch]
     permissions: {}
+    env:
+      TFACTION_CONFIG: tests/tfaction-root.yaml
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -231,8 +221,7 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
           action: get-or-create-drift-issue
         env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          TFACTION_TARGET: tests/aws/foo/dev-${{github.run_id}}
+          TFACTION_TARGET: aws/foo/dev-${{github.run_id}}
       - run: git reset HEAD "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Remove a dummy working directory
         run: rm -R "tests/aws/foo/dev-${GITHUB_RUN_ID}"
@@ -243,8 +232,6 @@ jobs:
         with:
           github_token: ${{steps.token.outputs.token}}
           action: create-drift-issues
-        env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
 
       - name: Test env
         run: |
@@ -264,6 +251,10 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      TFACTION_WORKING_DIR: bar
+      TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
+      TFACTION_JOB_TYPE: terraform
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -296,11 +287,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/opentofu/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/opentofu/foo
-          TFACTION_WORKING_DIR: setup/test/opentofu/foo
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test terraform init
         uses: ./
@@ -309,11 +295,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/opentofu/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/opentofu/foo
-          TFACTION_WORKING_DIR: setup/test/opentofu/foo
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test test
         uses: ./
@@ -322,11 +303,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/opentofu/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/opentofu/foo
-          TFACTION_WORKING_DIR: setup/test/opentofu/foo
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
         uses: ./
@@ -335,11 +311,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/opentofu/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/opentofu/foo
-          TFACTION_WORKING_DIR: setup/test/opentofu/foo
-          TFACTION_JOB_TYPE: terraform
 
   test-terragrunt:
     timeout-minutes: 15
@@ -348,6 +319,10 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
+      TFACTION_WORKING_DIR: zoo
+      TFACTION_JOB_TYPE: terraform
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -379,11 +354,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/terragrunt/foo
-          TFACTION_WORKING_DIR: setup/test/terragrunt/foo
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test test
         uses: ./
@@ -392,11 +362,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/terragrunt/foo
-          TFACTION_WORKING_DIR: setup/test/terragrunt/foo
-          TFACTION_JOB_TYPE: terraform
 
       - name: Test plan
         uses: ./
@@ -405,11 +370,6 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
-          TFACTION_TARGET: setup/test/terragrunt/foo
-          TFACTION_WORKING_DIR: setup/test/terragrunt/foo
-          TFACTION_JOB_TYPE: terraform
 
       # TODO: https://github.com/suzuki-shunsuke/tfaction/actions/runs/12452038055/job/34760573474?pr=2138
       # - name: Test test-module
@@ -420,5 +380,5 @@ jobs:
       #   if: |
       #     ! github.event.pull_request.head.repo.fork
       #   env:
-      #     TFACTION_CONFIG: setup/test/terragrunt/tfaction-root.yaml
+      #     TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
       #     TFACTION_TARGET: tests/modules/foo

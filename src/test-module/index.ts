@@ -17,11 +17,27 @@ export const main = async () => {
     core.getInput("securefix_action_app_private_key") || "";
 
   const config = lib.getConfig();
-  const target = process.env.TFACTION_TARGET || "";
+  const configDir = path.dirname(config.config_path);
+  const target = lib.getTargetFromEnv();
+  const wd = lib.getWorkingDirFromEnv();
 
-  if (!target) {
-    throw new Error("TFACTION_TARGET is required");
+  if (!wd && !target) {
+    throw new Error(
+      "Either TFACTION_WORKING_DIR or TFACTION_TARGET is required",
+    );
   }
+
+  const gitRootDir = await lib.getGitRootDir(configDir);
+
+  // github.workspace => working dir
+  const workingDir = path.join(configDir, wd || target);
+
+  const workspace = lib.getGitHubWorkspace();
+
+  const workingDirFromGitRoot = path.relative(
+    gitRootDir,
+    path.join(workspace, workingDir),
+  );
 
   const enableTrivy = config.trivy?.enabled ?? true;
   const enableTflint = config.tflint?.enabled ?? true;
@@ -32,7 +48,7 @@ export const main = async () => {
 
   const executor = await aqua.NewExecutor({
     githubToken,
-    cwd: target,
+    cwd: workingDir,
   });
 
   core.startGroup("terraform init");
@@ -40,10 +56,10 @@ export const main = async () => {
     "github-comment",
     ["exec", "-var", `tfaction_target:${target}`, "--", "terraform", "init"],
     {
-      cwd: target,
+      cwd: workingDir,
       env: {
         GITHUB_TOKEN: githubToken,
-        GH_COMMENT_CONFIG: process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "",
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
     },
   );
@@ -51,7 +67,7 @@ export const main = async () => {
 
   if (enableTrivy) {
     await runTrivy({
-      workingDirectory: target,
+      workingDirectory: workingDir,
       githubToken,
       githubComment: true,
       configPath: "",
@@ -61,7 +77,7 @@ export const main = async () => {
 
   if (enableTflint) {
     await runTflint({
-      workingDirectory: target,
+      workingDirectory: workingDir,
       githubToken,
       githubTokenForTflintInit: githubToken,
       githubComment: true,
@@ -82,7 +98,7 @@ export const main = async () => {
   }
 
   await runTerraformDocs({
-    workingDirectory: target,
+    workingDirectory: workingDir,
     githubToken,
     securefixActionAppId: securefixAppId,
     securefixActionAppPrivateKey: securefixAppPrivateKey,
@@ -92,7 +108,7 @@ export const main = async () => {
 
   let fmtOutput = "";
   await executor.exec(terraformCommand, ["fmt", "-recursive"], {
-    cwd: target,
+    cwd: workingDir,
     listeners: {
       stdout: (data: Buffer) => {
         fmtOutput += data.toString();
@@ -105,13 +121,14 @@ export const main = async () => {
     .split("\n")
     .map((f) => f.trim())
     .filter((f) => f.length > 0)
-    .map((f) => path.join(target, f));
+    .map((f) => path.join(workingDirFromGitRoot, f));
 
   if (formattedFiles.length > 0) {
     core.info(`Formatted ${formattedFiles.length} files, committing...`);
     await createCommit({
       commitMessage: `style: ${terraformCommand} fmt -recursive`,
       githubToken,
+      rootDir: gitRootDir,
       files: new Set(formattedFiles),
       serverRepository: securefixServerRepository,
       appId: securefixAppId,

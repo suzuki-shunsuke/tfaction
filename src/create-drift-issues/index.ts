@@ -35,8 +35,8 @@ export const main = async () => {
   }
 
   const result = await run({
-    target: process.env.TFACTION_TARGET,
-    workingDir: process.env.TFACTION_WORKING_DIR,
+    target: lib.getTargetFromEnv(),
+    workingDir: lib.getWorkingDirFromEnv(),
     ghToken: core.getInput("github_token", { required: true }),
     repo: process.env.GITHUB_REPOSITORY,
   });
@@ -68,9 +68,15 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   if (!repoOwner || !repoName) {
     throw new Error("repo_owner and repo_name are required");
   }
-  const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
+  const workingDirectoryFile = cfg.working_directory_file;
 
-  const files = await lib.listWorkingDirFiles(workingDirectoryFile);
+  const configDir = path.dirname(cfg.config_path);
+  const gitRootDir = await lib.getGitRootDir(configDir);
+  const files = await lib.listWorkingDirFiles(
+    gitRootDir,
+    configDir,
+    workingDirectoryFile,
+  );
   const dirs: string[] = [];
   for (const file of files) {
     dirs.push(path.dirname(file));
@@ -81,8 +87,9 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   const targetWDMap = new Map<string, string>();
   for (const [wd, target] of m) {
     const tg = await lib.getTargetGroup(cfg, target, wd);
-    const workingDirectoryFile = cfg.working_directory_file ?? "tfaction.yaml";
-    const wdConfig = lib.readTargetConfig(path.join(wd, workingDirectoryFile));
+    const wdConfig = lib.readTargetConfig(
+      path.join(configDir, wd, cfg.working_directory_file),
+    );
     if (lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
       targetWDMap.set(target, wd);
     }

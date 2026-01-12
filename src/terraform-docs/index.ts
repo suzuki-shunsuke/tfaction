@@ -47,7 +47,7 @@ const findConfigFile = (
 };
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const pwd = process.env.GITHUB_WORKSPACE ?? process.cwd();
+  const pwd = lib.getGitHubWorkspace();
   const readmePath = path.join(inputs.workingDirectory, "README.md");
   const executor = inputs.executor;
 
@@ -69,16 +69,8 @@ export const run = async (inputs: Inputs): Promise<void> => {
     const opts = config ? ["-c", config] : ["markdown"];
 
     const args = ["exec"];
-    if (process.env.TFACTION_GITHUB_COMMENT_CONFIG) {
-      args.push(
-        "-config",
-        process.env.TFACTION_GITHUB_COMMENT_CONFIG,
-        "-k",
-        "terraform-docs",
-      );
-    }
-    if (process.env.TFACTION_TARGET) {
-      args.push("-var", `tfaction_target:${process.env.TFACTION_TARGET}`);
+    if (lib.getTargetFromEnv()) {
+      args.push("-var", `tfaction_target:${lib.getTargetFromEnv()}`);
     }
     args.push("--", "terraform-docs", ...opts, ".");
 

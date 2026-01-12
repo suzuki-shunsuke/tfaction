@@ -13,8 +13,8 @@ export const main = async () => {
   const config = lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
@@ -33,7 +33,7 @@ export const main = async () => {
 
   // Step 4: Run plan if not skipped
   if (!skipTerraform) {
-    await runPlan();
+    await runPlan(targetConfig);
 
     // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)
     if (jobType === "tfmigrate") {

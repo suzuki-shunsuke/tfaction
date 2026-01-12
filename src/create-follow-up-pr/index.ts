@@ -309,7 +309,6 @@ interface GitHubAPIParams {
   draftPr: boolean;
   target: string;
   mentions: string;
-  configPath: string;
   executor: aqua.Executor;
 }
 
@@ -329,7 +328,6 @@ const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
     draftPr,
     target,
     mentions,
-    configPath,
   } = params;
 
   await commit.createCommit(octokit, {
@@ -391,39 +389,32 @@ const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
 
   const executor = params.executor;
 
-  if (configPath) {
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-config",
-        configPath,
-        "-var",
-        `tfaction_target:${target}`,
-        "-var",
-        `mentions:${mentions}`,
-        "-var",
-        `follow_up_pr_url:${followUpPrUrl}`,
-        "-k",
-        "create-follow-up-pr",
-      ],
-      {
-        env: {
-          GITHUB_TOKEN: githubToken,
-        },
+  await executor.exec(
+    "github-comment",
+    [
+      "post",
+      "-config",
+      lib.GitHubCommentConfig,
+      "-var",
+      `tfaction_target:${target}`,
+      "-var",
+      `mentions:${mentions}`,
+      "-var",
+      `follow_up_pr_url:${followUpPrUrl}`,
+      "-k",
+      "create-follow-up-pr",
+    ],
+    {
+      env: {
+        GITHUB_TOKEN: githubToken,
       },
-    );
-    core.info("Posted comment to the original PR");
-  } else {
-    core.warning(
-      "TFACTION_GITHUB_COMMENT_CONFIG is not set, skipping github-comment",
-    );
-  }
+    },
+  );
+  core.info("Posted comment to the original PR");
 };
 
 interface SkipCreateCommentParams {
   githubToken: string;
-  configPath: string;
   repository: string;
   branch: string;
   prTitle: string;
@@ -441,7 +432,6 @@ const postSkipCreateComment = async (
 ): Promise<void> => {
   const {
     githubToken,
-    configPath,
     repository,
     branch,
     prTitle,
@@ -476,34 +466,27 @@ const postSkipCreateComment = async (
 
   const executor = params.executor;
 
-  if (configPath) {
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-config",
-        configPath,
-        "-k",
-        "skip-create-follow-up-pr",
-        "-var",
-        `tfaction_target:${target}`,
-        "-var",
-        `mentions:${mentions}`,
-        "-var",
-        `opts:${optsString}`,
-      ],
-      {
-        env: {
-          GITHUB_TOKEN: githubToken,
-        },
+  await executor.exec(
+    "github-comment",
+    [
+      "post",
+      "-k",
+      "skip-create-follow-up-pr",
+      "-var",
+      `tfaction_target:${target}`,
+      "-var",
+      `mentions:${mentions}`,
+      "-var",
+      `opts:${optsString}`,
+    ],
+    {
+      env: {
+        GITHUB_TOKEN: githubToken,
+        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
-    );
-    core.info("Posted skip-create-follow-up-pr comment");
-  } else {
-    core.warning(
-      "TFACTION_GITHUB_COMMENT_CONFIG is not set, skipping github-comment",
-    );
-  }
+    },
+  );
+  core.info("Posted skip-create-follow-up-pr comment");
 };
 
 export const main = async () => {
@@ -529,8 +512,8 @@ export const main = async () => {
   // Get target config
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
@@ -538,15 +521,14 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfig.working_directory || process.env.TFACTION_WORKING_DIR || "";
-  const target = targetConfig.target || process.env.TFACTION_TARGET || "";
+    targetConfig.working_directory || lib.getWorkingDirFromEnv() || "";
+  const target = targetConfig.target || lib.getTargetFromEnv() || "";
 
   const prNumber = process.env.CI_INFO_PR_NUMBER || "";
   const tempDir = process.env.CI_INFO_TEMP_DIR || "";
   const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
   const repository = process.env.GITHUB_REPOSITORY ?? "";
   const runId = process.env.GITHUB_RUN_ID ?? "";
-  const configPath = process.env.TFACTION_GITHUB_COMMENT_CONFIG ?? "";
 
   const executor = await aqua.NewExecutor({
     githubToken,
@@ -621,7 +603,6 @@ export const main = async () => {
       draftPr,
       target,
       mentions: prParams.mentions,
-      configPath,
       executor,
     });
   }
@@ -630,7 +611,6 @@ export const main = async () => {
   if (skipCreatePr) {
     await postSkipCreateComment({
       githubToken,
-      configPath,
       repository,
       branch: prParams.branch,
       prTitle: prParams.prTitle,

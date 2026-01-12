@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
+import * as path from "path";
 
 import * as lib from "../lib";
 import * as aqua from "../aqua";
@@ -9,54 +9,7 @@ import { run as runTrivy } from "../trivy";
 import { run as runTflint } from "../tflint";
 import { run as runTerraformDocs } from "../terraform-docs";
 import { create as createCommit } from "../commit";
-
-const fmt = async (
-  tfCommand: string,
-  workingDir: string,
-  executor: aqua.Executor,
-): Promise<exec.ExecOutput> => {
-  if (tfCommand !== "terragrunt") {
-    core.startGroup(`${tfCommand} fmt`);
-    const fmtResult = await executor.getExecOutput(
-      tfCommand,
-      ["fmt", "-recursive"],
-      {
-        cwd: workingDir,
-      },
-    );
-    core.endGroup();
-    return fmtResult;
-  }
-  // https://github.com/suzuki-shunsuke/tfaction/issues/3148
-  // terragrunt v0.88.0: Drop the support `terragrunt fmt`
-  // terragrunt v0.73.0: support `terrgrunt run`
-  const runCode = await executor.exec("terragrunt", ["run", "--help"], {
-    silent: true,
-    ignoreReturnCode: true,
-  });
-  if (runCode === 0) {
-    core.startGroup(`terragrunt run -- fmt`);
-    const fmtResult = await executor.getExecOutput(
-      tfCommand,
-      ["run", "--", "fmt", "-recursive"],
-      {
-        cwd: workingDir,
-      },
-    );
-    core.endGroup();
-    return fmtResult;
-  }
-  core.startGroup(`terragrunt fmt`);
-  const fmtResult = await executor.getExecOutput(
-    tfCommand,
-    ["fmt", "-recursive"],
-    {
-      cwd: workingDir,
-    },
-  );
-  core.endGroup();
-  return fmtResult;
-};
+import { fmt } from "./fmt";
 
 export const main = async () => {
   const config = lib.getConfig();
@@ -68,15 +21,16 @@ export const main = async () => {
   // Step 1: Get target config
   const targetConfig = await getTargetConfig(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
     config,
   );
 
-  const workingDir = targetConfig.working_directory;
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
   const destroy = targetConfig.destroy ?? false;
   const tfCommand = targetConfig.terraform_command;
   const target = targetConfig.target;
@@ -89,14 +43,13 @@ export const main = async () => {
 
   await runConftest(
     {
-      workingDir,
-      target,
-      rootDir: process.env.GITHUB_WORKSPACE ?? "",
+      configDir: path.dirname(config.config_path),
       githubToken,
       plan: false,
       executor,
     },
     config,
+    targetConfig,
   );
 
   if (!destroy) {

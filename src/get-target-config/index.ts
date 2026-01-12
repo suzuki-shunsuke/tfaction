@@ -50,6 +50,7 @@ export const getTargetConfig = async (
   config: lib.Config,
 ): Promise<TargetConfig> => {
   const workingDirectoryFile = config.working_directory_file;
+  const configDir = path.dirname(config.config_path);
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
   const workingDir = t.workingDir;
@@ -57,7 +58,7 @@ export const getTargetConfig = async (
   const targetGroup = t.group;
 
   const result: TargetConfig = {
-    working_directory: workingDir,
+    working_directory: t.workingDir,
     target: target,
     providers_lock_opts:
       "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
@@ -110,7 +111,7 @@ export const getTargetConfig = async (
     );
 
     const wdConfig = lib.readTargetConfig(
-      path.join(workingDir, workingDirectoryFile),
+      path.join(configDir, workingDir, workingDirectoryFile),
     );
     const jobConfig = lib.getJobConfig(
       wdConfig,
@@ -216,8 +217,8 @@ export const getTargetConfig = async (
 export const main = async () => {
   const result = await run(
     {
-      target: process.env.TFACTION_TARGET,
-      workingDir: process.env.TFACTION_WORKING_DIR,
+      target: lib.getTargetFromEnv(),
+      workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },

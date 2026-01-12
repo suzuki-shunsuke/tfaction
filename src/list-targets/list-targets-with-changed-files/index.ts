@@ -5,7 +5,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../../lib";
 import * as aqua from "../../aqua";
-import { listFiles } from "./list_files";
 import { list as listModuleCallers } from "./list-module-callers";
 
 type TargetConfig = {
@@ -293,17 +292,6 @@ export const run = async (input: Input): Promise<Result> => {
   const terraformTargetObjs = new Array<TargetConfig>();
   const tfmigrateObjs = new Array<TargetConfig>();
 
-  handleLabels(
-    input.labels,
-    isApply,
-    terraformTargets,
-    targetWDMap,
-    config,
-    terraformTargetObjs,
-    tfmigrateObjs,
-    tfmigrates,
-  );
-
   const moduleData = prepareModuleData(input.moduleCallers, input.moduleFiles);
   const { changedWorkingDirs, changedModules } = processChangedFiles(
     input.changedFiles,
@@ -352,7 +340,6 @@ export const run = async (input: Input): Promise<Result> => {
 type Input = {
   config: lib.Config;
   isApply: boolean;
-  labels: string[];
   changedFiles: string[];
   configFiles: string[];
   moduleFiles: string[];
@@ -390,83 +377,6 @@ const getFollowupTarget = (input: Input): string => {
   return matchResult ? matchResult[1] : "";
 };
 
-const handleLabels = (
-  labels: string[],
-  isApply: boolean,
-  terraformTargets: Set<string>,
-  targetWDMap: Map<string, string>,
-  config: lib.Config,
-  terraformTargetObjs: Array<TargetConfig>,
-  tfmigrateObjs: Array<TargetConfig>,
-  tfmigrates: Set<string>,
-) => {
-  const skips = new Set<string>();
-  const targetPrefix = config?.label_prefixes?.target || "target:";
-  const skipPrefix = config?.label_prefixes?.skip || "skip:";
-  const tfmigratePrefix = config?.label_prefixes?.tfmigrate || "tfmigrate:";
-  for (const label of labels) {
-    if (label == "") {
-      continue;
-    }
-    if (label.startsWith(targetPrefix)) {
-      const target = label.slice(targetPrefix.length);
-      if (!terraformTargets.has(target)) {
-        terraformTargets.add(target);
-        const wd = targetWDMap.get(target);
-        if (wd === undefined) {
-          throw new Error(
-            `No working directory is found for the target ${target}`,
-          );
-        }
-        const tg = lib.getTargetFromTargetGroupsByWorkingDir(
-          config.target_groups,
-          wd,
-        );
-        const obj = getTargetConfigByTarget(
-          config.target_groups,
-          wd,
-          target,
-          isApply,
-          "terraform",
-        );
-        if (obj === undefined) {
-          throw new Error(`No target config is found for the target ${target}`);
-        }
-        terraformTargetObjs.push(obj);
-      }
-      continue;
-    }
-    if (label.startsWith(tfmigratePrefix)) {
-      const target = label.slice(tfmigratePrefix.length);
-      if (!tfmigrates.has(target)) {
-        tfmigrates.add(target);
-        const wd = targetWDMap.get(target);
-        if (wd === undefined) {
-          throw new Error(
-            `No working directory is found for the target ${target}`,
-          );
-        }
-        const obj = getTargetConfigByTarget(
-          config.target_groups,
-          wd,
-          target,
-          isApply,
-          "tfmigrate",
-        );
-        if (obj === undefined) {
-          throw new Error(`No target config is found for the target ${target}`);
-        }
-        tfmigrateObjs.push(obj);
-      }
-      continue;
-    }
-    if (label.startsWith(skipPrefix)) {
-      skips.add(label.slice(skipPrefix.length));
-      continue;
-    }
-  }
-};
-
 export const main = async (executor: aqua.Executor) => {
   // The path to ci-info's pr.json.
   if (!process.env.CI_INFO_TEMP_DIR) {
@@ -476,17 +386,18 @@ export const main = async (executor: aqua.Executor) => {
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
   const cfg = lib.getConfig();
 
-  const baseWorkingDirectory = cfg.base_working_directory;
-  const workingDirectoryFile = cfg.working_directory_file;
-
-  const configFiles = await listFiles(
-    baseWorkingDirectory,
-    workingDirectoryFile,
+  const configDir = path.dirname(cfg.config_path);
+  const gitRootDir = await lib.getGitRootDir(configDir);
+  const configFiles = await lib.listWorkingDirFiles(
+    gitRootDir,
+    configDir,
+    cfg.working_directory_file,
   );
-
-  const moduleBaseDirectory = cfg.module_base_directory;
-  const moduleFile = cfg.module_file;
-  const modules = await listFiles(moduleBaseDirectory, moduleFile);
+  const modules = await lib.listWorkingDirFiles(
+    gitRootDir,
+    configDir,
+    cfg.module_file,
+  );
 
   let moduleCallers: any = null;
   if (cfg.update_local_path_module_caller?.enabled) {
@@ -494,9 +405,6 @@ export const main = async (executor: aqua.Executor) => {
   }
 
   const result = await run({
-    labels: fs
-      .readFileSync(`${process.env.CI_INFO_TEMP_DIR}/labels.txt`, "utf8")
-      .split("\n"),
     config: cfg,
     isApply: lib.getIsApply(),
     changedFiles: fs

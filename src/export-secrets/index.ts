@@ -56,8 +56,8 @@ export const main = async () => {
     `The list of secret names passed to the action: ${Array.from(secrets.keys()).join(", ")}`,
   );
 
-  const targetS = lib.getTarget();
-  const workingDir = lib.getWorkingDir();
+  const targetS = lib.getTargetFromEnv();
+  const workingDir = lib.getWorkingDirFromEnv();
   const jobType = lib.getJobType();
   const isApply = lib.getIsApply();
 

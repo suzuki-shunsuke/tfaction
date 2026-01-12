@@ -133,10 +133,6 @@ outputs:
     description: Terraform command. By default, the value is "terraform". If you use OpenTofu, the value is "tofu"
 
   # get-global-config
-  base_working_directory:
-    description: base directory of working directories
-  module_base_directory:
-    description: base directory of Modules
   working_directory_file:
     description: file name which locates on working directories
   module_file:
