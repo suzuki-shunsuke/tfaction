@@ -50,9 +50,10 @@ export const getTargetConfig = async (
   config: lib.Config,
 ): Promise<TargetConfig> => {
   const workingDirectoryFile = config.working_directory_file;
+  const configDir = path.dirname(config.config_path);
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
-  const workingDir = path.join(path.dirname(config.config_path), t.workingDir);
+  const workingDir = path.join(configDir, t.workingDir);
   const target = t.target;
   const targetGroup = t.group;
 
@@ -67,6 +68,10 @@ export const getTargetConfig = async (
     terraform_command: config.terraform_command,
     template_dir: targetGroup?.template_dir,
   };
+
+  if (result.template_dir) {
+    result.template_dir = path.join(configDir, result.template_dir);
+  }
 
   if (inputs.jobType === "scaffold_working_dir") {
     const m = lib.setOutputs(
