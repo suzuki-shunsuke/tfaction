@@ -30,7 +30,8 @@ jobs:
       contents: write
       pull-requests: write
 
-  test-terraform:
+  test-normal:
+    name: Test Normal (${{matrix.env.key}})
     timeout-minutes: 15
     runs-on: ubuntu-24.04
     needs: [create-pr-branch]
@@ -38,10 +39,26 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - key: terraform
+            TFACTION_CONFIG: tests/tfaction-root.yaml
+            TFACTION_WORKING_DIR: foo
+            TFACTION_JOB_TYPE: terraform
+          - key: opentofu
+            TFACTION_WORKING_DIR: bar
+            TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
+            TFACTION_JOB_TYPE: terraform
+          - key: terragrunt
+            TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
+            TFACTION_WORKING_DIR: zoo
+            TFACTION_JOB_TYPE: terraform
     env:
-      TFACTION_CONFIG: tests/tfaction-root.yaml
-      TFACTION_WORKING_DIR: foo
-      TFACTION_JOB_TYPE: terraform
+      TFACTION_CONFIG: ${{matrix.env.TFACTION_CONFIG}}
+      TFACTION_WORKING_DIR: ${{matrix.env.TFACTION_WORKING_DIR}}
+      TFACTION_JOB_TYPE: ${{matrix.env.TFACTION_JOB_TYPE}}
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -101,25 +118,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
 
-      - name: Test test-module
-        uses: ./
-        with:
-          action: test-module
-          github_token: ${{steps.token.outputs.token}}
-        if: |
-          ! github.event.pull_request.head.repo.fork
-        env:
-          TFACTION_WORKING_DIR: modules/foo
-          TFACTION_TARGET: modules/foo
-
-      - name: Test scaffold-working-dir
-        uses: ./
-        with:
-          action: scaffold-working-dir
-        env:
-          TFACTION_WORKING_DIR: zoo
-
-  test-get-target-config:
+  test-sub:
     timeout-minutes: 15
     runs-on: ubuntu-24.04
     needs: [create-pr-branch]
@@ -129,8 +128,8 @@ jobs:
       issues: write
     env:
       TFACTION_CONFIG: tests/tfaction-root.yaml
+      TFACTION_WORKING_DIR: foo
       TFACTION_JOB_TYPE: terraform
-      TFACTION_WORKING_DIR: aws/foo/dev
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -155,17 +154,43 @@ jobs:
           permission-pull-requests: write
           permission-contents: write
 
+      - name: Test test-module
+        uses: ./
+        with:
+          action: test-module
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+        env:
+          TFACTION_WORKING_DIR: modules/foo
+          TFACTION_TARGET: modules/foo
+
+      - name: Test scaffold-working-dir
+        uses: ./
+        with:
+          action: scaffold-working-dir
+        env:
+          TFACTION_WORKING_DIR: zoo
+
       - name: Test get-target-config
         uses: ./
         id: target-config
         with:
           action: get-target-config
+        env:
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_JOB_TYPE: terraform
+          TFACTION_WORKING_DIR: aws/foo/dev
 
       - name: Test get-global-config
         uses: ./
         id: global-config
         with:
           action: get-global-config
+        env:
+          TFACTION_CONFIG: tests/tfaction-root.yaml
+          TFACTION_JOB_TYPE: terraform
+          TFACTION_WORKING_DIR: aws/foo/dev
 
       - name: Test actions' outputs
         uses: ./
@@ -243,142 +268,3 @@ jobs:
             echo "::error:: TFACTION_DRIFT_ISSUE_STATE is not expected" >&2
             exit 1
           fi
-
-  test-opentofu:
-    timeout-minutes: 15
-    runs-on: ubuntu-24.04
-    needs: [create-pr-branch]
-    permissions:
-      contents: write
-      pull-requests: write
-    env:
-      TFACTION_WORKING_DIR: bar
-      TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
-      TFACTION_JOB_TYPE: terraform
-    steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-        with:
-          persist-credentials: false
-      - run: gh pr checkout "$PR"
-        if: inputs.pr != ''
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-          PR: ${{inputs.pr}}
-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
-        with:
-          path: dist
-          name: js
-      - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
-        run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
-      - id: token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        with:
-          app-id: ${{secrets.gh_app_id}}
-          private-key: ${{secrets.gh_app_private_key}}
-          permission-pull-requests: write
-          permission-contents: write
-
-      - name: Test setup
-        id: setup
-        uses: ./
-        with:
-          action: setup
-          github_token: ${{steps.token.outputs.token}}
-        if: |
-          ! github.event.pull_request.head.repo.fork
-
-      - name: Test terraform init
-        uses: ./
-        with:
-          action: terraform-init
-          github_token: ${{steps.token.outputs.token}}
-        if: |
-          ! github.event.pull_request.head.repo.fork
-
-      - name: Test test
-        uses: ./
-        with:
-          action: test
-          github_token: ${{steps.token.outputs.token}}
-        if: |
-          ! github.event.pull_request.head.repo.fork
-
-      - name: Test plan
-        uses: ./
-        with:
-          action: plan
-          github_token: ${{steps.token.outputs.token}}
-        if: |
-          ! github.event.pull_request.head.repo.fork
-
-  test-terragrunt:
-    timeout-minutes: 15
-    runs-on: ubuntu-24.04
-    needs: [create-pr-branch]
-    permissions:
-      contents: write
-      pull-requests: write
-    env:
-      TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
-      TFACTION_WORKING_DIR: zoo
-      TFACTION_JOB_TYPE: terraform
-    steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-        with:
-          persist-credentials: false
-      - run: gh pr checkout "$PR"
-        if: inputs.pr != ''
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-          PR: ${{inputs.pr}}
-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
-        with:
-          path: dist
-          name: js
-      - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
-        run: |
-          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
-      - id: token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        with:
-          app-id: ${{secrets.gh_app_id}}
-          private-key: ${{secrets.gh_app_private_key}}
-          permission-pull-requests: write
-          permission-contents: write
-
-      - name: Test setup
-        uses: ./
-        with:
-          action: setup
-          github_token: ${{steps.token.outputs.token}}
-        if: |
-          ! github.event.pull_request.head.repo.fork
-
-      - name: Test test
-        uses: ./
-        with:
-          action: test
-          github_token: ${{steps.token.outputs.token}}
-        if: |
-          ! github.event.pull_request.head.repo.fork
-
-      - name: Test plan
-        uses: ./
-        with:
-          action: plan
-          github_token: ${{steps.token.outputs.token}}
-        if: |
-          ! github.event.pull_request.head.repo.fork
-
-      # TODO: https://github.com/suzuki-shunsuke/tfaction/actions/runs/12452038055/job/34760573474?pr=2138
-      # - name: Test test-module
-      #   uses: ./
-      #   with:
-      #     action: test-module
-      #     github_token: ${{steps.token.outputs.token}}
-      #   if: |
-      #     ! github.event.pull_request.head.repo.fork
-      #   env:
-      #     TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
-      #     TFACTION_TARGET: tests/modules/foo
