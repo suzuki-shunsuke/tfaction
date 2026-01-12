@@ -8,7 +8,7 @@ type Inputs = {
   githubToken: string;
   /** A relative path from github.workspace to Git Root Directory */
   rootDir?: string;
-  /** Relative pathes from Git Root Directory */
+  /** Relative paths from Git Root Directory */
   files: Set<string>;
   serverRepository: string;
   appId: string;
