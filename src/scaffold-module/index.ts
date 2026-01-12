@@ -95,7 +95,7 @@ export const main = async () => {
   core.info(`Copied template from ${templateDir} to ${modulePath}`);
 
   // Create tfaction_module.yaml
-  fs.writeFileSync(path.join(modulePath, "tfaction_module.yaml"), "{}");
+  fs.writeFileSync(path.join(modulePath, "tfaction_module.yaml"), "{}\n");
   core.info("Created tfaction_module.yaml");
 
   // Get module name and path for replacements
