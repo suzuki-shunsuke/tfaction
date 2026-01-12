@@ -71,7 +71,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -85,7 +85,7 @@ jobs:
           ! github.event.pull_request.head.repo.fork
         env:
           TFACTION_JOB_TYPE: terraform
-          TFACTION_CONFIG: tests/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
 
@@ -98,7 +98,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -112,7 +112,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -133,7 +133,7 @@ jobs:
         with:
           action: scaffold-working-dir
         env:
-          TFACTION_CONFIG: tests/test/tfaction-root.yaml
+          TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_WORKING_DIR: zoo
           TFACTION_TARGET: ""
 
@@ -306,7 +306,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/opentofu/tfaction-root.yaml
+          TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -319,7 +319,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/opentofu/tfaction-root.yaml
+          TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -332,7 +332,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/opentofu/tfaction-root.yaml
+          TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -345,7 +345,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/opentofu/tfaction-root.yaml
+          TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -389,7 +389,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/terragrunt/tfaction-root.yaml
+          TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -402,7 +402,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/terragrunt/tfaction-root.yaml
+          TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -415,7 +415,7 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_CONFIG: tests/test/terragrunt/tfaction-root.yaml
+          TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
           TFACTION_TARGET: foo
           TFACTION_WORKING_DIR: foo
           TFACTION_JOB_TYPE: terraform
@@ -429,5 +429,5 @@ jobs:
       #   if: |
       #     ! github.event.pull_request.head.repo.fork
       #   env:
-      #     TFACTION_CONFIG: tests/test/terragrunt/tfaction-root.yaml
+      #     TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
       #     TFACTION_TARGET: tests/modules/foo
