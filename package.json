@@ -10,7 +10,7 @@
     "@actions/exec": "^2.0.0",
     "@actions/github": "7.0.0",
     "@actions/tool-cache": "^3.0.0",
-    "@aws-sdk/client-secrets-manager": "3.965.0",
+    "@aws-sdk/client-secrets-manager": "3.966.0",
     "@csm-actions/securefix-action": "npm:@jsr/csm-actions__securefix-action@^0.1.0",
     "@csm-actions/update-branch-action": "npm:@jsr/csm-actions__update-branch-action@^0.0.2",
     "@octokit/core": "^7.0.0",
