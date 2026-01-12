@@ -251,7 +251,7 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      TFACTION_WORKING_DIR: foo
+      TFACTION_WORKING_DIR: bar
       TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
       TFACTION_JOB_TYPE: terraform
     steps:
@@ -320,7 +320,7 @@ jobs:
       pull-requests: write
     env:
       TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
-      TFACTION_WORKING_DIR: foo
+      TFACTION_WORKING_DIR: zoo
       TFACTION_JOB_TYPE: terraform
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
