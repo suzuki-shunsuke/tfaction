@@ -135,6 +135,7 @@ jobs:
         env:
           TFACTION_CONFIG: setup/test/tfaction-root.yaml
           TFACTION_WORKING_DIR: setup/test/zoo
+          TFACTION_TARGET: ""
 
   test-get-target-config:
     timeout-minutes: 15
