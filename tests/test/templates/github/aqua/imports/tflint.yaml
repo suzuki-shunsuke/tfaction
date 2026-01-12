@@ -1,0 +1,2 @@
+packages:
+  - name: terraform-linters/tflint@v0.48.0
