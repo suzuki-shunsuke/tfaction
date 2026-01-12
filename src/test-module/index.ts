@@ -48,7 +48,7 @@ export const main = async () => {
 
   const executor = await aqua.NewExecutor({
     githubToken,
-    cwd: target,
+    cwd: workingDir,
   });
 
   core.startGroup("terraform init");
