@@ -8,7 +8,7 @@ export const main = async () => {
       expected: {
         working_directory: "tests/aws/foo/dev",
         providers_lock_opts: "-platform=linux_amd64 -platform=darwin_amd64",
-        template_dir: "tests/templates/aws",
+        template_dir: "tests/templates/github",
         enable_tflint: "true",
         enable_trivy: "true",
         tflint_fix: "true",

@@ -137,7 +137,7 @@ test("scaffold_working_dir", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "aws/",
+              working_directory: "aws",
               template_dir: "templates/github",
             },
           ],
