@@ -170,6 +170,7 @@ export const main = async (): Promise<void> => {
           `cat ${applyOutput} && exit ${exitCode}`,
         ],
         {
+          cwd: workingDir,
           ignoreReturnCode: true,
           env: {
             GITHUB_TOKEN: githubToken,

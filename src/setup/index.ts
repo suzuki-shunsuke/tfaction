@@ -137,8 +137,10 @@ export const main = async () => {
     }
   }
 
+  const isPR = isPullRequestEvent();
+
   // 5. Add label to PR (only for PRs)
-  if (isPullRequestEvent()) {
+  if (isPR) {
     await addLabelToPR(octokit, targetConfig.target);
   }
 
@@ -147,7 +149,7 @@ export const main = async () => {
     cwd: workingDir,
   });
 
-  if (config.aqua?.update_checksum?.enabled) {
+  if (isPR && config.aqua?.update_checksum?.enabled) {
     try {
       core.info("updating checksum");
       await aquaUpdateChecksum.main(executor, workingDir, config);
