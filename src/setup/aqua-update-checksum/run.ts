@@ -1,12 +1,10 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import * as github from "@actions/github";
-import * as securefix from "@csm-actions/securefix-action";
-import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
+import * as commit from "../../commit";
 
 type Inputs = {
   githubToken: string;
@@ -112,52 +110,6 @@ const checkIfChanged = async (
 
 /**
  *
- * @param inputs
- * @param checksumFile a relative path from git root directory
- * @param cfg
- * @returns
- */
-const createCommitIfNeeded = async (
-  inputs: Inputs,
-  checksumFile: string,
-  cfg: lib.Config,
-): Promise<void> => {
-  const commitMessage = `chore(aqua): update ${checksumFile}`;
-
-  if (cfg?.securefix_action?.server_repository) {
-    if (!inputs.securefixActionAppId || !inputs.securefixActionAppPrivateKey) {
-      throw new Error(
-        "app_id and app_private_key are required when securefix_action_server_repository is set",
-      );
-    }
-
-    await securefix.request({
-      appId: inputs.securefixActionAppId,
-      privateKey: inputs.securefixActionAppPrivateKey,
-      serverRepository: cfg.securefix_action.server_repository,
-      files: new Set([checksumFile]),
-      commitMessage: commitMessage,
-      workspace: process.env.GITHUB_WORKSPACE ?? "",
-    });
-    return;
-  }
-
-  const octokit = github.getOctokit(inputs.githubToken);
-  await commit.createCommit(octokit, {
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    branch: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || "",
-    message: commitMessage,
-    files: [checksumFile],
-    deleteIfNotExist: true,
-    logger: {
-      info: core.info,
-    },
-  });
-};
-
-/**
- *
  * @param executor
  * @param workingDir a relative path from github.workspace
  * @param cfg
@@ -200,6 +152,14 @@ export const main = async (
     path.join(workspace, checksumFileOutput),
   );
 
-  await createCommitIfNeeded(inputs, checksumFileFromRootDir, cfg);
+  await commit.create({
+    commitMessage: `chore(aqua): update ${checksumFile}`,
+    githubToken: inputs.githubToken,
+    rootDir: gitRootDir,
+    files: new Set([checksumFileFromRootDir]),
+    serverRepository: cfg?.securefix_action?.server_repository ?? "",
+    appId: inputs.securefixActionAppId,
+    appPrivateKey: inputs.securefixActionAppPrivateKey,
+  });
   throw new Error(`${checksumFileOutput} is updated.`);
 };
