@@ -509,15 +509,18 @@ export const setValues = (name: string, values: Array<unknown>): void => {
   }
 };
 
-export const setOutputs = (
+export const setOutputs = <T extends object>(
   keys: Array<string>,
-  objs: Array<Record<string, unknown> | undefined>,
+  objs: Array<T | undefined>,
 ): Map<string, string> => {
   const outputs = new Map<string, string>();
   for (const key of keys) {
     for (const obj of objs) {
-      if (obj != undefined && obj != null && obj[key] != undefined) {
-        outputs.set(key, obj[key] as string);
+      if (obj != undefined && obj != null && key in obj) {
+        const value = (obj as Record<string, unknown>)[key];
+        if (value != undefined) {
+          outputs.set(key, value as string);
+        }
         break;
       }
     }
