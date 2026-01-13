@@ -8,7 +8,8 @@ export const fmt = async (
   executor: aqua.Executor,
 ): Promise<exec.ExecOutput> => {
   const terragruntRunAvailable =
-    tfCommand === "terragrunt" && (await aqua.checkTerrgruntRun(executor));
+    tfCommand === "terragrunt" &&
+    (await aqua.checkTerrgruntRun(executor, workingDir));
 
   core.startGroup(
     terragruntRunAvailable ? `${tfCommand} run -- fmt` : `${tfCommand} fmt`,

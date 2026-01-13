@@ -48,7 +48,8 @@ export const main = async () => {
   });
 
   const terragruntRunAvailable =
-    tfCommand === "terragrunt" && (await aqua.checkTerrgruntRun(executor));
+    tfCommand === "terragrunt" &&
+    (await aqua.checkTerrgruntRun(executor, workingDir));
 
   if (!isPullRequestEvent()) {
     // Non-PR: just run init with github-comment
