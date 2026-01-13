@@ -1,14 +1,11 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
-import * as github from "@actions/github";
-import * as securefix from "@csm-actions/securefix-action";
-import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
 
 import * as lib from "../lib";
 import * as aqua from "../aqua";
 import * as getTargetConfig from "../get-target-config";
+import * as commit from "../commit";
 
 export const main = async () => {
   const githubToken = core.getInput("github_token") || "";
@@ -117,43 +114,13 @@ export const main = async () => {
   // Commit the changes
   const commitMessage = "chore: import resources";
 
-  if (securefixServerRepository) {
-    if (!securefixAppId || !securefixAppPrivateKey) {
-      throw new Error(
-        "securefix_action_app_id and securefix_action_app_private_key are required when securefix_action_server_repository is set",
-      );
-    }
-
-    await securefix.request({
-      appId: securefixAppId,
-      privateKey: securefixAppPrivateKey,
-      serverRepository: securefixServerRepository,
-      branch,
-      files: new Set([targetFilePath]),
-      commitMessage,
-      workspace: process.env.GITHUB_WORKSPACE ?? "",
-    });
-    core.info("Created commit via securefix");
-  } else {
-    if (!githubToken) {
-      throw new Error(
-        "github_token is required when securefix_action_server_repository is not set",
-      );
-    }
-
-    const octokit = github.getOctokit(githubToken);
-
-    await commit.createCommit(octokit, {
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      branch,
-      message: commitMessage,
-      files: [targetFilePath],
-      deleteIfNotExist: true,
-      logger: {
-        info: core.info,
-      },
-    });
-    core.info(`Created commit on branch ${branch}`);
-  }
+  await commit.create({
+    commitMessage,
+    githubToken,
+    files: new Set([targetFilePath]),
+    serverRepository: securefixServerRepository ?? "",
+    appId: securefixAppId,
+    appPrivateKey: securefixAppPrivateKey,
+    branch,
+  });
 };
