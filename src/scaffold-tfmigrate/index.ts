@@ -1,8 +1,6 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
-import * as securefix from "@csm-actions/securefix-action";
-import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
 import Handlebars from "handlebars";
@@ -10,6 +8,7 @@ import Handlebars from "handlebars";
 import * as lib from "../lib";
 import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
+import * as commit from "../commit";
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 
@@ -132,160 +131,6 @@ const createMigrationFile = (
 
   fs.writeFileSync(migrationFilePath, content);
   core.info(`Created migration file: ${migrationFilePath}`);
-};
-
-interface SecurefixParams {
-  appId: string;
-  privateKey: string;
-  serverRepository: string;
-  branch: string;
-  files: string[];
-  commitMessage: string;
-  skipCreatePr: boolean;
-  prTitle: string;
-  prBody: string;
-  baseBranch: string;
-  label: string;
-  assignee: string;
-  draftPr: boolean;
-  prComment: string;
-}
-
-const createViaSecurefix = async (params: SecurefixParams): Promise<void> => {
-  const {
-    appId,
-    privateKey,
-    serverRepository,
-    branch,
-    files,
-    commitMessage,
-    skipCreatePr,
-    prTitle,
-    prBody,
-    baseBranch,
-    label,
-    assignee,
-    draftPr,
-    prComment,
-  } = params;
-
-  if (skipCreatePr) {
-    await securefix.request({
-      appId,
-      privateKey,
-      serverRepository,
-      branch,
-      files: new Set(files),
-      commitMessage,
-      workspace: process.env.GITHUB_WORKSPACE ?? "",
-    });
-    core.info("Created commit via securefix");
-  } else {
-    await securefix.request({
-      appId,
-      privateKey,
-      serverRepository,
-      branch,
-      files: new Set(files),
-      commitMessage,
-      workspace: process.env.GITHUB_WORKSPACE ?? "",
-      pr: {
-        title: prTitle,
-        body: prBody,
-        base: baseBranch,
-        labels: label ? [label] : undefined,
-        assignees: assignee ? [assignee] : undefined,
-        draft: draftPr,
-        comment: prComment,
-      },
-    });
-    core.info("Created PR via securefix");
-  }
-};
-
-interface GitHubAPIParams {
-  octokit: Octokit;
-  githubToken: string;
-  branch: string;
-  files: string[];
-  commitMessage: string;
-  skipCreatePr: boolean;
-  prTitle: string;
-  prBody: string;
-  label: string;
-  assignee: string;
-  draftPr: boolean;
-}
-
-const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
-  const {
-    octokit,
-    githubToken,
-    branch,
-    files,
-    commitMessage,
-    skipCreatePr,
-    prTitle,
-    prBody,
-    label,
-    assignee,
-    draftPr,
-  } = params;
-
-  // Push commit using GitHub API
-  await commit.createCommit(octokit, {
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    branch: branch,
-    message: commitMessage,
-    files: files,
-    logger: {
-      info: core.info,
-    },
-  });
-  core.info(`Created commit on branch ${branch}`);
-
-  if (skipCreatePr) {
-    return;
-  }
-
-  const { data: repoData } = await octokit.rest.repos.get({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-  });
-  const baseBranch = repoData.default_branch;
-
-  const { data: pr } = await octokit.rest.pulls.create({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    head: branch,
-    base: baseBranch,
-    title: prTitle,
-    body: prBody,
-    draft: draftPr,
-  });
-
-  core.info(`Created PR: ${pr.html_url}`);
-
-  if (label) {
-    await octokit.rest.issues.addLabels({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      labels: [label],
-    });
-    core.info(`Added label ${label} to PR #${pr.number}`);
-  }
-
-  if (assignee) {
-    await octokit.rest.issues.addAssignees({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      assignees: [assignee],
-    });
-    core.info(`Added assignee ${assignee} to PR #${pr.number}`);
-  }
 };
 
 const outputSkipCreatePrGuide = (
@@ -450,44 +295,27 @@ Please fix the generated migration file.`;
   const prComment = `@${actor} This pull request was created by [GitHub Actions](${serverUrl}/${repository}/actions/runs/${runId}) you ran.
 Please handle this pull request.`;
 
-  if (securefixServerRepository) {
-    if (!securefixAppId || !securefixAppPrivateKey) {
-      throw new Error(
-        "securefix_action_app_id and securefix_action_app_private_key are required when securefix_action.server_repository is set",
-      );
-    }
-
-    await createViaSecurefix({
-      appId: securefixAppId,
-      privateKey: securefixAppPrivateKey,
-      serverRepository: securefixServerRepository,
-      branch,
-      files,
-      commitMessage,
-      skipCreatePr: skipCreatePr || !!prNumber,
-      prTitle,
-      prBody,
-      baseBranch: securefixPRBaseBranch,
-      label,
-      assignee: actor,
-      draftPr,
-      prComment,
-    });
-  } else {
-    await createViaGitHubAPI({
-      octokit,
-      githubToken,
-      branch,
-      files,
-      commitMessage,
-      skipCreatePr: skipCreatePr || !!prNumber,
-      prTitle,
-      prBody,
-      label,
-      assignee: actor,
-      draftPr,
-    });
-  }
+  const shouldSkipPr = skipCreatePr || !!prNumber;
+  await commit.create({
+    commitMessage,
+    githubToken,
+    files: new Set(files),
+    serverRepository: securefixServerRepository ?? "",
+    appId: securefixAppId,
+    appPrivateKey: securefixAppPrivateKey,
+    branch,
+    pr: shouldSkipPr
+      ? undefined
+      : {
+          title: prTitle,
+          body: prBody,
+          base: securefixPRBaseBranch,
+          labels: label ? [label] : undefined,
+          assignees: actor ? [actor] : undefined,
+          draft: draftPr,
+          comment: prComment,
+        },
+  });
 
   // Handle skip_create_pr case
   if (skipCreatePr && !prNumber) {
