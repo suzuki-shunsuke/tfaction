@@ -251,3 +251,16 @@ const getBinPath = (isWindows: boolean): string => {
   const base = aquaRoot || join(xdgDataHome, "aquaproj-aqua");
   return join(base, "bin");
 };
+
+export const checkTerrgruntRun = async (
+  executor: Executor,
+): Promise<boolean> => {
+  // https://github.com/suzuki-shunsuke/tfaction/issues/3148
+  // terragrunt v0.88.0: Drop the support `terragrunt fmt`
+  // terragrunt v0.73.0: support `terrgrunt run`
+  const runCode = await executor.exec("terragrunt", ["run", "--help"], {
+    silent: true,
+    ignoreReturnCode: true,
+  });
+  return runCode === 0;
+};
