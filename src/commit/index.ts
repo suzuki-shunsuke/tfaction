@@ -95,7 +95,7 @@ export const create = async (inputs: Inputs): Promise<string> => {
       issue_number: pr.number,
       assignees: inputs.pr.assignees,
     });
-    core.notice(`Added assingees to PR: ${pr.html_url}`);
+    core.notice(`Added assignees to PR: ${pr.html_url}`);
   }
   return pr.html_url;
 };
