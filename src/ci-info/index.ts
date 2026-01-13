@@ -108,7 +108,10 @@ const getPRFiles = async (
   return files.slice(0, maxFiles);
 };
 
-const setValue = (key: string, value: string | number | boolean | undefined) => {
+const setValue = (
+  key: string,
+  value: string | number | boolean | undefined,
+) => {
   core.setOutput(key, value);
   core.exportVariable(`CI_INFO_${key.toUpperCase()}`, value);
 };
@@ -117,7 +120,11 @@ interface PRData {
   labels?: Array<{ name: string }>;
 }
 
-const writeOutputFiles = async (dir: string, prData: PRData, files: PRFile[]) => {
+const writeOutputFiles = async (
+  dir: string,
+  prData: PRData,
+  files: PRFile[],
+) => {
   await fs.mkdir(dir, { recursive: true });
 
   // Write pr.json
