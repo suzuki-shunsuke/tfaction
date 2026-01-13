@@ -208,6 +208,18 @@ export const main = async (): Promise<void> => {
   }
 };
 
+const revoke = async (token: githubAppToken.Token): Promise<void> => {
+  if (!token) {
+    return;
+  }
+  if (githubAppToken.hasExpired(token.expiresAt)) {
+    core.info("GitHub App token has already expired");
+    return;
+  }
+  core.info("Revoking GitHub App token");
+  await githubAppToken.revoke(token.token);
+};
+
 export const updateBranchBySecurefix = async (
   securefixServerRepository: string,
   prNumbers: number[],
@@ -246,12 +258,7 @@ export const updateBranchBySecurefix = async (
       }
     }
   } finally {
-    if (token && !githubAppToken.hasExpired(token.expiresAt)) {
-      core.info("Revoking GitHub App token");
-      await githubAppToken.revoke(token.token);
-    } else if (token) {
-      core.info("GitHub App token has already expired");
-    }
+    await revoke(token);
   }
 };
 
