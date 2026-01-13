@@ -27,13 +27,18 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/js-yaml": "4.0.9",
     "@types/node": "20.19.28",
     "@types/semver": "7.7.1",
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.4",
+    "eslint": "^9.39.2",
+    "globals": "^17.0.0",
+    "jiti": "^2.6.1",
     "prettier": "3.7.4",
     "typescript": "5.9.3",
+    "typescript-eslint": "^8.53.0",
     "vitest": "4.0.16"
   },
   "volta": {
