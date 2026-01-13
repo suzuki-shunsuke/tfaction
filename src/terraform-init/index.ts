@@ -47,6 +47,9 @@ export const main = async () => {
     cwd: workingDir,
   });
 
+  const terragruntRunAvailable =
+    tfCommand === "terragrunt" && (await aqua.checkTerrgruntRun(executor));
+
   if (!isPullRequestEvent()) {
     // Non-PR: just run init with github-comment
     await executor.exec(
@@ -90,11 +93,19 @@ export const main = async () => {
     }
     core.endGroup();
 
-    core.startGroup(`${tfCommand} providers lock`);
+    core.startGroup(
+      terragruntRunAvailable
+        ? `${tfCommand} run -- providers lock`
+        : `${tfCommand} providers lock`,
+    );
     const lockArgs = providersLockOpts.split(/\s+/).filter((s) => s.length > 0);
     await executor.exec(
       "github-comment",
-      ["exec", "--", tfCommand, "providers", "lock", ...lockArgs],
+      ["exec", "--", tfCommand].concat(
+        terragruntRunAvailable ? ["run", "--"] : [],
+        ["providers", "lock"],
+        lockArgs,
+      ),
       {
         cwd: workingDir,
         env: {
@@ -118,9 +129,17 @@ export const main = async () => {
     }
   }
 
-  core.startGroup(`${tfCommand} providers`);
-  await executor.exec(tfCommand, ["providers"], {
-    cwd: workingDir,
-  });
+  core.startGroup(
+    terragruntRunAvailable
+      ? `${tfCommand} run -- providers`
+      : `${tfCommand} providers`,
+  );
+  await executor.exec(
+    tfCommand,
+    terragruntRunAvailable ? ["run", "--", "providers"] : ["providers"],
+    {
+      cwd: workingDir,
+    },
+  );
   core.endGroup();
 };
