@@ -47,7 +47,7 @@ export const main = async () => {
   const providersLockOpts = targetConfig.providers_lock_opts;
 
   const gitRootDir = await lib.getGitRootDir(workingDir);
-  const workspace = await lib.getGitHubWorkspace();
+  const workspace = lib.getGitHubWorkspace();
 
   const executor = await aqua.NewExecutor({
     githubToken,
@@ -124,7 +124,10 @@ export const main = async () => {
     core.endGroup();
 
     // Check if lock file changed
-    if (!existedBefore || (await hasFileChanged(lockFile, configDir))) {
+    if (
+      !existedBefore ||
+      (await hasFileChanged(".terraform.lock.hcl", workingDir))
+    ) {
       // Commit the change
       const lockFileFromGitRootDir = path.relative(
         gitRootDir,
