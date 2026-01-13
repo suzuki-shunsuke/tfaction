@@ -9,7 +9,6 @@ Please read the following document.
 - [aqua](https://aquaproj.github.io/): CLI Version Manager
   - [cmdx](https://github.com/suzuki-shunsuke/cmdx): Task Runner
 - Node.js
-  - [prettier](https://prettier.io/): Formatter
 
 Install cmdx by aqua.
 
@@ -19,10 +18,12 @@ aqua i -l
 
 After you update code, you have to run the following things.
 
-- Build TypeScript
-- Test JavaScript Action
-- Format code
-- Update [JSON Schema](schema) and [document](https://suzuki-shunsuke.github.io/tfaction/docs/)
+- Build TypeScript: `npm run build`
+- Test TypeScript: `npm t`
+- Lint TypeScript: `npm run lint`
+- Format code: `npm run fmt`
+- Update [JSON Schema](schema): `cmdx schema`
+- [Update Document](website)
 
 ## Node.js version management
 
@@ -47,18 +48,6 @@ We manage Node.js packages using npm, not [yarn](https://yarnpkg.com/) and [pnpm
 
 We don't manage transpiled JavaScript files in the main branch and feature branches anymore.
 
-## Test JavaScript Actions
-
-```sh
-npm t
-```
-
-## Format code
-
-```sh
-cmdx fmt
-```
-
 ## Manual test
 
 We provide some automatic tests such as unit tests, but sometimes the automatic tests aren't enough so you have to test your changes on your environment.
@@ -75,11 +64,11 @@ When a pull request is created or updated, the branch `pr/<pull request number>`
 
 You can test your pull request version by `pr/<pull request number>`.
 
-For example, if you want to test the pull request [#1513](https://github.com/suzuki-shunsuke/tfaction/pull/1513),
-you can update tfaction's version of your workflows to `pr/1513`.
+For example, if you want to test the pull request [#3402](https://github.com/suzuki-shunsuke/tfaction/pull/3402),
+you can update tfaction's version of your workflows to `pr/3402`.
 
 e.g.
 
 ```yaml
-- uses: suzuki-shunsuke/tfaction/setup@pr/1513
+- uses: suzuki-shunsuke/tfaction@pr/3402
 ```

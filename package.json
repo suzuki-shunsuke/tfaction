@@ -3,7 +3,8 @@
   "scripts": {
     "build": "ncc build src/index.ts --license LICENSE",
     "test": "vitest --run",
-    "fmt": "prettier -w ."
+    "fmt": "prettier -w .",
+    "lint": "eslint"
   },
   "dependencies": {
     "@actions/core": "2.0.2",
