@@ -20,7 +20,7 @@ After you update code, you have to run the following things.
 
 - Build TypeScript: `npm run build`
 - Test TypeScript: `npm t`
-- Lint TypeScript: `npm run lint`
+- Lint TypeScript: `npx eslint`
 - Format code: `npm run fmt`
 - Update [JSON Schema](schema): `cmdx schema`
 - [Update Document](website)
