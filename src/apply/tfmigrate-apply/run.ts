@@ -1,4 +1,3 @@
-import * as exec from "@actions/exec";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
@@ -40,7 +39,6 @@ export const main = async (): Promise<void> => {
   );
   const securefixServerRepository =
     cfg.securefix_action?.server_repository ?? "";
-  const installDir = process.env.TFACTION_INSTALL_DIR || "";
 
   // Set TFMIGRATE_EXEC_PATH if needed
   const tfmigrateExecPath = process.env.TFMIGRATE_EXEC_PATH || "";
@@ -146,7 +144,7 @@ export const main = async (): Promise<void> => {
   // Clean up temporary file
   try {
     fs.rmdirSync(tempDir);
-  } catch (error) {
+  } catch {
     // Ignore the failure
   }
 

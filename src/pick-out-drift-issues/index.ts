@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import * as path from "path";
 
@@ -177,25 +176,6 @@ const getTargetByWorkingDirectory = (
     );
   }
   return workingDirectoryPath;
-};
-
-// List working directory files using git ls-files
-const listWorkingDirectoryFiles = async (
-  baseWorkingDirectory: string,
-  workingDirectoryFile: string,
-): Promise<string[]> => {
-  let output = "";
-  await exec.exec("git", ["ls-files", baseWorkingDirectory], {
-    listeners: {
-      stdout: (data: Buffer) => {
-        output += data.toString();
-      },
-    },
-  });
-  return output
-    .split("\n")
-    .map((f) => f.trim())
-    .filter((f) => f.length > 0 && path.basename(f) === workingDirectoryFile);
 };
 
 // List targets with runs_on

@@ -25,7 +25,10 @@ const copyDirectory = (src: string, dest: string): void => {
   }
 };
 
-const replaceInFiles = async (workingDir: string, vars: any): Promise<void> => {
+const replaceInFiles = async (
+  workingDir: string,
+  vars: Record<string, string | undefined>,
+): Promise<void> => {
   // Get list of modified and new files
   let output = "";
   await exec.exec(

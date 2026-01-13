@@ -108,12 +108,23 @@ const getPRFiles = async (
   return files.slice(0, maxFiles);
 };
 
-const setValue = (key: string, value: any) => {
+const setValue = (
+  key: string,
+  value: string | number | boolean | undefined,
+) => {
   core.setOutput(key, value);
   core.exportVariable(`CI_INFO_${key.toUpperCase()}`, value);
 };
 
-const writeOutputFiles = async (dir: string, prData: any, files: PRFile[]) => {
+interface PRData {
+  labels?: Array<{ name: string }>;
+}
+
+const writeOutputFiles = async (
+  dir: string,
+  prData: PRData,
+  files: PRFile[],
+) => {
   await fs.mkdir(dir, { recursive: true });
 
   // Write pr.json
@@ -146,7 +157,7 @@ const writeOutputFiles = async (dir: string, prData: any, files: PRFile[]) => {
   );
 
   // Write labels.txt
-  const labels = (prData.labels || []).map((l: any) => l.name).join("\n");
+  const labels = (prData.labels || []).map((l) => l.name).join("\n");
   await fs.writeFile(path.join(dir, "labels.txt"), labels);
 };
 

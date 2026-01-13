@@ -3,8 +3,8 @@ import { diffString } from "json-diff";
 
 type TestData = {
   name: string;
-  expected: any;
-  actual: any;
+  expected: Record<string, string[]>;
+  actual: string;
 };
 
 export const main = async () => {
@@ -23,7 +23,7 @@ export const main = async () => {
   ];
   let failed = false;
   testdata.forEach((data) => {
-    let a = JSON.parse(data.actual || "{}");
+    const a = JSON.parse(data.actual || "{}");
     const b = diffString(data.expected, a);
     if (b !== "") {
       console.log(`Test failed: ${data.name}`);

@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../../lib";
@@ -93,7 +92,7 @@ const createTargetMaps = (
 };
 
 const prepareModuleData = (
-  moduleCallers: any,
+  moduleCallers: Record<string, string[]> | null,
   moduleFiles: string[],
 ): ModuleData => {
   const moduleCallerMap: Map<string, string[]> = new Map(
@@ -345,7 +344,7 @@ type Input = {
   moduleFiles: string[];
   pr: string;
   payload: Payload;
-  moduleCallers: any;
+  moduleCallers: Record<string, string[]> | null;
   maxChangedWorkingDirectories: number;
   maxChangedModules: number;
   githubToken: string;
@@ -399,7 +398,7 @@ export const main = async (executor: aqua.Executor) => {
     cfg.module_file,
   );
 
-  let moduleCallers: any = null;
+  let moduleCallers: Record<string, string[]> | null = null;
   if (cfg.update_local_path_module_caller?.enabled) {
     moduleCallers = await listModuleCallers(configFiles, modules, executor);
   }
