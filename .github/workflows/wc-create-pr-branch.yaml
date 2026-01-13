@@ -44,18 +44,107 @@ jobs:
       matrix:
         env:
           - key: terraform
-            dir: foo
-            TFACTION_CONFIG: foo/tests/tfaction-root.yaml
+            TFACTION_CONFIG: tests/tfaction-root.yaml
             TFACTION_WORKING_DIR: foo
             TFACTION_JOB_TYPE: terraform
           - key: opentofu
-            dir: foo
             TFACTION_WORKING_DIR: bar
-            TFACTION_CONFIG: foo/tests/opentofu/tfaction-root.yaml
+            TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
             TFACTION_JOB_TYPE: terraform
           - key: terragrunt
-            dir: foo
-            TFACTION_CONFIG: foo/tests/terragrunt/tfaction-root.yaml
+            TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
+            TFACTION_WORKING_DIR: zoo
+            TFACTION_JOB_TYPE: terraform
+    env:
+      TFACTION_CONFIG: ${{matrix.env.TFACTION_CONFIG}}
+      TFACTION_WORKING_DIR: ${{matrix.env.TFACTION_WORKING_DIR}}
+      TFACTION_JOB_TYPE: ${{matrix.env.TFACTION_JOB_TYPE}}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+          path: ${{matrix.env.dir}}
+      - run: gh pr checkout "$PR"
+        if: inputs.pr != ''
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+          PR: ${{inputs.pr}}
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: dist
+          name: js
+      - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
+        run: |
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
+      - id: token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        with:
+          app-id: ${{secrets.gh_app_id}}
+          private-key: ${{secrets.gh_app_private_key}}
+          permission-pull-requests: write
+          permission-contents: write
+
+      - name: Test setup
+        uses: ./
+        with:
+          action: setup
+          github_token: ${{steps.token.outputs.token}}
+        id: setup
+        if: |
+          ! github.event.pull_request.head.repo.fork
+
+      - name: Test terraform init
+        uses: ./
+        with:
+          action: terraform-init
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+
+      - name: Test test
+        uses: ./
+        with:
+          action: test
+          github_token: ${{steps.token.outputs.token}}
+        id: test
+        if: |
+          ! github.event.pull_request.head.repo.fork
+
+      - name: Test plan
+        uses: ./
+        id: plan
+        with:
+          action: plan
+          github_token: ${{steps.token.outputs.token}}
+        if: |
+          ! github.event.pull_request.head.repo.fork
+
+  test-change-checkout-path:
+    name: Change checkout path (${{matrix.env.key}})
+    timeout-minutes: 15
+    runs-on: ubuntu-24.04
+    needs: [create-pr-branch]
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - key: terraform
+            dir: yoo
+            TFACTION_CONFIG: yoo/tests/tfaction-root.yaml
+            TFACTION_WORKING_DIR: foo
+            TFACTION_JOB_TYPE: terraform
+          - key: opentofu
+            dir: yoo
+            TFACTION_WORKING_DIR: bar
+            TFACTION_CONFIG: yoo/tests/opentofu/tfaction-root.yaml
+            TFACTION_JOB_TYPE: terraform
+          - key: terragrunt
+            dir: yoo
+            TFACTION_CONFIG: yoo/tests/terragrunt/tfaction-root.yaml
             TFACTION_WORKING_DIR: zoo
             TFACTION_JOB_TYPE: terraform
     env:
@@ -75,7 +164,7 @@ jobs:
           PR: ${{inputs.pr}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: foo/dist
+          path: yoo/dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         working-directory: ${{matrix.env.dir}}
@@ -90,7 +179,7 @@ jobs:
           permission-contents: write
 
       - name: Test setup
-        uses: ./foo
+        uses: ./yoo
         with:
           action: setup
           github_token: ${{steps.token.outputs.token}}
@@ -99,7 +188,7 @@ jobs:
           ! github.event.pull_request.head.repo.fork
 
       - name: Test terraform init
-        uses: ./foo
+        uses: ./yoo
         with:
           action: terraform-init
           github_token: ${{steps.token.outputs.token}}
@@ -107,7 +196,7 @@ jobs:
           ! github.event.pull_request.head.repo.fork
 
       - name: Test test
-        uses: ./foo
+        uses: ./yoo
         with:
           action: test
           github_token: ${{steps.token.outputs.token}}
@@ -116,7 +205,7 @@ jobs:
           ! github.event.pull_request.head.repo.fork
 
       - name: Test plan
-        uses: ./foo
+        uses: ./yoo
         id: plan
         with:
           action: plan
