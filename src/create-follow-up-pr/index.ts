@@ -1,13 +1,12 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as securefix from "@csm-actions/securefix-action";
-import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as fs from "fs";
 import * as path from "path";
 import { z } from "zod";
 
 import * as lib from "../lib";
 import * as aqua from "../aqua";
+import * as commit from "../commit";
 import * as getTargetConfig from "../get-target-config";
 
 const PRData = z.object({
@@ -211,208 +210,6 @@ const createFailedPrsFile = (
   return failedPrsFile;
 };
 
-interface SecurefixParams {
-  appId: string;
-  privateKey: string;
-  serverRepository: string;
-  branch: string;
-  failedPrsFile: string;
-  commitMessage: string;
-  skipCreatePr: boolean;
-  prTitle: string;
-  prBody: string;
-  baseBranch: string;
-  groupLabel: string;
-  assignees: string[];
-  draftPr: boolean;
-  mentions: string;
-  prNumber: string;
-}
-
-const createViaSecurefix = async (params: SecurefixParams): Promise<void> => {
-  const {
-    appId,
-    privateKey,
-    serverRepository,
-    branch,
-    failedPrsFile,
-    commitMessage,
-    skipCreatePr,
-    prTitle,
-    prBody,
-    baseBranch,
-    groupLabel,
-    assignees,
-    draftPr,
-    mentions,
-    prNumber,
-  } = params;
-
-  if (skipCreatePr) {
-    await securefix.request({
-      appId,
-      privateKey,
-      serverRepository,
-      branch,
-      files: new Set([failedPrsFile]),
-      commitMessage,
-      workspace: process.env.GITHUB_WORKSPACE ?? "",
-    });
-    core.info("Created commit via securefix");
-  } else {
-    const prComment = `${mentions}
-This pull request was created because \`terraform apply\` failed.
-
-- #${prNumber}
-
-Please handle this pull request.
-
-1. Check the error message #${prNumber}
-1. Check the result of \`terraform plan\`
-1. Add commits to this pull request and fix the problem if needed
-1. Review and merge this pull request`;
-
-    await securefix.request({
-      appId,
-      privateKey,
-      serverRepository,
-      branch,
-      files: new Set([failedPrsFile]),
-      commitMessage,
-      workspace: process.env.GITHUB_WORKSPACE ?? "",
-      pr: {
-        title: prTitle,
-        body: prBody,
-        base: baseBranch,
-        labels: groupLabel ? [groupLabel] : undefined,
-        assignees: assignees.length > 0 ? assignees : undefined,
-        draft: draftPr,
-        comment: prComment,
-      },
-    });
-    core.info("Created PR via securefix");
-  }
-};
-
-interface GitHubAPIParams {
-  octokit: Octokit;
-  githubToken: string;
-  branch: string;
-  failedPrsFile: string;
-  commitMessage: string;
-  skipCreatePr: boolean;
-  prTitle: string;
-  prBody: string;
-  groupLabelEnabled: boolean;
-  groupLabel: string;
-  assignees: string[];
-  draftPr: boolean;
-  target: string;
-  mentions: string;
-  executor: aqua.Executor;
-}
-
-const createViaGitHubAPI = async (params: GitHubAPIParams): Promise<void> => {
-  const {
-    octokit,
-    githubToken,
-    branch,
-    failedPrsFile,
-    commitMessage,
-    skipCreatePr,
-    prTitle,
-    prBody,
-    groupLabelEnabled,
-    groupLabel,
-    assignees,
-    draftPr,
-    target,
-    mentions,
-  } = params;
-
-  await commit.createCommit(octokit, {
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    branch,
-    message: commitMessage,
-    files: [failedPrsFile],
-    deleteIfNotExist: true,
-    logger: {
-      info: core.info,
-    },
-  });
-  core.info(`Created commit on branch ${branch}`);
-
-  if (skipCreatePr) {
-    return;
-  }
-
-  const { data: repoData } = await octokit.rest.repos.get({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-  });
-  const baseBranch = repoData.default_branch;
-
-  const { data: pr } = await octokit.rest.pulls.create({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    head: branch,
-    base: baseBranch,
-    title: prTitle,
-    body: prBody,
-    draft: draftPr,
-  });
-
-  const followUpPrUrl = pr.html_url;
-  core.info(`Created PR: ${followUpPrUrl}`);
-  core.notice(`The follow up pull request: ${followUpPrUrl}`);
-
-  if (groupLabelEnabled && groupLabel) {
-    await octokit.rest.issues.addLabels({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      labels: [groupLabel],
-    });
-    core.info(`Added label ${groupLabel} to PR #${pr.number}`);
-  }
-
-  if (assignees.length > 0) {
-    await octokit.rest.issues.addAssignees({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      assignees,
-    });
-    core.info(`Added assignees ${assignees.join(", ")} to PR #${pr.number}`);
-  }
-
-  const executor = params.executor;
-
-  await executor.exec(
-    "github-comment",
-    [
-      "post",
-      "-config",
-      lib.GitHubCommentConfig,
-      "-var",
-      `tfaction_target:${target}`,
-      "-var",
-      `mentions:${mentions}`,
-      "-var",
-      `follow_up_pr_url:${followUpPrUrl}`,
-      "-k",
-      "create-follow-up-pr",
-    ],
-    {
-      env: {
-        GITHUB_TOKEN: githubToken,
-      },
-    },
-  );
-  core.info("Posted comment to the original PR");
-};
-
 interface SkipCreateCommentParams {
   githubToken: string;
   repository: string;
@@ -562,49 +359,66 @@ export const main = async () => {
     prNumber,
   );
 
-  // Execute based on conditions
-  if (securefixServerRepository) {
-    if (!securefixAppId || !securefixAppPrivateKey) {
-      throw new Error(
-        "securefix_action_app_id and securefix_action_app_private_key are required when securefix_action_server_repository is set",
-      );
-    }
+  // Build PR comment for securefix
+  const prComment = `${prParams.mentions}
+This pull request was created because \`terraform apply\` failed.
 
-    await createViaSecurefix({
-      appId: securefixAppId,
-      privateKey: securefixAppPrivateKey,
-      serverRepository: securefixServerRepository,
-      branch: prParams.branch,
-      failedPrsFile,
-      commitMessage: prParams.commitMessage,
-      skipCreatePr,
-      prTitle: prParams.prTitle,
-      prBody: prParams.prBody,
-      baseBranch: securefixPRBaseBranch,
-      groupLabel,
-      assignees: prParams.assignees,
-      draftPr,
-      mentions: prParams.mentions,
-      prNumber,
-    });
-  } else {
-    await createViaGitHubAPI({
-      octokit,
-      githubToken,
-      branch: prParams.branch,
-      failedPrsFile,
-      commitMessage: prParams.commitMessage,
-      skipCreatePr,
-      prTitle: prParams.prTitle,
-      prBody: prParams.prBody,
-      groupLabelEnabled,
-      groupLabel,
-      assignees: prParams.assignees,
-      draftPr,
-      target,
-      mentions: prParams.mentions,
-      executor,
-    });
+- #${prNumber}
+
+Please handle this pull request.
+
+1. Check the error message #${prNumber}
+1. Check the result of \`terraform plan\`
+1. Add commits to this pull request and fix the problem if needed
+1. Review and merge this pull request`;
+
+  // Create commit and PR
+  const followUpPrUrl = await commit.create({
+    commitMessage: prParams.commitMessage,
+    githubToken,
+    files: new Set([failedPrsFile]),
+    serverRepository: securefixServerRepository,
+    appId: securefixAppId,
+    appPrivateKey: securefixAppPrivateKey,
+    branch: prParams.branch,
+    pr: skipCreatePr
+      ? undefined
+      : {
+          title: prParams.prTitle,
+          body: prParams.prBody,
+          base: securefixPRBaseBranch,
+          labels: groupLabel ? [groupLabel] : undefined,
+          assignees:
+            prParams.assignees.length > 0 ? prParams.assignees : undefined,
+          draft: draftPr,
+          comment: prComment,
+        },
+  });
+
+  // Post comment to original PR (GitHub API only)
+  if (followUpPrUrl) {
+    await executor.exec(
+      "github-comment",
+      [
+        "post",
+        "-config",
+        lib.GitHubCommentConfig,
+        "-var",
+        `tfaction_target:${target}`,
+        "-var",
+        `mentions:${prParams.mentions}`,
+        "-var",
+        `follow_up_pr_url:${followUpPrUrl}`,
+        "-k",
+        "create-follow-up-pr",
+      ],
+      {
+        env: {
+          GITHUB_TOKEN: githubToken,
+        },
+      },
+    );
+    core.info("Posted comment to the original PR");
   }
 
   // Post skip-create comment if skip_create_pr is true
