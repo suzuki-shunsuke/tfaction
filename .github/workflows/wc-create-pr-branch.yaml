@@ -49,12 +49,12 @@ jobs:
             TFACTION_WORKING_DIR: foo
             TFACTION_JOB_TYPE: terraform
           - key: opentofu
-            dir: ""
+            dir: foo
             TFACTION_WORKING_DIR: bar
             TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
             TFACTION_JOB_TYPE: terraform
           - key: terragrunt
-            dir: ""
+            dir: foo
             TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
             TFACTION_WORKING_DIR: zoo
             TFACTION_JOB_TYPE: terraform
@@ -75,7 +75,7 @@ jobs:
           PR: ${{inputs.pr}}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          path: dist
+          path: foo/dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         working-directory: ${{matrix.env.dir}}
@@ -90,7 +90,7 @@ jobs:
           permission-contents: write
 
       - name: Test setup
-        uses: ./
+        uses: ./foo
         with:
           action: setup
           github_token: ${{steps.token.outputs.token}}
@@ -99,7 +99,7 @@ jobs:
           ! github.event.pull_request.head.repo.fork
 
       - name: Test terraform init
-        uses: ./
+        uses: ./foo
         with:
           action: terraform-init
           github_token: ${{steps.token.outputs.token}}
@@ -107,7 +107,7 @@ jobs:
           ! github.event.pull_request.head.repo.fork
 
       - name: Test test
-        uses: ./
+        uses: ./foo
         with:
           action: test
           github_token: ${{steps.token.outputs.token}}
@@ -116,7 +116,7 @@ jobs:
           ! github.event.pull_request.head.repo.fork
 
       - name: Test plan
-        uses: ./
+        uses: ./foo
         id: plan
         with:
           action: plan
