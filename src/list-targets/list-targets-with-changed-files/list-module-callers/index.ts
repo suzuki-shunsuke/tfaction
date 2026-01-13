@@ -3,13 +3,11 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as semver from "semver";
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import {
   buildModuleToCallers,
   resolveRelativeCallTree,
   ModuleToCallers,
 } from "./lib";
-import * as lib from "../../../lib";
 import * as aqua from "../../../aqua";
 
 export const main = async (executor: aqua.Executor) => {
@@ -118,19 +116,19 @@ export const list = async (
     const inspection = JSON.parse(outInspect.stdout);
 
     // List keys of Local Path modules (source starts with ./ or ../) in module_calls
-    const arr = Object.values(inspection["module_calls"]).flatMap(
-      (module: any) => {
-        const source = module.source;
-        if (
-          source.startsWith("." + path.sep) ||
-          source.startsWith(".." + path.sep)
-        ) {
-          return [source];
-        } else {
-          return [];
-        }
-      },
-    );
+    const arr = Object.values(
+      inspection["module_calls"] as Record<string, { source: string }>,
+    ).flatMap((module) => {
+      const source = module.source;
+      if (
+        source.startsWith("." + path.sep) ||
+        source.startsWith(".." + path.sep)
+      ) {
+        return [source];
+      } else {
+        return [];
+      }
+    });
     if (rawModuleCalls[tfDir] === undefined) {
       rawModuleCalls[tfDir] = arr;
     } else {

@@ -1,8 +1,5 @@
-import * as fs from "fs";
 import * as core from "@actions/core";
 import * as lib from "../lib";
-
-const yaml = require("js-yaml");
 
 export interface Secret {
   env_name: string | undefined;

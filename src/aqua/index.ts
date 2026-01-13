@@ -238,20 +238,6 @@ export const install = async (): Promise<string> => {
   }
 };
 
-const getBinPath = (isWindows: boolean): string => {
-  const aquaRoot = process.env.AQUA_ROOT_DIR;
-
-  if (isWindows) {
-    const base =
-      aquaRoot || join(homedir(), "AppData", "Local", "aquaproj-aqua");
-    return join(base, "bin");
-  }
-  const xdgDataHome =
-    process.env.XDG_DATA_HOME || join(homedir(), ".local", "share");
-  const base = aquaRoot || join(xdgDataHome, "aquaproj-aqua");
-  return join(base, "bin");
-};
-
 export const checkTerrgruntRun = async (
   executor: Executor,
 ): Promise<boolean> => {

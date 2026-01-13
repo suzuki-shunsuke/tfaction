@@ -1,4 +1,3 @@
-import * as exec from "@actions/exec";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
@@ -73,13 +72,6 @@ const getSeverity = (s: string): string => {
   }
   if (s.startsWith("LOW")) {
     return "INFO";
-  }
-  return "";
-};
-
-const getURL = (result: any): string => {
-  if (result.links && result.links.length != 0) {
-    return result.links[0];
   }
   return "";
 };

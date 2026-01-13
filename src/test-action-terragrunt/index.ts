@@ -3,8 +3,8 @@ import { diffString } from "json-diff";
 
 type TestData = {
   name: string;
-  expected: any;
-  actual: any;
+  expected: Record<string, string[]>;
+  actual: string;
 };
 
 export const main = async () => {

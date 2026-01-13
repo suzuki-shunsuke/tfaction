@@ -10,8 +10,8 @@ type Inputs = {
 };
 
 export type Result = {
-  envs: Map<string, any>;
-  outputs: Map<string, any>;
+  envs: Map<string, string | boolean>;
+  outputs: Map<string, string | boolean>;
 };
 
 export interface TargetConfig {
@@ -238,7 +238,7 @@ export const run = async (
 ): Promise<Result> => {
   const targetConfig = await getTargetConfig(inputs, config);
 
-  const envs = new Map<string, any>();
+  const envs = new Map<string, string | boolean>();
   envs.set("TFACTION_WORKING_DIR", targetConfig.working_directory);
   envs.set("TFACTION_TARGET", targetConfig.target);
   if (targetConfig.env) {
@@ -247,7 +247,7 @@ export const run = async (
     }
   }
 
-  const outputs = new Map<string, any>();
+  const outputs = new Map<string, string | boolean>();
   for (const [key, value] of Object.entries(targetConfig)) {
     if (key !== "env" && key !== "target" && value !== undefined) {
       outputs.set(key, value);

@@ -500,7 +500,7 @@ export const getJobConfig = (
   }
 };
 
-export const setValues = (name: string, values: Array<any>): void => {
+export const setValues = (name: string, values: Array<unknown>): void => {
   for (const value of values) {
     if (value != undefined) {
       core.setOutput(name, value);
@@ -511,13 +511,13 @@ export const setValues = (name: string, values: Array<any>): void => {
 
 export const setOutputs = (
   keys: Array<string>,
-  objs: Array<any>,
-): Map<string, any> => {
-  const outputs = new Map<string, any>();
+  objs: Array<Record<string, unknown> | undefined>,
+): Map<string, string> => {
+  const outputs = new Map<string, string>();
   for (const key of keys) {
     for (const obj of objs) {
       if (obj != undefined && obj != null && obj[key] != undefined) {
-        outputs.set(key, obj[key]);
+        outputs.set(key, obj[key] as string);
         break;
       }
     }
@@ -531,8 +531,8 @@ type HasEnv = {
 
 export const setEnvs = (
   ...objs: Array<HasEnv | undefined>
-): Map<string, any> => {
-  const envs = new Map<string, any>();
+): Map<string, string> => {
+  const envs = new Map<string, string>();
   for (const obj of objs) {
     if (obj?.env) {
       for (const [key, value] of Object.entries(obj.env)) {

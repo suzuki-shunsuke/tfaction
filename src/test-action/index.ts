@@ -23,7 +23,7 @@ export const main = async () => {
         destroy: "false",
         enable_terraform_docs: "false",
       },
-      convert: (data: any): any => {
+      convert: (data: Record<string, string>): Record<string, string> => {
         data.aws_role_session_name = "";
         return data;
       },

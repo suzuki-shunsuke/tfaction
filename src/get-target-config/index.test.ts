@@ -5,11 +5,11 @@ import { expect, test } from "vitest";
 test("default", async () => {
   const runID = process.env.GITHUB_RUN_ID ?? "";
   const result: Result = {
-    envs: new Map<string, any>([
+    envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "aws/foo/dev"],
       ["TFACTION_TARGET", "aws/foo/dev"],
     ]),
-    outputs: new Map<string, any>([
+    outputs: new Map<string, string | boolean>([
       ["working_directory", "aws/foo/dev"],
       [
         "providers_lock_opts",
@@ -52,11 +52,11 @@ test("default", async () => {
 
 test("config", async () => {
   const result: Result = {
-    envs: new Map<string, any>([
+    envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "aws/foo/dev"],
       ["TFACTION_TARGET", "aws/foo/dev"],
     ]),
-    outputs: new Map<string, any>([
+    outputs: new Map<string, string | boolean>([
       ["working_directory", "aws/foo/dev"],
       [
         "providers_lock_opts",
@@ -109,11 +109,11 @@ test("config", async () => {
 
 test("scaffold_working_dir", async () => {
   const result: Result = {
-    envs: new Map<string, any>([
+    envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "aws/foo/dev"],
       ["TFACTION_TARGET", "aws/foo/dev"],
     ]),
-    outputs: new Map<string, any>([
+    outputs: new Map<string, string | boolean>([
       ["working_directory", "aws/foo/dev"],
       [
         "providers_lock_opts",

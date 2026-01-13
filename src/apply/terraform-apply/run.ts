@@ -1,4 +1,3 @@
-import * as exec from "@actions/exec";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
@@ -186,7 +185,7 @@ export const main = async (): Promise<void> => {
   // Clean up temporary file
   try {
     fs.rmdirSync(tempDir);
-  } catch (error) {
+  } catch {
     // Ignore the failure
   }
 
@@ -247,15 +246,12 @@ export const updateBranchBySecurefix = async (
       }
     }
   } finally {
-    if (!token) {
-      return;
-    }
-    if (githubAppToken.hasExpired(token.expiresAt)) {
+    if (token && !githubAppToken.hasExpired(token.expiresAt)) {
+      core.info("Revoking GitHub App token");
+      await githubAppToken.revoke(token.token);
+    } else if (token) {
       core.info("GitHub App token has already expired");
-      return;
     }
-    core.info("Revoking GitHub App token");
-    await githubAppToken.revoke(token.token);
   }
 };
 
