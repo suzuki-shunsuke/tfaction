@@ -51,11 +51,11 @@ jobs:
           - key: opentofu
             dir: foo
             TFACTION_WORKING_DIR: bar
-            TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
+            TFACTION_CONFIG: foo/tests/opentofu/tfaction-root.yaml
             TFACTION_JOB_TYPE: terraform
           - key: terragrunt
             dir: foo
-            TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
+            TFACTION_CONFIG: foo/tests/terragrunt/tfaction-root.yaml
             TFACTION_WORKING_DIR: zoo
             TFACTION_JOB_TYPE: terraform
     env:
