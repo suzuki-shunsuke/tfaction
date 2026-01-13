@@ -44,14 +44,17 @@ jobs:
       matrix:
         env:
           - key: terraform
-            TFACTION_CONFIG: tests/tfaction-root.yaml
+            dir: foo
+            TFACTION_CONFIG: foo/tests/tfaction-root.yaml
             TFACTION_WORKING_DIR: foo
             TFACTION_JOB_TYPE: terraform
           - key: opentofu
+            dir: ""
             TFACTION_WORKING_DIR: bar
             TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
             TFACTION_JOB_TYPE: terraform
           - key: terragrunt
+            dir: ""
             TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
             TFACTION_WORKING_DIR: zoo
             TFACTION_JOB_TYPE: terraform
@@ -63,8 +66,10 @@ jobs:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
+          path: ${{matrix.env.dir}}
       - run: gh pr checkout "$PR"
         if: inputs.pr != ''
+        working-directory: ${{matrix.env.dir}}
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
@@ -73,6 +78,7 @@ jobs:
           path: dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
+        working-directory: ${{matrix.env.dir}}
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
