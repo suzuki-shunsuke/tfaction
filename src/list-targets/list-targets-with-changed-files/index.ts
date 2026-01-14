@@ -291,6 +291,15 @@ export const run = async (input: Input): Promise<Result> => {
   const terraformTargetObjs = new Array<TargetConfig>();
   const tfmigrateObjs = new Array<TargetConfig>();
 
+  handleLabels(
+    input.labels,
+    isApply,
+    targetWDMap,
+    config,
+    tfmigrateObjs,
+    tfmigrates,
+  );
+
   const moduleData = prepareModuleData(input.moduleCallers, input.moduleFiles);
   const { changedWorkingDirs, changedModules } = processChangedFiles(
     input.changedFiles,
@@ -339,6 +348,7 @@ export const run = async (input: Input): Promise<Result> => {
 type Input = {
   config: lib.Config;
   isApply: boolean;
+  labels: string[];
   changedFiles: string[];
   configFiles: string[];
   moduleFiles: string[];
@@ -376,6 +386,52 @@ const getFollowupTarget = (input: Input): string => {
   return matchResult ? matchResult[1] : "";
 };
 
+const handleLabels = (
+  labels: string[],
+  isApply: boolean,
+  targetWDMap: Map<string, string>,
+  config: lib.Config,
+  tfmigrateObjs: Array<TargetConfig>,
+  tfmigrates: Set<string>,
+) => {
+  const skips = new Set<string>();
+  const skipPrefix = config?.label_prefixes?.skip || "skip:";
+  const tfmigratePrefix = config?.label_prefixes?.tfmigrate || "tfmigrate:";
+  for (const label of labels) {
+    if (label == "") {
+      continue;
+    }
+    if (label.startsWith(skipPrefix)) {
+      skips.add(label.slice(skipPrefix.length));
+      continue;
+    }
+    if (!label.startsWith(tfmigratePrefix)) {
+      continue;
+    }
+    // tfmigrate
+    const target = label.slice(tfmigratePrefix.length);
+    if (tfmigrates.has(target)) {
+      continue;
+    }
+    tfmigrates.add(target);
+    const wd = targetWDMap.get(target);
+    if (wd === undefined) {
+      throw new Error(`No working directory is found for the target ${target}`);
+    }
+    const obj = getTargetConfigByTarget(
+      config.target_groups,
+      wd,
+      target,
+      isApply,
+      "tfmigrate",
+    );
+    if (obj === undefined) {
+      throw new Error(`No target config is found for the target ${target}`);
+    }
+    tfmigrateObjs.push(obj);
+  }
+};
+
 export const main = async (executor: aqua.Executor) => {
   // The path to ci-info's pr.json.
   if (!process.env.CI_INFO_TEMP_DIR) {
@@ -404,6 +460,9 @@ export const main = async (executor: aqua.Executor) => {
   }
 
   const result = await run({
+    labels: fs
+      .readFileSync(`${process.env.CI_INFO_TEMP_DIR}/labels.txt`, "utf8")
+      .split("\n"),
     config: cfg,
     isApply: lib.getIsApply(),
     changedFiles: fs
