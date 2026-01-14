@@ -90,14 +90,15 @@ export const main = async () => {
   }
 
   const generatedContent = fs.readFileSync(tempFilePath, "utf8");
-  const filteredLines = generatedContent
-    .split("\n")
-    .filter((line) => {
-      const trimmed = line.trim();
-      // Skip comments (lines starting with #) and empty lines
-      return trimmed.length > 0 && !trimmed.startsWith("#");
-    })
-    .join("\n");
+  const filteredLines =
+    generatedContent
+      .split("\n")
+      .filter((line) => {
+        const trimmed = line.trim();
+        // Skip comments (lines starting with #) and empty lines
+        return trimmed.length > 0 && !trimmed.startsWith("#");
+      })
+      .join("\n") + "\n";
 
   // Append to target file
   if (fs.existsSync(targetFilePath)) {
