@@ -5,6 +5,7 @@ import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
 import * as aqua from "../aqua";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../conftest";
 
@@ -90,7 +91,7 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
     return false;
   }
 
-  const installDir = process.env.TFACTION_INSTALL_DIR || "";
+  const installDir = path.join(lib.GitHubActionPath, "install");
   let templatePath = "";
   let content = "";
 
@@ -167,7 +168,7 @@ export const runTfmigratePlan = async (
     GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
   };
   // Set TFMIGRATE_EXEC_PATH if TF_COMMAND is not "terraform"
-  if (!process.env.TFMIGRATE_EXEC_PATH && inputs.tfCommand !== "terraform") {
+  if (!env.tfmigrateExecPath && inputs.tfCommand !== "terraform") {
     env.TFMIGRATE_EXEC_PATH = inputs.tfCommand;
   }
 
@@ -224,7 +225,7 @@ export const runTfmigratePlan = async (
 export const runTerraformPlan = async (
   inputs: Inputs,
 ): Promise<TerraformPlanOutputs> => {
-  const installDir = process.env.TFACTION_INSTALL_DIR || "";
+  const installDir = path.join(lib.GitHubActionPath, "install");
 
   // Run terraform plan with tfcmt
   core.startGroup(`${inputs.tfCommand} plan`);
@@ -364,16 +365,16 @@ export const main = async (
     destroy: targetConfig.destroy || false,
     tfCommand: targetConfig.terraform_command || "terraform",
     target: targetConfig.target,
-    driftIssueNumber: process.env.TFACTION_DRIFT_ISSUE_NUMBER,
-    prAuthor: process.env.CI_INFO_PR_AUTHOR,
-    ciInfoTempDir: process.env.CI_INFO_TEMP_DIR,
+    driftIssueNumber: env.tfactionDriftIssueNumber || undefined,
+    prAuthor: env.ciInfoPrAuthor || undefined,
+    ciInfoTempDir: env.ciInfoTempDir || undefined,
     s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
     executor,
   };
 
-  const jobType = process.env.TFACTION_JOB_TYPE;
+  const jobType = env.tfactionJobType;
 
   let planJsonPath: string | undefined;
 

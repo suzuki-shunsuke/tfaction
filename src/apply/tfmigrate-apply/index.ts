@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../../lib";
+import * as env from "../../lib/env";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../../get-target-config";
 import {
@@ -14,7 +15,7 @@ import {
 
 export const main = async (): Promise<void> => {
   const githubToken = core.getInput("github_token");
-  const driftIssueNumber = process.env.TFACTION_DRIFT_ISSUE_NUMBER || "";
+  const driftIssueNumber = env.tfactionDriftIssueNumber;
   const cfg = lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
@@ -33,7 +34,7 @@ export const main = async (): Promise<void> => {
   const driftIssueRepo = lib.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;
-  const ciInfoPrNumber = process.env.CI_INFO_PR_NUMBER || "";
+  const ciInfoPrNumber = env.ciInfoPrNumber;
   const disableUpdateRelatedPullRequests = !(
     cfg.update_related_pull_requests?.enabled ?? true
   );
@@ -41,7 +42,7 @@ export const main = async (): Promise<void> => {
     cfg.securefix_action?.server_repository ?? "";
 
   // Set TFMIGRATE_EXEC_PATH if needed
-  const tfmigrateExecPath = process.env.TFMIGRATE_EXEC_PATH || "";
+  const tfmigrateExecPath = env.tfmigrateExecPath;
   if (!tfmigrateExecPath && tfCommand !== "terraform") {
     process.env.TFMIGRATE_EXEC_PATH = tfCommand;
   }

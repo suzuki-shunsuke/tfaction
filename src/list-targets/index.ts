@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as ciInfo from "../ci-info";
 import * as aqua from "../aqua";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 
 export const main = async () => {
@@ -26,7 +27,7 @@ export const main = async () => {
   const isPREvent =
     eventName === "pull_request" || eventName.startsWith("pull_request_");
   if (isPREvent) {
-    const ciInfoTempDir = process.env.CI_INFO_TEMP_DIR;
+    const ciInfoTempDir = env.ciInfoTempDir;
     if (!ciInfoTempDir) {
       throw new Error("CI_INFO_TEMP_DIR is not set");
     }

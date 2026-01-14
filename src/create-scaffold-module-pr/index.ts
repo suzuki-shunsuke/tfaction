@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as aqua from "../aqua";
 import * as commit from "../commit";
 
@@ -44,8 +45,8 @@ const writeSkipCreatePrSummary = (
   modulePath: string,
   draftPr: boolean,
 ): void => {
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
-  const runId = process.env.GITHUB_RUN_ID ?? "";
+  const serverUrl = env.githubServerUrl || "https://github.com";
+  const runId = env.githubRunId;
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   let draftOpt = "";
@@ -85,7 +86,7 @@ export const main = async () => {
     );
   }
 
-  const modulePath = process.env.TFACTION_MODULE_PATH ?? "";
+  const modulePath = env.tfactionModulePath;
   if (!modulePath) {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
@@ -116,10 +117,10 @@ export const main = async () => {
     return;
   }
 
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
-  const repository = process.env.GITHUB_REPOSITORY ?? "";
-  const runId = process.env.GITHUB_RUN_ID ?? "";
-  const actor = process.env.GITHUB_ACTOR ?? "";
+  const serverUrl = env.githubServerUrl || "https://github.com";
+  const repository = env.githubRepository;
+  const runId = env.githubRunId;
+  const actor = env.githubActor;
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   const commitMessage = `chore(${modulePath}): scaffold a Terraform Module`;

@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as aqua from "../aqua";
 import * as getTargetConfig from "../get-target-config";
 import * as commit from "../commit";
@@ -53,7 +54,7 @@ export const main = async () => {
   });
 
   // Generate temp file name
-  const runId = process.env.GITHUB_RUN_ID ?? "";
+  const runId = env.githubRunId;
   const timestamp = new Date()
     .toISOString()
     .replace(/[-:T]/g, "")
@@ -63,7 +64,7 @@ export const main = async () => {
   const targetFilePath = path.join(workingDir, file);
 
   // Run terraform plan -generate-config-out with tfcmt
-  const stepSummaryPath = process.env.GITHUB_STEP_SUMMARY ?? "";
+  const stepSummaryPath = env.githubStepSummary;
   await executor.exec(
     "tfcmt",
     [

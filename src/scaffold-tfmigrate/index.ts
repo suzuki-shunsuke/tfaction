@@ -6,6 +6,7 @@ import * as path from "path";
 import Handlebars from "handlebars";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
 import * as commit from "../commit";
@@ -144,9 +145,9 @@ const outputSkipCreatePrGuide = (
   draftPr: boolean,
 ): void => {
   const draftFlag = draftPr ? "-d " : "";
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
-  const repository = process.env.GITHUB_REPOSITORY ?? "";
-  const runId = process.env.GITHUB_RUN_ID ?? "";
+  const serverUrl = env.githubServerUrl || "https://github.com";
+  const repository = env.githubRepository;
+  const runId = env.githubRunId;
 
   const guide = `
 ## Create a pull request
@@ -166,7 +167,7 @@ Then please fix the generated migration file.
 [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
 `;
 
-  fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY ?? "", guide);
+  fs.appendFileSync(env.githubStepSummary, guide);
   core.info("Output skip-create-pr guide to GitHub Step Summary");
 };
 
@@ -241,10 +242,10 @@ export const main = async () => {
     config.securefix_action?.pull_request?.base_branch ?? "";
 
   const label = `${labelPrefix}${target}`;
-  const actor = process.env.GITHUB_ACTOR ?? "";
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
-  const repository = process.env.GITHUB_REPOSITORY ?? "";
-  const runId = process.env.GITHUB_RUN_ID ?? "";
+  const actor = env.githubActor;
+  const serverUrl = env.githubServerUrl || "https://github.com";
+  const repository = env.githubRepository;
+  const runId = env.githubRunId;
 
   const gitRootDir = await lib.getGitRootDir(configDir);
 

@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 
 type Issue = {
   number: number;
@@ -191,7 +192,7 @@ const listTargets = async (
   );
 
   const targets = new Map<string, string>();
-  const pwd = process.env.GITHUB_WORKSPACE ?? process.cwd();
+  const pwd = env.githubWorkspace || process.cwd();
 
   for (const file of files) {
     const workingDirectoryPath = path.dirname(file);

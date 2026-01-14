@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 
 type Inputs = {
   ghToken: string;
@@ -13,7 +14,7 @@ type Inputs = {
 };
 
 export const main = async () => {
-  const issueNumberStr = process.env.TFACTION_DRIFT_ISSUE_NUMBER;
+  const issueNumberStr = env.tfactionDriftIssueNumber;
   if (!issueNumberStr) {
     core.info("TFACTION_DRIFT_ISSUE_NUMBER is not set, skipping");
     return;
@@ -26,10 +27,10 @@ export const main = async () => {
     ghToken: core.getInput("github_token", { required: true }),
     status: core.getInput("status", { required: true }),
     issueNumber: parseInt(issueNumberStr, 10),
-    issueState: process.env.TFACTION_DRIFT_ISSUE_STATE,
+    issueState: env.tfactionDriftIssueState,
     repoOwner: driftIssueRepo.owner,
     repoName: driftIssueRepo.name,
-    skipTerraform: process.env.TFACTION_SKIP_TERRAFORM === "true",
+    skipTerraform: env.tfactionSkipTerraform,
   };
 
   await run(inputs);
@@ -63,9 +64,9 @@ const run = async (inputs: Inputs) => {
 };
 
 const getJobUrl = (): string => {
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
-  const repo = process.env.GITHUB_REPOSITORY ?? "";
-  const runId = process.env.GITHUB_RUN_ID ?? "";
+  const serverUrl = env.githubServerUrl || "https://github.com";
+  const repo = env.githubRepository;
+  const runId = env.githubRunId;
   return `${serverUrl}/${repo}/actions/runs/${runId}`;
 };
 

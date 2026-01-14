@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as exec from "@actions/exec";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import { getTargetConfig } from "../get-target-config";
 import * as checkTerraformSkip from "../check-terraform-skip";
 import { main as runPlan } from "./run";
@@ -21,13 +22,13 @@ export const main = async () => {
     config,
   );
 
-  const jobType = process.env.TFACTION_JOB_TYPE;
-  const driftIssueNumber = process.env.TFACTION_DRIFT_ISSUE_NUMBER;
+  const jobType = env.tfactionJobType;
+  const driftIssueNumber = env.tfactionDriftIssueNumber;
 
   let skipTerraform = false;
   if (jobType === "terraform" && !driftIssueNumber) {
     await checkTerraformSkip.main();
-    skipTerraform = process.env.TFACTION_SKIP_TERRAFORM === "true";
+    skipTerraform = env.tfactionSkipTerraform;
   }
   core.setOutput("skipped", skipTerraform);
 

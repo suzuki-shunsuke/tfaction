@@ -1,9 +1,10 @@
 import { run, Result } from "./index";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import { expect, test } from "vitest";
 
 test("default", async () => {
-  const runID = process.env.GITHUB_RUN_ID ?? "";
+  const runID = env.githubRunId;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "aws/foo/dev"],

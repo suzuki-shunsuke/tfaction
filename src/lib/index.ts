@@ -6,6 +6,7 @@ import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
 import { fileURLToPath } from "node:url";
+import * as env from "./env";
 
 export const GitHubActionPath = path.join(
   fileURLToPath(import.meta.url),
@@ -25,8 +26,8 @@ export const aquaConfig = path.join(
   "aqua",
   "aqua.yaml",
 );
-export const aquaGlobalConfig = process.env.AQUA_GLOBAL_CONFIG
-  ? `${process.env.AQUA_GLOBAL_CONFIG}:${aquaConfig}`
+export const aquaGlobalConfig = env.aquaGlobalConfigEnv
+  ? `${env.aquaGlobalConfigEnv}:${aquaConfig}`
   : aquaConfig;
 
 const GitHubEnvironment = z.union([
@@ -46,10 +47,10 @@ const JobType = z.union([
 export type JobType = z.infer<typeof JobType>;
 
 export const getJobType = (): JobType => {
-  if (process.env.TFACTION_JOB_TYPE === undefined) {
+  if (!env.tfactionJobType) {
     throw new Error("environment variable TFACTION_JOB_TYPE is required");
   }
-  return JobType.parse(process.env.TFACTION_JOB_TYPE);
+  return JobType.parse(env.tfactionJobType);
 };
 
 const ReviewdogConfig = z.object({
@@ -392,7 +393,7 @@ export const applyConfigDefaults = (
 };
 
 export const getConfigPathFromEnv = (): string => {
-  return process.env.TFACTION_CONFIG || "tfaction-root.yaml";
+  return env.tfactionConfig || "tfaction-root.yaml";
 };
 
 export const getConfig = (): Config => {
@@ -437,19 +438,19 @@ export const createWDTargetMap = (
 };
 
 export const getGitRootDirFromEnv = (): string => {
-  return process.env.TFACTION_GIT_ROOT_DIR ?? "";
+  return env.tfactionGitRootDir;
 };
 
 export const getTargetFromEnv = (): string => {
-  return process.env.TFACTION_TARGET ?? "";
+  return env.tfactionTarget;
 };
 
 export const getWorkingDirFromEnv = (): string => {
-  return process.env.TFACTION_WORKING_DIR ?? "";
+  return env.tfactionWorkingDir;
 };
 
 export const getIsApply = (): boolean => {
-  return process.env.TFACTION_IS_APPLY === "true";
+  return env.tfactionIsApply === "true";
 };
 
 /**
@@ -742,5 +743,5 @@ export const getGitRootDir = async (cwd: string): Promise<string> => {
  * @returns an absolute path to github.workspace
  */
 export const getGitHubWorkspace = (): string => {
-  return process.env.GITHUB_WORKSPACE ?? process.cwd();
+  return env.githubWorkspace || process.cwd();
 };

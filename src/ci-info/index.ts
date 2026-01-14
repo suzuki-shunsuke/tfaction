@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import * as fs from "fs/promises";
 import * as os from "os";
 import * as path from "path";
+import * as env from "../lib/env";
 
 interface PRFile {
   filename: string;
@@ -10,7 +11,7 @@ interface PRFile {
 }
 
 const getPRNumberFromMergeGroup = (): number | undefined => {
-  const refName = process.env.GITHUB_REF_NAME;
+  const refName = env.githubRefName;
   if (!refName) {
     return undefined;
   }

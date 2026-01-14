@@ -6,6 +6,7 @@ import Handlebars from "handlebars";
 
 import * as aqua from "../aqua";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 
 const copyDirectory = (src: string, dest: string): void => {
   if (!fs.existsSync(dest)) {
@@ -68,18 +69,15 @@ export const main = async () => {
   const configDir = path.dirname(lib.getConfigPathFromEnv());
 
   // Validate inputs
-  if (!process.env.TFACTION_MODULE_PATH) {
+  if (!env.tfactionModulePath) {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
-  if (!process.env.TFACTION_MODULE_TEMPLATE_DIR) {
+  if (!env.tfactionModuleTemplateDir) {
     throw new Error("env.TFACTION_MODULE_TEMPLATE_DIR is required");
   }
 
-  const modulePath = path.join(configDir, process.env.TFACTION_MODULE_PATH);
-  const templateDir = path.join(
-    configDir,
-    process.env.TFACTION_MODULE_TEMPLATE_DIR,
-  );
+  const modulePath = path.join(configDir, env.tfactionModulePath);
+  const templateDir = path.join(configDir, env.tfactionModuleTemplateDir);
 
   // Check if module path already exists
   if (fs.existsSync(modulePath)) {
@@ -108,7 +106,7 @@ export const main = async () => {
 
   // Get module name and path for replacements
   const moduleName = path.basename(modulePath);
-  const repository = process.env.GITHUB_REPOSITORY ?? "";
+  const repository = env.githubRepository;
   const ref = `module_${modulePath.replace(/\//g, "_")}_v0.1.0`;
 
   // Replace placeholders

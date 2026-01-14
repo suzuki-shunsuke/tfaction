@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 
 type Issue = {
   number: number;
@@ -16,7 +17,7 @@ export const main = async () => {
 
   const repoOwner = driftIssueRepo.owner;
   const repoName = driftIssueRepo.name;
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
+  const serverUrl = env.githubServerUrl || "https://github.com";
 
   // TFCMT environment variables
   core.exportVariable("TFCMT_REPO_OWNER", repoOwner);

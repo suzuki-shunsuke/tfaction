@@ -3,13 +3,14 @@ import { main } from "./run";
 import * as testAction from "./test-action";
 import * as testActionTerragrunt from "./test-action-terragrunt";
 import { generateJSONSchema } from "./lib";
+import * as env from "./lib/env";
 
 try {
-  if (process.env.TFACTION_TEST_ACTION) {
+  if (env.tfactionTestAction) {
     await testAction.main();
-  } else if (process.env.TFACTION_TEST_ACTION_TERRAGRUNT) {
+  } else if (env.tfactionTestActionTerragrunt) {
     await testActionTerragrunt.main();
-  } else if (process.env.TFACTION_GENERATE_JSON_SCHEMA) {
+  } else if (env.tfactionGenerateJsonSchema) {
     generateJSONSchema("schema");
   } else {
     await main({
