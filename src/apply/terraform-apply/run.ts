@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../../lib";
+import * as env from "../../lib/env";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../../get-target-config";
 import * as updateBranchAction from "@csm-actions/update-branch-action";
@@ -53,7 +54,7 @@ export const listRelatedPullRequests = async (
 
 export const main = async (): Promise<void> => {
   const githubToken = core.getInput("github_token");
-  const driftIssueNumber = process.env.TFACTION_DRIFT_ISSUE_NUMBER || "";
+  const driftIssueNumber = env.tfactionDriftIssueNumber;
   const cfg = lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
@@ -72,13 +73,12 @@ export const main = async (): Promise<void> => {
   const driftIssueRepo = lib.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;
-  const ciInfoPrNumber = process.env.CI_INFO_PR_NUMBER || "";
+  const ciInfoPrNumber = env.ciInfoPrNumber;
   const disableUpdateRelatedPullRequests = !(
     cfg.update_related_pull_requests?.enabled ?? true
   );
   const securefixServerRepository =
     cfg.securefix_action?.server_repository ?? "";
-  const installDir = process.env.TFACTION_INSTALL_DIR || "";
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
     cwd: workingDir,
@@ -144,7 +144,11 @@ export const main = async (): Promise<void> => {
   // If this is a drift issue, post the result to the drift issue
   if (driftIssueNumber) {
     const prUrl = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/pull/${ciInfoPrNumber}`;
-    const tfcmtConfig = path.join(installDir, "tfcmt-drift.yaml");
+    const tfcmtConfig = path.join(
+      lib.GitHubActionPath,
+      "install",
+      "tfcmt-drift.yaml",
+    );
 
     try {
       await executor.exec(
@@ -318,8 +322,8 @@ const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   const githubToken = core.getInput("github_token");
   const target = lib.getTargetFromEnv() || "";
   const planWorkflowName = cfg.plan_workflow_name;
-  const ciInfoTempDir = process.env.CI_INFO_TEMP_DIR || "";
-  const branch = process.env.CI_INFO_HEAD_REF || "";
+  const ciInfoTempDir = env.ciInfoTempDir;
+  const branch = env.ciInfoHeadRef;
 
   const filename = "tfplan.binary";
   const artifactName = `terraform_plan_file_${target.replaceAll("/", "__")}`;

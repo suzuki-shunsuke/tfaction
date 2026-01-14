@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
+import * as env from "../lib/env";
 
 type Inputs = {
   commitMessage: string;
@@ -32,18 +33,14 @@ export const create = async (inputs: Inputs): Promise<string> => {
       branch: inputs.branch,
       files: inputs.files,
       commitMessage: inputs.commitMessage,
-      workspace: process.env.GITHUB_WORKSPACE ?? "",
+      workspace: env.githubWorkspace,
       pr: inputs.pr,
     });
     return "";
   }
 
   const octokit = github.getOctokit(inputs.githubToken);
-  const branch =
-    inputs.branch ||
-    process.env.GITHUB_HEAD_REF ||
-    process.env.GITHUB_REF_NAME ||
-    "";
+  const branch = inputs.branch || env.githubHeadRef || env.githubRefName;
   await commit.createCommit(octokit, {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,

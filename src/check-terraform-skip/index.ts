@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 
 type Inputs = {
   skipLabelPrefix: string;
@@ -12,16 +13,16 @@ type Inputs = {
 
 export const main = async () => {
   const config = lib.getConfig();
-  if (!process.env.CI_INFO_TEMP_DIR) {
+  if (!env.ciInfoTempDir) {
     throw new Error("CI_INFO_TEMP_DIR is not set");
   }
-  if (!process.env.CI_INFO_PR_AUTHOR) {
+  if (!env.ciInfoPrAuthor) {
     throw new Error("CI_INFO_PR_AUTHOR is not set");
   }
   const inputs = {
     skipLabelPrefix: config.label_prefixes.skip,
-    labels: path.join(process.env.CI_INFO_TEMP_DIR, "labels.txt"),
-    prAuthor: process.env.CI_INFO_PR_AUTHOR,
+    labels: path.join(env.ciInfoTempDir, "labels.txt"),
+    prAuthor: env.ciInfoPrAuthor,
     target: lib.getTargetFromEnv(),
   };
   // labels is pull request's labels.

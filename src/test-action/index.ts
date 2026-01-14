@@ -1,4 +1,5 @@
 import { diffString } from "json-diff";
+import * as env from "../lib/env";
 
 export const main = async () => {
   // Compare outputs
@@ -27,7 +28,7 @@ export const main = async () => {
         data.aws_role_session_name = "";
         return data;
       },
-      actual: process.env.TARGET_CONFIG,
+      actual: env.targetConfig,
     },
     {
       name: "get-global-config",
@@ -58,7 +59,7 @@ export const main = async () => {
         securefix_action_server_repository: "",
         securefix_action_pull_request_base_branch: "",
       },
-      actual: process.env.GLOBAL_CONFIG,
+      actual: env.globalConfig,
     },
   ];
   let failed = false;

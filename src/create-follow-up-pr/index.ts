@@ -5,6 +5,7 @@ import * as path from "path";
 import { z } from "zod";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as aqua from "../aqua";
 import * as commit from "../commit";
 import * as getTargetConfig from "../get-target-config";
@@ -113,8 +114,8 @@ const generatePRParams = (input: GeneratePRParamsInput): PRParams => {
   const { prNumber, target, tempDir, serverUrl, repository, runId } = input;
 
   const runURL = `${serverUrl}/${repository}/actions/runs/${runId}`;
-  const actor = process.env.GITHUB_ACTOR ?? "";
-  const prAuthor = process.env.CI_INFO_PR_AUTHOR ?? "";
+  const actor = env.githubActor;
+  const prAuthor = env.ciInfoPrAuthor;
 
   const branch = `follow-up-${prNumber}-${target}-${new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "")}`;
   const commitMessage = `chore: create a commit to open follow up pull request
@@ -328,11 +329,11 @@ export const main = async () => {
   const workingDir = path.join(configDir, targetConfig.working_directory);
   const target = targetConfig.target;
 
-  const prNumber = process.env.CI_INFO_PR_NUMBER || "";
-  const tempDir = process.env.CI_INFO_TEMP_DIR || "";
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
-  const repository = process.env.GITHUB_REPOSITORY ?? "";
-  const runId = process.env.GITHUB_RUN_ID ?? "";
+  const prNumber = env.ciInfoPrNumber;
+  const tempDir = env.ciInfoTempDir;
+  const serverUrl = env.githubServerUrl || "https://github.com";
+  const repository = env.githubRepository;
+  const runId = env.githubRunId;
 
   const executor = await aqua.NewExecutor({
     githubToken,

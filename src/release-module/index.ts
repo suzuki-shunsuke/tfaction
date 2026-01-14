@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
+import * as env from "../lib/env";
 
 export const main = async () => {
   const modulePath = core.getInput("module_path", { required: true });
@@ -27,9 +28,9 @@ export const main = async () => {
 
   const octokit = github.getOctokit(githubToken);
   const { owner, repo } = github.context.repo;
-  const sha = process.env.GITHUB_SHA ?? "";
-  const serverUrl = process.env.GITHUB_SERVER_URL ?? "https://github.com";
-  const repository = process.env.GITHUB_REPOSITORY ?? "";
+  const sha = env.githubSha;
+  const serverUrl = env.githubServerUrl || "https://github.com";
+  const repository = env.githubRepository;
 
   // Create tag
   core.info(`Creating tag ${tag}`);

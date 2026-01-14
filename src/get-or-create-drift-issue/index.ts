@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import { Octokit } from "@octokit/core";
 import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as path from "path";
 
 type Inputs = {
@@ -34,7 +35,7 @@ export const main = async () => {
     target: lib.getTargetFromEnv(),
     workingDir: lib.getWorkingDirFromEnv(),
     ghToken: core.getInput("github_token", { required: true }),
-    repo: process.env.GITHUB_REPOSITORY,
+    repo: env.githubRepository,
   });
 
   if (result === undefined) {

@@ -5,6 +5,7 @@ import * as os from "os";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as aqua from "../aqua";
 import * as ciinfo from "../ci-info";
 import { getTargetConfig } from "../get-target-config";
@@ -30,7 +31,7 @@ const checkLatestCommit = async (): Promise<void> => {
     return;
   }
 
-  const tempDir = process.env.CI_INFO_TEMP_DIR;
+  const tempDir = env.ciInfoTempDir;
   if (!tempDir) {
     core.warning("CI_INFO_TEMP_DIR not set, skipping latest commit check");
     return;
@@ -57,7 +58,7 @@ const addLabelToPR = async (
   octokit: ReturnType<typeof github.getOctokit>,
   target: string,
 ): Promise<void> => {
-  const prNumber = process.env.CI_INFO_PR_NUMBER;
+  const prNumber = env.ciInfoPrNumber;
   if (!prNumber) {
     core.warning("CI_INFO_PR_NUMBER not set, skipping label");
     return;

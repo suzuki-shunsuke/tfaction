@@ -7,6 +7,7 @@ import { join, dirname } from "path";
 import { arch, homedir, platform, tmpdir } from "os";
 import { mkdtempSync, existsSync, renameSync, mkdirSync } from "fs";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 
 const Version = "v2.56.2";
 const CHECKSUMS = new Map([
@@ -63,15 +64,15 @@ const getArch = (): string => {
 };
 
 const getInstallPath = (os: string): string => {
-  const aquaRoot = process.env.AQUA_ROOT_DIR;
+  const aquaRoot = env.aquaRootDir;
   if (os === "windows") {
     const base =
       aquaRoot || join(homedir(), "AppData", "Local", "aquaproj-aqua");
     return join(base, "bin", "aqua.exe");
   } else {
-    const xdgDataHome =
-      process.env.XDG_DATA_HOME || join(homedir(), ".local", "share");
-    const base = aquaRoot || join(xdgDataHome, "aquaproj-aqua");
+    const xdgDataHomeVal =
+      env.xdgDataHome || join(homedir(), ".local", "share");
+    const base = aquaRoot || join(xdgDataHomeVal, "aquaproj-aqua");
     return join(base, "bin", "aqua");
   }
 };
@@ -150,7 +151,7 @@ export class Executor {
           AQUA_GITHUB_TOKEN: this.githubToken,
         }),
         ...(this.installDir && {
-          PATH: `${process.env.PATH}:${this.installDir}`,
+          PATH: `${env.path}:${this.installDir}`,
         }),
       },
     });
@@ -170,7 +171,7 @@ export class Executor {
           AQUA_GITHUB_TOKEN: this.githubToken,
         }),
         ...(this.installDir && {
-          PATH: `${process.env.PATH}:${this.installDir}`,
+          PATH: `${env.path}:${this.installDir}`,
         }),
       },
     });

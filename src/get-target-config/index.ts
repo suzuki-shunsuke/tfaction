@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as path from "path";
 
 type Inputs = {
@@ -173,7 +174,7 @@ export const getTargetConfig = async (
     if (result.aws_role_session_name === undefined) {
       const prefix = `tfaction-${inputs.isApply ? "apply" : "plan"}`;
       const normalizedTarget = target.replaceAll("/", "_");
-      const runID = process.env.GITHUB_RUN_ID ?? "";
+      const runID = env.githubRunId;
       const names = [
         `${prefix}-${normalizedTarget}-${runID}`,
         `${prefix}-${normalizedTarget}`,

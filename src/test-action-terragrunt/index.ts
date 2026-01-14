@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { diffString } from "json-diff";
+import * as env from "../lib/env";
 
 type TestData = {
   name: string;
@@ -16,7 +17,7 @@ export const main = async () => {
         "setup/test/terragrunt/module": ["setup/test/terragrunt/foo"],
       },
       actual: fs.readFileSync(
-        JSON.parse(process.env.LIST_MODULE_CALLERS || "{}").file || "dummy",
+        JSON.parse(env.listModuleCallers || "{}").file || "dummy",
         "utf8",
       ),
     },

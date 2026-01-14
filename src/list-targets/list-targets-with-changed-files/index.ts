@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../../lib";
+import * as env from "../../lib/env";
 import * as aqua from "../../aqua";
 import { list as listModuleCallers } from "./list-module-callers";
 
@@ -434,10 +435,10 @@ const handleLabels = (
 
 export const main = async (executor: aqua.Executor) => {
   // The path to ci-info's pr.json.
-  if (!process.env.CI_INFO_TEMP_DIR) {
+  if (!env.ciInfoTempDir) {
     throw new Error("CI_INFO_TEMP_DIR is not set");
   }
-  const prPath = `${process.env.CI_INFO_TEMP_DIR}/pr.json`;
+  const prPath = `${env.ciInfoTempDir}/pr.json`;
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
   const cfg = lib.getConfig();
 
@@ -461,15 +462,12 @@ export const main = async (executor: aqua.Executor) => {
 
   const result = await run({
     labels: fs
-      .readFileSync(`${process.env.CI_INFO_TEMP_DIR}/labels.txt`, "utf8")
+      .readFileSync(`${env.ciInfoTempDir}/labels.txt`, "utf8")
       .split("\n"),
     config: cfg,
     isApply: lib.getIsApply(),
     changedFiles: fs
-      .readFileSync(
-        `${process.env.CI_INFO_TEMP_DIR}/pr_all_filenames.txt`,
-        "utf8",
-      )
+      .readFileSync(`${env.ciInfoTempDir}/pr_all_filenames.txt`, "utf8")
       .split("\n"),
     configFiles,
     moduleFiles: modules,
