@@ -5,6 +5,7 @@ import * as path from "path";
 import Handlebars from "handlebars";
 
 import * as aqua from "../aqua";
+import * as lib from "../lib";
 
 const copyDirectory = (src: string, dest: string): void => {
   if (!fs.existsSync(dest)) {
@@ -64,16 +65,21 @@ const replaceInFiles = async (
 export const main = async () => {
   const githubToken = core.getInput("github_token");
 
-  const modulePath = process.env.TFACTION_MODULE_PATH ?? "";
-  const templateDir = process.env.TFACTION_MODULE_TEMPLATE_DIR ?? "";
+  const configDir = path.dirname(lib.getConfigPathFromEnv());
 
   // Validate inputs
-  if (!modulePath) {
+  if (!process.env.TFACTION_MODULE_PATH) {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
-  if (!templateDir) {
+  if (!process.env.TFACTION_MODULE_TEMPLATE_DIR) {
     throw new Error("env.TFACTION_MODULE_TEMPLATE_DIR is required");
   }
+
+  const modulePath = path.join(configDir, process.env.TFACTION_MODULE_PATH);
+  const templateDir = path.join(
+    configDir,
+    process.env.TFACTION_MODULE_TEMPLATE_DIR,
+  );
 
   // Check if module path already exists
   if (fs.existsSync(modulePath)) {

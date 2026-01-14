@@ -257,6 +257,15 @@ jobs:
         env:
           TFACTION_WORKING_DIR: zoo
 
+      - name: Test scaffold-module
+        uses: ./
+        with:
+          action: scaffold-module
+        env:
+          TFACTION_WORKING_DIR: ""
+          TFACTION_MODULE_PATH: modules/yoo
+          TFACTION_MODULE_TEMPLATE_DIR: templates/module-github
+
       - name: Test get-target-config
         uses: ./
         id: target-config

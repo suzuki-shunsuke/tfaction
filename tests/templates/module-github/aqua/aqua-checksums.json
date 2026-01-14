@@ -1,0 +1,54 @@
+{
+  "checksums": [
+    {
+      "id": "github_release/github.com/aquasecurity/trivy/v0.46.0/trivy_0.46.0_Linux-64bit.tar.gz",
+      "checksum": "D26B6A5B4445C4A7F99E104A8C47579AEC150023FB927D55F8622E760C171AF2",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/aquasecurity/trivy/v0.46.0/trivy_0.46.0_Linux-ARM64.tar.gz",
+      "checksum": "6AF0383E99B579203BBA3286C780BEBFC49A1EFB66739BC6FEFA3B0A779499B4",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/aquasecurity/trivy/v0.46.0/trivy_0.46.0_macOS-64bit.tar.gz",
+      "checksum": "C2E498941FE8914C3B364AE982ABB1DEA362AF0DEF7E6F15175166B3CFFF5947",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/aquasecurity/trivy/v0.46.0/trivy_0.46.0_macOS-ARM64.tar.gz",
+      "checksum": "B5A8F853A132B18BFF6ABA3E20604F81DE724DEFCCD188B53FFF1ED55BE00918",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/terraform-linters/tflint/v0.48.0/tflint_darwin_amd64.zip",
+      "checksum": "8F491F42A07152B27D7C3599FAF24EB839A202F5C58EF735740303AE3CAD51FA",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/terraform-linters/tflint/v0.48.0/tflint_darwin_arm64.zip",
+      "checksum": "88BBA0BD1CA4012F836D14093E5D18CF0D6633C7FEA82404382FDA70C99753A0",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/terraform-linters/tflint/v0.48.0/tflint_linux_amd64.zip",
+      "checksum": "13C7947963C4DC4F0AA9E0CB7A0854367A425162A508BC7517D1CBCBEF822F3C",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/terraform-linters/tflint/v0.48.0/tflint_linux_arm64.zip",
+      "checksum": "EF4E07EF95E5F2779DF0ED43E62364855DAFB92B938CF62F08C64016DE2756B0",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/terraform-linters/tflint/v0.48.0/tflint_windows_amd64.zip",
+      "checksum": "1EFAB7EA19E8ADB73CAE770E5EDABAE44A5CEBD63BAF203A5D3270948DB55648",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.71.0/registry.yaml",
+      "checksum": "A1C0A6710A70FA6C8CA737392B1E4455B9D25C42650631F8713B7E45680B74456892B4EA2EB71AAF4EB272DC5B0B73C226A54E60BA4561B12D0FFE47A5DDC78A",
+      "algorithm": "sha512"
+    }
+  ]
+}
