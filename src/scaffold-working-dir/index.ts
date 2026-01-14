@@ -73,9 +73,10 @@ export const main = async () => {
     config,
   );
 
-  const workingDir = targetConfig.working_directory;
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
   const target = targetConfig.target;
-  const templateDir = targetConfig.template_dir;
+  const templateDir = path.join(configDir, targetConfig.template_dir ?? "");
   const s3Bucket = targetConfig.s3_bucket_name_tfmigrate_history;
   const gcsBucket = targetConfig.gcs_bucket_name_tfmigrate_history;
   const workingDirectoryFile = config.working_directory_file;
