@@ -30,7 +30,6 @@ export const main = async (): Promise<void> => {
     path.dirname(cfg.config_path),
     targetConfig.working_directory,
   );
-  const tfCommand = targetConfig.terraform_command || "terraform";
   const driftIssueRepo = lib.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;
@@ -40,12 +39,6 @@ export const main = async (): Promise<void> => {
   );
   const securefixServerRepository =
     cfg.securefix_action?.server_repository ?? "";
-
-  // Set TFMIGRATE_EXEC_PATH if needed
-  const tfmigrateExecPath = env.tfmigrateExecPath;
-  if (!tfmigrateExecPath && tfCommand !== "terraform") {
-    process.env.TFMIGRATE_EXEC_PATH = tfCommand;
-  }
 
   // Create a temporary file for apply output
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
@@ -80,6 +73,9 @@ export const main = async (): Promise<void> => {
           env: {
             GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
             GITHUB_TOKEN: githubToken,
+            ...(env.tfmigrateExecPath && {
+              TFMIGRATE_EXEC_PATH: env.tfmigrateExecPath,
+            }),
           },
           listeners: {
             stdout: (data: Buffer) => {

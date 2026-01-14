@@ -151,7 +151,7 @@ export class Executor {
           AQUA_GITHUB_TOKEN: this.githubToken,
         }),
         ...(this.installDir && {
-          PATH: `${process.env.PATH}:${this.installDir}`,
+          PATH: `${env.path}:${this.installDir}`,
         }),
       },
     });
@@ -171,7 +171,7 @@ export class Executor {
           AQUA_GITHUB_TOKEN: this.githubToken,
         }),
         ...(this.installDir && {
-          PATH: `${process.env.PATH}:${this.installDir}`,
+          PATH: `${env.path}:${this.installDir}`,
         }),
       },
     });

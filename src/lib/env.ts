@@ -1,3 +1,5 @@
+export const path = process.env.PATH ?? "";
+
 // GitHub Actions
 export const githubServerUrl = process.env.GITHUB_SERVER_URL ?? "";
 export const githubRepository = process.env.GITHUB_REPOSITORY ?? "";
