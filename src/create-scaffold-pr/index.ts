@@ -1,8 +1,8 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as git from "../lib/git";
 import * as aqua from "../aqua";
 import * as getTargetConfig from "../get-target-config";
 import * as commit from "../commit";
@@ -18,25 +18,6 @@ const generateBranchName = (target: string): string => {
     now.getMinutes().toString().padStart(2, "0") +
     now.getSeconds().toString().padStart(2, "0");
   return `scaffold-working-directory-${target}-${timestamp}`;
-};
-
-const getModifiedFiles = async (workingDir: string): Promise<string[]> => {
-  let output = "";
-  await exec.exec(
-    "git",
-    ["ls-files", "--modified", "--others", "--exclude-standard", workingDir],
-    {
-      listeners: {
-        stdout: (data: Buffer) => {
-          output += data.toString();
-        },
-      },
-    },
-  );
-  return output
-    .split("\n")
-    .map((f) => f.trim())
-    .filter((f) => f.length > 0);
 };
 
 const writeSkipCreatePrSummary = (
@@ -117,7 +98,7 @@ export const main = async () => {
   core.info(`Generated branch name: ${branch}`);
 
   // Get modified files
-  const files = await getModifiedFiles(workingDir);
+  const files = await git.getModifiedFiles(workingDir);
   core.info(`Found ${files.length} modified files`);
   if (files.length === 0) {
     core.info("No files to commit");

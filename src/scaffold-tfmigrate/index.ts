@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
@@ -7,6 +6,7 @@ import Handlebars from "handlebars";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as git from "../lib/git";
 import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
 import * as commit from "../commit";
@@ -27,41 +27,6 @@ const generateBranchName = (target: string, prNumber: string): string => {
     now.getMinutes().toString().padStart(2, "0") +
     now.getSeconds().toString().padStart(2, "0");
   return `scaffold-tfmigrate-${target}-${timestamp}`;
-};
-
-const getCurrentBranch = async (): Promise<string> => {
-  let output = "";
-  await exec.exec("git", ["branch", "--show-current"], {
-    listeners: {
-      stdout: (data: Buffer) => {
-        output += data.toString();
-      },
-    },
-  });
-  return output.trim();
-};
-
-const getModifiedFiles = async (
-  gitRootDir: string,
-  workingDir: string,
-): Promise<string[]> => {
-  let output = "";
-  await exec.exec(
-    "git",
-    ["ls-files", "--modified", "--others", "--exclude-standard", workingDir],
-    {
-      cwd: gitRootDir,
-      listeners: {
-        stdout: (data: Buffer) => {
-          output += data.toString();
-        },
-      },
-    },
-  );
-  return output
-    .split("\n")
-    .map((f) => f.trim())
-    .filter((f) => f.length > 0);
 };
 
 const createTfmigrateHcl = (
@@ -263,7 +228,7 @@ export const main = async () => {
         GITHUB_TOKEN: githubToken,
       },
     });
-    branch = await getCurrentBranch();
+    branch = await git.getCurrentBranch();
   }
 
   // Create directory
@@ -288,7 +253,7 @@ export const main = async () => {
   createMigrationFile(workingDir, migrationName, actionPath);
 
   // Get modified files
-  const files = await getModifiedFiles(gitRootDir, workingDir);
+  const files = await git.getModifiedFiles(workingDir, gitRootDir);
   if (files.length === 0) {
     core.info("No files to commit");
     return;

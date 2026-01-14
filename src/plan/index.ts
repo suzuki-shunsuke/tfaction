@@ -1,9 +1,9 @@
 import * as core from "@actions/core";
 import * as fs from "fs";
-import * as exec from "@actions/exec";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as git from "../lib/git";
 import { getTargetConfig } from "../get-target-config";
 import * as checkTerraformSkip from "../check-terraform-skip";
 import { main as runPlan } from "./run";
@@ -49,18 +49,8 @@ export const main = async () => {
           config.securefix_action?.server_repository ?? "";
 
         if (fs.existsSync(tfmigrateHclPath)) {
-          // Use git to check if the file is new or modified
-          let gitOutput = "";
-          await exec.exec("git", ["status", "--porcelain", tfmigrateHclPath], {
-            listeners: {
-              stdout: (data: Buffer) => {
-                gitOutput += data.toString();
-              },
-            },
-          });
-
           // If the file is new or modified, commit it
-          if (gitOutput.trim().length > 0) {
+          if (await git.hasFileChangedPorcelain(tfmigrateHclPath)) {
             core.info("Committing .tfmigrate.hcl");
             await createCommit({
               commitMessage: "chore(tfmigrate): add .tfmigrate.hcl",
