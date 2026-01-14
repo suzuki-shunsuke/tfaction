@@ -51,5 +51,5 @@ replace:
       replace: /
 
 target_groups:
-  - working_directory: zoo
+  - working_directory: ""
     template_dir: ../templates/github

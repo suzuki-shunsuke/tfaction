@@ -51,19 +51,7 @@ replace:
       replace: /
 
 target_groups:
-  - working_directory: aws
-    aws_region: ap-northeast-1
-    s3_bucket_name_tfmigrate_history: 0000-0000-0000-suzuki-shunsuke-tfmigrate-history
-    template_dir: templates/github
-    terraform_plan_config:
-      aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan
-    tfmigrate_plan_config:
-      aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_plan
-    terraform_apply_config:
-      aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_apply
-    tfmigrate_apply_config:
-      aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_tfmigrate_apply
-  - working_directory: foo
+  - working_directory: ""
     aws_region: ap-northeast-1
     s3_bucket_name_tfmigrate_history: 0000-0000-0000-suzuki-shunsuke-tfmigrate-history
     template_dir: templates/github

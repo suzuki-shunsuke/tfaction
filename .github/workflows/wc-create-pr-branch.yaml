@@ -46,24 +46,20 @@ jobs:
           - key: terraform
             TFACTION_CONFIG: tests/tfaction-root.yaml
             TFACTION_WORKING_DIR: foo
-            TFACTION_JOB_TYPE: terraform
           - key: opentofu
             TFACTION_WORKING_DIR: bar
             TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
-            TFACTION_JOB_TYPE: terraform
           - key: terragrunt
             TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
             TFACTION_WORKING_DIR: zoo
-            TFACTION_JOB_TYPE: terraform
     env:
       TFACTION_CONFIG: ${{matrix.env.TFACTION_CONFIG}}
       TFACTION_WORKING_DIR: ${{matrix.env.TFACTION_WORKING_DIR}}
-      TFACTION_JOB_TYPE: ${{matrix.env.TFACTION_JOB_TYPE}}
+      TFACTION_JOB_TYPE: terraform
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
-          path: ${{matrix.env.dir}}
       - run: gh pr checkout "$PR"
         if: inputs.pr != ''
         env:
@@ -133,32 +129,26 @@ jobs:
       matrix:
         env:
           - key: terraform
-            dir: yoo
             TFACTION_CONFIG: yoo/tests/tfaction-root.yaml
-            TFACTION_WORKING_DIR: foo
-            TFACTION_JOB_TYPE: terraform
+            TFACTION_WORKING_DIR: foo-2
           - key: opentofu
-            dir: yoo
-            TFACTION_WORKING_DIR: bar
+            TFACTION_WORKING_DIR: bar-2
             TFACTION_CONFIG: yoo/tests/opentofu/tfaction-root.yaml
-            TFACTION_JOB_TYPE: terraform
           - key: terragrunt
-            dir: yoo
             TFACTION_CONFIG: yoo/tests/terragrunt/tfaction-root.yaml
-            TFACTION_WORKING_DIR: zoo
-            TFACTION_JOB_TYPE: terraform
+            TFACTION_WORKING_DIR: zoo-2
     env:
       TFACTION_CONFIG: ${{matrix.env.TFACTION_CONFIG}}
       TFACTION_WORKING_DIR: ${{matrix.env.TFACTION_WORKING_DIR}}
-      TFACTION_JOB_TYPE: ${{matrix.env.TFACTION_JOB_TYPE}}
+      TFACTION_JOB_TYPE: terraform
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
-          path: ${{matrix.env.dir}}
+          path: yoo
       - run: gh pr checkout "$PR"
         if: inputs.pr != ''
-        working-directory: ${{matrix.env.dir}}
+        working-directory: yoo
         env:
           GITHUB_TOKEN: ${{github.token}}
           PR: ${{inputs.pr}}
@@ -167,7 +157,7 @@ jobs:
           path: yoo/dist
           name: js
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
-        working-directory: ${{matrix.env.dir}}
+        working-directory: yoo
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
