@@ -222,6 +222,7 @@ interface SkipCreateCommentParams {
   target: string;
   mentions: string;
   executor: aqua.Executor;
+  workingDir: string;
 }
 
 const postSkipCreateComment = async (
@@ -238,6 +239,7 @@ const postSkipCreateComment = async (
     groupLabel,
     target,
     mentions,
+    workingDir,
   } = params;
 
   const createOpts: string[] = [
@@ -277,6 +279,7 @@ const postSkipCreateComment = async (
       `opts:${optsString}`,
     ],
     {
+      cwd: workingDir,
       env: {
         GITHUB_TOKEN: githubToken,
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
@@ -295,6 +298,9 @@ export const main = async () => {
   const octokit = github.getOctokit(githubToken);
 
   const config = lib.getConfig();
+  const configDir = path.dirname(config.config_path);
+  const gitRootDir = await lib.getGitRootDir(configDir);
+  const workspace = lib.getGitHubWorkspace();
 
   const skipCreatePr = config.skip_create_pr;
   const draftPr = config.draft_pr;
@@ -306,20 +312,21 @@ export const main = async () => {
   const securefixPRBaseBranch =
     config.securefix_action?.pull_request?.base_branch ?? "";
 
+  const jobType = lib.getJobType();
+
   // Get target config
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
       target: lib.getTargetFromEnv(),
       workingDir: lib.getWorkingDirFromEnv(),
       isApply: lib.getIsApply(),
-      jobType: lib.getJobType(),
+      jobType,
     },
     config,
   );
 
-  const workingDir =
-    targetConfig.working_directory || lib.getWorkingDirFromEnv() || "";
-  const target = targetConfig.target || lib.getTargetFromEnv() || "";
+  const workingDir = path.join(configDir, targetConfig.working_directory);
+  const target = targetConfig.target;
 
   const prNumber = process.env.CI_INFO_PR_NUMBER || "";
   const tempDir = process.env.CI_INFO_TEMP_DIR || "";
@@ -352,11 +359,12 @@ export const main = async () => {
   });
 
   // Create failed-prs file
-  const failedPrsFile = createFailedPrsFile(
-    workingDir,
-    serverUrl,
-    repository,
-    prNumber,
+  const failedPrsFile = path.relative(
+    gitRootDir,
+    path.join(
+      workspace,
+      createFailedPrsFile(workingDir, serverUrl, repository, prNumber),
+    ),
   );
 
   // Build PR comment for securefix
@@ -372,10 +380,19 @@ Please handle this pull request.
 1. Add commits to this pull request and fix the problem if needed
 1. Review and merge this pull request`;
 
+  const labels: string[] = [];
+  if (groupLabel) {
+    labels.push(groupLabel);
+  }
+  if (jobType === "tfmigrate") {
+    labels.push(config.label_prefixes.tfmigrate + target);
+  }
+
   // Create commit and PR
   const followUpPrUrl = await commit.create({
     commitMessage: prParams.commitMessage,
     githubToken,
+    rootDir: gitRootDir,
     files: new Set([failedPrsFile]),
     serverRepository: securefixServerRepository,
     appId: securefixAppId,
@@ -387,7 +404,7 @@ Please handle this pull request.
           title: prParams.prTitle,
           body: prParams.prBody,
           base: securefixPRBaseBranch,
-          labels: groupLabel ? [groupLabel] : undefined,
+          labels: labels,
           assignees:
             prParams.assignees.length > 0 ? prParams.assignees : undefined,
           draft: draftPr,
@@ -413,6 +430,7 @@ Please handle this pull request.
         "create-follow-up-pr",
       ],
       {
+        cwd: workingDir,
         env: {
           GITHUB_TOKEN: githubToken,
         },
@@ -435,6 +453,7 @@ Please handle this pull request.
       target,
       mentions: prParams.mentions,
       executor,
+      workingDir,
     });
   }
 };
