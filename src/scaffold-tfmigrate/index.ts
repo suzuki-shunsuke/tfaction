@@ -40,12 +40,16 @@ const getCurrentBranch = async (): Promise<string> => {
   return output.trim();
 };
 
-const getModifiedFiles = async (workingDir: string): Promise<string[]> => {
+const getModifiedFiles = async (
+  gitRootDir: string,
+  workingDir: string,
+): Promise<string[]> => {
   let output = "";
   await exec.exec(
     "git",
     ["ls-files", "--modified", "--others", "--exclude-standard", workingDir],
     {
+      cwd: gitRootDir,
       listeners: {
         stdout: (data: Buffer) => {
           output += data.toString();
@@ -74,7 +78,7 @@ const createTfmigrateHcl = (
 
   if (s3Bucket) {
     const template = fs.readFileSync(
-      path.join(actionPath, "tfmigrate.hcl"),
+      path.join(actionPath, "install", "tfmigrate.hcl"),
       "utf8",
     );
 
@@ -86,7 +90,7 @@ const createTfmigrateHcl = (
     core.info(`Created .tfmigrate.hcl with S3 backend`);
   } else if (gcsBucket) {
     const template = fs.readFileSync(
-      path.join(actionPath, "tfmigrate-gcs.hcl"),
+      path.join(actionPath, "install", "tfmigrate-gcs.hcl"),
       "utf8",
     );
     const content = Handlebars.compile(template)({
@@ -109,7 +113,7 @@ const createMigrationFile = (
   }
 
   const template = fs.readFileSync(
-    path.join(actionPath, "migration.hcl"),
+    path.join(actionPath, "install", "migration.hcl"),
     "utf8",
   );
   const content = Handlebars.compile(template)({
@@ -225,7 +229,8 @@ export const main = async () => {
     config,
   );
 
-  const workingDir = targetConfig.working_directory;
+  const configDir = path.dirname(config.config_path);
+  const workingDir = path.join(configDir, targetConfig.working_directory);
   const target = targetConfig.target;
 
   const skipCreatePr = config.skip_create_pr;
@@ -241,18 +246,20 @@ export const main = async () => {
   const repository = process.env.GITHUB_REPOSITORY ?? "";
   const runId = process.env.GITHUB_RUN_ID ?? "";
 
+  const gitRootDir = await lib.getGitRootDir(configDir);
+
   const executor = await aqua.NewExecutor({
     githubToken,
+    cwd: workingDir,
   });
 
   // Checkout PR if pr_number is provided
   let branch = generateBranchName(target, prNumber);
   if (prNumber) {
     await executor.exec("gh", ["pr", "checkout", prNumber], {
+      cwd: configDir,
       env: {
-        ...process.env,
         GITHUB_TOKEN: githubToken,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
       },
     });
     branch = await getCurrentBranch();
@@ -280,7 +287,7 @@ export const main = async () => {
   createMigrationFile(workingDir, migrationName, actionPath);
 
   // Get modified files
-  const files = await getModifiedFiles(workingDir);
+  const files = await getModifiedFiles(gitRootDir, workingDir);
   if (files.length === 0) {
     core.info("No files to commit");
     return;
@@ -298,6 +305,7 @@ Please handle this pull request.`;
   const shouldSkipPr = skipCreatePr || !!prNumber;
   await commit.create({
     commitMessage,
+    rootDir: gitRootDir,
     githubToken,
     files: new Set(files),
     serverRepository: securefixServerRepository ?? "",
@@ -327,7 +335,4 @@ Please handle this pull request.`;
   if (prNumber) {
     await addLabelToPR(octokit, prNumber, label);
   }
-
-  // Set output
-  core.setOutput("working_directory", workingDir);
 };

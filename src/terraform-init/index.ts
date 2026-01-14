@@ -16,8 +16,12 @@ const isPullRequestEvent = (): boolean => {
 };
 
 // Check if a file has changed using git diff
-const hasFileChanged = async (file: string): Promise<boolean> => {
+const hasFileChanged = async (
+  file: string,
+  cwd: string | undefined,
+): Promise<boolean> => {
   const result = await exec.getExecOutput("git", ["diff", "--quiet", file], {
+    cwd,
     ignoreReturnCode: true,
   });
   return result.exitCode !== 0;
@@ -42,13 +46,17 @@ export const main = async () => {
   const tfCommand = targetConfig.terraform_command;
   const providersLockOpts = targetConfig.providers_lock_opts;
 
+  const gitRootDir = await lib.getGitRootDir(workingDir);
+  const workspace = lib.getGitHubWorkspace();
+
   const executor = await aqua.NewExecutor({
     githubToken,
     cwd: workingDir,
   });
 
   const terragruntRunAvailable =
-    tfCommand === "terragrunt" && (await aqua.checkTerrgruntRun(executor));
+    tfCommand === "terragrunt" &&
+    (await aqua.checkTerrgruntRun(executor, workingDir));
 
   if (!isPullRequestEvent()) {
     // Non-PR: just run init with github-comment
@@ -116,12 +124,20 @@ export const main = async () => {
     core.endGroup();
 
     // Check if lock file changed
-    if (!existedBefore || (await hasFileChanged(lockFile))) {
+    if (
+      !existedBefore ||
+      (await hasFileChanged(".terraform.lock.hcl", workingDir))
+    ) {
       // Commit the change
+      const lockFileFromGitRootDir = path.relative(
+        gitRootDir,
+        path.join(workspace, lockFile),
+      );
       await commit.create({
         commitMessage: "chore: update .terraform.lock.hcl",
         githubToken,
-        files: new Set([lockFile]),
+        rootDir: gitRootDir,
+        files: new Set([lockFileFromGitRootDir]),
         serverRepository: core.getInput("securefix_action_server_repository"),
         appId: core.getInput("securefix_action_app_id"),
         appPrivateKey: core.getInput("securefix_action_app_private_key"),

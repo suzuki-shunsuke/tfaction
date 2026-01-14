@@ -51,4 +51,4 @@ replace:
       replace: /
 
 target_groups:
-  - working_directory: bar
+  - working_directory: ""
