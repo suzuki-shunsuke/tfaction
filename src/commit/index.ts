@@ -78,6 +78,15 @@ export const create = async (inputs: Inputs): Promise<string> => {
   });
   core.notice(`Created PR: ${pr.html_url}`);
 
+  if (inputs.pr.comment) {
+    await octokit.rest.issues.createComment({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      issue_number: pr.number,
+      body: inputs.pr.comment,
+    });
+  }
+
   if (inputs.pr.labels && inputs.pr.labels.length > 0) {
     await octokit.rest.issues.addLabels({
       owner: github.context.repo.owner,
@@ -85,7 +94,6 @@ export const create = async (inputs: Inputs): Promise<string> => {
       issue_number: pr.number,
       labels: inputs.pr.labels,
     });
-    core.notice(`Added labels to PR: ${pr.html_url}`);
   }
 
   if (inputs.pr.assignees && inputs.pr.assignees.length > 0) {
@@ -95,7 +103,6 @@ export const create = async (inputs: Inputs): Promise<string> => {
       issue_number: pr.number,
       assignees: inputs.pr.assignees,
     });
-    core.notice(`Added assignees to PR: ${pr.html_url}`);
   }
   return pr.html_url;
 };
