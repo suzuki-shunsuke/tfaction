@@ -26,7 +26,6 @@ tflint:
   fix: true
 
 scaffold_working_directory:
-  skip_adding_aqua_packages: true
 
 # aqua:
 #   update_checksum:
