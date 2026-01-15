@@ -56,13 +56,20 @@ export const main = async () => {
 
         if (fs.existsSync(tfmigrateHclPath)) {
           // If the file is new or modified, commit it
-          if (await git.hasFileChangedPorcelain(tfmigrateHclPath, config.git_root_dir)) {
+          if (
+            await git.hasFileChangedPorcelain(
+              tfmigrateHclPath,
+              config.git_root_dir,
+            )
+          ) {
             core.info("Committing .tfmigrate.hcl");
             await createCommit({
               commitMessage: "chore(tfmigrate): add .tfmigrate.hcl",
               githubToken,
               rootDir: config.git_root_dir,
-              files: new Set([path.relative(config.git_root_dir, tfmigrateHclPath)]),
+              files: new Set([
+                path.relative(config.git_root_dir, tfmigrateHclPath),
+              ]),
               serverRepository,
               appId: securefixAppId,
               appPrivateKey: securefixAppPrivateKey,

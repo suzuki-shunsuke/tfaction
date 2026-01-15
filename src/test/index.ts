@@ -29,7 +29,10 @@ export const main = async () => {
     config,
   );
 
-  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
   const destroy = targetConfig.destroy ?? false;
   const tfCommand = targetConfig.terraform_command;
   const target = targetConfig.target;

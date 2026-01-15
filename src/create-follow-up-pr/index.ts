@@ -323,7 +323,10 @@ export const main = async () => {
     config,
   );
 
-  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
   const target = targetConfig.target;
 
   const prNumber = env.ciInfoPrNumber;

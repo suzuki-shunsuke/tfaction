@@ -195,7 +195,10 @@ export const main = async () => {
     config,
   );
 
-  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
   const target = targetConfig.target;
 
   const skipCreatePr = config.skip_create_pr;
@@ -210,7 +213,6 @@ export const main = async () => {
   const serverUrl = env.githubServerUrl || "https://github.com";
   const repository = env.githubRepository;
   const runId = env.githubRunId;
-
 
   const executor = await aqua.NewExecutor({
     githubToken,

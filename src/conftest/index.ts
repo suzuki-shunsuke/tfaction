@@ -225,7 +225,10 @@ export const run = async (
 ) => {
   const executor = inputs.executor;
 
-  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
   const wdConfig = lib.readTargetConfig(
     path.join(workingDir, config.working_directory_file),
   );

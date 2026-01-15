@@ -119,7 +119,10 @@ export const main = async () => {
     },
     config,
   );
-  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
 
   // Set environment variables from target config
   core.exportVariable("TFACTION_WORKING_DIR", targetConfig.working_directory);

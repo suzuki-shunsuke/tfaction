@@ -349,7 +349,10 @@ export const main = async (
   targetConfig: getTargetConfig.TargetConfig,
 ): Promise<void> => {
   const config = await lib.getConfig();
-  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
 
   const githubToken = core.getInput("github_token");
   const executor = await aqua.NewExecutor({
