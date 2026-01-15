@@ -2,12 +2,13 @@ import * as core from "@actions/core";
 
 // Common inputs used across multiple actions
 export const githubToken = core.getInput("github_token");
-export const securefixActionAppId =
-  core.getInput("securefix_action_app_id") || "";
-export const securefixActionAppPrivateKey =
-  core.getInput("securefix_action_app_private_key") || "";
-export const securefixActionServerRepository =
-  core.getInput("securefix_action_server_repository") || "";
+export const securefixActionAppId = core.getInput("securefix_action_app_id");
+export const securefixActionAppPrivateKey = core.getInput(
+  "securefix_action_app_private_key",
+);
+export const securefixActionServerRepository = core.getInput(
+  "securefix_action_server_repository",
+);
 export const sshKey = core.getInput("ssh_key");
 
 // Action-specific inputs
