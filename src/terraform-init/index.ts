@@ -1,11 +1,11 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
 
 import { getTargetConfig } from "../get-target-config";
 import * as lib from "../lib";
+import * as git from "../lib/git";
 import * as aqua from "../aqua";
 import * as commit from "../commit";
 
@@ -13,18 +13,6 @@ import * as commit from "../commit";
 const isPullRequestEvent = (): boolean => {
   const eventName = github.context.eventName;
   return eventName === "pull_request" || eventName.startsWith("pull_request_");
-};
-
-// Check if a file has changed using git diff
-const hasFileChanged = async (
-  file: string,
-  cwd: string | undefined,
-): Promise<boolean> => {
-  const result = await exec.getExecOutput("git", ["diff", "--quiet", file], {
-    cwd,
-    ignoreReturnCode: true,
-  });
-  return result.exitCode !== 0;
 };
 
 export const main = async () => {
@@ -126,7 +114,7 @@ export const main = async () => {
     // Check if lock file changed
     if (
       !existedBefore ||
-      (await hasFileChanged(".terraform.lock.hcl", workingDir))
+      (await git.hasFileChanged(".terraform.lock.hcl", workingDir))
     ) {
       // Commit the change
       const lockFileFromGitRootDir = path.relative(

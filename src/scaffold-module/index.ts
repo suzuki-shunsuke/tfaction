@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import Handlebars from "handlebars";
@@ -7,6 +6,7 @@ import Handlebars from "handlebars";
 import * as aqua from "../aqua";
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as git from "../lib/git";
 
 const copyDirectory = (src: string, dest: string): void => {
   if (!fs.existsSync(dest)) {
@@ -30,24 +30,7 @@ const replaceInFiles = async (
   workingDir: string,
   vars: Record<string, string>,
 ): Promise<void> => {
-  let output = "";
-  await exec.exec(
-    "git",
-    ["ls-files", "--modified", "--others", "--exclude-standard", "."],
-    {
-      cwd: workingDir,
-      listeners: {
-        stdout: (data: Buffer) => {
-          output += data.toString();
-        },
-      },
-    },
-  );
-
-  const files = output
-    .split("\n")
-    .map((f) => f.trim())
-    .filter((f) => f.length > 0);
+  const files = await git.getModifiedFiles(".", workingDir);
 
   for (const file of files) {
     const filePath = path.join(workingDir, file);

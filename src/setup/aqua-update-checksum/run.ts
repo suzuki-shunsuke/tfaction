@@ -1,10 +1,10 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
+import * as git from "../../lib/git";
 import * as commit from "../../commit";
 
 type Inputs = {
@@ -78,34 +78,12 @@ const checkIfChanged = async (
   checksumFile: string,
   workingDir: string,
 ): Promise<boolean> => {
-  const lsFilesExitCode = await exec.exec(
-    "git",
-    ["ls-files", "--error-unmatch", "--", checksumFile],
-    {
-      cwd: workingDir,
-      ignoreReturnCode: true,
-      silent: true,
-    },
-  );
-
-  if (lsFilesExitCode !== 0) {
-    // File is not tracked, so it's a new file
+  // File is not tracked, so it's a new file
+  if (!(await git.isFileTracked(checksumFile, workingDir))) {
     return true;
   }
-
   // Check if file has changes
-  const diffExitCode = await exec.exec(
-    "git",
-    ["diff", "--quiet", "--", checksumFile],
-    {
-      cwd: workingDir,
-      ignoreReturnCode: true,
-      silent: true,
-    },
-  );
-
-  // git diff --quiet returns 0 if no changes, 1 if there are changes
-  return diffExitCode !== 0;
+  return await git.hasFileChanged(checksumFile, workingDir);
 };
 
 /**
