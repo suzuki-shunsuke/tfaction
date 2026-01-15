@@ -8,7 +8,6 @@ import * as aqua from "../aqua";
 import * as commit from "../commit";
 
 const generateBranchName = (modulePath: string): string => {
-  const sanitizedPath = modulePath.replace(/\//g, "_");
   const now = new Date();
   const timestamp =
     now.getFullYear().toString() +
@@ -18,7 +17,7 @@ const generateBranchName = (modulePath: string): string => {
     now.getHours().toString().padStart(2, "0") +
     now.getMinutes().toString().padStart(2, "0") +
     now.getSeconds().toString().padStart(2, "0");
-  return `scaffold-module-${sanitizedPath}-${timestamp}`;
+  return `scaffold-module-${modulePath}-${timestamp}`.replaceAll("/", "__");
 };
 
 const writeSkipCreatePrSummary = (

@@ -118,7 +118,11 @@ const generatePRParams = (input: GeneratePRParamsInput): PRParams => {
   const actor = env.githubActor;
   const prAuthor = env.ciInfoPrAuthor;
 
-  const branch = `follow-up-${prNumber}-${target}-${new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "")}`;
+  const branch =
+    `follow-up-${prNumber}-${target}-${new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "")}`.replaceAll(
+      "/",
+      "__",
+    );
   const commitMessage = `chore: create a commit to open follow up pull request
 Follow up #${prNumber}
 ${runURL}`;

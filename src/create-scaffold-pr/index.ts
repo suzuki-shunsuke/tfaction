@@ -19,7 +19,10 @@ const generateBranchName = (target: string): string => {
     now.getHours().toString().padStart(2, "0") +
     now.getMinutes().toString().padStart(2, "0") +
     now.getSeconds().toString().padStart(2, "0");
-  return `scaffold-working-directory-${target}-${timestamp}`;
+  return `scaffold-working-directory-${target}-${timestamp}`.replaceAll(
+    "/",
+    "__",
+  );
 };
 
 const writeSkipCreatePrSummary = (
