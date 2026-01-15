@@ -258,7 +258,17 @@ const RawConfig = z.object({
   plan_workflow_name: z.string(),
   renovate_login: z.string().optional(),
   renovate_terraform_labels: z.string().array().optional(),
-  scaffold_working_directory: z.object({}).nullish(),
+  scaffold_working_directory: z
+    .object({
+      pull_request: z
+        .object({
+          title: z.string().optional(),
+          body: z.string().optional(),
+          comment: z.string().optional(),
+        })
+        .nullish(),
+    })
+    .nullish(),
   skip_create_pr: z.boolean().optional(),
   skip_terraform_by_renovate: z.boolean().optional(),
   target_groups: TargetGroup.array(),

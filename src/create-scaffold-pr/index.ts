@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import Handlebars from "handlebars";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
@@ -111,12 +112,33 @@ export const main = async () => {
   const actor = env.githubActor;
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
+  const vars = {
+    target: target,
+    working_dir: workingDir,
+    actor,
+    run_url: runUrl,
+  };
   const commitMessage = `scaffold a working directory (${target})`;
-  const prTitle = `Scaffold a working directory (${target})`;
-  const prBody = `This pull request scaffolds a working directory \`${workingDir}\`.
-[@${actor} created this pull request by GitHub Actions](${runUrl}).`;
-  const prComment = `@${actor} This pull request was created by [GitHub Actions](${runUrl}) you ran.
-Please handle this pull request.`;
+
+  const prTitle = config?.scaffold_working_directory?.pull_request?.title
+    ? Handlebars.compile(
+        config?.scaffold_working_directory?.pull_request?.title,
+      )(vars)
+    : `Scaffold a working directory (${target})`;
+
+  const prBody = config?.scaffold_working_directory?.pull_request?.body
+    ? Handlebars.compile(
+        config?.scaffold_working_directory?.pull_request?.body,
+      )(vars)
+    : `This pull request scaffolds a working directory \`${workingDir}\`.
+    [@${actor} created this pull request by GitHub Actions](${runUrl}).`;
+
+  const prComment = config?.scaffold_working_directory?.pull_request?.comment
+    ? Handlebars.compile(
+        config?.scaffold_working_directory?.pull_request?.comment,
+      )(vars)
+    : `@${actor} This pull request was created by [GitHub Actions](${runUrl}) you ran.
+    Please handle this pull request.`;
 
   await commit.create({
     commitMessage,
