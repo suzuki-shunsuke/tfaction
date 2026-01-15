@@ -1,0 +1,1244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "aqua": {
+      "type": "object",
+      "properties": {
+        "update_checksum": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "skip_push": {
+              "type": "boolean"
+            },
+            "prune": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "conftest": {
+      "type": "object",
+      "properties": {
+        "disable_all": {
+          "type": "boolean"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tf": {
+                "type": "boolean"
+              },
+              "plan": {
+                "type": "boolean"
+              },
+              "id": {
+                "type": "string"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "policy": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "fail_on_warn": {
+                "type": "boolean"
+              },
+              "no_fail": {
+                "type": "boolean"
+              },
+              "all_namespaces": {
+                "type": "boolean"
+              },
+              "quiet": {
+                "type": "boolean"
+              },
+              "trace": {
+                "type": "boolean"
+              },
+              "strict": {
+                "type": "boolean"
+              },
+              "show_builtin_errors": {
+                "type": "boolean"
+              },
+              "junit_hide_message": {
+                "type": "boolean"
+              },
+              "suppress_exceptions": {
+                "type": "boolean"
+              },
+              "combine": {
+                "type": "boolean"
+              },
+              "tls": {
+                "type": "boolean"
+              },
+              "ignore": {
+                "type": "string"
+              },
+              "parser": {
+                "type": "string"
+              },
+              "capabilities": {
+                "type": "string"
+              },
+              "output": {
+                "type": "string"
+              },
+              "namespaces": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "proto_file_dirs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "policy"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "draft_pr": {
+      "type": "boolean"
+    },
+    "drift_detection": {
+      "type": "object",
+      "properties": {
+        "issue_repo_owner": {
+          "type": "string"
+        },
+        "issue_repo_name": {
+          "type": "string"
+        },
+        "num_of_issues": {
+          "type": "number"
+        },
+        "minimum_detection_interval": {
+          "type": "number"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "env": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "label_prefixes": {
+      "type": "object",
+      "properties": {
+        "tfmigrate": {
+          "type": "string"
+        },
+        "skip": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "module_file": {
+      "type": "string"
+    },
+    "plan_workflow_name": {
+      "type": "string"
+    },
+    "renovate_login": {
+      "type": "string"
+    },
+    "renovate_terraform_labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scaffold_working_directory": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "skip_create_pr": {
+      "type": "boolean"
+    },
+    "skip_terraform_by_renovate": {
+      "type": "boolean"
+    },
+    "target_groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "aws_region": {
+            "type": "string"
+          },
+          "aws_assume_role_arn": {
+            "type": "string"
+          },
+          "aws_role_session_name": {
+            "type": "string"
+          },
+          "destroy": {
+            "type": "boolean"
+          },
+          "env": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "environment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "gcp_service_account": {
+            "type": "string"
+          },
+          "gcp_workload_identity_provider": {
+            "type": "string"
+          },
+          "gcp_remote_backend_service_account": {
+            "type": "string"
+          },
+          "gcp_remote_backend_workload_identity_provider": {
+            "type": "string"
+          },
+          "gcs_bucket_name_tfmigrate_history": {
+            "type": "string"
+          },
+          "runs_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "secrets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "env_name": {
+                  "type": "string"
+                },
+                "secret_name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "env_name",
+                "secret_name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "s3_bucket_name_tfmigrate_history": {
+            "type": "string"
+          },
+          "template_dir": {
+            "type": "string"
+          },
+          "terraform_apply_config": {
+            "type": "object",
+            "properties": {
+              "aws_assume_role_arn": {
+                "type": "string"
+              },
+              "aws_role_session_name": {
+                "type": "string"
+              },
+              "gcp_service_account": {
+                "type": "string"
+              },
+              "gcp_workload_identity_provider": {
+                "type": "string"
+              },
+              "gcp_access_token_scopes": {
+                "type": "string"
+              },
+              "gcp_remote_backend_service_account": {
+                "type": "string"
+              },
+              "gcp_remote_backend_workload_identity_provider": {
+                "type": "string"
+              },
+              "environment": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "secrets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "env_name": {
+                      "type": "string"
+                    },
+                    "secret_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "env_name",
+                    "secret_name"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "runs_on": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "env": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "aws_secrets_manager": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "envs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "env_name": {
+                            "type": "string"
+                          },
+                          "secret_key": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "env_name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "secret_id": {
+                      "type": "string"
+                    },
+                    "version_id": {
+                      "type": "string"
+                    },
+                    "version_stage": {
+                      "type": "string"
+                    },
+                    "aws_region": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "envs",
+                    "secret_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "terraform_plan_config": {
+            "type": "object",
+            "properties": {
+              "aws_assume_role_arn": {
+                "type": "string"
+              },
+              "aws_role_session_name": {
+                "type": "string"
+              },
+              "gcp_service_account": {
+                "type": "string"
+              },
+              "gcp_workload_identity_provider": {
+                "type": "string"
+              },
+              "gcp_access_token_scopes": {
+                "type": "string"
+              },
+              "gcp_remote_backend_service_account": {
+                "type": "string"
+              },
+              "gcp_remote_backend_workload_identity_provider": {
+                "type": "string"
+              },
+              "environment": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "secrets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "env_name": {
+                      "type": "string"
+                    },
+                    "secret_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "env_name",
+                    "secret_name"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "runs_on": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "env": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "aws_secrets_manager": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "envs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "env_name": {
+                            "type": "string"
+                          },
+                          "secret_key": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "env_name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "secret_id": {
+                      "type": "string"
+                    },
+                    "version_id": {
+                      "type": "string"
+                    },
+                    "version_stage": {
+                      "type": "string"
+                    },
+                    "aws_region": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "envs",
+                    "secret_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "tfmigrate_apply_config": {
+            "type": "object",
+            "properties": {
+              "aws_assume_role_arn": {
+                "type": "string"
+              },
+              "aws_role_session_name": {
+                "type": "string"
+              },
+              "gcp_service_account": {
+                "type": "string"
+              },
+              "gcp_workload_identity_provider": {
+                "type": "string"
+              },
+              "gcp_access_token_scopes": {
+                "type": "string"
+              },
+              "gcp_remote_backend_service_account": {
+                "type": "string"
+              },
+              "gcp_remote_backend_workload_identity_provider": {
+                "type": "string"
+              },
+              "environment": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "secrets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "env_name": {
+                      "type": "string"
+                    },
+                    "secret_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "env_name",
+                    "secret_name"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "runs_on": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "env": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "aws_secrets_manager": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "envs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "env_name": {
+                            "type": "string"
+                          },
+                          "secret_key": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "env_name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "secret_id": {
+                      "type": "string"
+                    },
+                    "version_id": {
+                      "type": "string"
+                    },
+                    "version_stage": {
+                      "type": "string"
+                    },
+                    "aws_region": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "envs",
+                    "secret_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "tfmigrate_plan_config": {
+            "type": "object",
+            "properties": {
+              "aws_assume_role_arn": {
+                "type": "string"
+              },
+              "aws_role_session_name": {
+                "type": "string"
+              },
+              "gcp_service_account": {
+                "type": "string"
+              },
+              "gcp_workload_identity_provider": {
+                "type": "string"
+              },
+              "gcp_access_token_scopes": {
+                "type": "string"
+              },
+              "gcp_remote_backend_service_account": {
+                "type": "string"
+              },
+              "gcp_remote_backend_workload_identity_provider": {
+                "type": "string"
+              },
+              "environment": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "secrets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "env_name": {
+                      "type": "string"
+                    },
+                    "secret_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "env_name",
+                    "secret_name"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "runs_on": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              },
+              "env": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "aws_secrets_manager": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "envs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "env_name": {
+                            "type": "string"
+                          },
+                          "secret_key": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "env_name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "secret_id": {
+                      "type": "string"
+                    },
+                    "version_id": {
+                      "type": "string"
+                    },
+                    "version_stage": {
+                      "type": "string"
+                    },
+                    "aws_region": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "envs",
+                    "secret_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "working_directory": {
+            "type": "string"
+          },
+          "aws_secrets_manager": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "envs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "env_name": {
+                        "type": "string"
+                      },
+                      "secret_key": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "env_name"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "secret_id": {
+                  "type": "string"
+                },
+                "version_id": {
+                  "type": "string"
+                },
+                "version_stage": {
+                  "type": "string"
+                },
+                "aws_region": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "envs",
+                "secret_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "terraform_command": {
+            "type": "string"
+          },
+          "conftest": {
+            "type": "object",
+            "properties": {
+              "disable_all": {
+                "type": "boolean"
+              },
+              "policies": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tf": {
+                      "type": "boolean"
+                    },
+                    "plan": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "policy": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      ]
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      ]
+                    },
+                    "fail_on_warn": {
+                      "type": "boolean"
+                    },
+                    "no_fail": {
+                      "type": "boolean"
+                    },
+                    "all_namespaces": {
+                      "type": "boolean"
+                    },
+                    "quiet": {
+                      "type": "boolean"
+                    },
+                    "trace": {
+                      "type": "boolean"
+                    },
+                    "strict": {
+                      "type": "boolean"
+                    },
+                    "show_builtin_errors": {
+                      "type": "boolean"
+                    },
+                    "junit_hide_message": {
+                      "type": "boolean"
+                    },
+                    "suppress_exceptions": {
+                      "type": "boolean"
+                    },
+                    "combine": {
+                      "type": "boolean"
+                    },
+                    "tls": {
+                      "type": "boolean"
+                    },
+                    "ignore": {
+                      "type": "string"
+                    },
+                    "parser": {
+                      "type": "string"
+                    },
+                    "capabilities": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    },
+                    "namespaces": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "proto_file_dirs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "paths": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "policy"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "drift_detection": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "working_directory"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "tflint": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "fix": {
+          "type": "boolean"
+        },
+        "reviewdog": {
+          "type": "object",
+          "properties": {
+            "filter_mode": {
+              "type": "string",
+              "enum": [
+                "added",
+                "diff_context",
+                "file",
+                "nofilter"
+              ]
+            },
+            "fail_level": {
+              "type": "string",
+              "enum": [
+                "none",
+                "any",
+                "info",
+                "warning",
+                "error"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "trivy": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "reviewdog": {
+          "type": "object",
+          "properties": {
+            "filter_mode": {
+              "type": "string",
+              "enum": [
+                "added",
+                "diff_context",
+                "file",
+                "nofilter"
+              ]
+            },
+            "fail_level": {
+              "type": "string",
+              "enum": [
+                "none",
+                "any",
+                "info",
+                "warning",
+                "error"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "terraform_docs": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "update_local_path_module_caller": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "terraform_command": {
+      "type": "string"
+    },
+    "update_related_pull_requests": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "working_directory_file": {
+      "type": "string"
+    },
+    "replace": {
+      "type": "object",
+      "properties": {
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "regexp": {
+                "type": "string"
+              },
+              "replace": {
+                "type": "string"
+              },
+              "flags": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "regexp",
+              "replace"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "patterns"
+      ],
+      "additionalProperties": false
+    },
+    "providers_lock_opts": {
+      "type": "string"
+    },
+    "follow_up_pr_group_label": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "prefix": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "securefix_action": {
+      "type": "object",
+      "properties": {
+        "server_repository": {
+          "type": "string"
+        },
+        "pull_request": {
+          "type": "object",
+          "properties": {
+            "base_branch": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "base_branch"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "server_repository",
+        "pull_request"
+      ],
+      "additionalProperties": false
+    },
+    "limit_changed_dirs": {
+      "type": "object",
+      "properties": {
+        "working_dirs": {
+          "type": "number"
+        },
+        "modules": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "plan_workflow_name",
+    "target_groups"
+  ],
+  "additionalProperties": false
+}
