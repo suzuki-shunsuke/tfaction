@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as tmp from "tmp";
 import * as commit from "../commit";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as aqua from "../aqua";
 
 type Inputs = {
@@ -69,8 +70,8 @@ export const run = async (inputs: Inputs): Promise<void> => {
     const opts = config ? ["-c", config] : ["markdown"];
 
     const args = ["exec"];
-    if (lib.getTargetFromEnv()) {
-      args.push("-var", `tfaction_target:${lib.getTargetFromEnv()}`);
+    if (env.tfactionTarget) {
+      args.push("-var", `tfaction_target:${env.tfactionTarget}`);
     }
     args.push("--", "terraform-docs", ...opts, ".");
 

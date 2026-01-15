@@ -20,8 +20,8 @@ export const main = async (): Promise<void> => {
   const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: lib.getTargetFromEnv(),
-      workingDir: lib.getWorkingDirFromEnv(),
+      target: env.tfactionTarget,
+      workingDir: env.tfactionWorkingDir,
       isApply: true,
       jobType: lib.getJobType(),
     },

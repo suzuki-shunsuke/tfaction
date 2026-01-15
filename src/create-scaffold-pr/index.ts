@@ -72,8 +72,8 @@ export const main = async () => {
   // Get target config
   const targetConfigResult = await getTargetConfig.getTargetConfig(
     {
-      target: lib.getTargetFromEnv(),
-      workingDir: lib.getWorkingDirFromEnv(),
+      target: env.tfactionTarget,
+      workingDir: env.tfactionWorkingDir,
       isApply: false,
       jobType: "scaffold_working_dir",
     },
@@ -81,8 +81,8 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfigResult.working_directory || lib.getWorkingDirFromEnv() || "";
-  const target = targetConfigResult.target || lib.getTargetFromEnv() || "";
+    targetConfigResult.working_directory || env.tfactionWorkingDir;
+  const target = targetConfigResult.target || env.tfactionTarget;
 
   if (!target) {
     throw new Error("TFACTION_TARGET is required");

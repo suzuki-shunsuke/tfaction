@@ -5,6 +5,7 @@ import * as path from "path";
 import Handlebars from "handlebars";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as getTargetConfig from "../get-target-config";
 
 const copyDirectory = (src: string, dest: string): void => {
@@ -65,8 +66,8 @@ export const main = async () => {
   const config = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: lib.getTargetFromEnv(),
-      workingDir: lib.getWorkingDirFromEnv(),
+      target: env.tfactionTarget,
+      workingDir: env.tfactionWorkingDir,
       isApply: false,
       jobType: "scaffold_working_dir",
     },

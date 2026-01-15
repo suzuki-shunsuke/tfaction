@@ -398,14 +398,11 @@ export const applyConfigDefaults = async (
   };
 };
 
-export const getConfigPathFromEnv = (): string => {
-  return env.tfactionConfig || "tfaction-root.yaml";
-};
-
 export const getConfig = async (): Promise<Config> => {
-  const configFilePath = getConfigPathFromEnv();
-  const raw = RawConfig.parse(load(fs.readFileSync(configFilePath, "utf8")));
-  return await applyConfigDefaults(raw, configFilePath);
+  const raw = RawConfig.parse(
+    load(fs.readFileSync(env.tfactionConfig, "utf8")),
+  );
+  return await applyConfigDefaults(raw, env.tfactionConfig);
 };
 
 /**
@@ -438,14 +435,6 @@ export const createWDTargetMap = (
     m.set(wd, target);
   }
   return m;
-};
-
-export const getTargetFromEnv = (): string => {
-  return env.tfactionTarget;
-};
-
-export const getWorkingDirFromEnv = (): string => {
-  return env.tfactionWorkingDir;
 };
 
 export const getIsApply = (): boolean => {

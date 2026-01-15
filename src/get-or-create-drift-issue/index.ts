@@ -33,8 +33,8 @@ export const main = async () => {
   }
 
   const result = await run(cfg, {
-    target: lib.getTargetFromEnv(),
-    workingDir: lib.getWorkingDirFromEnv(),
+    target: env.tfactionTarget,
+    workingDir: env.tfactionWorkingDir,
     ghToken: input.getRequiredGitHubToken(),
     repo: env.githubRepository,
   });
