@@ -20,7 +20,7 @@ export const main = async () => {
     return;
   }
 
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const driftIssueRepo = lib.getDriftIssueRepo(config);
 
   const inputs: Inputs = {

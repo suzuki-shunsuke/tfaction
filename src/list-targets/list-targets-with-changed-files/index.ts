@@ -440,18 +440,16 @@ export const main = async (executor: aqua.Executor) => {
   }
   const prPath = `${env.ciInfoTempDir}/pr.json`;
   const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
-  const cfg = lib.getConfig();
+  const cfg = await lib.getConfig();
 
-  const configDir = path.dirname(cfg.config_path);
-  const gitRootDir = await lib.getGitRootDir(configDir);
   const configFiles = await lib.listWorkingDirFiles(
-    gitRootDir,
-    configDir,
+    cfg.git_root_dir,
+    cfg.config_dir,
     cfg.working_directory_file,
   );
   const modules = await lib.listWorkingDirFiles(
-    gitRootDir,
-    configDir,
+    cfg.git_root_dir,
+    cfg.config_dir,
     cfg.module_file,
   );
 

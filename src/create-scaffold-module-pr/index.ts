@@ -72,7 +72,7 @@ export const main = async () => {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
 
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
 
   const skipCreatePr = config.skip_create_pr;
   const draftPr = config.draft_pr;

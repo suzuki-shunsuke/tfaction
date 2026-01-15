@@ -34,7 +34,7 @@ test("default", async () => {
         isApply: false,
         jobType: "terraform",
       },
-      lib.applyConfigDefaults(
+      await lib.applyConfigDefaults(
         {
           plan_workflow_name: "plan.yaml",
           target_groups: [
@@ -44,7 +44,6 @@ test("default", async () => {
             },
           ],
         },
-        "/home/foo",
         "tests/tfaction-root.yaml",
       ),
     ),
@@ -82,7 +81,7 @@ test("config", async () => {
         isApply: false,
         jobType: "terraform",
       },
-      lib.applyConfigDefaults(
+      await lib.applyConfigDefaults(
         {
           plan_workflow_name: "plan.yaml",
           terraform_command: "tofu",
@@ -101,7 +100,6 @@ test("config", async () => {
             },
           ],
         },
-        "/home/foo",
         "tests/tfaction-root.yaml",
       ),
     ),
@@ -135,7 +133,7 @@ test("scaffold_working_dir", async () => {
         isApply: false,
         jobType: "scaffold_working_dir",
       },
-      lib.applyConfigDefaults(
+      await lib.applyConfigDefaults(
         {
           plan_workflow_name: "plan.yaml",
           target_groups: [
@@ -145,7 +143,6 @@ test("scaffold_working_dir", async () => {
             },
           ],
         },
-        "/home/foo",
         "tests/tfaction-root.yaml",
       ),
     ),

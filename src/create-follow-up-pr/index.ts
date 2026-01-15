@@ -298,10 +298,7 @@ export const main = async () => {
 
   const octokit = github.getOctokit(githubToken);
 
-  const config = lib.getConfig();
-  const configDir = path.dirname(config.config_path);
-  const gitRootDir = await lib.getGitRootDir(configDir);
-  const workspace = lib.getGitHubWorkspace();
+  const config = await lib.getConfig();
 
   const skipCreatePr = config.skip_create_pr;
   const draftPr = config.draft_pr;
@@ -326,7 +323,10 @@ export const main = async () => {
     config,
   );
 
-  const workingDir = path.join(configDir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
   const target = targetConfig.target;
 
   const prNumber = env.ciInfoPrNumber;
@@ -361,9 +361,9 @@ export const main = async () => {
 
   // Create failed-prs file
   const failedPrsFile = path.relative(
-    gitRootDir,
+    config.git_root_dir,
     path.join(
-      workspace,
+      config.workspace,
       createFailedPrsFile(workingDir, serverUrl, repository, prNumber),
     ),
   );
@@ -393,7 +393,7 @@ Please handle this pull request.
   const followUpPrUrl = await commit.create({
     commitMessage: prParams.commitMessage,
     githubToken,
-    rootDir: gitRootDir,
+    rootDir: config.git_root_dir,
     files: new Set([failedPrsFile]),
     serverRepository: securefixServerRepository,
     appId: securefixAppId,

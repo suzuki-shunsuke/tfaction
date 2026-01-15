@@ -69,7 +69,7 @@ async function exportSecrets(
 }
 
 export const main = async (): Promise<void> => {
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const targetS = lib.getTargetFromEnv();
   const wd = lib.getWorkingDirFromEnv();
   const jobType = lib.getJobType();

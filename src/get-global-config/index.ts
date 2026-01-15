@@ -3,7 +3,7 @@ import * as lib from "../lib";
 import * as env from "../lib/env";
 
 export const main = async () => {
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
 
   if (!config.plan_workflow_name) {
     throw new Error(

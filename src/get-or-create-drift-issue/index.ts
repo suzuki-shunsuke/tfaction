@@ -25,7 +25,7 @@ type Issue = {
 };
 
 export const main = async () => {
-  const cfg = lib.getConfig();
+  const cfg = await lib.getConfig();
   if (!cfg.drift_detection) {
     // dirft detection is disabled
     return;
@@ -66,10 +66,8 @@ const run = async (
   }
   const tg = await lib.getTargetGroup(cfg, inputs.target, inputs.workingDir);
 
-  const configDir = path.dirname(cfg.config_path);
-
   const wdConfig = lib.readTargetConfig(
-    path.join(configDir, tg.workingDir, cfg.working_directory_file),
+    path.join(cfg.config_dir, tg.workingDir, cfg.working_directory_file),
   );
 
   if (!lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {

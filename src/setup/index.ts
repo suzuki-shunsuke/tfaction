@@ -109,7 +109,7 @@ export const main = async () => {
     await checkLatestCommit();
   }
 
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
       target: lib.getTargetFromEnv(),
@@ -119,8 +119,10 @@ export const main = async () => {
     },
     config,
   );
-  const configDir = path.dirname(config.config_path);
-  const workingDir = path.join(configDir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
 
   // Set environment variables from target config
   core.exportVariable("TFACTION_WORKING_DIR", targetConfig.working_directory);

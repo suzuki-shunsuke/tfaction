@@ -62,7 +62,7 @@ const replaceInFiles = async (
 };
 
 export const main = async () => {
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
       target: lib.getTargetFromEnv(),
@@ -73,10 +73,15 @@ export const main = async () => {
     config,
   );
 
-  const configDir = path.dirname(config.config_path);
-  const workingDir = path.join(configDir, targetConfig.working_directory);
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
   const target = targetConfig.target;
-  const templateDir = path.join(configDir, targetConfig.template_dir ?? "");
+  const templateDir = path.join(
+    config.config_dir,
+    targetConfig.template_dir ?? "",
+  );
   const s3Bucket = targetConfig.s3_bucket_name_tfmigrate_history;
   const gcsBucket = targetConfig.gcs_bucket_name_tfmigrate_history;
   const workingDirectoryFile = config.working_directory_file;

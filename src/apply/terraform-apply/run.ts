@@ -55,7 +55,7 @@ export const listRelatedPullRequests = async (
 export const main = async (): Promise<void> => {
   const githubToken = core.getInput("github_token");
   const driftIssueNumber = env.tfactionDriftIssueNumber;
-  const cfg = lib.getConfig();
+  const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
       target: lib.getTargetFromEnv(),
@@ -65,10 +65,7 @@ export const main = async (): Promise<void> => {
     },
     cfg,
   );
-  const workingDir = path.join(
-    path.dirname(cfg.config_path),
-    targetConfig.working_directory,
-  );
+  const workingDir = path.join(cfg.config_dir, targetConfig.working_directory);
   const tfCommand = targetConfig.terraform_command || "terraform";
   const driftIssueRepo = lib.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
@@ -318,7 +315,7 @@ const downloadArtifact = async (
 };
 
 const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
-  const cfg = lib.getConfig();
+  const cfg = await lib.getConfig();
   const githubToken = core.getInput("github_token");
   const target = lib.getTargetFromEnv() || "";
   const planWorkflowName = cfg.plan_workflow_name;
