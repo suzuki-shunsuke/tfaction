@@ -6,4 +6,5 @@
     "github>aquaproj/aqua-renovate-config#2.9.0",
     "github>aquaproj/aqua-renovate-config:file#2.9.0(aqua/.*\\.yaml)",
   ],
+  addLabels: ["renovate-change"]
 }
