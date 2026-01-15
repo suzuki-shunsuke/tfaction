@@ -440,14 +440,6 @@ export const createWDTargetMap = (
   return m;
 };
 
-export const getTargetFromEnv = (): string => {
-  return env.tfactionTarget;
-};
-
-export const getWorkingDirFromEnv = (): string => {
-  return env.tfactionWorkingDir;
-};
-
 export const getIsApply = (): boolean => {
   return env.tfactionIsApply === "true";
 };

@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as input from "../lib/input";
 import * as aqua from "../aqua";
 import { run as runTrivy } from "../trivy";
@@ -16,8 +17,8 @@ export const main = async () => {
   const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
 
   const config = await lib.getConfig();
-  const target = lib.getTargetFromEnv();
-  const wd = lib.getWorkingDirFromEnv();
+  const target = env.tfactionTarget;
+  const wd = env.tfactionWorkingDir;
 
   if (!wd && !target) {
     throw new Error(

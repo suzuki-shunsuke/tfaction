@@ -59,8 +59,8 @@ export const main = async (): Promise<void> => {
   const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: lib.getTargetFromEnv(),
-      workingDir: lib.getWorkingDirFromEnv(),
+      target: env.tfactionTarget,
+      workingDir: env.tfactionWorkingDir,
       isApply: true,
       jobType: lib.getJobType(),
     },
@@ -318,7 +318,7 @@ const downloadArtifact = async (
 const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   const cfg = await lib.getConfig();
   const githubToken = core.getInput("github_token");
-  const target = lib.getTargetFromEnv() || "";
+  const target = env.tfactionTarget || "";
   const planWorkflowName = cfg.plan_workflow_name;
   const ciInfoTempDir = env.ciInfoTempDir;
   const branch = env.ciInfoHeadRef;

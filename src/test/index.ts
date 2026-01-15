@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as input from "../lib/input";
 import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
@@ -21,8 +22,8 @@ export const main = async () => {
   // Step 1: Get target config
   const targetConfig = await getTargetConfig(
     {
-      target: lib.getTargetFromEnv(),
-      workingDir: lib.getWorkingDirFromEnv(),
+      target: env.tfactionTarget,
+      workingDir: env.tfactionWorkingDir,
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },

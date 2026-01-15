@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import * as input from "../lib/input";
 
 export interface Secret {
@@ -54,8 +55,8 @@ export const main = async () => {
     `The list of secret names passed to the action: ${Array.from(secrets.keys()).join(", ")}`,
   );
 
-  const targetS = lib.getTargetFromEnv();
-  const workingDir = lib.getWorkingDirFromEnv();
+  const targetS = env.tfactionTarget;
+  const workingDir = env.tfactionWorkingDir;
   const jobType = lib.getJobType();
   const isApply = lib.getIsApply();
 

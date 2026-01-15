@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as env from "../lib/env";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
@@ -70,8 +71,8 @@ async function exportSecrets(
 
 export const main = async (): Promise<void> => {
   const config = await lib.getConfig();
-  const targetS = lib.getTargetFromEnv();
-  const wd = lib.getWorkingDirFromEnv();
+  const targetS = env.tfactionTarget;
+  const wd = env.tfactionWorkingDir;
   const jobType = lib.getJobType();
   const isApply = lib.getIsApply();
   const t = await lib.getTargetGroup(config, targetS, wd);

@@ -217,8 +217,8 @@ export const getTargetConfig = async (
 export const main = async () => {
   const result = await run(
     {
-      target: lib.getTargetFromEnv(),
-      workingDir: lib.getWorkingDirFromEnv(),
+      target: env.tfactionTarget,
+      workingDir: env.tfactionWorkingDir,
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },

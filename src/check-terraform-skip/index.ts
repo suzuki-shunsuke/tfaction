@@ -23,7 +23,7 @@ export const main = async () => {
     skipLabelPrefix: config.label_prefixes.skip,
     labels: path.join(env.ciInfoTempDir, "labels.txt"),
     prAuthor: env.ciInfoPrAuthor,
-    target: lib.getTargetFromEnv(),
+    target: env.tfactionTarget,
   };
   // labels is pull request's labels.
   const labels = fs.readFileSync(inputs.labels, "utf8").split("\n");

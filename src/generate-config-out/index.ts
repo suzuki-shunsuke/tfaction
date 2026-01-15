@@ -31,8 +31,8 @@ export const main = async () => {
   // Get target config
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: lib.getTargetFromEnv(),
-      workingDir: lib.getWorkingDirFromEnv(),
+      target: env.tfactionTarget,
+      workingDir: env.tfactionWorkingDir,
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
@@ -40,8 +40,8 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfig.working_directory || lib.getWorkingDirFromEnv() || "";
-  const target = targetConfig.target || lib.getTargetFromEnv() || "";
+    targetConfig.working_directory || env.tfactionWorkingDir || "";
+  const target = targetConfig.target || env.tfactionTarget || "";
 
   if (!workingDir) {
     throw new Error("working_directory is required");
