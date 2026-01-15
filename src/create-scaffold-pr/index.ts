@@ -81,8 +81,8 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfigResult.working_directory || env.tfactionWorkingDir || "";
-  const target = targetConfigResult.target || env.tfactionTarget || "";
+    targetConfigResult.working_directory || env.tfactionWorkingDir;
+  const target = targetConfigResult.target || env.tfactionTarget;
 
   if (!target) {
     throw new Error("TFACTION_TARGET is required");

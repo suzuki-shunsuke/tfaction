@@ -318,7 +318,7 @@ const downloadArtifact = async (
 const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   const cfg = await lib.getConfig();
   const githubToken = core.getInput("github_token");
-  const target = env.tfactionTarget || "";
+  const target = env.tfactionTarget;
   const planWorkflowName = cfg.plan_workflow_name;
   const ciInfoTempDir = env.ciInfoTempDir;
   const branch = env.ciInfoHeadRef;
