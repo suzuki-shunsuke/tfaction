@@ -75,10 +75,4 @@ export const main = async () => {
     "max_changed_modules",
     config.limit_changed_dirs?.modules ?? 0,
   );
-
-  // Set environment variables
-  core.exportVariable(
-    "TFACTION_SKIP_ADDING_AQUA_PACKAGES",
-    config.scaffold_working_directory?.skip_adding_aqua_packages ?? true,
-  );
 };
