@@ -85,7 +85,6 @@ export const main = async () => {
     await runTrivy({
       workingDirectory: workingDir,
       githubToken,
-      githubComment: true,
       configPath: "",
       executor,
     });
@@ -97,7 +96,6 @@ export const main = async () => {
       githubToken,
       githubTokenForTflintInit: "",
       githubTokenForFix: "",
-      githubComment: true,
       fix: targetConfig.tflint_fix,
       serverRepository,
       securefixActionAppId: securefixAppId,
