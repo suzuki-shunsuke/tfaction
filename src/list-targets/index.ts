@@ -6,12 +6,13 @@ import * as ciInfo from "../ci-info";
 import * as aqua from "../aqua";
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 
 export const main = async () => {
   core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
   const executor = await aqua.NewExecutor({
-    githubToken: core.getInput("github_token"),
+    githubToken: input.githubToken,
   });
 
   // Step 2: Run ci-info (skip for workflow_dispatch and schedule events)

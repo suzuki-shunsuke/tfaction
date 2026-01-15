@@ -5,6 +5,7 @@ import * as path from "path";
 
 import { getTargetConfig } from "../get-target-config";
 import * as lib from "../lib";
+import * as input from "../lib/input";
 import * as git from "../lib/git";
 import * as aqua from "../aqua";
 import * as commit from "../commit";
@@ -16,7 +17,7 @@ const isPullRequestEvent = (): boolean => {
 };
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token", { required: true });
+  const githubToken = input.getRequiredGitHubToken();
   const config = await lib.getConfig();
 
   const targetConfig = await getTargetConfig(
@@ -125,9 +126,9 @@ export const main = async () => {
         githubToken,
         rootDir: config.git_root_dir,
         files: new Set([lockFileFromGitRootDir]),
-        serverRepository: core.getInput("securefix_action_server_repository"),
-        appId: core.getInput("securefix_action_app_id"),
-        appPrivateKey: core.getInput("securefix_action_app_private_key"),
+        serverRepository: input.securefixActionServerRepository,
+        appId: input.securefixActionAppId,
+        appPrivateKey: input.securefixActionAppPrivateKey,
       });
     }
   }

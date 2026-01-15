@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as input from "../lib/input";
 
 export interface Secret {
   env_name: string | undefined;
@@ -44,7 +45,7 @@ const getSecrets = (
 export const main = async () => {
   const config = await lib.getConfig();
   const secrets = new Map<string, string>(
-    Object.entries(JSON.parse(core.getInput("secrets"))),
+    Object.entries(JSON.parse(input.secrets)),
   );
 
   // Log the list of secrets for troubleshooting

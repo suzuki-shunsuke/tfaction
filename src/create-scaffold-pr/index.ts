@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as git from "../lib/git";
 import * as aqua from "../aqua";
 import * as getTargetConfig from "../get-target-config";
@@ -55,10 +56,9 @@ gh pr create -R "${repository}" ${draftOpt}\\
 };
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token") || "";
-  const securefixAppId = core.getInput("securefix_action_app_id") || "";
-  const securefixAppPrivateKey =
-    core.getInput("securefix_action_app_private_key") || "";
+  const githubToken = input.githubToken;
+  const securefixAppId = input.securefixActionAppId;
+  const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
 
   const config = await lib.getConfig();
 

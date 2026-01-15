@@ -4,17 +4,17 @@ import * as path from "path";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as aqua from "../aqua";
 import * as getTargetConfig from "../get-target-config";
 import * as commit from "../commit";
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token") || "";
-  const branch = core.getInput("branch");
-  const file = core.getInput("file");
-  const securefixAppId = core.getInput("securefix_action_app_id") || "";
-  const securefixAppPrivateKey =
-    core.getInput("securefix_action_app_private_key") || "";
+  const githubToken = input.githubToken;
+  const branch = input.branch;
+  const file = input.file;
+  const securefixAppId = input.securefixActionAppId;
+  const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
 
   if (!branch) {
     throw new Error("branch input is required");

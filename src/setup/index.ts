@@ -6,6 +6,7 @@ import * as path from "path";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as aqua from "../aqua";
 import * as ciinfo from "../ci-info";
 import { getTargetConfig } from "../get-target-config";
@@ -95,8 +96,7 @@ const setupSSHKey = async (sshKey: string): Promise<void> => {
 
 export const main = async () => {
   core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
-  const githubToken = core.getInput("github_token", { required: true });
-  const sshKey = core.getInput("ssh_key");
+  const githubToken = input.getRequiredGitHubToken();
 
   const octokit = github.getOctokit(githubToken);
 
@@ -170,9 +170,9 @@ export const main = async () => {
 
   await exportAWSSecretsManager.main();
 
-  if (sshKey) {
+  if (input.sshKey) {
     core.info("Setting up SSH key...");
-    await setupSSHKey(sshKey);
+    await setupSSHKey(input.sshKey);
   }
 
   core.setOutput("working_directory", targetConfig.working_directory);

@@ -4,6 +4,7 @@ import * as path from "path";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
+import * as input from "../../lib/input";
 import * as git from "../../lib/git";
 import * as commit from "../../commit";
 
@@ -15,11 +16,9 @@ type Inputs = {
 
 const getInputs = (): Inputs => {
   return {
-    githubToken: core.getInput("github_token") || env.githubToken,
-    securefixActionAppId: core.getInput("securefix_action_app_id"),
-    securefixActionAppPrivateKey: core.getInput(
-      "securefix_action_app_private_key",
-    ),
+    githubToken: input.githubToken || env.githubToken,
+    securefixActionAppId: input.securefixActionAppId,
+    securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
   };
 };
 

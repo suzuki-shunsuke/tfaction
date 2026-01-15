@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
+import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import { list as listModuleCallers } from "./list-module-callers";
 
@@ -473,7 +474,7 @@ export const main = async (executor: aqua.Executor) => {
     maxChangedModules: cfg.limit_changed_dirs?.modules ?? 0,
     pr,
     payload: github.context.payload,
-    githubToken: core.getInput("github_token", { required: true }),
+    githubToken: input.getRequiredGitHubToken(),
     /*
     {
       // caller is a directory where uses the module

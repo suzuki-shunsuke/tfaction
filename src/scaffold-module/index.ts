@@ -6,6 +6,7 @@ import Handlebars from "handlebars";
 import * as aqua from "../aqua";
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as git from "../lib/git";
 
 const copyDirectory = (src: string, dest: string): void => {
@@ -47,7 +48,7 @@ const replaceInFiles = async (
 };
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token");
+  const githubToken = input.githubToken;
 
   const configDir = path.dirname(lib.getConfigPathFromEnv());
 

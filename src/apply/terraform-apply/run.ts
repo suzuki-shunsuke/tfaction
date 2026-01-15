@@ -5,6 +5,7 @@ import * as os from "os";
 import * as path from "path";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
+import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../../get-target-config";
 import * as updateBranchAction from "@csm-actions/update-branch-action";
@@ -53,7 +54,7 @@ export const listRelatedPullRequests = async (
 };
 
 export const main = async (): Promise<void> => {
-  const githubToken = core.getInput("github_token");
+  const githubToken = input.githubToken;
   const driftIssueNumber = env.tfactionDriftIssueNumber;
   const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
@@ -228,8 +229,8 @@ export const updateBranchBySecurefix = async (
   const serverRepoOwner = securefixServerRepository.split("/")[0];
   const serverRepoName = securefixServerRepository.split("/")[1];
   const token = await githubAppToken.create({
-    appId: core.getInput("securefix_action_app_id"),
-    privateKey: core.getInput("securefix_action_app_private_key"),
+    appId: input.securefixActionAppId,
+    privateKey: input.securefixActionAppPrivateKey,
     owner: serverRepoOwner,
     repositories: [serverRepoName],
     permissions: {

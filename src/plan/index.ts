@@ -4,6 +4,7 @@ import * as path from "path";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as git from "../lib/git";
 import { getTargetConfig } from "../get-target-config";
 import * as checkTerraformSkip from "../check-terraform-skip";
@@ -47,10 +48,6 @@ export const main = async () => {
           workingDir,
           ".tfmigrate.hcl",
         );
-        const githubToken = core.getInput("github_token");
-        const securefixAppId = core.getInput("securefix_action_app_id") || "";
-        const securefixAppPrivateKey =
-          core.getInput("securefix_action_app_private_key") || "";
         const serverRepository =
           config.securefix_action?.server_repository ?? "";
 
@@ -65,14 +62,14 @@ export const main = async () => {
             core.info("Committing .tfmigrate.hcl");
             await createCommit({
               commitMessage: "chore(tfmigrate): add .tfmigrate.hcl",
-              githubToken,
+              githubToken: input.githubToken,
               rootDir: config.git_root_dir,
               files: new Set([
                 path.relative(config.git_root_dir, tfmigrateHclPath),
               ]),
               serverRepository,
-              appId: securefixAppId,
-              appPrivateKey: securefixAppPrivateKey,
+              appId: input.securefixActionAppId,
+              appPrivateKey: input.securefixActionAppPrivateKey,
             });
           }
         }

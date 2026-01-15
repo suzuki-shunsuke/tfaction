@@ -1,8 +1,8 @@
-import * as core from "@actions/core";
 import * as github from "@actions/github";
+import * as input from "../lib/input";
 
 export const main = async () => {
-  const ghToken = core.getInput("github_token", { required: true });
+  const ghToken = input.getRequiredGitHubToken();
   const octokit = github.getOctokit(ghToken);
 
   const issueNumber = github.context.payload.issue?.number;
