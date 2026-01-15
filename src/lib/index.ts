@@ -403,10 +403,8 @@ export const getConfigPathFromEnv = (): string => {
 };
 
 export const getConfig = async (): Promise<Config> => {
-  const configFilePath = path.join(getConfigPathFromEnv());
-  const raw = RawConfig.parse(
-    load(fs.readFileSync(path.join(configFilePath), "utf8")),
-  );
+  const configFilePath = getConfigPathFromEnv();
+  const raw = RawConfig.parse(load(fs.readFileSync(configFilePath, "utf8")));
   return await applyConfigDefaults(raw, configFilePath);
 };
 
