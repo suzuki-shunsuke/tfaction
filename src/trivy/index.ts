@@ -7,7 +7,6 @@ import * as aqua from "../aqua";
 type Inputs = {
   workingDirectory: string;
   githubToken: string;
-  githubComment: boolean;
   configPath: string;
   executor: aqua.Executor;
 };
@@ -121,7 +120,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
     }
   }
 
-  if (inputs.githubComment && diagnostics.length > 0) {
+  const config = await lib.getConfig();
+  const filterMode = config.trivy?.reviewdog?.filter_mode ?? "nofilter";
+
+  if (filterMode === "nofilter" && diagnostics.length > 0) {
     const table = generateTable(diagnostics, inputs.workingDirectory);
     const githubCommentTemplate = `## :x: Trivy error
 
@@ -144,8 +146,6 @@ ${table}`;
       ? "github-pr-review"
       : "github-check";
 
-  const config = await lib.getConfig();
-  const filterMode = config.trivy?.reviewdog?.filter_mode ?? "nofilter";
   const reviewdogArgs = [
     "-f",
     "rdjson",

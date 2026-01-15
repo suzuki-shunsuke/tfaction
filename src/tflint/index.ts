@@ -11,7 +11,6 @@ type Inputs = {
   githubToken: string;
   githubTokenForTflintInit: string;
   githubTokenForFix: string;
-  githubComment: boolean;
   fix: boolean;
   serverRepository: string;
   securefixActionAppId: string;
@@ -198,7 +197,10 @@ export const run = async (inputs: Inputs): Promise<void> => {
     }
   }
 
-  if (inputs.githubComment && diagnostics.length > 0) {
+  const config = await lib.getConfig();
+  const filterMode = config.tflint?.reviewdog?.filter_mode ?? "nofilter";
+
+  if (filterMode === "nofilter" && diagnostics.length > 0) {
     const table = generateTable(diagnostics);
     const githubCommentTemplate = `## :x: tflint error
 
@@ -230,8 +232,6 @@ ${table}`;
   core.info(`Reviewdog input: ${reviewDogInput}`);
   core.info("Running reviewdog");
 
-  const config = await lib.getConfig();
-  const filterMode = config.tflint?.reviewdog?.filter_mode ?? "nofilter";
   const reviewdogArgs = [
     "-f",
     "rdjson",
