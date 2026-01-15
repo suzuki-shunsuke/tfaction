@@ -50,7 +50,7 @@ const replaceInFiles = async (
 export const main = async () => {
   const githubToken = input.githubToken;
 
-  const configDir = path.dirname(lib.getConfigPathFromEnv());
+  const configDir = path.dirname(env.tfactionConfig);
 
   // Validate inputs
   if (!env.tfactionModulePath) {
