@@ -105,10 +105,25 @@ export const main = async () => {
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   const commitMessage = `chore(${modulePath}): scaffold a Terraform Module`;
-  const prTitle = `Scaffold a Terraform Module (${modulePath})`;
-  const prBody = `This pull request was created by [GitHub Actions](${runUrl})`;
-  const prComment = `@${actor} This pull request was created by [GitHub Actions](${runUrl}) you ran.
-Please handle this pull request.`;
+
+  const vars = {
+    module_path: modulePath,
+    actor,
+    run_url: runUrl,
+  };
+
+  const prTitle = config?.scaffold_module?.pull_request?.title
+    ? Handlebars.compile(config?.scaffold_module?.pull_request?.title)(vars)
+    : `Scaffold a Terraform Module (${modulePath})`;
+
+  const prBody = config?.scaffold_module?.pull_request?.body
+    ? Handlebars.compile(config?.scaffold_module?.pull_request?.body)(vars)
+    : `This pull request was created by [GitHub Actions](${runUrl})`;
+
+  const prComment = config?.scaffold_module?.pull_request?.comment
+    ? Handlebars.compile(config?.scaffold_module?.pull_request?.comment)(vars)
+    : `@${actor} This pull request was created by [GitHub Actions](${runUrl}) you ran.
+    Please handle this pull request.`;
 
   await commit.create({
     commitMessage,
