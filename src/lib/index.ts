@@ -269,6 +269,28 @@ const RawConfig = z.object({
         .nullish(),
     })
     .nullish(),
+  scaffold_module: z
+    .object({
+      pull_request: z
+        .object({
+          title: z.string().optional(),
+          body: z.string().optional(),
+          comment: z.string().optional(),
+        })
+        .nullish(),
+    })
+    .nullish(),
+  scaffold_tfmigrate: z
+    .object({
+      pull_request: z
+        .object({
+          title: z.string().optional(),
+          body: z.string().optional(),
+          comment: z.string().optional(),
+        })
+        .nullish(),
+    })
+    .nullish(),
   skip_create_pr: z.boolean().optional(),
   skip_terraform_by_renovate: z.boolean().optional(),
   target_groups: TargetGroup.array(),
