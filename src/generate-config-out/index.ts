@@ -39,9 +39,10 @@ export const main = async () => {
     config,
   );
 
-  const workingDir =
-    targetConfig.working_directory || env.tfactionWorkingDir || "";
-  const target = targetConfig.target || env.tfactionTarget || "";
+  const workingDir = path.join(
+    config.config_dir,
+    targetConfig.working_directory,
+  );
 
   if (!workingDir) {
     throw new Error("working_directory is required");
@@ -49,7 +50,7 @@ export const main = async () => {
 
   // Run aqua i -l -a (install)
   const executor = await aqua.NewExecutor({
-    cwd: workingDir,
+    cwd: config.config_dir,
     githubToken,
   });
 
@@ -63,15 +64,13 @@ export const main = async () => {
   const tempFilePath = path.join(workingDir, tempFile);
   const targetFilePath = path.join(workingDir, file);
 
-  // Run terraform plan -generate-config-out with tfcmt
-  const stepSummaryPath = env.githubStepSummary;
   await executor.exec(
     "tfcmt",
     [
       "-output",
-      stepSummaryPath,
+      env.githubStepSummary,
       "-var",
-      `target:${target}`,
+      `target:${targetConfig.target}`,
       "plan",
       "--",
       "terraform",
@@ -119,7 +118,13 @@ export const main = async () => {
   await commit.create({
     commitMessage,
     githubToken,
-    files: new Set([targetFilePath]),
+    rootDir: config.git_root_dir,
+    files: new Set([
+      path.relative(
+        config.git_root_dir,
+        path.join(config.workspace, targetFilePath),
+      ),
+    ]),
     serverRepository: securefixServerRepository ?? "",
     appId: securefixAppId,
     appPrivateKey: securefixAppPrivateKey,
