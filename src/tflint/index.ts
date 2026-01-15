@@ -230,7 +230,7 @@ ${table}`;
   core.info(`Reviewdog input: ${reviewDogInput}`);
   core.info("Running reviewdog");
 
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const filterMode = config.tflint?.reviewdog?.filter_mode ?? "nofilter";
   const reviewdogArgs = [
     "-f",

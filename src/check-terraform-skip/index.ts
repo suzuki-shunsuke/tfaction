@@ -12,7 +12,7 @@ type Inputs = {
 };
 
 export const main = async () => {
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   if (!env.ciInfoTempDir) {
     throw new Error("CI_INFO_TEMP_DIR is not set");
   }

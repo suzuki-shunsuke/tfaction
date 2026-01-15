@@ -348,9 +348,8 @@ export const runTerraformPlan = async (
 export const main = async (
   targetConfig: getTargetConfig.TargetConfig,
 ): Promise<void> => {
-  const config = lib.getConfig();
-  const configDir = path.dirname(config.config_path);
-  const workingDir = path.join(configDir, targetConfig.working_directory);
+  const config = await lib.getConfig();
+  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
 
   const githubToken = core.getInput("github_token");
   const executor = await aqua.NewExecutor({
@@ -405,7 +404,7 @@ export const main = async (
   if (planJsonPath) {
     await conftest.run(
       {
-        configDir,
+        configDir: config.config_dir,
         githubToken,
         plan: true,
         planJsonPath,

@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as fs from "fs";
+import * as path from "path";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
@@ -11,7 +12,7 @@ import { create as createCommit } from "../commit";
 
 export const main = async () => {
   // Step 1: Get target config
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
       target: lib.getTargetFromEnv(),
@@ -40,7 +41,12 @@ export const main = async () => {
     if (jobType === "tfmigrate") {
       const workingDir = targetConfig.working_directory;
       if (workingDir) {
-        const tfmigrateHclPath = `${workingDir}/.tfmigrate.hcl`;
+        const tfmigrateHclPath = path.join(
+          config.workspace,
+          config.config_dir,
+          workingDir,
+          ".tfmigrate.hcl",
+        );
         const githubToken = core.getInput("github_token");
         const securefixAppId = core.getInput("securefix_action_app_id") || "";
         const securefixAppPrivateKey =
@@ -50,12 +56,13 @@ export const main = async () => {
 
         if (fs.existsSync(tfmigrateHclPath)) {
           // If the file is new or modified, commit it
-          if (await git.hasFileChangedPorcelain(tfmigrateHclPath)) {
+          if (await git.hasFileChangedPorcelain(tfmigrateHclPath, config.git_root_dir)) {
             core.info("Committing .tfmigrate.hcl");
             await createCommit({
               commitMessage: "chore(tfmigrate): add .tfmigrate.hcl",
               githubToken,
-              files: new Set([tfmigrateHclPath]),
+              rootDir: config.git_root_dir,
+              files: new Set([path.relative(config.git_root_dir, tfmigrateHclPath)]),
               serverRepository,
               appId: securefixAppId,
               appPrivateKey: securefixAppPrivateKey,

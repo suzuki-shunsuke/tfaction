@@ -15,8 +15,7 @@ export const main = async () => {
   const securefixAppPrivateKey =
     core.getInput("securefix_action_app_private_key") || "";
 
-  const config = lib.getConfig();
-  const configDir = path.dirname(config.config_path);
+  const config = await lib.getConfig();
   const target = lib.getTargetFromEnv();
   const wd = lib.getWorkingDirFromEnv();
 
@@ -26,16 +25,12 @@ export const main = async () => {
     );
   }
 
-  const gitRootDir = await lib.getGitRootDir(configDir);
-
   // github.workspace => working dir
-  const workingDir = path.join(configDir, wd || target);
-
-  const workspace = lib.getGitHubWorkspace();
+  const workingDir = path.join(config.config_dir, wd || target);
 
   const workingDirFromGitRoot = path.relative(
-    gitRootDir,
-    path.join(workspace, workingDir),
+    config.git_root_dir,
+    path.join(config.workspace, workingDir),
   );
 
   const enableTrivy = config.trivy?.enabled ?? true;
@@ -127,7 +122,7 @@ export const main = async () => {
     await createCommit({
       commitMessage: `style: ${terraformCommand} fmt -recursive`,
       githubToken,
-      rootDir: gitRootDir,
+      rootDir: config.git_root_dir,
       files: new Set(formattedFiles),
       serverRepository: securefixServerRepository,
       appId: securefixAppId,

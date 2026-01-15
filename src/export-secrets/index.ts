@@ -42,7 +42,7 @@ const getSecrets = (
 };
 
 export const main = async () => {
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const secrets = new Map<string, string>(
     Object.entries(JSON.parse(core.getInput("secrets"))),
   );

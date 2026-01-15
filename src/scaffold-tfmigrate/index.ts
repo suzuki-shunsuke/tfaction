@@ -184,7 +184,7 @@ export const main = async () => {
   const actionPath = lib.GitHubActionPath;
 
   // Get config
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
       target: lib.getTargetFromEnv(),
@@ -195,8 +195,7 @@ export const main = async () => {
     config,
   );
 
-  const configDir = path.dirname(config.config_path);
-  const workingDir = path.join(configDir, targetConfig.working_directory);
+  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
   const target = targetConfig.target;
 
   const skipCreatePr = config.skip_create_pr;
@@ -212,7 +211,6 @@ export const main = async () => {
   const repository = env.githubRepository;
   const runId = env.githubRunId;
 
-  const gitRootDir = await lib.getGitRootDir(configDir);
 
   const executor = await aqua.NewExecutor({
     githubToken,
@@ -223,12 +221,12 @@ export const main = async () => {
   let branch = generateBranchName(target, prNumber);
   if (prNumber) {
     await executor.exec("gh", ["pr", "checkout", prNumber], {
-      cwd: configDir,
+      cwd: config.config_dir,
       env: {
         GITHUB_TOKEN: githubToken,
       },
     });
-    branch = await git.getCurrentBranch();
+    branch = await git.getCurrentBranch(config.config_dir);
   }
 
   // Create directory
@@ -253,7 +251,7 @@ export const main = async () => {
   createMigrationFile(workingDir, migrationName, actionPath);
 
   // Get modified files
-  const files = await git.getModifiedFiles(workingDir, gitRootDir);
+  const files = await git.getModifiedFiles(workingDir, config.git_root_dir);
   if (files.length === 0) {
     core.info("No files to commit");
     return;
@@ -271,7 +269,7 @@ Please handle this pull request.`;
   const shouldSkipPr = skipCreatePr || !!prNumber;
   await commit.create({
     commitMessage,
-    rootDir: gitRootDir,
+    rootDir: config.git_root_dir,
     githubToken,
     files: new Set(files),
     serverRepository: securefixServerRepository ?? "",

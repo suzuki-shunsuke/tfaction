@@ -183,11 +183,9 @@ const getTargetByWorkingDirectory = (
 const listTargets = async (
   config: lib.Config,
 ): Promise<Map<string, string>> => {
-  const configDir = path.dirname(config.config_path);
-  const gitRootDir = await lib.getGitRootDir(configDir);
   const files = await lib.listWorkingDirFiles(
-    gitRootDir,
-    configDir,
+    config.git_root_dir,
+    config.config_dir,
     config.working_directory_file,
   );
 
@@ -235,7 +233,7 @@ const listTargets = async (
  */
 export const main = async () => {
   const githubToken = core.getInput("github_token", { required: true });
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
 
   // If drift_detection is not configured, output empty
   if (!config.drift_detection) {

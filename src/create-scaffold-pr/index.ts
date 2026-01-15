@@ -60,7 +60,7 @@ export const main = async () => {
   const securefixAppPrivateKey =
     core.getInput("securefix_action_app_private_key") || "";
 
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
 
   const skipCreatePr = config.skip_create_pr;
   const draftPr = config.draft_pr;

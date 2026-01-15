@@ -51,7 +51,6 @@ export const getTargetConfig = async (
   config: lib.Config,
 ): Promise<TargetConfig> => {
   const workingDirectoryFile = config.working_directory_file;
-  const configDir = path.dirname(config.config_path);
 
   const t = await lib.getTargetGroup(config, inputs.target, inputs.workingDir);
   const workingDir = t.workingDir;
@@ -112,7 +111,7 @@ export const getTargetConfig = async (
     );
 
     const wdConfig = lib.readTargetConfig(
-      path.join(configDir, workingDir, workingDirectoryFile),
+      path.join(config.config_dir, workingDir, workingDirectoryFile),
     );
     const jobConfig = lib.getJobConfig(
       wdConfig,
@@ -223,7 +222,7 @@ export const main = async () => {
       isApply: lib.getIsApply(),
       jobType: lib.getJobType(),
     },
-    lib.getConfig(),
+    await lib.getConfig(),
   );
   for (const [key, value] of result.envs) {
     core.exportVariable(key, value);

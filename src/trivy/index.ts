@@ -144,7 +144,7 @@ ${table}`;
       ? "github-pr-review"
       : "github-check";
 
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const filterMode = config.trivy?.reviewdog?.filter_mode ?? "nofilter";
   const reviewdogArgs = [
     "-f",

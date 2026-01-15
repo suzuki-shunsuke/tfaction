@@ -12,7 +12,7 @@ export const main = async () => {
   const issueInput = core.getInput("issue", { required: true });
   const issue: Issue = JSON.parse(issueInput);
 
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const driftIssueRepo = lib.getDriftIssueRepo(config);
 
   const repoOwner = driftIssueRepo.owner;

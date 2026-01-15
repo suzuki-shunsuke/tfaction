@@ -16,7 +16,7 @@ import {
 export const main = async (): Promise<void> => {
   const githubToken = core.getInput("github_token");
   const driftIssueNumber = env.tfactionDriftIssueNumber;
-  const cfg = lib.getConfig();
+  const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
       target: lib.getTargetFromEnv(),
@@ -27,7 +27,7 @@ export const main = async (): Promise<void> => {
     cfg,
   );
   const workingDir = path.join(
-    path.dirname(cfg.config_path),
+    cfg.config_dir,
     targetConfig.working_directory,
   );
   const driftIssueRepo = lib.getDriftIssueRepo(cfg);

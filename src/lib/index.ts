@@ -317,6 +317,8 @@ export interface Config extends Omit<
 > {
   git_root_dir: string;
   config_path: string;
+  config_dir: string;
+  workspace: string;
   working_directory_file: string;
   module_file: string;
   renovate_login: string;
@@ -356,15 +358,19 @@ export const generateJSONSchema = (dir: string) => {
   );
 };
 
-export const applyConfigDefaults = (
+export const applyConfigDefaults = async (
   raw: RawConfig,
-  gitRootDir: string,
   configPath: string,
-): Config => {
+): Promise<Config> => {
+  const configDir = path.dirname(configPath);
+  const gitRootDir = await getGitRootDir(configDir);
+  const workspace = getGitHubWorkspace();
   return {
     ...raw,
     git_root_dir: gitRootDir,
     config_path: configPath,
+    config_dir: configDir,
+    workspace: workspace,
     working_directory_file: raw.working_directory_file ?? "tfaction.yaml",
     module_file: raw.module_file ?? "tfaction_module.yaml",
     renovate_login: raw.renovate_login ?? "renovate[bot]",
@@ -396,13 +402,12 @@ export const getConfigPathFromEnv = (): string => {
   return env.tfactionConfig || "tfaction-root.yaml";
 };
 
-export const getConfig = (): Config => {
-  const gitRootDir = getGitRootDirFromEnv();
-  const configFilePath = path.join(gitRootDir, getConfigPathFromEnv());
+export const getConfig = async (): Promise<Config> => {
+  const configFilePath = path.join(getConfigPathFromEnv());
   const raw = RawConfig.parse(
-    load(fs.readFileSync(path.join(gitRootDir, configFilePath), "utf8")),
+    load(fs.readFileSync(path.join(configFilePath), "utf8")),
   );
-  return applyConfigDefaults(raw, gitRootDir, configFilePath);
+  return await applyConfigDefaults(raw, configFilePath);
 };
 
 /**
@@ -435,10 +440,6 @@ export const createWDTargetMap = (
     m.set(wd, target);
   }
   return m;
-};
-
-export const getGitRootDirFromEnv = (): string => {
-  return env.tfactionGitRootDir;
 };
 
 export const getTargetFromEnv = (): string => {

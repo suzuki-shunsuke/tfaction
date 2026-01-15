@@ -123,17 +123,15 @@ export const main = async (
     throw new Error(`${checksumFileOutput} isn't latest.`);
   }
 
-  const gitRootDir = await lib.getGitRootDir(workingDir);
-  const workspace = lib.getGitHubWorkspace();
   const checksumFileFromRootDir = path.relative(
-    gitRootDir,
-    path.join(workspace, checksumFileOutput),
+    cfg.git_root_dir,
+    path.join(cfg.workspace, checksumFileOutput),
   );
 
   await commit.create({
     commitMessage: `chore(aqua): update ${checksumFile}`,
     githubToken: inputs.githubToken,
-    rootDir: gitRootDir,
+    rootDir: cfg.git_root_dir,
     files: new Set([checksumFileFromRootDir]),
     serverRepository: cfg?.securefix_action?.server_repository ?? "",
     appId: inputs.securefixActionAppId,

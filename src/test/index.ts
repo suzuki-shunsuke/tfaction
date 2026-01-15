@@ -12,7 +12,7 @@ import { create as createCommit } from "../commit";
 import { fmt } from "./fmt";
 
 export const main = async () => {
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
   const githubToken = core.getInput("github_token");
   const securefixAppId = core.getInput("securefix_action_app_id") || "";
   const securefixAppPrivateKey =
@@ -29,8 +29,7 @@ export const main = async () => {
     config,
   );
 
-  const configDir = path.dirname(config.config_path);
-  const workingDir = path.join(configDir, targetConfig.working_directory);
+  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
   const destroy = targetConfig.destroy ?? false;
   const tfCommand = targetConfig.terraform_command;
   const target = targetConfig.target;
@@ -43,7 +42,7 @@ export const main = async () => {
 
   await runConftest(
     {
-      configDir: path.dirname(config.config_path),
+      configDir: config.config_dir,
       githubToken,
       plan: false,
       executor,

@@ -21,7 +21,6 @@ export const tfactionSkipTerraform =
   process.env.TFACTION_SKIP_TERRAFORM === "true";
 export const tfactionJobType = process.env.TFACTION_JOB_TYPE ?? "";
 export const tfactionConfig = process.env.TFACTION_CONFIG ?? "";
-export const tfactionGitRootDir = process.env.TFACTION_GIT_ROOT_DIR ?? "";
 export const tfactionTarget = process.env.TFACTION_TARGET ?? "";
 export const tfactionWorkingDir = process.env.TFACTION_WORKING_DIR ?? "";
 export const tfactionIsApply = process.env.TFACTION_IS_APPLY ?? "";

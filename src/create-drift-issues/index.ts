@@ -28,7 +28,7 @@ type Issue = {
 };
 
 export const main = async () => {
-  const cfg = lib.getConfig();
+  const cfg = await lib.getConfig();
   if (!cfg.drift_detection) {
     // dirft detection is disabled
     return;
@@ -55,7 +55,7 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   if (inputs.ghToken === "") {
     throw new Error("GITHUB_TOKEN is required");
   }
-  const cfg = lib.getConfig();
+  const cfg = await lib.getConfig();
   if (!cfg.drift_detection) {
     core.info("drift detection is disabled");
     return undefined;
@@ -70,11 +70,9 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   }
   const workingDirectoryFile = cfg.working_directory_file;
 
-  const configDir = path.dirname(cfg.config_path);
-  const gitRootDir = await lib.getGitRootDir(configDir);
   const files = await lib.listWorkingDirFiles(
-    gitRootDir,
-    configDir,
+    cfg.git_root_dir,
+    cfg.config_dir,
     workingDirectoryFile,
   );
   const dirs: string[] = [];
@@ -88,7 +86,7 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   for (const [wd, target] of m) {
     const tg = await lib.getTargetGroup(cfg, target, wd);
     const wdConfig = lib.readTargetConfig(
-      path.join(configDir, wd, cfg.working_directory_file),
+      path.join(cfg.config_dir, wd, cfg.working_directory_file),
     );
     if (lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
       targetWDMap.set(target, wd);

@@ -17,7 +17,7 @@ const isPullRequestEvent = (): boolean => {
 
 export const main = async () => {
   const githubToken = core.getInput("github_token", { required: true });
-  const config = lib.getConfig();
+  const config = await lib.getConfig();
 
   const targetConfig = await getTargetConfig(
     {
@@ -29,13 +29,9 @@ export const main = async () => {
     config,
   );
 
-  const configDir = path.dirname(config.config_path);
-  const workingDir = path.join(configDir, targetConfig.working_directory);
+  const workingDir = path.join(config.config_dir, targetConfig.working_directory);
   const tfCommand = targetConfig.terraform_command;
   const providersLockOpts = targetConfig.providers_lock_opts;
-
-  const gitRootDir = await lib.getGitRootDir(workingDir);
-  const workspace = lib.getGitHubWorkspace();
 
   const executor = await aqua.NewExecutor({
     githubToken,
@@ -118,13 +114,13 @@ export const main = async () => {
     ) {
       // Commit the change
       const lockFileFromGitRootDir = path.relative(
-        gitRootDir,
-        path.join(workspace, lockFile),
+        config.git_root_dir,
+        path.join(config.workspace, lockFile),
       );
       await commit.create({
         commitMessage: "chore: update .terraform.lock.hcl",
         githubToken,
-        rootDir: gitRootDir,
+        rootDir: config.git_root_dir,
         files: new Set([lockFileFromGitRootDir]),
         serverRepository: core.getInput("securefix_action_server_repository"),
         appId: core.getInput("securefix_action_app_id"),
