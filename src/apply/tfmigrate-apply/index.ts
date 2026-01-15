@@ -5,6 +5,7 @@ import * as os from "os";
 import * as path from "path";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
+import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../../get-target-config";
 import {
@@ -14,7 +15,7 @@ import {
 } from "../terraform-apply/run";
 
 export const main = async (): Promise<void> => {
-  const githubToken = core.getInput("github_token");
+  const githubToken = input.githubToken;
   const driftIssueNumber = env.tfactionDriftIssueNumber;
   const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(

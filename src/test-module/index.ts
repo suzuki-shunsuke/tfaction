@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as input from "../lib/input";
 import * as aqua from "../aqua";
 import { run as runTrivy } from "../trivy";
 import { run as runTflint } from "../tflint";
@@ -10,10 +11,9 @@ import { run as runTerraformDocs } from "../terraform-docs";
 import { create as createCommit } from "../commit";
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token", { required: true });
-  const securefixAppId = core.getInput("securefix_action_app_id") || "";
-  const securefixAppPrivateKey =
-    core.getInput("securefix_action_app_private_key") || "";
+  const githubToken = input.getRequiredGitHubToken();
+  const securefixAppId = input.securefixActionAppId;
+  const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
 
   const config = await lib.getConfig();
   const target = lib.getTargetFromEnv();

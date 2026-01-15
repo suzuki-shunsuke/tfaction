@@ -8,15 +8,16 @@ import {
   resolveRelativeCallTree,
   ModuleToCallers,
 } from "./lib";
+import * as input from "../../../lib/input";
 import * as aqua from "../../../aqua";
 
 export const main = async (executor: aqua.Executor) => {
   const configFiles = fs
-    .readFileSync(core.getInput("config_files"), "utf8")
+    .readFileSync(input.getRequiredConfigFiles(), "utf8")
     .trim()
     .split("\n");
   const moduleFiles = fs
-    .readFileSync(core.getInput("module_files"), "utf8")
+    .readFileSync(input.getRequiredModuleFiles(), "utf8")
     .trim()
     .split("\n");
 

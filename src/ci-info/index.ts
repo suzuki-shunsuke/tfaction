@@ -4,6 +4,7 @@ import * as fs from "fs/promises";
 import * as os from "os";
 import * as path from "path";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 
 interface PRFile {
   filename: string;
@@ -175,11 +176,7 @@ export const main = async () => {
   }
   setValue("is_pr", prNumber !== undefined);
 
-  const octokit = github.getOctokit(
-    core.getInput("github_token", {
-      required: true,
-    }),
-  );
+  const octokit = github.getOctokit(input.getRequiredGitHubToken());
 
   // Try to get PR number from SHA
   if (!prNumber) {

@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as aqua from "../aqua";
 import * as commit from "../commit";
 import * as getTargetConfig from "../get-target-config";
@@ -291,10 +292,9 @@ const postSkipCreateComment = async (
 };
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token", { required: true });
-  const securefixAppId = core.getInput("securefix_action_app_id") || "";
-  const securefixAppPrivateKey =
-    core.getInput("securefix_action_app_private_key") || "";
+  const githubToken = input.getRequiredGitHubToken();
+  const securefixAppId = input.securefixActionAppId;
+  const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
 
   const octokit = github.getOctokit(githubToken);
 

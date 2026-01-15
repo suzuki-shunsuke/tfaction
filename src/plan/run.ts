@@ -6,6 +6,7 @@ import { DefaultArtifactClient } from "@actions/artifact";
 import * as aqua from "../aqua";
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../conftest";
 
@@ -354,14 +355,13 @@ export const main = async (
     targetConfig.working_directory,
   );
 
-  const githubToken = core.getInput("github_token");
   const executor = await aqua.NewExecutor({
-    githubToken,
+    githubToken: input.githubToken,
     cwd: workingDir,
   });
 
   const inputs: Inputs = {
-    githubToken,
+    githubToken: input.githubToken,
     workingDirectory: workingDir,
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.destroy || false,
@@ -408,7 +408,7 @@ export const main = async (
     await conftest.run(
       {
         configDir: config.config_dir,
-        githubToken,
+        githubToken: input.githubToken,
         plan: true,
         planJsonPath,
         executor,

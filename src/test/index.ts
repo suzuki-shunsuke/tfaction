@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as path from "path";
 
 import * as lib from "../lib";
+import * as input from "../lib/input";
 import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
 import { run as runConftest } from "../conftest";
@@ -13,10 +14,9 @@ import { fmt } from "./fmt";
 
 export const main = async () => {
   const config = await lib.getConfig();
-  const githubToken = core.getInput("github_token");
-  const securefixAppId = core.getInput("securefix_action_app_id") || "";
-  const securefixAppPrivateKey =
-    core.getInput("securefix_action_app_private_key") || "";
+  const githubToken = input.githubToken;
+  const securefixAppId = input.securefixActionAppId;
+  const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
 
   // Step 1: Get target config
   const targetConfig = await getTargetConfig(

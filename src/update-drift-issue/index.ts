@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 
 type Inputs = {
   ghToken: string;
@@ -24,8 +25,8 @@ export const main = async () => {
   const driftIssueRepo = lib.getDriftIssueRepo(config);
 
   const inputs: Inputs = {
-    ghToken: core.getInput("github_token", { required: true }),
-    status: core.getInput("status", { required: true }),
+    ghToken: input.getRequiredGitHubToken(),
+    status: input.getRequiredStatus(),
     issueNumber: parseInt(issueNumberStr, 10),
     issueState: env.tfactionDriftIssueState,
     repoOwner: driftIssueRepo.owner,

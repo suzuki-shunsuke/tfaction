@@ -6,6 +6,7 @@ import Handlebars from "handlebars";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 import * as git from "../lib/git";
 import * as aqua from "../aqua";
 import { getTargetConfig } from "../get-target-config";
@@ -172,13 +173,11 @@ const createLabel = async (octokit: Octokit, label: string): Promise<void> => {
 };
 
 export const main = async () => {
-  const githubToken = core.getInput("github_token");
-  const migrationName = core.getInput("migration_name") || "main";
-  const prNumber = core.getInput("pr_number") || "";
-  const securefixAppId = core.getInput("securefix_action_app_id");
-  const securefixAppPrivateKey = core.getInput(
-    "securefix_action_app_private_key",
-  );
+  const githubToken = input.githubToken;
+  const migrationName = input.migrationName;
+  const prNumber = input.prNumber;
+  const securefixAppId = input.securefixActionAppId;
+  const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
 
   const octokit = github.getOctokit(githubToken);
   const actionPath = lib.GitHubActionPath;

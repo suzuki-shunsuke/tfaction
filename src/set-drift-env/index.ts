@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 
 type Issue = {
   number: number;
@@ -9,7 +10,7 @@ type Issue = {
 };
 
 export const main = async () => {
-  const issueInput = core.getInput("issue", { required: true });
+  const issueInput = input.getRequiredIssue();
   const issue: Issue = JSON.parse(issueInput);
 
   const config = await lib.getConfig();

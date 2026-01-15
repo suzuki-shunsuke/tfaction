@@ -4,6 +4,7 @@ import * as path from "path";
 
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 
 type Issue = {
   number: number;
@@ -232,7 +233,7 @@ const listTargets = async (
  * @returns
  */
 export const main = async () => {
-  const githubToken = core.getInput("github_token", { required: true });
+  const githubToken = input.getRequiredGitHubToken();
   const config = await lib.getConfig();
 
   // If drift_detection is not configured, output empty

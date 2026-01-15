@@ -4,6 +4,7 @@ import * as testAction from "./test-action";
 import * as testActionTerragrunt from "./test-action-terragrunt";
 import { generateJSONSchema } from "./lib";
 import * as env from "./lib/env";
+import * as input from "./lib/input";
 
 try {
   if (env.tfactionTestAction) {
@@ -14,7 +15,7 @@ try {
     generateJSONSchema("schema");
   } else {
     await main({
-      action: core.getInput("action"),
+      action: input.action,
     });
   }
 } catch (error) {

@@ -1,12 +1,13 @@
-import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
+import * as core from "@actions/core";
 import * as env from "../lib/env";
+import * as input from "../lib/input";
 
 export const main = async () => {
-  const modulePath = core.getInput("module_path", { required: true });
-  const version = core.getInput("version", { required: true });
-  const githubToken = core.getInput("github_token", { required: true });
+  const modulePath = input.getRequiredModulePath();
+  const version = input.getRequiredVersion();
+  const githubToken = input.getRequiredGitHubToken();
 
   // Validate inputs
   if (!modulePath) {
