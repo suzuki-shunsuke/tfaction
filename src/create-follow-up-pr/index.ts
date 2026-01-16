@@ -9,7 +9,7 @@ import * as env from "../lib/env";
 import * as input from "../lib/input";
 import * as aqua from "../aqua";
 import * as commit from "../commit";
-import * as getTargetConfig from "../get-target-config";
+import { getTargetConfig, TargetConfig } from "../get-target-config";
 
 const PRData = z.object({
   body: z.string(),
@@ -100,6 +100,7 @@ interface PRParams {
   prBody: string;
   assignees: string[];
   mentions: string;
+  comment: string;
 }
 
 interface GeneratePRParamsInput {
@@ -111,7 +112,11 @@ interface GeneratePRParamsInput {
   runId: string;
 }
 
-const generatePRParams = (input: GeneratePRParamsInput): PRParams => {
+const generatePRParams = (
+  cfg: lib.Config,
+  targetConfig: TargetConfig,
+  input: GeneratePRParamsInput,
+): PRParams => {
   const { prNumber, target, tempDir, serverUrl, repository, runId } = input;
 
   const runURL = `${serverUrl}/${repository}/actions/runs/${runId}`;
@@ -126,18 +131,6 @@ const generatePRParams = (input: GeneratePRParamsInput): PRParams => {
   const commitMessage = `chore: create a commit to open follow up pull request
 Follow up #${prNumber}
 ${runURL}`;
-  const prTitle = `chore(${target}): follow up #${prNumber}`;
-
-  let prBody = `This pull request was created automatically to follow up the failure of apply.
-- Follow up #${prNumber} ([failed workflow](${runURL}))
-
-Please write the description of this pull request below.
-
-## Why did the terraform apply fail?
-
-## How do you fix the problem?
-
-`;
 
   const assignees = new Set<string>();
   if (prAuthor && !prAuthor.endsWith("[bot]")) {
@@ -146,6 +139,30 @@ Please write the description of this pull request below.
   if (actor && !actor.endsWith("[bot]") && actor !== prAuthor) {
     assignees.add(actor);
   }
+
+  const assigneesArray = [...assignees];
+  const mentions = assigneesArray.map((a) => `@${a}`).join(" ");
+
+  let defaultPRBody = `This pull request was created automatically to follow up the failure of apply.
+      - Follow up #${prNumber} ([failed workflow](${runURL}))
+
+      Please write the description of this pull request below.
+
+      ## Why did the terraform apply fail?
+
+      ## How do you fix the problem?
+
+      `;
+
+  const vars = {
+    target: target,
+    workingDir: targetConfig.working_directory,
+    actor,
+    run_url: runURL,
+    pr_number: prNumber,
+    mentions: mentions,
+    original_pr_body: "",
+  };
 
   if (tempDir) {
     const prJsonPath = `${tempDir}/pr.json`;
@@ -158,7 +175,7 @@ Please write the description of this pull request below.
             assignees.add(assignee.login);
           }
         }
-        prBody += `
+        defaultPRBody += `
 ---
 
 <details>
@@ -168,20 +185,41 @@ ${prData.body}
 
 </details>
 `;
+        vars.original_pr_body = prData.body;
       } catch (error) {
         console.error("Failed to read or parse pr.json:", error);
       }
     }
   }
 
-  const assigneesArray = [...assignees];
-  const mentions = assigneesArray.map((a) => `@${a}`).join(" ");
+  const prTitle = cfg?.follow_up_pr?.pull_request?.title
+    ? Handlebars.compile(cfg?.scaffold_module?.pull_request?.title)(vars)
+    : `chore(${target}): follow up #${prNumber}`;
+
+  const prBody = cfg?.follow_up_pr?.pull_request?.body
+    ? Handlebars.compile(cfg?.scaffold_module?.pull_request?.body)(vars)
+    : defaultPRBody;
+
+  const comment = cfg?.follow_up_pr?.pull_request?.comment
+    ? Handlebars.compile(cfg?.follow_up_pr?.pull_request?.comment)(vars)
+    : `${mentions}
+        This pull request was created because \`terraform apply\` failed.
+
+        - #${prNumber}
+
+        Please handle this pull request.
+
+        1. Check the error message #${prNumber}
+        1. Check the result of \`terraform plan\`
+        1. Add commits to this pull request and fix the problem if needed
+        1. Review and merge this pull request`;
 
   return {
     branch,
     commitMessage,
     prTitle,
     prBody,
+    comment,
     assignees: assigneesArray,
     mentions,
   };
@@ -306,9 +344,9 @@ export const main = async () => {
 
   const skipCreatePr = config.skip_create_pr;
   const draftPr = config.draft_pr;
-  const groupLabelEnabled = config.follow_up_pr_group_label?.enabled ?? false;
+  const groupLabelEnabled = config.follow_up_pr?.group_label?.enabled ?? false;
   const groupLabelPrefix =
-    config.follow_up_pr_group_label?.prefix ?? "tfaction:follow-up-pr-group/";
+    config.follow_up_pr?.group_label?.prefix ?? "tfaction:follow-up-pr-group/";
   const securefixServerRepository =
     config.securefix_action?.server_repository ?? "";
   const securefixPRBaseBranch =
@@ -317,7 +355,7 @@ export const main = async () => {
   const jobType = lib.getJobType();
 
   // Get target config
-  const targetConfig = await getTargetConfig.getTargetConfig(
+  const targetConfig = await getTargetConfig(
     {
       target: env.tfactionTarget,
       workingDir: env.tfactionWorkingDir,
@@ -354,7 +392,7 @@ export const main = async () => {
   });
 
   // Generate PR parameters
-  const prParams = generatePRParams({
+  const prParams = generatePRParams(config, targetConfig, {
     prNumber,
     target,
     tempDir,

@@ -53,11 +53,11 @@ export const main = async () => {
   core.setOutput("terraform_command", config.terraform_command);
   core.setOutput(
     "follow_up_pr_group_label_prefix",
-    config.follow_up_pr_group_label?.prefix ?? "tfaction:follow-up-pr-group/",
+    config.follow_up_pr?.group_label?.prefix ?? "tfaction:follow-up-pr-group/",
   );
   core.setOutput(
     "follow_up_pr_group_label_enabled",
-    config.follow_up_pr_group_label?.enabled ?? false,
+    config.follow_up_pr?.group_label?.enabled ?? false,
   );
   core.setOutput(
     "securefix_action_server_repository",

@@ -218,12 +218,6 @@ const Replace = z.object({
 });
 type Replace = z.infer<typeof Replace>;
 
-const FollowUpPRGroupLabel = z.object({
-  enabled: z.boolean().optional(),
-  prefix: z.string().optional(),
-});
-type FollowUpPRGroupLabel = z.infer<typeof FollowUpPRGroupLabel>;
-
 const RawConfig = z.object({
   aqua: z
     .object({
@@ -265,6 +259,23 @@ const RawConfig = z.object({
           title: z.string().optional(),
           body: z.string().optional(),
           comment: z.string().optional(),
+        })
+        .nullish(),
+    })
+    .nullish(),
+  follow_up_pr: z
+    .object({
+      pull_request: z
+        .object({
+          title: z.string().optional(),
+          body: z.string().optional(),
+          comment: z.string().optional(),
+        })
+        .nullish(),
+      group_label: z
+        .object({
+          enabled: z.boolean().optional(),
+          prefix: z.string().optional(),
         })
         .nullish(),
     })
@@ -311,7 +322,6 @@ const RawConfig = z.object({
   working_directory_file: z.string().optional(),
   replace: Replace.optional(),
   providers_lock_opts: z.string().optional(),
-  follow_up_pr_group_label: FollowUpPRGroupLabel.optional(),
   securefix_action: z
     .object({
       server_repository: z.string(),
@@ -341,7 +351,6 @@ export interface Config extends Omit<
   | "label_prefixes"
   | "tflint"
   | "trivy"
-  | "follow_up_pr_group_label"
 > {
   git_root_dir: string;
   config_path: string;
@@ -365,10 +374,6 @@ export interface Config extends Omit<
   trivy: {
     enabled: boolean;
     reviewdog?: z.infer<typeof ReviewdogConfig>;
-  };
-  follow_up_pr_group_label: {
-    enabled: boolean;
-    prefix: string;
   };
 }
 
@@ -417,11 +422,6 @@ export const applyConfigDefaults = async (
     trivy: {
       enabled: raw.trivy?.enabled ?? true,
       reviewdog: raw.trivy?.reviewdog,
-    },
-    follow_up_pr_group_label: {
-      enabled: raw.follow_up_pr_group_label?.enabled ?? false,
-      prefix:
-        raw.follow_up_pr_group_label?.prefix ?? "tfaction:follow-up-pr-group/",
     },
   };
 };
