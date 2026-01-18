@@ -231,33 +231,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/golang.org/dl/go1.25.5.darwin-amd64.tar.gz",
-      "checksum": "B69D51BCE599E5381A94CE15263AE644EC84667A5CE23D58DC2E63E2C12A9F56",
+      "id": "http/golang.org/dl/go1.25.6.darwin-amd64.tar.gz",
+      "checksum": "E2B5B237F5C262931B8E280AC4B8363F156E19BFAD5270C099998932819670B7",
       "algorithm": "sha256"
     },
     {
-      "id": "http/golang.org/dl/go1.25.5.darwin-arm64.tar.gz",
-      "checksum": "BED8EBE824E3D3B27E8471D1307F803FC6AB8E1D0EB7A4AE196979BD9B801DD3",
+      "id": "http/golang.org/dl/go1.25.6.darwin-arm64.tar.gz",
+      "checksum": "984521AE978A5377C7D782FD2DD953291840D7D3D0BD95781A1F32F16D94A006",
       "algorithm": "sha256"
     },
     {
-      "id": "http/golang.org/dl/go1.25.5.linux-amd64.tar.gz",
-      "checksum": "9E9B755D63B36ACF30C12A9A3FC379243714C1C6D3DD72861DA637F336EBB35B",
+      "id": "http/golang.org/dl/go1.25.6.linux-amd64.tar.gz",
+      "checksum": "F022B6AAD78E362BCBA9B0B94D09AD58C5A70C6BA3B7582905FABABF5FE0181A",
       "algorithm": "sha256"
     },
     {
-      "id": "http/golang.org/dl/go1.25.5.linux-arm64.tar.gz",
-      "checksum": "B00B694903D126C588C378E72D3545549935D3982635BA3F7A964C9FA23FE3B9",
+      "id": "http/golang.org/dl/go1.25.6.linux-arm64.tar.gz",
+      "checksum": "738EF87D79C34272424CCDF83302B7B0300B8B096ED443896089306117943DD5",
       "algorithm": "sha256"
     },
     {
-      "id": "http/golang.org/dl/go1.25.5.windows-amd64.zip",
-      "checksum": "AE756CCE1CB80C819B4FE01B0353807178F532211B47F72D7FA77949DE054EBB",
+      "id": "http/golang.org/dl/go1.25.6.windows-amd64.zip",
+      "checksum": "19B4733B727BA5C611B5656187F3AC367D278D64C3D4199A845E39C0FDAC5335",
       "algorithm": "sha256"
     },
     {
-      "id": "http/golang.org/dl/go1.25.5.windows-arm64.zip",
-      "checksum": "55A94A423A6B8F3AC2AC4D05A6E44D7760C6520A2C6DCEF7425F6BAC79C4EECE",
+      "id": "http/golang.org/dl/go1.25.6.windows-arm64.zip",
+      "checksum": "8F2D8E6DD0849A2EC0ADE1683BCFB7809E64D264A4273D8437841000A28FFB60",
       "algorithm": "sha256"
     },
     {
