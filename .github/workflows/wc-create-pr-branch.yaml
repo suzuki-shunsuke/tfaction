@@ -362,3 +362,24 @@ jobs:
             echo "::error:: TFACTION_DRIFT_ISSUE_STATE is not expected" >&2
             exit 1
           fi
+
+  test-list-targets:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    needs: [create-pr-branch]
+    permissions: {}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: dist
+          name: js
+      - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
+        run: |
+          git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
+      - name: Test list-targets
+        uses: ./
+        with:
+          action: list-targets

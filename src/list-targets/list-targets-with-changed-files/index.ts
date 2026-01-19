@@ -1,11 +1,11 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as fs from "fs";
+
 import * as path from "path";
 import * as lib from "../../lib";
-import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
+import * as ciInfo from "../../ci-info";
 import { list as listModuleCallers } from "./list-module-callers";
 
 type TargetConfig = {
@@ -58,15 +58,11 @@ type PullRequestPayload = {
   body?: string;
 };
 
-const getPRBody = (prStr: string, payload: Payload): string => {
+const getPRBody = (prBody: string, payload: Payload): string => {
   if (payload.pull_request) {
     return payload.pull_request.body || "";
   }
-  if (!prStr) {
-    return "";
-  }
-  const pr = JSON.parse(prStr);
-  return pr?.body || "";
+  return prBody;
 };
 
 type Result = {
@@ -354,7 +350,7 @@ type Input = {
   changedFiles: string[];
   configFiles: string[];
   moduleFiles: string[];
-  pr: string;
+  prBody: string;
   payload: Payload;
   moduleCallers: Record<string, string[]> | null;
   maxChangedWorkingDirectories: number;
@@ -383,7 +379,7 @@ const getFollowupTarget = (input: Input): string => {
     /<!-- tfaction follow up pr target=([^\s]+).*-->/,
     "s",
   );
-  const prBody = getPRBody(input.pr, input.payload);
+  const prBody = getPRBody(input.prBody, input.payload);
   const matchResult = prBody.match(followupTargetCommentRegex);
   return matchResult ? matchResult[1] : "";
 };
@@ -434,13 +430,7 @@ const handleLabels = (
   }
 };
 
-export const main = async (executor: aqua.Executor) => {
-  // The path to ci-info's pr.json.
-  if (!env.ciInfoTempDir) {
-    throw new Error("CI_INFO_TEMP_DIR is not set");
-  }
-  const prPath = `${env.ciInfoTempDir}/pr.json`;
-  const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
+export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   const cfg = await lib.getConfig();
 
   const configFiles = await lib.listWorkingDirFiles(
@@ -460,19 +450,15 @@ export const main = async (executor: aqua.Executor) => {
   }
 
   const result = await run({
-    labels: fs
-      .readFileSync(`${env.ciInfoTempDir}/labels.txt`, "utf8")
-      .split("\n"),
+    labels: pr.pr?.data.labels?.map((l) => l.name) ?? [],
     config: cfg,
     isApply: lib.getIsApply(),
-    changedFiles: fs
-      .readFileSync(`${env.ciInfoTempDir}/pr_all_filenames.txt`, "utf8")
-      .split("\n"),
+    changedFiles: pr.pr?.files ?? [],
     configFiles,
     moduleFiles: modules,
     maxChangedWorkingDirectories: cfg.limit_changed_dirs?.working_dirs ?? 0,
     maxChangedModules: cfg.limit_changed_dirs?.modules ?? 0,
-    pr,
+    prBody: pr.pr?.data.body ?? "",
     payload: github.context.payload,
     githubToken: input.getRequiredGitHubToken(),
     /*

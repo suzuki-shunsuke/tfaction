@@ -119,6 +119,7 @@ const setValue = (
 };
 
 interface PRData {
+  body: string | null;
   base: {
     ref: string;
   };
