@@ -10,8 +10,9 @@ import {
 } from "./lib";
 import * as input from "../../../lib/input";
 import * as aqua from "../../../aqua";
+import * as lib from "../../../lib";
 
-export const main = async (executor: aqua.Executor) => {
+export const main = async (executor: aqua.Executor, cfg: lib.Config) => {
   const configFiles = fs
     .readFileSync(input.getRequiredConfigFiles(), "utf8")
     .trim()
@@ -21,7 +22,12 @@ export const main = async (executor: aqua.Executor) => {
     .trim()
     .split("\n");
 
-  const moduleCallers = await list(configFiles, moduleFiles, executor);
+  const moduleCallers = await list(
+    cfg.config_dir,
+    configFiles,
+    moduleFiles,
+    executor,
+  );
 
   const json = JSON.stringify(moduleCallers);
   core.info(`file: ${json}`);
@@ -31,6 +37,7 @@ export const main = async (executor: aqua.Executor) => {
 };
 
 export const list = async (
+  configDir: string,
   configFiles: string[],
   moduleFiles: string[],
   executor: aqua.Executor,
@@ -41,7 +48,7 @@ export const list = async (
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
 
   for (const tfFile of configFiles) {
-    const tfDir = path.dirname(tfFile);
+    const tfDir = path.join(configDir, path.dirname(tfFile));
     if (!fs.existsSync(path.join(tfDir, "terragrunt.hcl"))) {
       continue;
     }
@@ -108,11 +115,14 @@ export const list = async (
       continue;
     }
 
-    const tfDir = path.dirname(tfFile);
+    const tfDir = path.join(configDir, path.dirname(tfFile));
 
     const outInspect = await executor.getExecOutput(
       "terraform-config-inspect",
       ["--json", tfDir],
+      {
+        cwd: tfDir,
+      },
     );
     const inspection = JSON.parse(outInspect.stdout);
 

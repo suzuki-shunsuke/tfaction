@@ -446,7 +446,12 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
 
   let moduleCallers: Record<string, string[]> | null = null;
   if (cfg.update_local_path_module_caller?.enabled) {
-    moduleCallers = await listModuleCallers(configFiles, modules, executor);
+    moduleCallers = await listModuleCallers(
+      cfg.config_dir,
+      configFiles,
+      modules,
+      executor,
+    );
   }
 
   const result = await run({
