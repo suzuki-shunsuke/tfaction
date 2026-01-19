@@ -119,7 +119,20 @@ const setValue = (
 };
 
 interface PRData {
-  labels?: Array<{ name: string }>;
+  base: {
+    ref: string;
+  };
+  head: {
+    ref: string;
+    sha: string;
+  };
+  user: {
+    login: string;
+  };
+  merged: boolean;
+  labels?: Array<{
+    name: string;
+  }>;
 }
 
 const writeOutputFiles = async (
@@ -163,7 +176,15 @@ const writeOutputFiles = async (
   await fs.writeFile(path.join(dir, "labels.txt"), labels);
 };
 
-export const main = async () => {
+export type Result = {
+  tempDir?: string;
+  pr?: {
+    data: PRData;
+    files: string[];
+  };
+};
+
+export const main = async (): Promise<Result> => {
   setValue("repo_owner", github.context.repo.owner);
   setValue("repo_name", github.context.repo.repo);
 
@@ -191,7 +212,7 @@ export const main = async () => {
 
   if (!prNumber) {
     core.info("No PR number found - running in non-PR environment");
-    return;
+    return {};
   }
   setValue("pr_number", prNumber);
 
@@ -223,7 +244,12 @@ export const main = async () => {
   setValue("temp_dir", outputDir);
   // Write output files
   await writeOutputFiles(outputDir, prData, files);
-  core.info(`Output files written to: ${outputDir}`);
 
-  core.info("CI info collection completed successfully");
+  return {
+    tempDir: outputDir,
+    pr: {
+      data: prData,
+      files: files.map((f) => f.filename),
+    },
+  };
 };
