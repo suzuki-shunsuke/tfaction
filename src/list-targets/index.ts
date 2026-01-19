@@ -1,11 +1,9 @@
 import * as github from "@actions/github";
 import * as core from "@actions/core";
-import * as fs from "fs";
 
 import * as ciInfo from "../ci-info";
 import * as aqua from "../aqua";
 import * as lib from "../lib";
-import * as env from "../lib/env";
 import * as input from "../lib/input";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
 
@@ -20,23 +18,18 @@ export const main = async () => {
   const skipCiInfo =
     eventName === "workflow_dispatch" || eventName === "schedule";
 
+  let pr: ciInfo.Result = {};
+
   if (!skipCiInfo) {
-    await ciInfo.main();
+    pr = await ciInfo.main();
   }
 
   // Step 3: Check if commit is latest (for PR events)
   const isPREvent =
     eventName === "pull_request" || eventName.startsWith("pull_request_");
   if (isPREvent) {
-    const ciInfoTempDir = env.ciInfoTempDir;
-    if (!ciInfoTempDir) {
-      throw new Error("CI_INFO_TEMP_DIR is not set");
-    }
-
-    const prJsonPath = `${ciInfoTempDir}/pr.json`;
-    if (fs.existsSync(prJsonPath)) {
-      const prData = JSON.parse(fs.readFileSync(prJsonPath, "utf8"));
-      const latestHeadSha = prData.head?.sha;
+    if (pr.pr) {
+      const latestHeadSha = pr.pr.data.head.sha;
       const headSha = github.context.payload.pull_request?.head?.sha;
 
       if (headSha && latestHeadSha && headSha !== latestHeadSha) {
