@@ -1,0 +1,5 @@
+name: Get Secrets from AWS Secrets Manager
+description: Get Secrets from AWS Secrets Manager
+runs:
+  using: "node20"
+  main: "dist/index.js"
