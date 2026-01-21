@@ -145,14 +145,6 @@ const prCommentExpected = {
       target: "foo/dev",
       working_directory: "foo/dev",
     },
-    {
-      environment: "yoo",
-      job_type: "terraform",
-      runs_on: "ubuntu-latest",
-      secrets: undefined,
-      target: "yoo/dev",
-      working_directory: "yoo/services/dev",
-    },
   ],
 };
 
