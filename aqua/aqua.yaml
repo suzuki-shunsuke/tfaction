@@ -4,7 +4,7 @@
 # https://aquaproj.github.io/
 registries:
   - type: standard
-    ref: v4.458.0 # renovate: depName=aquaproj/aqua-registry
+    ref: v4.459.0 # renovate: depName=aquaproj/aqua-registry
 checksum:
   enabled: true
   require_checksum: true
