@@ -12,14 +12,12 @@ import * as commit from "../commit";
 import { getTargetConfig, TargetConfig } from "../get-target-config";
 
 const PRData = z.object({
-  body: z.string(),
-  assignees: z
-    .array(
-      z.object({
-        login: z.string(),
-      }),
-    )
-    .optional(),
+  body: z.string().nullable(),
+  assignees: z.array(
+    z.object({
+      login: z.string(),
+    }),
+  ),
 });
 
 const escapeRegExp = (str: string): string => {
@@ -185,7 +183,7 @@ ${prData.body}
 
 </details>
 `;
-        vars.original_pr_body = prData.body;
+        vars.original_pr_body = prData.body || "";
       } catch (error) {
         console.error("Failed to read or parse pr.json:", error);
       }
