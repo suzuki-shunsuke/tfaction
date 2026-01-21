@@ -12,7 +12,7 @@ import {
   listRelatedPullRequests,
   updateBranchBySecurefix,
   updateBranchByCommit,
-} from "../terraform-apply/run";
+} from "../terraform-apply";
 
 export const main = async (): Promise<void> => {
   const githubToken = input.githubToken;
