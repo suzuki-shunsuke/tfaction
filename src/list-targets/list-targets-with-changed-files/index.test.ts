@@ -5,7 +5,6 @@ test("normal", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             working_directory: "foo/",
@@ -47,7 +46,6 @@ test("job config", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             working_directory: "foo/",
@@ -210,7 +208,6 @@ test("module callers", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             working_directory: "foo/",
@@ -275,7 +272,6 @@ test("nest", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             working_directory: "foo/",

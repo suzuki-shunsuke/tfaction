@@ -85,9 +85,10 @@ type ModuleData = {
 
 const createTargetMaps = (
   workingDirs: string[],
-  config: lib.Config,
+  targetGroups: lib.TargetGroup[],
+  replace: lib.Replace | undefined,
 ): { wdTargetMap: Map<string, string>; targetWDMap: Map<string, string> } => {
-  const wdTargetMap = lib.createWDTargetMap(workingDirs, config);
+  const wdTargetMap = lib.createWDTargetMap(workingDirs, targetGroups, replace);
   const targetWDMap = new Map<string, string>();
   for (const [wd, t] of wdTargetMap) {
     targetWDMap.set(t, wd);
@@ -172,7 +173,7 @@ const addTargetsFromChangedWorkingDirs = (
   wdTargetMap: Map<string, string>,
   terraformTargets: Set<string>,
   tfmigrates: Set<string>,
-  config: lib.Config,
+  targetGroups: lib.TargetGroup[],
   isApply: boolean,
   terraformTargetObjs: TargetConfig[],
 ): void => {
@@ -188,7 +189,7 @@ const addTargetsFromChangedWorkingDirs = (
       continue;
     }
     const obj = getTargetConfigByTarget(
-      config.target_groups,
+      targetGroups,
       changedWorkingDir,
       target,
       isApply,
@@ -261,7 +262,11 @@ export const run = async (input: Input): Promise<Result> => {
   const isApply = input.isApply;
 
   const workingDirs = listWD(input.configFiles);
-  const { wdTargetMap, targetWDMap } = createTargetMaps(workingDirs, config);
+  const { wdTargetMap, targetWDMap } = createTargetMaps(
+    workingDirs,
+    config.target_groups,
+    config.replace,
+  );
 
   const terraformTargets = new Set<string>();
   const tfmigrates = new Set<string>();
@@ -272,7 +277,8 @@ export const run = async (input: Input): Promise<Result> => {
     input.labels,
     isApply,
     targetWDMap,
-    config,
+    config.label_prefixes,
+    config.target_groups,
     tfmigrateObjs,
     tfmigrates,
   );
@@ -290,7 +296,7 @@ export const run = async (input: Input): Promise<Result> => {
     wdTargetMap,
     terraformTargets,
     tfmigrates,
-    config,
+    config.target_groups,
     isApply,
     terraformTargetObjs,
   );
@@ -313,7 +319,11 @@ export const run = async (input: Input): Promise<Result> => {
 };
 
 type Input = {
-  config: lib.Config;
+  config: {
+    target_groups: lib.TargetGroup[];
+    replace?: lib.Replace;
+    label_prefixes?: lib.LabelPrefixes;
+  };
   isApply: boolean;
   labels: string[];
   /** Absolute paths to changed files */
@@ -354,13 +364,14 @@ const handleLabels = (
   labels: string[],
   isApply: boolean,
   targetWDMap: Map<string, string>,
-  config: lib.Config,
+  labelPrefixes: lib.LabelPrefixes | undefined,
+  targetGroups: lib.TargetGroup[],
   tfmigrateObjs: Array<TargetConfig>,
   tfmigrates: Set<string>,
 ) => {
   const skips = new Set<string>();
-  const skipPrefix = config?.label_prefixes?.skip || "skip:";
-  const tfmigratePrefix = config?.label_prefixes?.tfmigrate || "tfmigrate:";
+  const skipPrefix = labelPrefixes?.skip || "skip:";
+  const tfmigratePrefix = labelPrefixes?.tfmigrate || "tfmigrate:";
   for (const label of labels) {
     if (label == "") {
       continue;
@@ -383,7 +394,7 @@ const handleLabels = (
       throw new Error(`No working directory is found for the target ${target}`);
     }
     const obj = getTargetConfigByTarget(
-      config.target_groups,
+      targetGroups,
       wd,
       target,
       isApply,
