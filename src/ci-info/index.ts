@@ -119,6 +119,7 @@ const setValue = (
 };
 
 interface PRData {
+  body: string | null;
   base: {
     ref: string;
   };
@@ -180,6 +181,7 @@ export type Result = {
   tempDir?: string;
   pr?: {
     data: PRData;
+    /** Relative paths from the git root directory */
     files: string[];
   };
 };

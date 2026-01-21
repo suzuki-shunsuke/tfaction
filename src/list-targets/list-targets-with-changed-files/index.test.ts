@@ -5,7 +5,6 @@ test("normal", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             working_directory: "foo/",
@@ -47,7 +46,6 @@ test("job config", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             working_directory: "foo/",
@@ -147,14 +145,6 @@ const prCommentExpected = {
       target: "foo/dev",
       working_directory: "foo/dev",
     },
-    {
-      environment: "yoo",
-      job_type: "terraform",
-      runs_on: "ubuntu-latest",
-      secrets: undefined,
-      target: "yoo/dev",
-      working_directory: "yoo/services/dev",
-    },
   ],
 };
 
@@ -210,7 +200,6 @@ test("module callers", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             working_directory: "foo/",
@@ -275,7 +264,6 @@ test("nest", async () => {
   expect(
     await run({
       config: {
-        plan_workflow_name: "plan.yaml",
         target_groups: [
           {
             working_directory: "foo/",

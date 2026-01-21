@@ -42,5 +42,5 @@ export const main = async () => {
 
   // Step 4: Run list-targets-with-changed-files
   // The outputs (modules, targets) are set by listTargetsWithChangedFiles.main()
-  await listTargetsWithChangedFiles.main(executor);
+  await listTargetsWithChangedFiles.main(executor, pr);
 };

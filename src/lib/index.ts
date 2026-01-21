@@ -207,6 +207,12 @@ const TargetConfig = z.object({
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
+const LabelPrefixes = z.object({
+  skip: z.string().optional(),
+  tfmigrate: z.string().optional(),
+});
+export type LabelPrefixes = z.infer<typeof LabelPrefixes>;
+
 const Replace = z.object({
   patterns: z
     .object({
@@ -216,7 +222,7 @@ const Replace = z.object({
     })
     .array(),
 });
-type Replace = z.infer<typeof Replace>;
+export type Replace = z.infer<typeof Replace>;
 
 const RawConfig = z.object({
   aqua: z
@@ -242,12 +248,7 @@ const RawConfig = z.object({
     })
     .optional(),
   env: z.record(z.string(), z.string()).optional(),
-  label_prefixes: z
-    .object({
-      tfmigrate: z.string().optional(),
-      skip: z.string().optional(),
-    })
-    .optional(),
+  label_prefixes: LabelPrefixes.optional(),
   module_file: z.string().optional(),
   plan_workflow_name: z.string(),
   renovate_login: z.string().optional(),
@@ -352,6 +353,7 @@ export interface Config extends Omit<
   | "tflint"
   | "trivy"
 > {
+  /** Absolute path to git root directory */
   git_root_dir: string;
   config_path: string;
   config_dir: string;
@@ -441,18 +443,19 @@ export const getConfig = async (): Promise<Config> => {
  */
 export const createWDTargetMap = (
   wds: string[],
-  config: Config,
+  targetGroups: TargetGroup[],
+  replace: Replace | undefined,
 ): Map<string, string> => {
   const m = new Map<string, string>();
   for (const wd of wds) {
     let target = wd;
-    for (const tg of config.target_groups) {
+    for (const tg of targetGroups) {
       const rel = path.relative(tg.working_directory, wd);
       // path.isAbsolute check handles Windows edge case where different drive letters result in absolute path
       if (rel.startsWith("..") || path.isAbsolute(rel)) {
         continue;
       }
-      for (const pattern of config.replace?.patterns ?? []) {
+      for (const pattern of replace?.patterns ?? []) {
         target = target.replace(
           new RegExp(pattern.regexp, pattern.flags),
           pattern.replace,
@@ -577,7 +580,12 @@ export type Target = {
  * @returns
  */
 export const getTargetGroup = async (
-  config: Config,
+  config: {
+    config_path: string;
+    working_directory_file: string;
+    target_groups: TargetGroup[];
+    replace?: Replace | undefined;
+  },
   target?: string,
   workingDir?: string,
 ): Promise<Target> => {
@@ -622,7 +630,7 @@ export const getTargetGroup = async (
   for (const file of files) {
     wds.push(path.dirname(file));
   }
-  const m = createWDTargetMap(wds, config);
+  const m = createWDTargetMap(wds, config.target_groups, config.replace);
   for (const [wd, t] of m) {
     if (t === target) {
       workingDir = wd;
@@ -648,7 +656,7 @@ export const getTargetGroup = async (
  * @param gitRootDir
  * @param configDir
  * @param fileName
- * @returns A list of files relative to the config directory
+ * @returns A relative file paths from tfaction-root.yaml to the config directory
  */
 export const listWorkingDirFiles = async (
   gitRootDir: string,

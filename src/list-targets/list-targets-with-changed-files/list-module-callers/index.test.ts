@@ -1,4 +1,4 @@
-import { resolveRelativeCallTree, buildModuleToCallers } from "./lib";
+import { resolveRelativeCallTree, buildModuleToCallers } from "./";
 import { expect, describe, it } from "vitest";
 
 describe("resolveRelativeCallTree", () => {

@@ -1,15 +1,19 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as fs from "fs";
+
 import * as path from "path";
 import * as lib from "../../lib";
-import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
-import { list as listModuleCallers } from "./list-module-callers";
+import * as ciInfo from "../../ci-info";
+import {
+  list as listModuleCallers,
+  ModuleToCallers,
+} from "./list-module-callers";
 
 type TargetConfig = {
   target: string;
+  /** A relative path from tfaction-root.yaml */
   working_directory: string;
   runs_on: string | string[];
   job_type: string;
@@ -58,34 +62,33 @@ type PullRequestPayload = {
   body?: string;
 };
 
-const getPRBody = (prStr: string, payload: Payload): string => {
-  if (payload.pull_request) {
-    return payload.pull_request.body || "";
-  }
-  if (!prStr) {
-    return "";
-  }
-  const pr = JSON.parse(prStr);
-  return pr?.body || "";
-};
-
 type Result = {
   targetConfigs: TargetConfig[];
+  /** A relative file paths from tfaction-root.yaml */
   modules: string[];
 };
 
 type ModuleData = {
+  /**
+   * Map of modules and module callers. values call key.
+   * key: absolute path to module.
+   * value: relative paths from github.workspace to module caller.
+   * */
   moduleCallerMap: Map<string, string[]>;
+  /** Absolute paths to modules */
   modules: string[];
+  /** Relative paths from tfaction-root.yaml to modules */
   moduleDirs: string[];
+  /** Relative paths from tfaction-root.yaml to modules */
   moduleSet: Set<string>;
 };
 
 const createTargetMaps = (
   workingDirs: string[],
-  config: lib.Config,
+  targetGroups: lib.TargetGroup[],
+  replace: lib.Replace | undefined,
 ): { wdTargetMap: Map<string, string>; targetWDMap: Map<string, string> } => {
-  const wdTargetMap = lib.createWDTargetMap(workingDirs, config);
+  const wdTargetMap = lib.createWDTargetMap(workingDirs, targetGroups, replace);
   const targetWDMap = new Map<string, string>();
   for (const [wd, t] of wdTargetMap) {
     targetWDMap.set(t, wd);
@@ -94,16 +97,18 @@ const createTargetMaps = (
 };
 
 const prepareModuleData = (
-  moduleCallers: Record<string, string[]> | null,
+  moduleCallers: ModuleToCallers | null,
   moduleFiles: string[],
 ): ModuleData => {
   const moduleCallerMap: Map<string, string[]> = new Map(
     Object.entries(moduleCallers ?? {}),
   );
+  /** Absolute paths to modules */
   const modules = [...moduleCallerMap.keys()];
   modules.sort();
   modules.reverse();
 
+  /** Relative paths from tfaction-root.yaml to modules */
   const moduleDirs = moduleFiles.map((moduleFile) => {
     return path.dirname(moduleFile);
   });
@@ -115,6 +120,7 @@ const prepareModuleData = (
 };
 
 const processChangedFiles = (
+  /** Absolute paths to changed files */
   changedFiles: string[],
   moduleData: ModuleData,
   workingDirs: string[],
@@ -128,7 +134,9 @@ const processChangedFiles = (
       continue;
     }
     for (const module of moduleData.modules) {
-      if (changedFile.startsWith(module + "/")) {
+      const rel = path.relative(module, changedFile);
+      if (!rel.startsWith(".." + path.sep)) {
+        // changedFile belongs to module, meaning module was changed
         moduleData.moduleCallerMap.get(module)?.forEach((caller) => {
           if (wdTargetMap.has(caller)) {
             changedWorkingDirs.add(caller);
@@ -141,13 +149,16 @@ const processChangedFiles = (
       }
     }
     for (const workingDir of workingDirs) {
-      if (changedFile.startsWith(workingDir + "/")) {
+      // changedFile belongs to workingDir, meaning workingDir was changed
+      const rel = path.relative(workingDir, changedFile);
+      if (!rel.startsWith(".." + path.sep)) {
         changedWorkingDirs.add(workingDir);
         break;
       }
     }
     for (const module of moduleData.moduleDirs) {
-      if (changedFile.startsWith(module + "/")) {
+      const rel = path.relative(module, changedFile);
+      if (!rel.startsWith(".." + path.sep)) {
         changedModules.add(module);
         break;
       }
@@ -162,7 +173,7 @@ const addTargetsFromChangedWorkingDirs = (
   wdTargetMap: Map<string, string>,
   terraformTargets: Set<string>,
   tfmigrates: Set<string>,
-  config: lib.Config,
+  targetGroups: lib.TargetGroup[],
   isApply: boolean,
   terraformTargetObjs: TargetConfig[],
 ): void => {
@@ -174,53 +185,18 @@ const addTargetsFromChangedWorkingDirs = (
       );
       continue;
     }
-    if (!terraformTargets.has(target) && !tfmigrates.has(target)) {
-      const obj = getTargetConfigByTarget(
-        config.target_groups,
-        changedWorkingDir,
-        target,
-        isApply,
-        "terraform",
-      );
-      if (obj !== undefined) {
-        terraformTargets.add(target);
-        terraformTargetObjs.push(obj);
-      }
-    }
-  }
-};
-
-const addFollowupTarget = (
-  input: Input,
-  tfmigrates: Set<string>,
-  terraformTargets: Set<string>,
-  targetWDMap: Map<string, string>,
-  config: lib.Config,
-  isApply: boolean,
-  terraformTargetObjs: TargetConfig[],
-): void => {
-  const followupTarget = getFollowupTarget(input);
-
-  if (
-    followupTarget &&
-    !tfmigrates.has(followupTarget) &&
-    !terraformTargets.has(followupTarget)
-  ) {
-    const wd = targetWDMap.get(followupTarget);
-    if (wd === undefined) {
-      throw new Error(
-        `No working directory is found for the target ${followupTarget}`,
-      );
+    if (terraformTargets.has(target) || tfmigrates.has(target)) {
+      continue;
     }
     const obj = getTargetConfigByTarget(
-      config.target_groups,
-      wd,
-      followupTarget,
+      targetGroups,
+      changedWorkingDir,
+      target,
       isApply,
       "terraform",
     );
     if (obj !== undefined) {
-      terraformTargets.add(followupTarget);
+      terraformTargets.add(target);
       terraformTargetObjs.push(obj);
     }
   }
@@ -286,7 +262,11 @@ export const run = async (input: Input): Promise<Result> => {
   const isApply = input.isApply;
 
   const workingDirs = listWD(input.configFiles);
-  const { wdTargetMap, targetWDMap } = createTargetMaps(workingDirs, config);
+  const { wdTargetMap, targetWDMap } = createTargetMaps(
+    workingDirs,
+    config.target_groups,
+    config.replace,
+  );
 
   const terraformTargets = new Set<string>();
   const tfmigrates = new Set<string>();
@@ -297,7 +277,8 @@ export const run = async (input: Input): Promise<Result> => {
     input.labels,
     isApply,
     targetWDMap,
-    config,
+    config.label_prefixes,
+    config.target_groups,
     tfmigrateObjs,
     tfmigrates,
   );
@@ -315,17 +296,7 @@ export const run = async (input: Input): Promise<Result> => {
     wdTargetMap,
     terraformTargets,
     tfmigrates,
-    config,
-    isApply,
-    terraformTargetObjs,
-  );
-
-  addFollowupTarget(
-    input,
-    tfmigrates,
-    terraformTargets,
-    targetWDMap,
-    config,
+    config.target_groups,
     isApply,
     terraformTargetObjs,
   );
@@ -348,21 +319,34 @@ export const run = async (input: Input): Promise<Result> => {
 };
 
 type Input = {
-  config: lib.Config;
+  config: {
+    target_groups: lib.TargetGroup[];
+    replace?: lib.Replace;
+    label_prefixes?: lib.LabelPrefixes;
+  };
   isApply: boolean;
   labels: string[];
+  /** Absolute paths to changed files */
   changedFiles: string[];
+  /** Relative paths from tfaction-root.yaml */
   configFiles: string[];
+  /** Relative paths from tfaction-root.yaml */
   moduleFiles: string[];
-  pr: string;
+  prBody: string;
   payload: Payload;
-  moduleCallers: Record<string, string[]> | null;
+  /** Absolute path to module => Relative paths from github.workspace to module callers */
+  moduleCallers: ModuleToCallers | null;
   maxChangedWorkingDirectories: number;
   maxChangedModules: number;
   githubToken: string;
   executor: aqua.Executor;
 };
 
+/**
+ * Returns a list of working directories based on the provided config files.
+ * @param configFiles - Relative paths from tfaction-root.yaml
+ * @returns An array of working directories. Relative paths from tfaction-root.yaml
+ */
 const listWD = (configFiles: string[]): string[] => {
   const workingDirs = new Array<string>();
   for (const configFile of configFiles) {
@@ -376,29 +360,18 @@ const listWD = (configFiles: string[]): string[] => {
   return workingDirs;
 };
 
-const getFollowupTarget = (input: Input): string => {
-  // Expected followupPRBody include the line:
-  // <!-- tfaction follow up pr target=foo -->
-  const followupTargetCommentRegex = new RegExp(
-    /<!-- tfaction follow up pr target=([^\s]+).*-->/,
-    "s",
-  );
-  const prBody = getPRBody(input.pr, input.payload);
-  const matchResult = prBody.match(followupTargetCommentRegex);
-  return matchResult ? matchResult[1] : "";
-};
-
 const handleLabels = (
   labels: string[],
   isApply: boolean,
   targetWDMap: Map<string, string>,
-  config: lib.Config,
+  labelPrefixes: lib.LabelPrefixes | undefined,
+  targetGroups: lib.TargetGroup[],
   tfmigrateObjs: Array<TargetConfig>,
   tfmigrates: Set<string>,
 ) => {
   const skips = new Set<string>();
-  const skipPrefix = config?.label_prefixes?.skip || "skip:";
-  const tfmigratePrefix = config?.label_prefixes?.tfmigrate || "tfmigrate:";
+  const skipPrefix = labelPrefixes?.skip || "skip:";
+  const tfmigratePrefix = labelPrefixes?.tfmigrate || "tfmigrate:";
   for (const label of labels) {
     if (label == "") {
       continue;
@@ -421,7 +394,7 @@ const handleLabels = (
       throw new Error(`No working directory is found for the target ${target}`);
     }
     const obj = getTargetConfigByTarget(
-      config.target_groups,
+      targetGroups,
       wd,
       target,
       isApply,
@@ -434,13 +407,7 @@ const handleLabels = (
   }
 };
 
-export const main = async (executor: aqua.Executor) => {
-  // The path to ci-info's pr.json.
-  if (!env.ciInfoTempDir) {
-    throw new Error("CI_INFO_TEMP_DIR is not set");
-  }
-  const prPath = `${env.ciInfoTempDir}/pr.json`;
-  const pr = prPath ? fs.readFileSync(prPath, "utf8") : "";
+export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   const cfg = await lib.getConfig();
 
   const configFiles = await lib.listWorkingDirFiles(
@@ -454,25 +421,27 @@ export const main = async (executor: aqua.Executor) => {
     cfg.module_file,
   );
 
-  let moduleCallers: Record<string, string[]> | null = null;
+  let moduleCallers: ModuleToCallers | null = null;
   if (cfg.update_local_path_module_caller?.enabled) {
-    moduleCallers = await listModuleCallers(configFiles, modules, executor);
+    moduleCallers = await listModuleCallers(
+      cfg.config_dir,
+      configFiles,
+      modules,
+      executor,
+    );
   }
 
   const result = await run({
-    labels: fs
-      .readFileSync(`${env.ciInfoTempDir}/labels.txt`, "utf8")
-      .split("\n"),
+    labels: pr.pr?.data.labels?.map((l) => l.name) ?? [],
     config: cfg,
     isApply: lib.getIsApply(),
-    changedFiles: fs
-      .readFileSync(`${env.ciInfoTempDir}/pr_all_filenames.txt`, "utf8")
-      .split("\n"),
+    changedFiles:
+      pr.pr?.files.map((file) => path.join(cfg.git_root_dir, file)) ?? [],
     configFiles,
     moduleFiles: modules,
     maxChangedWorkingDirectories: cfg.limit_changed_dirs?.working_dirs ?? 0,
     maxChangedModules: cfg.limit_changed_dirs?.modules ?? 0,
-    pr,
+    prBody: pr.pr?.data.body ?? "",
     payload: github.context.payload,
     githubToken: input.getRequiredGitHubToken(),
     /*
