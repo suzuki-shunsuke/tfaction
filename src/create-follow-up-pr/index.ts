@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
+import Handlebars from "handlebars";
 import { z } from "zod";
 
 import * as lib from "../lib";
