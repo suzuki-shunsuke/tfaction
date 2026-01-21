@@ -352,6 +352,7 @@ export interface Config extends Omit<
   | "tflint"
   | "trivy"
 > {
+  /** Absolute path to git root directory */
   git_root_dir: string;
   config_path: string;
   config_dir: string;
@@ -648,7 +649,7 @@ export const getTargetGroup = async (
  * @param gitRootDir
  * @param configDir
  * @param fileName
- * @returns A list of files relative to the config directory
+ * @returns A relative file paths from tfaction-root.yaml to the config directory
  */
 export const listWorkingDirFiles = async (
   gitRootDir: string,

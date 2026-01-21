@@ -181,6 +181,7 @@ export type Result = {
   tempDir?: string;
   pr?: {
     data: PRData;
+    /** Relative paths from the git root directory */
     files: string[];
   };
 };

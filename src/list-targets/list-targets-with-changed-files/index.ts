@@ -6,10 +6,14 @@ import * as lib from "../../lib";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import * as ciInfo from "../../ci-info";
-import { list as listModuleCallers } from "./list-module-callers";
+import {
+  list as listModuleCallers,
+  ModuleToCallers,
+} from "./list-module-callers";
 
 type TargetConfig = {
   target: string;
+  /** A relative path from tfaction-root.yaml */
   working_directory: string;
   runs_on: string | string[];
   job_type: string;
@@ -58,22 +62,24 @@ type PullRequestPayload = {
   body?: string;
 };
 
-const getPRBody = (prBody: string, payload: Payload): string => {
-  if (payload.pull_request) {
-    return payload.pull_request.body || "";
-  }
-  return prBody;
-};
-
 type Result = {
   targetConfigs: TargetConfig[];
+  /** A relative file paths from tfaction-root.yaml */
   modules: string[];
 };
 
 type ModuleData = {
+  /**
+   * Map of modules and module callers. values call key.
+   * key: absolute path to module.
+   * value: relative paths from github.workspace to module caller.
+   * */
   moduleCallerMap: Map<string, string[]>;
+  /** Absolute paths to modules */
   modules: string[];
+  /** Relative paths from tfaction-root.yaml to modules */
   moduleDirs: string[];
+  /** Relative paths from tfaction-root.yaml to modules */
   moduleSet: Set<string>;
 };
 
@@ -90,16 +96,18 @@ const createTargetMaps = (
 };
 
 const prepareModuleData = (
-  moduleCallers: Record<string, string[]> | null,
+  moduleCallers: ModuleToCallers | null,
   moduleFiles: string[],
 ): ModuleData => {
   const moduleCallerMap: Map<string, string[]> = new Map(
     Object.entries(moduleCallers ?? {}),
   );
+  /** Absolute paths to modules */
   const modules = [...moduleCallerMap.keys()];
   modules.sort();
   modules.reverse();
 
+  /** Relative paths from tfaction-root.yaml to modules */
   const moduleDirs = moduleFiles.map((moduleFile) => {
     return path.dirname(moduleFile);
   });
@@ -111,6 +119,7 @@ const prepareModuleData = (
 };
 
 const processChangedFiles = (
+  /** Absolute paths to changed files */
   changedFiles: string[],
   moduleData: ModuleData,
   workingDirs: string[],
@@ -124,7 +133,9 @@ const processChangedFiles = (
       continue;
     }
     for (const module of moduleData.modules) {
-      if (changedFile.startsWith(module + "/")) {
+      const rel = path.relative(module, changedFile);
+      if (!rel.startsWith(".." + path.sep)) {
+        // changedFile belongs to module, meaning module was changed
         moduleData.moduleCallerMap.get(module)?.forEach((caller) => {
           if (wdTargetMap.has(caller)) {
             changedWorkingDirs.add(caller);
@@ -137,13 +148,16 @@ const processChangedFiles = (
       }
     }
     for (const workingDir of workingDirs) {
-      if (changedFile.startsWith(workingDir + "/")) {
+      // changedFile belongs to workingDir, meaning workingDir was changed
+      const rel = path.relative(workingDir, changedFile);
+      if (!rel.startsWith(".." + path.sep)) {
         changedWorkingDirs.add(workingDir);
         break;
       }
     }
     for (const module of moduleData.moduleDirs) {
-      if (changedFile.startsWith(module + "/")) {
+      const rel = path.relative(module, changedFile);
+      if (!rel.startsWith(".." + path.sep)) {
         changedModules.add(module);
         break;
       }
@@ -170,53 +184,18 @@ const addTargetsFromChangedWorkingDirs = (
       );
       continue;
     }
-    if (!terraformTargets.has(target) && !tfmigrates.has(target)) {
-      const obj = getTargetConfigByTarget(
-        config.target_groups,
-        changedWorkingDir,
-        target,
-        isApply,
-        "terraform",
-      );
-      if (obj !== undefined) {
-        terraformTargets.add(target);
-        terraformTargetObjs.push(obj);
-      }
-    }
-  }
-};
-
-const addFollowupTarget = (
-  input: Input,
-  tfmigrates: Set<string>,
-  terraformTargets: Set<string>,
-  targetWDMap: Map<string, string>,
-  config: lib.Config,
-  isApply: boolean,
-  terraformTargetObjs: TargetConfig[],
-): void => {
-  const followupTarget = getFollowupTarget(input);
-
-  if (
-    followupTarget &&
-    !tfmigrates.has(followupTarget) &&
-    !terraformTargets.has(followupTarget)
-  ) {
-    const wd = targetWDMap.get(followupTarget);
-    if (wd === undefined) {
-      throw new Error(
-        `No working directory is found for the target ${followupTarget}`,
-      );
+    if (terraformTargets.has(target) || tfmigrates.has(target)) {
+      continue;
     }
     const obj = getTargetConfigByTarget(
       config.target_groups,
-      wd,
-      followupTarget,
+      changedWorkingDir,
+      target,
       isApply,
       "terraform",
     );
     if (obj !== undefined) {
-      terraformTargets.add(followupTarget);
+      terraformTargets.add(target);
       terraformTargetObjs.push(obj);
     }
   }
@@ -316,16 +295,6 @@ export const run = async (input: Input): Promise<Result> => {
     terraformTargetObjs,
   );
 
-  addFollowupTarget(
-    input,
-    tfmigrates,
-    terraformTargets,
-    targetWDMap,
-    config,
-    isApply,
-    terraformTargetObjs,
-  );
-
   const result = {
     targetConfigs: terraformTargetObjs.concat(tfmigrateObjs),
     modules: Array.from(changedModules),
@@ -347,18 +316,27 @@ type Input = {
   config: lib.Config;
   isApply: boolean;
   labels: string[];
+  /** Absolute paths to changed files */
   changedFiles: string[];
+  /** Relative paths from tfaction-root.yaml */
   configFiles: string[];
+  /** Relative paths from tfaction-root.yaml */
   moduleFiles: string[];
   prBody: string;
   payload: Payload;
-  moduleCallers: Record<string, string[]> | null;
+  /** Absolute path to module => Relative paths from github.workspace to module callers */
+  moduleCallers: ModuleToCallers | null;
   maxChangedWorkingDirectories: number;
   maxChangedModules: number;
   githubToken: string;
   executor: aqua.Executor;
 };
 
+/**
+ * Returns a list of working directories based on the provided config files.
+ * @param configFiles - Relative paths from tfaction-root.yaml
+ * @returns An array of working directories. Relative paths from tfaction-root.yaml
+ */
 const listWD = (configFiles: string[]): string[] => {
   const workingDirs = new Array<string>();
   for (const configFile of configFiles) {
@@ -370,18 +348,6 @@ const listWD = (configFiles: string[]): string[] => {
   workingDirs.sort();
   workingDirs.reverse();
   return workingDirs;
-};
-
-const getFollowupTarget = (input: Input): string => {
-  // Expected followupPRBody include the line:
-  // <!-- tfaction follow up pr target=foo -->
-  const followupTargetCommentRegex = new RegExp(
-    /<!-- tfaction follow up pr target=([^\s]+).*-->/,
-    "s",
-  );
-  const prBody = getPRBody(input.prBody, input.payload);
-  const matchResult = prBody.match(followupTargetCommentRegex);
-  return matchResult ? matchResult[1] : "";
 };
 
 const handleLabels = (
@@ -444,7 +410,7 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     cfg.module_file,
   );
 
-  let moduleCallers: Record<string, string[]> | null = null;
+  let moduleCallers: ModuleToCallers | null = null;
   if (cfg.update_local_path_module_caller?.enabled) {
     moduleCallers = await listModuleCallers(
       cfg.config_dir,
@@ -458,7 +424,8 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     labels: pr.pr?.data.labels?.map((l) => l.name) ?? [],
     config: cfg,
     isApply: lib.getIsApply(),
-    changedFiles: pr.pr?.files ?? [],
+    changedFiles:
+      pr.pr?.files.map((file) => path.join(cfg.git_root_dir, file)) ?? [],
     configFiles,
     moduleFiles: modules,
     maxChangedWorkingDirectories: cfg.limit_changed_dirs?.working_dirs ?? 0,

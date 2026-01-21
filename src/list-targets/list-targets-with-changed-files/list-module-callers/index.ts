@@ -3,11 +3,6 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as semver from "semver";
 import * as core from "@actions/core";
-import {
-  buildModuleToCallers,
-  resolveRelativeCallTree,
-  ModuleToCallers,
-} from "./lib";
 import * as input from "../../../lib/input";
 import * as aqua from "../../../aqua";
 import * as lib from "../../../lib";
@@ -36,9 +31,19 @@ export const main = async (executor: aqua.Executor, cfg: lib.Config) => {
   core.setOutput("file", tmpobj.name);
 };
 
+/**
+ *
+ * @param configDir
+ * @param configFiles
+ * @param moduleFiles
+ * @param executor
+ * @returns Absolute path to module => Relative paths from github.workspace to module callers
+ */
 export const list = async (
   configDir: string,
+  /** relative file paths from tfaction-root.yaml */
   configFiles: string[],
+  /** relative file paths from tfaction-root.yaml */
   moduleFiles: string[],
   executor: aqua.Executor,
 ): Promise<ModuleToCallers> => {
@@ -48,6 +53,7 @@ export const list = async (
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
 
   for (const tfFile of configFiles) {
+    /** relative path from github.workspace to working directory */
     const tfDir = path.join(configDir, path.dirname(tfFile));
     if (!fs.existsSync(path.join(tfDir, "terragrunt.hcl"))) {
       continue;
@@ -92,6 +98,7 @@ export const list = async (
     await executor.exec("terragrunt", terragruntArgs.concat(tmpobj.name), {
       cwd: tfDir,
     });
+    /** A relative path from working directory to module dir */
     const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
       ?.source;
     if (!source) {
@@ -115,6 +122,7 @@ export const list = async (
       continue;
     }
 
+    /** relative path from github.workspace to working directory */
     const tfDir = path.join(configDir, path.dirname(tfFile));
 
     const outInspect = await executor.getExecOutput(
@@ -146,9 +154,89 @@ export const list = async (
       rawModuleCalls[tfDir].push(...arr);
     }
   }
+  /** Absolute path to module => Relative paths from github.workspace to module callers */
+  return buildModuleToCallers(resolveRelativeCallTree(rawModuleCalls));
+};
 
-  const moduleCallers = buildModuleToCallers(
-    resolveRelativeCallTree(rawModuleCalls),
-  );
-  return moduleCallers;
+/**
+ * Maps a directory that uses modules to the list of modules it uses.
+ * key: A relative path from github.workspace to module caller. A directory calling modules.
+ * value: absolute paths to modules. Modules that the key calls.
+ */
+type ModuleCalls = Record<string, string[]>;
+
+/**
+ * Maps a module to the list of directories that use it.
+ * key: absolute path to module. A module that is called.
+ * value: relative paths from github.workspace to module caller. Directories calling the key.
+ */
+export type ModuleToCallers = Record<string, string[]>;
+
+/**
+ * Resolves relative module paths to normalized absolute-style paths.
+ * For example, if a module at "foo/bar" calls "../shared", this function
+ * resolves it to "foo/shared".
+ *
+ * @param rawModuleCalls - A relative path from github.workspace to module caller => relative paths from module caller to modules
+ * @returns A relative path from github.workspace to module caller => absolute paths to modules
+ */
+export function resolveRelativeCallTree(
+  rawModuleCalls: ModuleCalls,
+): ModuleCalls {
+  const moduleCalls: ModuleCalls = {};
+  for (const [module, thisChildren] of Object.entries(rawModuleCalls)) {
+    const absModulePath = path.resolve("/", module);
+    const resolvedChildModules = [];
+    for (const child of thisChildren) {
+      const absChildPath = path.resolve(absModulePath, child);
+      const resolved = path.relative("/", absChildPath);
+      resolvedChildModules.push(resolved);
+    }
+    moduleCalls[module] = resolvedChildModules;
+  }
+  return moduleCalls;
+}
+
+/**
+ * Recursively finds all directories that call the specified module,
+ * including both direct and indirect callers.
+ *
+ * @param moduleCalls - A relative path from github.workspace to module caller => absolute paths to modules
+ * @param module - Absolute path to module path
+ * @returns An array of all directories that directly or indirectly call the module
+ */
+const findCallers = (moduleCalls: ModuleCalls, module: string): string[] => {
+  const callers = [];
+  for (const [directCaller, modules] of Object.entries(moduleCalls)) {
+    if (modules.includes(module)) {
+      // directCaller calls module
+      // parentCallers call directCaller, meaning they call module indirectly
+      const parentCallers = findCallers(moduleCalls, directCaller);
+      callers.push(directCaller, ...parentCallers);
+    }
+  }
+  return callers;
+};
+
+/**
+ * Builds a reverse lookup map from modules to their callers.
+ * This is useful for determining which directories are affected
+ * when a module is changed.
+ *
+ * @param moduleCalls - A relative path from github.workspace to module caller => absolute paths to modules
+ * @returns Absolute path to module => Relative paths from github.workspace to module callers
+ */
+export const buildModuleToCallers = (
+  moduleCalls: ModuleCalls,
+): ModuleToCallers => {
+  const moduleToCallers: ModuleToCallers = {};
+  /** absolute paths to modules */
+  const modules = [...new Set(Object.values(moduleCalls).flat())];
+  for (const module of modules) {
+    if (!moduleToCallers[module]) {
+      moduleToCallers[module] = [];
+    }
+    moduleToCallers[module].push(...findCallers(moduleCalls, module));
+  }
+  return moduleToCallers;
 };
