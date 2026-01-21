@@ -192,11 +192,11 @@ ${prData.body}
   }
 
   const prTitle = cfg?.follow_up_pr?.pull_request?.title
-    ? Handlebars.compile(cfg?.scaffold_module?.pull_request?.title)(vars)
+    ? Handlebars.compile(cfg?.follow_up_pr?.pull_request?.title)(vars)
     : `chore(${target}): follow up #${prNumber}`;
 
   const prBody = cfg?.follow_up_pr?.pull_request?.body
-    ? Handlebars.compile(cfg?.scaffold_module?.pull_request?.body)(vars)
+    ? Handlebars.compile(cfg?.follow_up_pr?.pull_request?.body)(vars)
     : defaultPRBody;
 
   const comment = cfg?.follow_up_pr?.pull_request?.comment
