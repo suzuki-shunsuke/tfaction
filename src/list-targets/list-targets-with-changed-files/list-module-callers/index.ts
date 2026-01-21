@@ -47,7 +47,10 @@ export const list = async (
   moduleFiles: string[],
   executor: aqua.Executor,
 ): Promise<ModuleToCallers> => {
-  // directory where uses modules => used modules
+  /**
+   * key: relative path from github.workspace to module caller
+   * value: List of relative paths from module caller to module
+   */
   const rawModuleCalls: Record<string, Array<string>> = {};
 
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
@@ -127,14 +130,14 @@ export const list = async (
 
     const outInspect = await executor.getExecOutput(
       "terraform-config-inspect",
-      ["--json", tfDir],
+      ["--json"],
       {
         cwd: tfDir,
       },
     );
     const inspection = JSON.parse(outInspect.stdout);
 
-    // List keys of Local Path modules (source starts with ./ or ../) in module_calls
+    /** List of relative paths from module caller to module */
     const arr = Object.values(
       inspection["module_calls"] as Record<string, { source: string }>,
     ).flatMap((module) => {
