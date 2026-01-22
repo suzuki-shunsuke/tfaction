@@ -4,7 +4,7 @@ import * as securefix from "@csm-actions/securefix-action";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as env from "../lib/env";
 
-type Inputs = {
+export type Inputs = {
   commitMessage: string;
   githubToken: string;
   /** A relative path from github.workspace to Git Root Directory */

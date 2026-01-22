@@ -8,8 +8,8 @@ import { z } from "zod";
 import * as lib from "../lib";
 import * as env from "../lib/env";
 import * as input from "../lib/input";
-import * as aqua from "../aqua";
 import * as commit from "../commit";
+import { post } from "../post";
 import { getTargetConfig, TargetConfig } from "../get-target-config";
 
 const PRData = z.object({
@@ -254,7 +254,7 @@ const createFailedPrsFile = (
 };
 
 interface SkipCreateCommentParams {
-  githubToken: string;
+  octokit: ReturnType<typeof github.getOctokit>;
   repository: string;
   branch: string;
   prTitle: string;
@@ -264,15 +264,12 @@ interface SkipCreateCommentParams {
   groupLabel: string;
   target: string;
   mentions: string;
-  executor: aqua.Executor;
-  workingDir: string;
 }
 
 const postSkipCreateComment = async (
   params: SkipCreateCommentParams,
 ): Promise<void> => {
   const {
-    githubToken,
     repository,
     branch,
     prTitle,
@@ -282,7 +279,6 @@ const postSkipCreateComment = async (
     groupLabel,
     target,
     mentions,
-    workingDir,
   } = params;
 
   const createOpts: string[] = [
@@ -306,29 +302,16 @@ const postSkipCreateComment = async (
 
   const optsString = createOpts.join(" ");
 
-  const executor = params.executor;
-
-  await executor.exec(
-    "github-comment",
-    [
-      "post",
-      "-k",
-      "skip-create-follow-up-pr",
-      "-var",
-      `tfaction_target:${target}`,
-      "-var",
-      `mentions:${mentions}`,
-      "-var",
-      `opts:${optsString}`,
-    ],
-    {
-      cwd: workingDir,
-      env: {
-        GITHUB_TOKEN: githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-      },
+  await post({
+    octokit: params.octokit,
+    prNumber: parseInt(prNumber, 10),
+    templateKey: "skip-create-follow-up-pr",
+    vars: {
+      tfaction_target: target,
+      mentions,
+      opts: optsString,
     },
-  );
+  });
   core.info("Posted skip-create-follow-up-pr comment");
 };
 
@@ -375,11 +358,6 @@ export const main = async () => {
   const serverUrl = env.githubServerUrl || "https://github.com";
   const repository = env.githubRepository;
   const runId = env.githubRunId;
-
-  const executor = await aqua.NewExecutor({
-    githubToken,
-    cwd: workingDir,
-  });
 
   // Get or create group label
   const groupLabel = await getOrCreateGroupLabel({
@@ -443,35 +421,23 @@ export const main = async () => {
 
   // Post comment to original PR (GitHub API only)
   if (followUpPrUrl) {
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-config",
-        lib.GitHubCommentConfig,
-        "-var",
-        `tfaction_target:${target}`,
-        "-var",
-        `mentions:${prParams.mentions}`,
-        "-var",
-        `follow_up_pr_url:${followUpPrUrl}`,
-        "-k",
-        "create-follow-up-pr",
-      ],
-      {
-        cwd: workingDir,
-        env: {
-          GITHUB_TOKEN: githubToken,
-        },
+    await post({
+      octokit,
+      prNumber: parseInt(prNumber, 10),
+      templateKey: "create-follow-up-pr",
+      vars: {
+        tfaction_target: target,
+        mentions: prParams.mentions,
+        follow_up_pr_url: followUpPrUrl,
       },
-    );
+    });
     core.info("Posted comment to the original PR");
   }
 
   // Post skip-create comment if skip_create_pr is true
   if (skipCreatePr) {
     await postSkipCreateComment({
-      githubToken,
+      octokit,
       repository,
       branch: prParams.branch,
       prTitle: prParams.prTitle,
@@ -481,8 +447,6 @@ export const main = async () => {
       groupLabel,
       target,
       mentions: prParams.mentions,
-      executor,
-      workingDir,
     });
   }
 };

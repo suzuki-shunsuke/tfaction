@@ -9,6 +9,7 @@ export const githubHeadRef = process.env.GITHUB_HEAD_REF ?? "";
 export const githubRefName = process.env.GITHUB_REF_NAME ?? "";
 export const githubActor = process.env.GITHUB_ACTOR ?? "";
 export const githubSha = process.env.GITHUB_SHA ?? "";
+export const githubJob = process.env.GITHUB_JOB ?? "";
 export const githubStepSummary = process.env.GITHUB_STEP_SUMMARY ?? "";
 export const githubToken = process.env.GITHUB_TOKEN ?? "";
 

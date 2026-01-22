@@ -271,6 +271,7 @@ const RawConfig = z.object({
           title: z.string().optional(),
           body: z.string().optional(),
           comment: z.string().optional(),
+          comment_to_original_pr: z.string().optional(),
         })
         .nullish(),
       group_label: z
