@@ -243,7 +243,7 @@ const RawConfig = z.object({
       issue_repo_owner: z.string().optional(),
       issue_repo_name: z.string().optional(),
       num_of_issues: z.number().optional(),
-      minimum_detection_interval: z.number().optional(),
+      minimum_detection_interval: z.number().default(168),
       enabled: z.boolean().optional(),
     })
     .optional(),
