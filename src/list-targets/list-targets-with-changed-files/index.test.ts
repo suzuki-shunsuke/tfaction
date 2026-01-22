@@ -98,7 +98,7 @@ test("job config", async () => {
 
 const prCommentConfig = {
   plan_workflow_name: "plan.yaml",
-  replace: {
+  replace_target: {
     patterns: [
       {
         regexp: "^yoo/services/",

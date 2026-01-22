@@ -44,7 +44,7 @@ drift_detection:
   minimum_detection_interval: 1
   num_of_issues: 1
 
-replace:
+replace_target:
   patterns:
     - regexp: /services/
       replace: /

@@ -321,7 +321,7 @@ const RawConfig = z.object({
     })
     .optional(),
   working_directory_file: z.string().optional(),
-  replace: Replace.optional(),
+  replace_target: Replace.optional(),
   providers_lock_opts: z.string().optional(),
   securefix_action: z
     .object({
@@ -444,7 +444,7 @@ export const getConfig = async (): Promise<Config> => {
 export const createWDTargetMap = (
   wds: string[],
   targetGroups: TargetGroup[],
-  replace: Replace | undefined,
+  replaceTarget: Replace | undefined,
 ): Map<string, string> => {
   const m = new Map<string, string>();
   for (const wd of wds) {
@@ -455,7 +455,7 @@ export const createWDTargetMap = (
       if (rel.startsWith("..") || path.isAbsolute(rel)) {
         continue;
       }
-      for (const pattern of replace?.patterns ?? []) {
+      for (const pattern of replaceTarget?.patterns ?? []) {
         target = target.replace(
           new RegExp(pattern.regexp, pattern.flags),
           pattern.replace,
@@ -584,7 +584,7 @@ export const getTargetGroup = async (
     config_path: string;
     working_directory_file: string;
     target_groups: TargetGroup[];
-    replace?: Replace | undefined;
+    replace_target?: Replace | undefined;
   },
   target?: string,
   workingDir?: string,
@@ -602,7 +602,7 @@ export const getTargetGroup = async (
       };
     }
     target = workingDir;
-    for (const pattern of config.replace?.patterns ?? []) {
+    for (const pattern of config.replace_target?.patterns ?? []) {
       target = target.replace(new RegExp(pattern.regexp), pattern.replace);
     }
     return {
@@ -630,7 +630,7 @@ export const getTargetGroup = async (
   for (const file of files) {
     wds.push(path.dirname(file));
   }
-  const m = createWDTargetMap(wds, config.target_groups, config.replace);
+  const m = createWDTargetMap(wds, config.target_groups, config.replace_target);
   for (const [wd, t] of m) {
     if (t === target) {
       workingDir = wd;
