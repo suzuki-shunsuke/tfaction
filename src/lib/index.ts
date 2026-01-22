@@ -58,15 +58,17 @@ const ReviewdogConfig = z.object({
   fail_level: z.enum(["none", "any", "info", "warning", "error"]).optional(),
 });
 
+const tflintDefaults = { enabled: true, fix: false } as const;
 const TflintConfig = z.object({
-  enabled: z.boolean().optional(),
-  fix: z.boolean().optional(),
+  enabled: z.boolean().default(tflintDefaults.enabled),
+  fix: z.boolean().default(tflintDefaults.fix),
   reviewdog: ReviewdogConfig.optional(),
 });
 type TflintConfig = z.infer<typeof TflintConfig>;
 
+const trivyDefaults = { enabled: true } as const;
 const TrivyConfig = z.object({
-  enabled: z.boolean().optional(),
+  enabled: z.boolean().default(trivyDefaults.enabled),
   reviewdog: ReviewdogConfig.optional(),
 });
 type TrivyConfig = z.infer<typeof TrivyConfig>;
@@ -207,9 +209,10 @@ const TargetConfig = z.object({
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
+const labelPrefixesDefaults = { skip: "skip:", tfmigrate: "tfmigrate:" } as const;
 const LabelPrefixes = z.object({
-  skip: z.string().optional(),
-  tfmigrate: z.string().optional(),
+  skip: z.string().default(labelPrefixesDefaults.skip),
+  tfmigrate: z.string().default(labelPrefixesDefaults.tfmigrate),
 });
 export type LabelPrefixes = z.infer<typeof LabelPrefixes>;
 
@@ -237,7 +240,7 @@ const RawConfig = z.object({
     })
     .optional(),
   conftest: ConftestConfig.optional(),
-  draft_pr: z.boolean().optional(),
+  draft_pr: z.boolean().default(false),
   drift_detection: z
     .object({
       issue_repo_owner: z.string().optional(),
@@ -248,10 +251,10 @@ const RawConfig = z.object({
     })
     .optional(),
   env: z.record(z.string(), z.string()).optional(),
-  label_prefixes: LabelPrefixes.optional(),
-  module_file: z.string().optional(),
+  label_prefixes: LabelPrefixes.default(labelPrefixesDefaults),
+  module_file: z.string().default("tfaction_module.yaml"),
   plan_workflow_name: z.string(),
-  renovate_login: z.string().optional(),
+  renovate_login: z.string().default("renovate[bot]"),
   renovate_terraform_labels: z.string().array().optional(),
   scaffold_working_directory: z
     .object({
@@ -303,24 +306,24 @@ const RawConfig = z.object({
         .nullish(),
     })
     .nullish(),
-  skip_create_pr: z.boolean().optional(),
+  skip_create_pr: z.boolean().default(false),
   skip_terraform_by_renovate: z.boolean().optional(),
   target_groups: TargetGroup.array(),
-  tflint: TflintConfig.optional(),
-  trivy: TrivyConfig.optional(),
+  tflint: TflintConfig.default(tflintDefaults),
+  trivy: TrivyConfig.default(trivyDefaults),
   terraform_docs: TerraformDocsConfig.optional(),
   update_local_path_module_caller: z
     .object({
       enabled: z.boolean().optional(),
     })
     .optional(),
-  terraform_command: z.string().optional(),
+  terraform_command: z.string().default("terraform"),
   update_related_pull_requests: z
     .object({
       enabled: z.boolean().optional(),
     })
     .optional(),
-  working_directory_file: z.string().optional(),
+  working_directory_file: z.string().default("tfaction.yaml"),
   replace_target: Replace.optional(),
   providers_lock_opts: z.string().optional(),
   securefix_action: z
@@ -340,43 +343,16 @@ const RawConfig = z.object({
 });
 export type RawConfig = z.infer<typeof RawConfig>;
 
-// Config with default values applied
-export interface Config extends Omit<
-  RawConfig,
-  | "working_directory_file"
-  | "module_file"
-  | "renovate_login"
-  | "draft_pr"
-  | "skip_create_pr"
-  | "terraform_command"
-  | "label_prefixes"
-  | "tflint"
-  | "trivy"
-> {
+// ParsedConfig is the type after zod parsing with defaults applied
+type ParsedConfig = z.output<typeof RawConfig>;
+
+// Config with default values applied and dynamic fields added
+export interface Config extends ParsedConfig {
   /** Absolute path to git root directory */
   git_root_dir: string;
   config_path: string;
   config_dir: string;
   workspace: string;
-  working_directory_file: string;
-  module_file: string;
-  renovate_login: string;
-  draft_pr: boolean;
-  skip_create_pr: boolean;
-  terraform_command: string;
-  label_prefixes: {
-    tfmigrate: string;
-    skip: string;
-  };
-  tflint: {
-    enabled: boolean;
-    fix: boolean;
-    reviewdog?: z.infer<typeof ReviewdogConfig>;
-  };
-  trivy: {
-    enabled: boolean;
-    reviewdog?: z.infer<typeof ReviewdogConfig>;
-  };
 }
 
 export const generateJSONSchema = (dir: string) => {
@@ -394,37 +370,19 @@ export const generateJSONSchema = (dir: string) => {
 };
 
 export const applyConfigDefaults = async (
-  raw: RawConfig,
+  raw: z.input<typeof RawConfig>,
   configPath: string,
 ): Promise<Config> => {
+  const parsed = RawConfig.parse(raw);
   const configDir = path.dirname(configPath);
   const gitRootDir = await getGitRootDir(configDir);
   const workspace = getGitHubWorkspace();
   return {
-    ...raw,
+    ...parsed,
     git_root_dir: gitRootDir,
     config_path: configPath,
     config_dir: configDir,
     workspace: workspace,
-    working_directory_file: raw.working_directory_file ?? "tfaction.yaml",
-    module_file: raw.module_file ?? "tfaction_module.yaml",
-    renovate_login: raw.renovate_login ?? "renovate[bot]",
-    draft_pr: raw.draft_pr ?? false,
-    skip_create_pr: raw.skip_create_pr ?? false,
-    terraform_command: raw.terraform_command ?? "terraform",
-    label_prefixes: {
-      tfmigrate: raw.label_prefixes?.tfmigrate ?? "tfmigrate:",
-      skip: raw.label_prefixes?.skip ?? "skip:",
-    },
-    tflint: {
-      enabled: raw.tflint?.enabled ?? true,
-      fix: raw.tflint?.fix ?? false,
-      reviewdog: raw.tflint?.reviewdog,
-    },
-    trivy: {
-      enabled: raw.trivy?.enabled ?? true,
-      reviewdog: raw.trivy?.reviewdog,
-    },
   };
 };
 
