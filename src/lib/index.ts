@@ -209,7 +209,10 @@ const TargetConfig = z.object({
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
-const labelPrefixesDefaults = { skip: "skip:", tfmigrate: "tfmigrate:" } as const;
+const labelPrefixesDefaults = {
+  skip: "skip:",
+  tfmigrate: "tfmigrate:",
+} as const;
 const LabelPrefixes = z.object({
   skip: z.string().default(labelPrefixesDefaults.skip),
   tfmigrate: z.string().default(labelPrefixesDefaults.tfmigrate),
