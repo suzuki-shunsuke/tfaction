@@ -358,7 +358,9 @@ describe("setEnvs", () => {
   });
 
   it("returns empty map when objects have no env field", () => {
-    const result = setEnvs({}, { other: "value" } as { env?: Record<string, string> });
+    const result = setEnvs({}, { other: "value" } as {
+      env?: Record<string, string>;
+    });
     expect(result.size).toBe(0);
   });
 
@@ -418,24 +420,22 @@ describe("setEnvs", () => {
 });
 
 describe("checkDriftDetectionEnabled", () => {
-  const createConfig = (
-    driftDetection?: { enabled?: boolean },
-  ): Config =>
+  const createConfig = (driftDetection?: { enabled?: boolean }): Config =>
     ({
       drift_detection: driftDetection,
     }) as Config;
 
-  const createTargetGroup = (
-    driftDetection?: { enabled?: boolean },
-  ): TargetGroup =>
+  const createTargetGroup = (driftDetection?: {
+    enabled?: boolean;
+  }): TargetGroup =>
     ({
       working_directory: "aws",
       drift_detection: driftDetection,
     }) as TargetGroup;
 
-  const createTargetConfig = (
-    driftDetection?: { enabled?: boolean },
-  ): TargetConfig => ({
+  const createTargetConfig = (driftDetection?: {
+    enabled?: boolean;
+  }): TargetConfig => ({
     drift_detection: driftDetection,
   });
 
