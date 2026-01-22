@@ -86,9 +86,13 @@ type ModuleData = {
 const createTargetMaps = (
   workingDirs: string[],
   targetGroups: lib.TargetGroup[],
-  replace: lib.Replace | undefined,
+  replaceTarget: lib.Replace | undefined,
 ): { wdTargetMap: Map<string, string>; targetWDMap: Map<string, string> } => {
-  const wdTargetMap = lib.createWDTargetMap(workingDirs, targetGroups, replace);
+  const wdTargetMap = lib.createWDTargetMap(
+    workingDirs,
+    targetGroups,
+    replaceTarget,
+  );
   const targetWDMap = new Map<string, string>();
   for (const [wd, t] of wdTargetMap) {
     targetWDMap.set(t, wd);
@@ -265,7 +269,7 @@ export const run = async (input: Input): Promise<Result> => {
   const { wdTargetMap, targetWDMap } = createTargetMaps(
     workingDirs,
     config.target_groups,
-    config.replace,
+    config.replace_target,
   );
 
   const terraformTargets = new Set<string>();
@@ -321,7 +325,7 @@ export const run = async (input: Input): Promise<Result> => {
 type Input = {
   config: {
     target_groups: lib.TargetGroup[];
-    replace?: lib.Replace;
+    replace_target?: lib.Replace;
     label_prefixes?: lib.LabelPrefixes;
   };
   isApply: boolean;

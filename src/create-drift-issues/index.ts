@@ -82,7 +82,7 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   }
 
   // map working directories and targets
-  const m = lib.createWDTargetMap(dirs, cfg.target_groups, cfg.replace);
+  const m = lib.createWDTargetMap(dirs, cfg.target_groups, cfg.replace_target);
   const targetWDMap = new Map<string, string>();
   for (const [wd, target] of m) {
     const tg = await lib.getTargetGroup(cfg, target, wd);

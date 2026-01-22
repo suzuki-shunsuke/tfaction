@@ -171,7 +171,7 @@ const getTargetByWorkingDirectory = (
   workingDirectoryPath: string,
   config: lib.Config,
 ): string => {
-  for (const pattern of config.replace?.patterns ?? []) {
+  for (const pattern of config.replace_target?.patterns ?? []) {
     workingDirectoryPath = workingDirectoryPath.replace(
       new RegExp(pattern.regexp),
       pattern.replace,
