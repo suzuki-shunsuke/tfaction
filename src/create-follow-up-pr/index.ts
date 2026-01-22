@@ -409,19 +409,6 @@ export const main = async () => {
     ),
   );
 
-  // Build PR comment for securefix
-  const prComment = `${prParams.mentions}
-This pull request was created because \`terraform apply\` failed.
-
-- #${prNumber}
-
-Please handle this pull request.
-
-1. Check the error message #${prNumber}
-1. Check the result of \`terraform plan\`
-1. Add commits to this pull request and fix the problem if needed
-1. Review and merge this pull request`;
-
   const labels: string[] = [];
   if (groupLabel) {
     labels.push(groupLabel);
@@ -450,7 +437,7 @@ Please handle this pull request.
           assignees:
             prParams.assignees.length > 0 ? prParams.assignees : undefined,
           draft: draftPr,
-          comment: prComment,
+          comment: prParams.comment,
         },
   });
 
