@@ -192,14 +192,18 @@ export const main = async (): Promise<void> => {
   }
 
   if (disableUpdateRelatedPullRequests) {
-    core.notice("Skip updating related pull requests");
+    core.info("Skip updating related pull requests");
   } else {
     const prNumbers = await listRelatedPullRequests(
       githubToken,
       targetConfig.target,
     );
     if (securefixServerRepository) {
-      await updateBranchBySecurefix(securefixServerRepository, prNumbers);
+      await updateBranchBySecurefix(
+        github.context.repo.owner,
+        securefixServerRepository,
+        prNumbers,
+      );
     } else {
       await updateBranchByCommit(githubToken, prNumbers);
     }
@@ -223,11 +227,10 @@ const revoke = async (token: githubAppToken.Token): Promise<void> => {
 };
 
 export const updateBranchBySecurefix = async (
-  securefixServerRepository: string,
+  serverRepoOwner: string,
+  serverRepoName: string,
   prNumbers: number[],
 ): Promise<void> => {
-  const serverRepoOwner = securefixServerRepository.split("/")[0];
-  const serverRepoName = securefixServerRepository.split("/")[1];
   const token = await githubAppToken.create({
     appId: input.securefixActionAppId,
     privateKey: input.securefixActionAppPrivateKey,
@@ -241,6 +244,9 @@ export const updateBranchBySecurefix = async (
     const octokit = github.getOctokit(token.token);
     for (const prNumber of prNumbers) {
       try {
+        core.info(
+          `Updating a branch ${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/pull/${prNumber}`,
+        );
         await updateBranchAction.update({
           octokit,
           owner: github.context.repo.owner,
@@ -249,12 +255,6 @@ export const updateBranchBySecurefix = async (
           serverRepositoryOwner: serverRepoOwner,
           serverRepositoryName: serverRepoName,
         });
-        const { data } = await octokit.rest.pulls.updateBranch({
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
-          pull_number: prNumber,
-        });
-        core.notice(`Updated a branch ${data.url}`);
       } catch (error) {
         core.warning(`Failed to update branch for PR #${prNumber}: ${error}`);
       }

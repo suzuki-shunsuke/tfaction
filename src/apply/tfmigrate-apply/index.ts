@@ -144,14 +144,18 @@ export const main = async (): Promise<void> => {
   }
 
   if (disableUpdateRelatedPullRequests) {
-    core.notice("Skip updating related pull requests");
+    core.info("Skip updating related pull requests");
   } else {
     const prNumbers = await listRelatedPullRequests(
       githubToken,
       targetConfig.target,
     );
     if (securefixServerRepository) {
-      await updateBranchBySecurefix(securefixServerRepository, prNumbers);
+      await updateBranchBySecurefix(
+        github.context.repo.owner,
+        securefixServerRepository,
+        prNumbers,
+      );
     } else {
       await updateBranchByCommit(githubToken, prNumbers);
     }
