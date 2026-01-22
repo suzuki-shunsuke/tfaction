@@ -18,6 +18,9 @@ const titlePattern = /^Terraform Drift \((\S+)\)$/;
 
 // Calculate deadline (minimum_detection_interval hours ago)
 const getDeadline = (now: Date, durationHours: number): string => {
+  if (durationHours === 0) {
+    return "";
+  }
   const deadline = new Date(now.getTime() - durationHours * 60 * 60 * 1000);
   return deadline.toISOString().replace(/\.\d{3}Z$/, "+00:00");
 };
@@ -48,7 +51,10 @@ const listLeastRecentlyUpdatedIssues = async (
     }
   `;
 
-  const searchQuery = `repo:${repoOwner}/${repoName} "Terraform Drift" in:title sort:updated-asc updated:<${deadline}`;
+  let searchQuery = `repo:${repoOwner}/${repoName} "Terraform Drift" in:title sort:updated-asc`;
+  if (deadline) {
+    searchQuery += ` updated:<${deadline}`;
+  }
   const issues: Issue[] = [];
   let cursor: string | null = null;
 
@@ -255,9 +261,13 @@ export const main = async () => {
   // Calculate deadline
   const deadline = getDeadline(
     new Date(),
-    config.drift_detection.minimum_detection_interval ?? 24,
+    config.drift_detection.minimum_detection_interval,
   );
-  core.info(`Deadline: ${deadline}`);
+  if (deadline) {
+    core.info(`Deadline: ${deadline}`);
+  } else {
+    core.info(`No Deadline`);
+  }
 
   // List least recently updated drift issues
   const octokit = github.getOctokit(githubToken);
