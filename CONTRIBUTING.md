@@ -22,7 +22,6 @@ After you update code, you have to run the following things.
 - Test TypeScript: `npm t`
 - Lint TypeScript: `npx eslint`
 - Format code: `npm run fmt`
-- Update [JSON Schema](schema): `cmdx schema`
 - [Update Document](website)
 
 ## Node.js version management
