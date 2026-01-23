@@ -95,7 +95,7 @@ const setupSSHKey = async (sshKey: string): Promise<void> => {
 };
 
 export const main = async () => {
-  core.exportVariable("AQUA_GLOBAL_CONFIG", env.aquaGlobalConfig);
+  core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
   const githubToken = input.getRequiredGitHubToken();
 
   const octokit = github.getOctokit(githubToken);
@@ -115,7 +115,7 @@ export const main = async () => {
       target: env.tfactionTarget,
       workingDir: env.tfactionWorkingDir,
       isApply: env.getIsApply(),
-      jobType: env.getJobType(),
+      jobType: lib.getJobType(),
     },
     config,
   );

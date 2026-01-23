@@ -352,7 +352,7 @@ export const main = async () => {
   const securefixPRBaseBranch =
     config.securefix_action?.pull_request?.base_branch ?? "";
 
-  const jobType = env.getJobType();
+  const jobType = lib.getJobType();
 
   // Get target config
   const targetConfig = await getTargetConfig(

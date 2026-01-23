@@ -58,7 +58,7 @@ export const main = async () => {
 
   const targetS = env.tfactionTarget;
   const workingDir = env.tfactionWorkingDir;
-  const jobType = env.getJobType();
+  const jobType = lib.getJobType();
   const isApply = env.getIsApply();
 
   const t = await lib.getTargetGroup(config, targetS, workingDir);

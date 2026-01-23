@@ -25,7 +25,7 @@ export const main = async () => {
       target: env.tfactionTarget,
       workingDir: env.tfactionWorkingDir,
       isApply: env.getIsApply(),
-      jobType: env.getJobType(),
+      jobType: lib.getJobType(),
     },
     config,
   );

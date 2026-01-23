@@ -35,6 +35,18 @@ export const aquaConfig = path.join(
   "aqua.yaml",
 );
 
+export const aquaGlobalConfig = env.aquaGlobalConfigEnv
+  ? `${env.aquaGlobalConfigEnv}:${aquaConfig}`
+  : aquaConfig;
+
+export const getJobType = (): JobType => {
+  const jobType = process.env.TFACTION_JOB_TYPE ?? "";
+  if (!jobType) {
+    throw new Error("environment variable TFACTION_JOB_TYPE is required");
+  }
+  return JobType.parse(jobType);
+};
+
 export const applyConfigDefaults = async (
   raw: z.input<typeof RawConfig>,
   configPath: string,

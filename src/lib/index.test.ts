@@ -5,10 +5,10 @@ import {
   getJobConfig,
   setOutputs,
   setEnvs,
+  getJobType,
 } from "./index";
 import { checkDriftDetectionEnabled } from "./drift";
 import type { TargetGroup, TargetConfig, Config, Replace } from "./types";
-import { getJobType } from "./env";
 
 describe("createWDTargetMap", () => {
   it("returns map with target equal to working_dir when no replace_target", () => {

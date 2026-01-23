@@ -1,5 +1,7 @@
-import { JobType } from "./types";
-import { aquaConfig } from "./index";
+// env.ts responsibility: Read tfaction-specific environment variables from process.env
+// - Centralizes environment variable dependencies
+// - Prevents typos in environment variable names by avoiding direct process.env references elsewhere
+// - env.ts MUST NOT depend on other modules
 
 export const path = process.env.PATH ?? "";
 
@@ -50,9 +52,6 @@ export const xdgDataHome = process.env.XDG_DATA_HOME ?? "";
 // aqua
 export const aquaRootDir = process.env.AQUA_ROOT_DIR ?? "";
 export const aquaGlobalConfigEnv = process.env.AQUA_GLOBAL_CONFIG ?? "";
-export const aquaGlobalConfig = aquaGlobalConfigEnv
-  ? `${aquaGlobalConfigEnv}:${aquaConfig}`
-  : aquaConfig;
 
 // tests
 export const targetConfig = process.env.TARGET_CONFIG ?? "";
@@ -60,14 +59,6 @@ export const globalConfig = process.env.GLOBAL_CONFIG ?? "";
 export const listModuleCallers = process.env.LIST_MODULE_CALLERS ?? "";
 
 // Input retrieval functions
-
-export const getJobType = (): JobType => {
-  const jobType = process.env.TFACTION_JOB_TYPE ?? "";
-  if (!jobType) {
-    throw new Error("environment variable TFACTION_JOB_TYPE is required");
-  }
-  return JobType.parse(jobType);
-};
 
 export const getIsApply = (): boolean => {
   return (process.env.TFACTION_IS_APPLY ?? "") === "true";
