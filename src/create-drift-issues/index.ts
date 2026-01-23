@@ -75,10 +75,7 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
     cfg.git_root_dir,
     workingDirectoryFile,
   );
-  const dirs: string[] = [];
-  for (const file of files) {
-    dirs.push(path.dirname(file));
-  }
+  const dirs = files.map((file) => path.dirname(file));
 
   // map working directories and targets
   const m = lib.createWDTargetMap(dirs, cfg.target_groups, cfg.replace_target);

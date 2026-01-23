@@ -18,8 +18,8 @@ export const main = async () => {
     {
       target: env.tfactionTarget,
       workingDir: env.tfactionWorkingDir,
-      isApply: lib.getIsApply(),
-      jobType: lib.getJobType(),
+      isApply: env.getIsApply(),
+      jobType: env.getJobType(),
     },
     config,
   );

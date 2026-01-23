@@ -351,14 +351,14 @@ export const main = async () => {
   const securefixPRBaseBranch =
     config.securefix_action?.pull_request?.base_branch ?? "";
 
-  const jobType = lib.getJobType();
+  const jobType = env.getJobType();
 
   // Get target config
   const targetConfig = await getTargetConfig(
     {
       target: env.tfactionTarget,
       workingDir: env.tfactionWorkingDir,
-      isApply: lib.getIsApply(),
+      isApply: env.getIsApply(),
       jobType,
     },
     config,

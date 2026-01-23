@@ -71,3 +71,65 @@ e.g.
 ```yaml
 - uses: suzuki-shunsuke/tfaction@pr/3402
 ```
+
+## Unit test
+
+### index.ts / run.ts Pattern
+
+For actions that need unit testing, separate code into two files:
+
+- `index.ts` - Entry point that retrieves inputs (env vars, configs, GitHub context)
+- `run.ts` - Business logic with typed parameters (no env/input access)
+
+Example:
+
+```typescript
+// run.ts
+export type RunInput = {
+  jobType: JobType;
+  isApply: boolean;
+  config: Config;
+  // ...
+};
+
+export const run = async (input: RunInput): Promise<RunResult> => {
+  // Business logic here - no env/input access
+};
+```
+
+```typescript
+// index.ts
+import { run } from "./run";
+import * as lib from "../lib";
+
+export const main = async () => {
+  // Retrieve all inputs
+  const jobType = lib.getJobType();
+  const isApply = lib.getIsApply();
+  const config = await lib.getConfig();
+
+  // Pass to business logic
+  const result = await run({ jobType, isApply, config });
+
+  // Set outputs
+  core.setOutput("result", result);
+};
+```
+
+This separation allows `run.ts` to be tested by passing mock values directly, without complex mocking.
+
+### env.ts and input.ts Usage
+
+`src/lib/env.ts` and `src/lib/input.ts` are for environment variable access and input retrieval functions (e.g., `getJobType`, `getIsApply`, `getGitHubWorkspace`).
+These files should only be referenced from action entry points (`src/*/index.ts`), not from `run.ts` or other business logic files.
+
+`src/lib/index.ts` is for business logic utilities and config schemas. It does not depend on `env.ts`.
+
+`env.ts` imports `JobType` from `index.ts` for validation. The dependency is one-way: `env.ts` → `index.ts`.
+
+Note: `getConfig` is in `index.ts` because it depends on `RawConfig` schema defined there.
+
+### Existing Examples
+
+- `src/pick-out-drift-issues/` - Has `index.ts`, `run.ts`, and `run.test.ts`
+- `src/plan/` - Has `index.ts` and `run.ts`

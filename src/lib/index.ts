@@ -6,7 +6,6 @@ import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
 import { fileURLToPath } from "node:url";
-import * as env from "./env";
 
 export const GitHubActionPath = path.join(
   fileURLToPath(import.meta.url),
@@ -26,8 +25,10 @@ export const aquaConfig = path.join(
   "aqua",
   "aqua.yaml",
 );
-export const aquaGlobalConfig = env.aquaGlobalConfigEnv
-  ? `${env.aquaGlobalConfigEnv}:${aquaConfig}`
+
+const aquaGlobalConfigEnv = process.env.AQUA_GLOBAL_CONFIG ?? "";
+export const aquaGlobalConfig = aquaGlobalConfigEnv
+  ? `${aquaGlobalConfigEnv}:${aquaConfig}`
   : aquaConfig;
 
 const GitHubEnvironment = z.union([
@@ -39,19 +40,12 @@ const GitHubEnvironment = z.union([
 ]);
 export type GitHubEnvironment = z.infer<typeof GitHubEnvironment>;
 
-const JobType = z.union([
+export const JobType = z.union([
   z.literal("terraform"),
   z.literal("tfmigrate"),
   z.literal("scaffold_working_dir"),
 ]);
 export type JobType = z.infer<typeof JobType>;
-
-export const getJobType = (): JobType => {
-  if (!env.tfactionJobType) {
-    throw new Error("environment variable TFACTION_JOB_TYPE is required");
-  }
-  return JobType.parse(env.tfactionJobType);
-};
 
 const ReviewdogConfig = z.object({
   filter_mode: z.enum(["added", "diff_context", "file", "nofilter"]).optional(),
@@ -375,11 +369,11 @@ export const generateJSONSchema = (dir: string) => {
 export const applyConfigDefaults = async (
   raw: z.input<typeof RawConfig>,
   configPath: string,
+  workspace: string,
 ): Promise<Config> => {
   const parsed = RawConfig.parse(raw);
   const configDir = path.dirname(configPath);
   const gitRootDir = await getGitRootDir(configDir);
-  const workspace = getGitHubWorkspace();
   return {
     ...parsed,
     git_root_dir: gitRootDir,
@@ -390,15 +384,15 @@ export const applyConfigDefaults = async (
 };
 
 export const getConfig = async (): Promise<Config> => {
-  const raw = RawConfig.parse(
-    load(fs.readFileSync(env.tfactionConfig, "utf8")),
-  );
-  return await applyConfigDefaults(raw, env.tfactionConfig);
+  const configPath = process.env.TFACTION_CONFIG ?? "tfaction-root.yaml";
+  const workspace = process.env.GITHUB_WORKSPACE || process.cwd();
+  const raw = RawConfig.parse(load(fs.readFileSync(configPath, "utf8")));
+  return await applyConfigDefaults(raw, configPath, workspace);
 };
 
 /**
  *
- * @param wds relative paths from tfaction-root.yaml
+ * @param wds relative paths from git root directory
  * @param config
  * @returns a map of working directory to target name
  */
@@ -427,10 +421,6 @@ export const createWDTargetMap = (
     m.set(wd, target);
   }
   return m;
-};
-
-export const getIsApply = (): boolean => {
-  return env.tfactionIsApply === "true";
 };
 
 /**
@@ -719,12 +709,4 @@ export const getGitRootDir = async (cwd: string): Promise<string> => {
     },
   );
   return out.stdout.trim();
-};
-
-/**
- *
- * @returns an absolute path to github.workspace
- */
-export const getGitHubWorkspace = (): string => {
-  return env.githubWorkspace || process.cwd();
 };

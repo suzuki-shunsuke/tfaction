@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 
 import * as path from "path";
 import * as lib from "../../lib";
+import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import * as ciInfo from "../../ci-info";
@@ -436,7 +437,7 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   const result = await run({
     labels: pr.pr?.data.labels?.map((l) => l.name) ?? [],
     config: cfg,
-    isApply: lib.getIsApply(),
+    isApply: env.getIsApply(),
     changedFiles:
       pr.pr?.files.map((file) => path.join(cfg.git_root_dir, file)) ?? [],
     configFiles,

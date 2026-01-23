@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import {
   createWDTargetMap,
   getTargetFromTargetGroupsByWorkingDir,
@@ -11,6 +11,7 @@ import {
   type Config,
   type Replace,
 } from "./index";
+import { getJobType } from "./env";
 
 describe("createWDTargetMap", () => {
   it("returns map with target equal to working_dir when no replace_target", () => {
@@ -509,54 +510,40 @@ describe("checkDriftDetectionEnabled", () => {
 });
 
 describe("getJobType", () => {
-  beforeEach(() => {
-    vi.resetModules();
+  const originalEnv = process.env.TFACTION_JOB_TYPE;
+
+  afterEach(() => {
+    if (originalEnv === undefined) {
+      delete process.env.TFACTION_JOB_TYPE;
+    } else {
+      process.env.TFACTION_JOB_TYPE = originalEnv;
+    }
   });
 
-  it("throws when TFACTION_JOB_TYPE is not set", async () => {
-    vi.doMock("./env", async (importOriginal) => {
-      const actual = await importOriginal<typeof import("./env")>();
-      return { ...actual, tfactionJobType: "" };
-    });
-    const { getJobType } = await import("./index");
+  it("throws when TFACTION_JOB_TYPE is not set", () => {
+    delete process.env.TFACTION_JOB_TYPE;
     expect(() => getJobType()).toThrow(
       "environment variable TFACTION_JOB_TYPE is required",
     );
   });
 
-  it("returns terraform when TFACTION_JOB_TYPE is terraform", async () => {
-    vi.doMock("./env", async (importOriginal) => {
-      const actual = await importOriginal<typeof import("./env")>();
-      return { ...actual, tfactionJobType: "terraform" };
-    });
-    const { getJobType } = await import("./index");
+  it("returns terraform when TFACTION_JOB_TYPE is terraform", () => {
+    process.env.TFACTION_JOB_TYPE = "terraform";
     expect(getJobType()).toBe("terraform");
   });
 
-  it("returns tfmigrate when TFACTION_JOB_TYPE is tfmigrate", async () => {
-    vi.doMock("./env", async (importOriginal) => {
-      const actual = await importOriginal<typeof import("./env")>();
-      return { ...actual, tfactionJobType: "tfmigrate" };
-    });
-    const { getJobType } = await import("./index");
+  it("returns tfmigrate when TFACTION_JOB_TYPE is tfmigrate", () => {
+    process.env.TFACTION_JOB_TYPE = "tfmigrate";
     expect(getJobType()).toBe("tfmigrate");
   });
 
-  it("returns scaffold_working_dir when TFACTION_JOB_TYPE is scaffold_working_dir", async () => {
-    vi.doMock("./env", async (importOriginal) => {
-      const actual = await importOriginal<typeof import("./env")>();
-      return { ...actual, tfactionJobType: "scaffold_working_dir" };
-    });
-    const { getJobType } = await import("./index");
+  it("returns scaffold_working_dir when TFACTION_JOB_TYPE is scaffold_working_dir", () => {
+    process.env.TFACTION_JOB_TYPE = "scaffold_working_dir";
     expect(getJobType()).toBe("scaffold_working_dir");
   });
 
-  it("throws when TFACTION_JOB_TYPE is invalid", async () => {
-    vi.doMock("./env", async (importOriginal) => {
-      const actual = await importOriginal<typeof import("./env")>();
-      return { ...actual, tfactionJobType: "invalid" };
-    });
-    const { getJobType } = await import("./index");
+  it("throws when TFACTION_JOB_TYPE is invalid", () => {
+    process.env.TFACTION_JOB_TYPE = "invalid";
     expect(() => getJobType()).toThrow();
   });
 });
