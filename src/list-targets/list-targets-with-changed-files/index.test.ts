@@ -300,3 +300,443 @@ test("nest", async () => {
     ],
   });
 });
+
+test("tfmigrate label", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: ["tfmigrate:foo/dev"],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "tfmigrate",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("tfmigrate label with changed files", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: ["tfmigrate:foo/dev"],
+      changedFiles: ["foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "tfmigrate",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("module change detection", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc"],
+    targetConfigs: [],
+  });
+});
+
+test("module callers triggered", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {
+        "modules/vpc": ["foo/dev"],
+      },
+      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc"],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("replace_target", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "services/",
+          },
+        ],
+        replace_target: {
+          patterns: [
+            {
+              regexp: "^services/",
+              replace: "",
+            },
+          ],
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["services/app/dev/main.tf"],
+      configFiles: ["services/app/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "app/dev",
+        working_directory: "services/app/dev",
+      },
+    ],
+  });
+});
+
+test("custom label prefixes for tfmigrate", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+        label_prefixes: {
+          tfmigrate: "migrate:",
+        },
+      },
+      isApply: false,
+      labels: ["migrate:foo/dev"],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "tfmigrate",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip label parses correctly", async () => {
+  // Note: skip labels are parsed but don't filter targets in current implementation
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: ["skip:foo/dev", "other-label"],
+      changedFiles: ["foo/bar/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/bar",
+        working_directory: "foo/bar",
+      },
+    ],
+  });
+});
+
+test("custom skip label prefix", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+        label_prefixes: {
+          skip: "ignore:",
+        },
+      },
+      isApply: false,
+      labels: ["ignore:foo/dev"],
+      changedFiles: ["foo/bar/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/bar",
+        working_directory: "foo/bar",
+      },
+    ],
+  });
+});
+
+test("tfmigrate label with unknown target throws error", async () => {
+  await expect(
+    run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: ["tfmigrate:unknown/target"],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).rejects.toThrow(
+    "No working directory is found for the target unknown/target",
+  );
+});
+
+test("empty labels and changed files", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: ["", ""],
+      changedFiles: ["", ""],
+      configFiles: ["foo/dev/tfaction.yaml", ""],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [],
+  });
+});
+
+test("duplicate tfmigrate labels", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: ["tfmigrate:foo/dev", "tfmigrate:foo/dev"],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "tfmigrate",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
