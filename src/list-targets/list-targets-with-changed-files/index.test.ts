@@ -663,7 +663,9 @@ test("tfmigrate label with unknown target throws error", async () => {
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
     }),
-  ).rejects.toThrow("No working directory is found for the target unknown/target");
+  ).rejects.toThrow(
+    "No working directory is found for the target unknown/target",
+  );
 });
 
 test("empty labels and changed files", async () => {
