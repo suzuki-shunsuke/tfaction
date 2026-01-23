@@ -740,3 +740,427 @@ test("duplicate tfmigrate labels", async () => {
     ],
   });
 });
+
+test("isApply mode", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+          },
+        ],
+      },
+      isApply: true,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("tfmigrate with job config", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+            runs_on: "ubuntu-latest",
+            tfmigrate_plan_config: {
+              runs_on: "macos-latest",
+              environment: "tfmigrate-env",
+              secrets: [
+                {
+                  env_name: "TFMIGRATE_TOKEN",
+                  secret_name: "TFMIGRATE_SECRET",
+                },
+              ],
+            },
+          },
+        ],
+      },
+      isApply: false,
+      labels: ["tfmigrate:foo/dev"],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: "tfmigrate-env",
+        job_type: "tfmigrate",
+        runs_on: "macos-latest",
+        secrets: [
+          {
+            env_name: "TFMIGRATE_TOKEN",
+            secret_name: "TFMIGRATE_SECRET",
+          },
+        ],
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("tfmigrate apply with job config", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+            runs_on: "ubuntu-latest",
+            tfmigrate_apply_config: {
+              runs_on: "self-hosted",
+              environment: "production",
+            },
+          },
+        ],
+      },
+      isApply: true,
+      labels: ["tfmigrate:foo/dev"],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: "production",
+        job_type: "tfmigrate",
+        runs_on: "self-hosted",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("module caller is also a module", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "terraform/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/base/main.tf"],
+      configFiles: ["terraform/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {
+        "modules/base": ["modules/vpc", "terraform/dev"],
+      },
+      moduleFiles: [
+        "modules/base/tfaction_module.yaml",
+        "modules/vpc/tfaction_module.yaml",
+      ],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc", "modules/base"],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "terraform/dev",
+        working_directory: "terraform/dev",
+      },
+    ],
+  });
+});
+
+test("multiple target groups", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "aws/",
+            runs_on: "ubuntu-latest",
+          },
+          {
+            working_directory: "gcp/",
+            runs_on: "macos-latest",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["aws/dev/main.tf", "gcp/prod/main.tf"],
+      configFiles: ["aws/dev/tfaction.yaml", "gcp/prod/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "aws/dev",
+        working_directory: "aws/dev",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "macos-latest",
+        secrets: undefined,
+        target: "gcp/prod",
+        working_directory: "gcp/prod",
+      },
+    ],
+  });
+});
+
+test("terraform plan job config", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+            runs_on: "ubuntu-latest",
+            terraform_plan_config: {
+              runs_on: "self-hosted",
+              environment: "plan-env",
+              secrets: [
+                {
+                  env_name: "PLAN_TOKEN",
+                  secret_name: "PLAN_SECRET",
+                },
+              ],
+            },
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: "plan-env",
+        job_type: "terraform",
+        runs_on: "self-hosted",
+        secrets: [
+          {
+            env_name: "PLAN_TOKEN",
+            secret_name: "PLAN_SECRET",
+          },
+        ],
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("terraform apply job config", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+            runs_on: "ubuntu-latest",
+            terraform_apply_config: {
+              runs_on: "production-runner",
+              environment: "production",
+            },
+          },
+        ],
+      },
+      isApply: true,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: "production",
+        job_type: "terraform",
+        runs_on: "production-runner",
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("multiple modules changed", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "terraform/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/main.tf", "modules/iam/main.tf"],
+      configFiles: ["terraform/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [
+        "modules/vpc/tfaction_module.yaml",
+        "modules/iam/tfaction_module.yaml",
+      ],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc", "modules/iam"],
+    targetConfigs: [],
+  });
+});
+
+test("runs_on as array", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/",
+            runs_on: ["self-hosted", "linux", "x64"],
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      pr: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: ["self-hosted", "linux", "x64"],
+        secrets: undefined,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
