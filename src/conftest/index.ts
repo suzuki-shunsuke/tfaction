@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
-import { TargetConfig } from "../get-target-config";
+import { TargetConfig } from "../actions/get-target-config";
 import * as aqua from "../aqua";
 import * as path from "path";
 import fs from "fs";
