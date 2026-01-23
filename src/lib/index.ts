@@ -3,6 +3,7 @@ import * as path from "path";
 import * as core from "@actions/core";
 import { load } from "js-yaml";
 import { z } from "zod";
+import * as env from "./env";
 import { fileURLToPath } from "node:url";
 import { listWorkingDirFiles, getRootDir as getGitRootDir } from "./git";
 import {
@@ -52,8 +53,8 @@ export const applyConfigDefaults = async (
 };
 
 export const getConfig = async (): Promise<Config> => {
-  const configPath = process.env.TFACTION_CONFIG ?? "tfaction-root.yaml";
-  const workspace = process.env.GITHUB_WORKSPACE || process.cwd();
+  const configPath = env.tfactionConfig;
+  const workspace = env.getGitHubWorkspace();
   const raw = RawConfig.parse(load(fs.readFileSync(configPath, "utf8")));
   return await applyConfigDefaults(raw, configPath, workspace);
 };
