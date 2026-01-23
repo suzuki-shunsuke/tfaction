@@ -120,7 +120,7 @@ export const main = async () => {
     config,
   );
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
 

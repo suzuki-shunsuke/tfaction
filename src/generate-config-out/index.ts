@@ -40,7 +40,7 @@ export const main = async () => {
   );
 
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
 
@@ -50,7 +50,7 @@ export const main = async () => {
 
   // Run aqua i -l -a (install)
   const executor = await aqua.NewExecutor({
-    cwd: config.config_dir,
+    cwd: config.git_root_dir,
     githubToken,
   });
 

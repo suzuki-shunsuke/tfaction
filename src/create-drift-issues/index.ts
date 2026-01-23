@@ -73,7 +73,6 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
 
   const files = await lib.listWorkingDirFiles(
     cfg.git_root_dir,
-    cfg.config_dir,
     workingDirectoryFile,
   );
   const dirs: string[] = [];
@@ -87,7 +86,7 @@ const run = async (inputs: Inputs): Promise<Result | undefined> => {
   for (const [wd, target] of m) {
     const tg = await lib.getTargetGroup(cfg, target, wd);
     const wdConfig = lib.readTargetConfig(
-      path.join(cfg.config_dir, wd, cfg.working_directory_file),
+      path.join(cfg.git_root_dir, wd, cfg.working_directory_file),
     );
     if (lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
       targetWDMap.set(target, wd);

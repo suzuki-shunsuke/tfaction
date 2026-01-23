@@ -32,7 +32,7 @@ export const main = async () => {
   );
 
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
   const tfCommand = targetConfig.terraform_command;

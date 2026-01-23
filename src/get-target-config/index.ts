@@ -111,7 +111,7 @@ export const getTargetConfig = async (
     );
 
     const wdConfig = lib.readTargetConfig(
-      path.join(config.config_dir, workingDir, workingDirectoryFile),
+      path.join(config.git_root_dir, workingDir, workingDirectoryFile),
     );
     const jobConfig = lib.getJobConfig(
       wdConfig,

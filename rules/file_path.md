@@ -16,5 +16,5 @@ Therefore, we define the file path handling rules clearly here.
 - When executing git commands like `git ls-files`, cwd must be within the Git repository
   - If cwd is not specified, it defaults to github.workspace, but github.workspace may not be within the Git repository (e.g., when checking out to a parent directory of github.workspace), so cwd should be explicitly specified
 - The Git repository root directory is the directory containing tfaction-root.yaml, and its absolute path is obtained via `git rev-parse --show-toplevel`
-  - lib.GetGitRootDir
+  - To get the git root directory, call `lib.GetGitRootDir`
 - When creating commits using Securefix Action or Commit Action, root_dir is the Git root directory, and files are relative paths from the Git root directory

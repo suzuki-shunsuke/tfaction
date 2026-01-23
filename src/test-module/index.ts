@@ -26,8 +26,8 @@ export const main = async () => {
     );
   }
 
-  // github.workspace => working dir
-  const workingDir = path.join(config.config_dir, wd || target);
+  // absolute path to working dir
+  const workingDir = path.join(config.git_root_dir, wd || target);
 
   const workingDirFromGitRoot = path.relative(
     config.git_root_dir,

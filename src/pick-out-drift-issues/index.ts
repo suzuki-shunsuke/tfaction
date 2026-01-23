@@ -79,7 +79,6 @@ const listTargets = async (
 ): Promise<Map<string, string>> => {
   const files = await lib.listWorkingDirFiles(
     config.git_root_dir,
-    config.config_dir,
     config.working_directory_file,
   );
 
