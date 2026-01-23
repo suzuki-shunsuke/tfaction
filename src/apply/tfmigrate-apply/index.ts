@@ -27,7 +27,10 @@ export const main = async (): Promise<void> => {
     },
     cfg,
   );
-  const workingDir = path.join(cfg.config_dir, targetConfig.working_directory);
+  const workingDir = path.join(
+    cfg.git_root_dir,
+    targetConfig.working_directory,
+  );
   const driftIssueRepo = lib.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;

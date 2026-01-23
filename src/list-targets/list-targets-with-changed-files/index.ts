@@ -13,7 +13,7 @@ import {
 
 type TargetConfig = {
   target: string;
-  /** A relative path from tfaction-root.yaml */
+  /** A relative path from git_root_dir */
   working_directory: string;
   runs_on: string | string[];
   job_type: string;
@@ -64,22 +64,22 @@ type PullRequestPayload = {
 
 type Result = {
   targetConfigs: TargetConfig[];
-  /** A relative file paths from tfaction-root.yaml */
+  /** Relative file paths from git_root_dir */
   modules: string[];
 };
 
 type ModuleData = {
   /**
    * Map of modules and module callers. values call key.
-   * key: absolute path to module.
-   * value: relative paths from github.workspace to module caller.
+   * key: relative path from git_root_dir to module.
+   * value: relative paths from git_root_dir to module caller.
    * */
   moduleCallerMap: Map<string, string[]>;
-  /** Absolute paths to modules */
+  /** Relative paths from git_root_dir to modules */
   modules: string[];
-  /** Relative paths from tfaction-root.yaml to modules */
+  /** Relative paths from git_root_dir to modules */
   moduleDirs: string[];
-  /** Relative paths from tfaction-root.yaml to modules */
+  /** Relative paths from git_root_dir to modules */
   moduleSet: Set<string>;
 };
 
@@ -107,12 +107,12 @@ const prepareModuleData = (
   const moduleCallerMap: Map<string, string[]> = new Map(
     Object.entries(moduleCallers ?? {}),
   );
-  /** Absolute paths to modules */
+  /** Relative paths from git_root_dir to modules */
   const modules = [...moduleCallerMap.keys()];
   modules.sort();
   modules.reverse();
 
-  /** Relative paths from tfaction-root.yaml to modules */
+  /** Relative paths from git_root_dir to modules */
   const moduleDirs = moduleFiles.map((moduleFile) => {
     return path.dirname(moduleFile);
   });
@@ -332,13 +332,13 @@ type Input = {
   labels: string[];
   /** Absolute paths to changed files */
   changedFiles: string[];
-  /** Relative paths from tfaction-root.yaml */
+  /** Relative paths from git_root_dir */
   configFiles: string[];
-  /** Relative paths from tfaction-root.yaml */
+  /** Relative paths from git_root_dir */
   moduleFiles: string[];
   prBody: string;
   payload: Payload;
-  /** Absolute path to module => Relative paths from github.workspace to module callers */
+  /** Relative path from git_root_dir to module => Relative paths from git_root_dir to module callers */
   moduleCallers: ModuleToCallers | null;
   maxChangedWorkingDirectories: number;
   maxChangedModules: number;
@@ -348,8 +348,8 @@ type Input = {
 
 /**
  * Returns a list of working directories based on the provided config files.
- * @param configFiles - Relative paths from tfaction-root.yaml
- * @returns An array of working directories. Relative paths from tfaction-root.yaml
+ * @param configFiles - Relative paths from git_root_dir
+ * @returns An array of working directories. Relative paths from git_root_dir
  */
 const listWD = (configFiles: string[]): string[] => {
   const workingDirs = new Array<string>();
@@ -416,19 +416,17 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
 
   const configFiles = await lib.listWorkingDirFiles(
     cfg.git_root_dir,
-    cfg.config_dir,
     cfg.working_directory_file,
   );
   const modules = await lib.listWorkingDirFiles(
     cfg.git_root_dir,
-    cfg.config_dir,
     cfg.module_file,
   );
 
   let moduleCallers: ModuleToCallers | null = null;
   if (cfg.update_local_path_module_caller?.enabled) {
     moduleCallers = await listModuleCallers(
-      cfg.config_dir,
+      cfg.git_root_dir,
       configFiles,
       modules,
       executor,

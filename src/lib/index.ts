@@ -585,7 +585,6 @@ export const getTargetGroup = async (
   const wds: string[] = [];
   const files = await listWorkingDirFiles(
     gitRootDir,
-    configDir,
     config.working_directory_file,
   );
   for (const file of files) {
@@ -613,15 +612,14 @@ export const getTargetGroup = async (
 };
 
 /**
- *
- * @param gitRootDir
- * @param configDir
- * @param fileName
- * @returns A relative file paths from tfaction-root.yaml to the config directory
+ * List all files matching the pattern in the git repository.
+ * List files by git ls-files.
+ * @param gitRootDir - Absolute path to the git root directory
+ * @param fileName - File name pattern to search for
+ * @returns Relative file paths from git_root_dir
  */
 export const listWorkingDirFiles = async (
   gitRootDir: string,
-  configDir: string,
   fileName: string,
 ): Promise<string[]> => {
   const result = await exec.getExecOutput(
@@ -639,7 +637,7 @@ export const listWorkingDirFiles = async (
     if (line === "") {
       continue;
     }
-    arr.push(path.relative(configDir, line));
+    arr.push(line);
   }
   return arr;
 };

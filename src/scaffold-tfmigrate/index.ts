@@ -195,7 +195,7 @@ export const main = async () => {
   );
 
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
   const target = targetConfig.target;
@@ -222,12 +222,12 @@ export const main = async () => {
   let branch = generateBranchName(target, prNumber);
   if (prNumber) {
     await executor.exec("gh", ["pr", "checkout", prNumber], {
-      cwd: config.config_dir,
+      cwd: config.git_root_dir,
       env: {
         GITHUB_TOKEN: githubToken,
       },
     });
-    branch = await git.getCurrentBranch(config.config_dir);
+    branch = await git.getCurrentBranch(config.git_root_dir);
   }
 
   // Create directory

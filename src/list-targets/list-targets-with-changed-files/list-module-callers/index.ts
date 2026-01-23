@@ -18,7 +18,7 @@ export const main = async (executor: aqua.Executor, cfg: lib.Config) => {
     .split("\n");
 
   const moduleCallers = await list(
-    cfg.config_dir,
+    cfg.git_root_dir,
     configFiles,
     moduleFiles,
     executor,
@@ -32,23 +32,23 @@ export const main = async (executor: aqua.Executor, cfg: lib.Config) => {
 };
 
 /**
- *
- * @param configDir
- * @param configFiles
- * @param moduleFiles
+ * List module callers in the git repository.
+ * @param gitRootDir - Absolute path to the git root directory
+ * @param configFiles - Relative file paths from git_root_dir to config files
+ * @param moduleFiles - Relative file paths from git_root_dir to module files
  * @param executor
- * @returns Absolute path to module => Relative paths from github.workspace to module callers
+ * @returns Relative path to module from git_root_dir => Relative paths from git_root_dir to module callers
  */
 export const list = async (
-  configDir: string,
-  /** relative file paths from tfaction-root.yaml */
+  gitRootDir: string,
+  /** relative file paths from git_root_dir */
   configFiles: string[],
-  /** relative file paths from tfaction-root.yaml */
+  /** relative file paths from git_root_dir */
   moduleFiles: string[],
   executor: aqua.Executor,
 ): Promise<ModuleToCallers> => {
   /**
-   * key: relative path from github.workspace to module caller
+   * key: relative path from git_root_dir to module caller
    * value: List of relative paths from module caller to module
    */
   const rawModuleCalls: Record<string, Array<string>> = {};
@@ -56,8 +56,8 @@ export const list = async (
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
 
   for (const tfFile of configFiles) {
-    /** relative path from github.workspace to working directory */
-    const tfDir = path.join(configDir, path.dirname(tfFile));
+    /** absolute path to working directory */
+    const tfDir = path.join(gitRootDir, path.dirname(tfFile));
     if (!fs.existsSync(path.join(tfDir, "terragrunt.hcl"))) {
       continue;
     }
@@ -125,8 +125,8 @@ export const list = async (
       continue;
     }
 
-    /** relative path from github.workspace to working directory */
-    const tfDir = path.join(configDir, path.dirname(tfFile));
+    /** absolute path to working directory */
+    const tfDir = path.join(gitRootDir, path.dirname(tfFile));
 
     const outInspect = await executor.getExecOutput(
       "terraform-config-inspect",
@@ -157,31 +157,31 @@ export const list = async (
       rawModuleCalls[tfDir].push(...arr);
     }
   }
-  /** Absolute path to module => Relative paths from github.workspace to module callers */
+  /** Relative path to module from git_root_dir => Relative paths from git_root_dir to module callers */
   return buildModuleToCallers(resolveRelativeCallTree(rawModuleCalls));
 };
 
 /**
  * Maps a directory that uses modules to the list of modules it uses.
- * key: A relative path from github.workspace to module caller. A directory calling modules.
- * value: absolute paths to modules. Modules that the key calls.
+ * key: A relative path from git_root_dir to module caller. A directory calling modules.
+ * value: relative paths from git_root_dir to modules. Modules that the key calls.
  */
 type ModuleCalls = Record<string, string[]>;
 
 /**
  * Maps a module to the list of directories that use it.
- * key: absolute path to module. A module that is called.
- * value: relative paths from github.workspace to module caller. Directories calling the key.
+ * key: relative path from git_root_dir to module. A module that is called.
+ * value: relative paths from git_root_dir to module caller. Directories calling the key.
  */
 export type ModuleToCallers = Record<string, string[]>;
 
 /**
- * Resolves relative module paths to normalized absolute-style paths.
+ * Resolves relative module paths to normalized paths.
  * For example, if a module at "foo/bar" calls "../shared", this function
  * resolves it to "foo/shared".
  *
- * @param rawModuleCalls - A relative path from github.workspace to module caller => relative paths from module caller to modules
- * @returns A relative path from github.workspace to module caller => absolute paths to modules
+ * @param rawModuleCalls - A relative path from git_root_dir to module caller => relative paths from module caller to modules
+ * @returns A relative path from git_root_dir to module caller => relative paths from git_root_dir to modules
  */
 export function resolveRelativeCallTree(
   rawModuleCalls: ModuleCalls,
@@ -204,8 +204,8 @@ export function resolveRelativeCallTree(
  * Recursively finds all directories that call the specified module,
  * including both direct and indirect callers.
  *
- * @param moduleCalls - A relative path from github.workspace to module caller => absolute paths to modules
- * @param module - Absolute path to module path
+ * @param moduleCalls - A relative path from git_root_dir to module caller => relative paths from git_root_dir to modules
+ * @param module - Relative path from git_root_dir to module
  * @returns An array of all directories that directly or indirectly call the module
  */
 const findCallers = (moduleCalls: ModuleCalls, module: string): string[] => {
@@ -226,14 +226,14 @@ const findCallers = (moduleCalls: ModuleCalls, module: string): string[] => {
  * This is useful for determining which directories are affected
  * when a module is changed.
  *
- * @param moduleCalls - A relative path from github.workspace to module caller => absolute paths to modules
- * @returns Absolute path to module => Relative paths from github.workspace to module callers
+ * @param moduleCalls - A relative path from git_root_dir to module caller => relative paths from git_root_dir to modules
+ * @returns Relative path from git_root_dir to module => Relative paths from git_root_dir to module callers
  */
 export const buildModuleToCallers = (
   moduleCalls: ModuleCalls,
 ): ModuleToCallers => {
   const moduleToCallers: ModuleToCallers = {};
-  /** absolute paths to modules */
+  /** relative paths from git_root_dir to modules */
   const modules = [...new Set(Object.values(moduleCalls).flat())];
   for (const module of modules) {
     if (!moduleToCallers[module]) {

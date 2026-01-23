@@ -43,8 +43,7 @@ export const main = async () => {
       const workingDir = targetConfig.working_directory;
       if (workingDir) {
         const tfmigrateHclPath = path.join(
-          config.workspace,
-          config.config_dir,
+          config.git_root_dir,
           workingDir,
           ".tfmigrate.hcl",
         );

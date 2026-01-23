@@ -8,8 +8,8 @@ import tmp from "tmp";
 import { globSync } from "glob";
 
 type Inputs = {
-  /** A relative path from github.workspace to the directory where tfaction-root.yaml is located */
-  configDir: string;
+  /** Absolute path to the git root directory */
+  gitRootDir: string;
   githubToken: string;
   plan: boolean;
   planJsonPath?: string;
@@ -56,15 +56,13 @@ const getConftestPaths = (
  *
  * @param policy
  * @param target
- * @param configDir A relative path from github.workspace to a directory where tfaction-root.yaml is located
- * @param workingDir A relative path from configDir to a working directory
+ * @param workingDir A relative path from git_root_dir to a working directory
  * @param paths
  * @returns
  */
 const buildConftestArgs = (
   policy: lib.ConftestPolicyConfig,
   target: string,
-  configDir: string,
   workingDir: string,
   paths: string[],
 ): string[] => {
@@ -226,7 +224,7 @@ export const run = async (
   const executor = inputs.executor;
 
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
   const wdConfig = lib.readTargetConfig(
@@ -266,7 +264,6 @@ export const run = async (
     const args = buildConftestArgs(
       policy,
       targetConfig.target,
-      inputs.configDir,
       targetConfig.working_directory,
       paths,
     );

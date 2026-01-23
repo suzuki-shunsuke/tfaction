@@ -351,7 +351,7 @@ export const main = async (
 ): Promise<void> => {
   const config = await lib.getConfig();
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
 
@@ -407,7 +407,7 @@ export const main = async (
   if (planJsonPath) {
     await conftest.run(
       {
-        configDir: config.config_dir,
+        gitRootDir: config.git_root_dir,
         githubToken: input.githubToken,
         plan: true,
         planJsonPath,
