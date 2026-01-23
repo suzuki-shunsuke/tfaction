@@ -3,10 +3,11 @@ import { Octokit } from "@octokit/core";
 import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import * as lib from "../../lib";
 import * as types from "../../lib/types";
+import * as drift from "../../lib/drift";
 import * as git from "../../lib/git";
 import * as path from "path";
 
-export type Issue = lib.Issue;
+export type Issue = drift.Issue;
 
 export type Result = {
   number: number;
@@ -131,7 +132,7 @@ export type CreateIssueFn = (
   ghToken: string,
   repoOwner: string,
   repoName: string,
-) => Promise<lib.Issue>;
+) => Promise<drift.Issue>;
 
 export type ListWorkingDirFilesFn = (
   gitRootDir: string,
@@ -156,15 +157,15 @@ export type RunDependencies = {
   listWorkingDirFiles: ListWorkingDirFilesFn;
   getTargetGroup: GetTargetGroupFn;
   readTargetConfig: ReadTargetConfigFn;
-  checkDriftDetectionEnabled: typeof lib.checkDriftDetectionEnabled;
+  checkDriftDetectionEnabled: typeof drift.checkDriftDetectionEnabled;
 };
 
 export const defaultDependencies: RunDependencies = {
-  createIssue: lib.createIssue,
+  createIssue: drift.createIssue,
   listWorkingDirFiles: git.listWorkingDirFiles,
   getTargetGroup: lib.getTargetGroup,
   readTargetConfig: lib.readTargetConfig,
-  checkDriftDetectionEnabled: lib.checkDriftDetectionEnabled,
+  checkDriftDetectionEnabled: drift.checkDriftDetectionEnabled,
 };
 
 export const run = async (

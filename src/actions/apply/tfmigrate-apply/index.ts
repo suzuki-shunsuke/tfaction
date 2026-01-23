@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as lib from "../../../lib";
+import * as drift from "../../../lib/drift";
 import * as env from "../../../lib/env";
 import * as input from "../../../lib/input";
 import * as aqua from "../../../aqua";
@@ -31,7 +32,7 @@ export const main = async (): Promise<void> => {
     cfg.git_root_dir,
     targetConfig.working_directory,
   );
-  const driftIssueRepo = lib.getDriftIssueRepo(cfg);
+  const driftIssueRepo = drift.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;
   const ciInfoPrNumber = env.ciInfoPrNumber;
