@@ -5,6 +5,7 @@ import * as path from "path";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
+import * as git from "../../lib/git";
 import { run } from "./run";
 
 // Check if drift detection is enabled
@@ -77,7 +78,7 @@ const getTargetByWorkingDirectory = (
 const listTargets = async (
   config: lib.Config,
 ): Promise<Map<string, string>> => {
-  const files = await lib.listWorkingDirFiles(
+  const files = await git.listWorkingDirFiles(
     config.git_root_dir,
     config.working_directory_file,
   );

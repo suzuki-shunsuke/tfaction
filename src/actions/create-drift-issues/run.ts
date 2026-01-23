@@ -2,6 +2,7 @@ import * as github from "@actions/github";
 import { Octokit } from "@octokit/core";
 import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import * as lib from "../../lib";
+import * as git from "../../lib/git";
 import * as path from "path";
 
 export type Issue = lib.Issue;
@@ -159,7 +160,7 @@ export type RunDependencies = {
 
 export const defaultDependencies: RunDependencies = {
   createIssue: lib.createIssue,
-  listWorkingDirFiles: lib.listWorkingDirFiles,
+  listWorkingDirFiles: git.listWorkingDirFiles,
   getTargetGroup: lib.getTargetGroup,
   readTargetConfig: lib.readTargetConfig,
   checkDriftDetectionEnabled: lib.checkDriftDetectionEnabled,

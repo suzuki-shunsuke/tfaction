@@ -5,6 +5,7 @@ import * as path from "path";
 import * as lib from "../../../lib";
 import * as env from "../../../lib/env";
 import * as input from "../../../lib/input";
+import * as git from "../../../lib/git";
 import * as aqua from "../../../aqua";
 import * as ciInfo from "../../../ci-info";
 import {
@@ -415,11 +416,11 @@ const handleLabels = (
 export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   const cfg = await lib.getConfig();
 
-  const configFiles = await lib.listWorkingDirFiles(
+  const configFiles = await git.listWorkingDirFiles(
     cfg.git_root_dir,
     cfg.working_directory_file,
   );
-  const modules = await lib.listWorkingDirFiles(
+  const modules = await git.listWorkingDirFiles(
     cfg.git_root_dir,
     cfg.module_file,
   );

@@ -97,3 +97,34 @@ export const hasFileChangedPorcelain = async (
   });
   return output.trim().length > 0;
 };
+
+/**
+ * List all files matching the pattern in the git repository.
+ * List files by git ls-files.
+ * @param gitRootDir - Absolute path to the git root directory
+ * @param fileName - File name pattern to search for
+ * @returns Relative file paths from git_root_dir
+ */
+export const listWorkingDirFiles = async (
+  gitRootDir: string,
+  fileName: string,
+): Promise<string[]> => {
+  const result = await exec.getExecOutput(
+    "git",
+    ["ls-files", `*/${fileName}`],
+    {
+      ignoreReturnCode: true,
+      silent: true,
+      cwd: gitRootDir,
+    },
+  );
+
+  const arr: string[] = [];
+  for (const line of result.stdout.split("\n").map((l) => l.trim())) {
+    if (line === "") {
+      continue;
+    }
+    arr.push(line);
+  }
+  return arr;
+};
