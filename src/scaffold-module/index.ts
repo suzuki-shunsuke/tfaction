@@ -61,7 +61,10 @@ export const main = async () => {
   }
 
   const modulePath = path.join(config.git_root_dir, env.tfactionModulePath);
-  const templateDir = path.join(config.git_root_dir, env.tfactionModuleTemplateDir);
+  const templateDir = path.join(
+    config.git_root_dir,
+    env.tfactionModuleTemplateDir,
+  );
 
   // Check if module path already exists
   if (fs.existsSync(modulePath)) {
