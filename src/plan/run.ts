@@ -5,8 +5,6 @@ import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
 import * as aqua from "../aqua";
 import * as lib from "../lib";
-import * as env from "../lib/env";
-import * as input from "../lib/input";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../conftest";
 
@@ -23,6 +21,14 @@ type Inputs = {
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
   executor: aqua.Executor;
+};
+
+export type RunInputs = {
+  githubToken: string;
+  jobType: string;
+  driftIssueNumber?: string;
+  prAuthor?: string;
+  ciInfoTempDir?: string;
 };
 
 type TerraformPlanOutputs = {
@@ -348,6 +354,7 @@ export const runTerraformPlan = async (
 
 export const main = async (
   targetConfig: getTargetConfig.TargetConfig,
+  runInputs: RunInputs,
 ): Promise<void> => {
   const config = await lib.getConfig();
   const workingDir = path.join(
@@ -356,27 +363,27 @@ export const main = async (
   );
 
   const executor = await aqua.NewExecutor({
-    githubToken: input.githubToken,
+    githubToken: runInputs.githubToken,
     cwd: workingDir,
   });
 
   const inputs: Inputs = {
-    githubToken: input.githubToken,
+    githubToken: runInputs.githubToken,
     workingDirectory: workingDir,
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.destroy || false,
     tfCommand: targetConfig.terraform_command || "terraform",
     target: targetConfig.target,
-    driftIssueNumber: env.tfactionDriftIssueNumber || undefined,
-    prAuthor: env.ciInfoPrAuthor || undefined,
-    ciInfoTempDir: env.ciInfoTempDir || undefined,
+    driftIssueNumber: runInputs.driftIssueNumber,
+    prAuthor: runInputs.prAuthor,
+    ciInfoTempDir: runInputs.ciInfoTempDir,
     s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
     executor,
   };
 
-  const jobType = env.tfactionJobType;
+  const jobType = runInputs.jobType;
 
   let planJsonPath: string | undefined;
 
@@ -408,7 +415,7 @@ export const main = async (
     await conftest.run(
       {
         gitRootDir: config.git_root_dir,
-        githubToken: input.githubToken,
+        githubToken: runInputs.githubToken,
         plan: true,
         planJsonPath,
         executor,

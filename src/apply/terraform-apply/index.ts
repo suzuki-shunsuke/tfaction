@@ -62,7 +62,7 @@ export const main = async (): Promise<void> => {
       target: env.tfactionTarget,
       workingDir: env.tfactionWorkingDir,
       isApply: true,
-      jobType: lib.getJobType(),
+      jobType: env.getJobType(),
     },
     cfg,
   );

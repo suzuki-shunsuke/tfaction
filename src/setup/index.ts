@@ -114,8 +114,8 @@ export const main = async () => {
     {
       target: env.tfactionTarget,
       workingDir: env.tfactionWorkingDir,
-      isApply: lib.getIsApply(),
-      jobType: lib.getJobType(),
+      isApply: env.getIsApply(),
+      jobType: env.getJobType(),
     },
     config,
   );
@@ -155,7 +155,11 @@ export const main = async () => {
   if (isPR && config.aqua?.update_checksum?.enabled) {
     try {
       core.info("updating checksum");
-      await aquaUpdateChecksum.main(executor, workingDir, config);
+      await aquaUpdateChecksum.main(executor, workingDir, config, {
+        githubToken: githubToken,
+        securefixActionAppId: input.securefixActionAppId,
+        securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
+      });
     } catch (error) {
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {

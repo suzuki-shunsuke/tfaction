@@ -3,23 +3,13 @@ import * as fs from "fs";
 import * as path from "path";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
-import * as env from "../../lib/env";
-import * as input from "../../lib/input";
 import * as git from "../../lib/git";
 import * as commit from "../../commit";
 
-type Inputs = {
+export type Inputs = {
   githubToken: string;
   securefixActionAppId: string;
   securefixActionAppPrivateKey: string;
-};
-
-const getInputs = (): Inputs => {
-  return {
-    githubToken: input.githubToken || env.githubToken,
-    securefixActionAppId: input.securefixActionAppId,
-    securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
-  };
 };
 
 /**
@@ -95,8 +85,8 @@ export const main = async (
   executor: aqua.Executor,
   workingDir: string,
   cfg: lib.Config,
+  inputs: Inputs,
 ) => {
-  const inputs = getInputs();
   await runAquaUpdateChecksum(
     executor,
     workingDir,

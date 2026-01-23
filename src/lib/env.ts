@@ -1,3 +1,5 @@
+import { JobType } from "./index";
+
 export const path = process.env.PATH ?? "";
 
 // GitHub Actions
@@ -50,3 +52,21 @@ export const aquaGlobalConfigEnv = process.env.AQUA_GLOBAL_CONFIG ?? "";
 export const targetConfig = process.env.TARGET_CONFIG ?? "";
 export const globalConfig = process.env.GLOBAL_CONFIG ?? "";
 export const listModuleCallers = process.env.LIST_MODULE_CALLERS ?? "";
+
+// Input retrieval functions
+
+export const getJobType = (): JobType => {
+  const jobType = process.env.TFACTION_JOB_TYPE ?? "";
+  if (!jobType) {
+    throw new Error("environment variable TFACTION_JOB_TYPE is required");
+  }
+  return JobType.parse(jobType);
+};
+
+export const getIsApply = (): boolean => {
+  return (process.env.TFACTION_IS_APPLY ?? "") === "true";
+};
+
+export const getGitHubWorkspace = (): string => {
+  return process.env.GITHUB_WORKSPACE || process.cwd();
+};
