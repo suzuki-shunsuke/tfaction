@@ -36,7 +36,13 @@ export const main = async () => {
 
   // Step 4: Run plan if not skipped
   if (!skipTerraform) {
-    await runPlan(targetConfig);
+    await runPlan(targetConfig, {
+      githubToken: input.githubToken,
+      jobType: jobType,
+      driftIssueNumber: driftIssueNumber || undefined,
+      prAuthor: env.ciInfoPrAuthor || undefined,
+      ciInfoTempDir: env.ciInfoTempDir || undefined,
+    });
 
     // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)
     if (jobType === "tfmigrate") {
