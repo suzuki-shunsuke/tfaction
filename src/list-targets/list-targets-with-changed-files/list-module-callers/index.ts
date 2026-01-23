@@ -47,23 +47,22 @@ export const list = async (
   moduleFiles: string[],
   executor: aqua.Executor,
 ): Promise<ModuleToCallers> => {
-  /**
-   * key: relative path from git_root_dir to module caller
-   * value: List of relative paths from module caller to module
-   */
-  const rawModuleCalls: Record<string, Array<string>> = {};
+  const rawModuleCalls: ModuleCalls = {};
 
+  /** Relative paths from git root dir to working directories and modules */
   const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
 
   for (const tfFile of configFiles) {
+    /** A relative path from git_root_dir to module caller */
+    const tfDir = path.dirname(tfFile);
     /** absolute path to working directory */
-    const tfDir = path.join(gitRootDir, path.dirname(tfFile));
-    if (!fs.existsSync(path.join(tfDir, "terragrunt.hcl"))) {
+    const absTfDir = path.join(gitRootDir, path.dirname(tfFile));
+    if (!fs.existsSync(path.join(absTfDir, "terragrunt.hcl"))) {
       continue;
     }
     const tmpobj = tmp.fileSync();
     await executor.exec("aqua", ["i", "-l", "-a"], {
-      cwd: tfDir,
+      cwd: absTfDir,
     });
 
     // Check terragrunt version
@@ -71,7 +70,7 @@ export const list = async (
       "terragrunt",
       ["--version"],
       {
-        cwd: tfDir,
+        cwd: absTfDir,
         silent: true,
       },
     );
@@ -99,7 +98,7 @@ export const list = async (
     }
 
     await executor.exec("terragrunt", terragruntArgs.concat(tmpobj.name), {
-      cwd: tfDir,
+      cwd: absTfDir,
     });
     /** A relative path from working directory to module dir */
     const source = JSON.parse(fs.readFileSync(tmpobj.name, "utf8")).terraform
@@ -111,7 +110,8 @@ export const list = async (
       source.startsWith("." + path.sep) ||
       source.startsWith(".." + path.sep)
     ) {
-      const normalizedSource = path.normalize(source);
+      /** A relative path from git root dir to source */
+      const normalizedSource = path.join(tfDir, source);
       if (rawModuleCalls[tfDir] === undefined) {
         rawModuleCalls[tfDir] = [normalizedSource];
       } else {
@@ -125,19 +125,21 @@ export const list = async (
       continue;
     }
 
+    /** a relative path from git_root_dir to module caller */
+    const tfDir = path.dirname(tfFile);
     /** absolute path to working directory */
-    const tfDir = path.join(gitRootDir, path.dirname(tfFile));
+    const absTfDir = path.join(gitRootDir, tfDir);
 
     const outInspect = await executor.getExecOutput(
       "terraform-config-inspect",
       ["--json"],
       {
-        cwd: tfDir,
+        cwd: absTfDir,
       },
     );
     const inspection = JSON.parse(outInspect.stdout);
 
-    /** List of relative paths from module caller to module */
+    /** List of relative paths from git_root_dir to modules */
     const arr = Object.values(
       inspection["module_calls"] as Record<string, { source: string }>,
     ).flatMap((module) => {
@@ -146,7 +148,7 @@ export const list = async (
         source.startsWith("." + path.sep) ||
         source.startsWith(".." + path.sep)
       ) {
-        return [source];
+        return [path.join(tfDir, source)];
       } else {
         return [];
       }
@@ -157,8 +159,7 @@ export const list = async (
       rawModuleCalls[tfDir].push(...arr);
     }
   }
-  /** Relative path to module from git_root_dir => Relative paths from git_root_dir to module callers */
-  return buildModuleToCallers(resolveRelativeCallTree(rawModuleCalls));
+  return buildModuleToCallers(rawModuleCalls);
 };
 
 /**
@@ -174,31 +175,6 @@ type ModuleCalls = Record<string, string[]>;
  * value: relative paths from git_root_dir to module caller. Directories calling the key.
  */
 export type ModuleToCallers = Record<string, string[]>;
-
-/**
- * Resolves relative module paths to normalized paths.
- * For example, if a module at "foo/bar" calls "../shared", this function
- * resolves it to "foo/shared".
- *
- * @param rawModuleCalls - A relative path from git_root_dir to module caller => relative paths from module caller to modules
- * @returns A relative path from git_root_dir to module caller => relative paths from git_root_dir to modules
- */
-export function resolveRelativeCallTree(
-  rawModuleCalls: ModuleCalls,
-): ModuleCalls {
-  const moduleCalls: ModuleCalls = {};
-  for (const [module, thisChildren] of Object.entries(rawModuleCalls)) {
-    const absModulePath = path.resolve("/", module);
-    const resolvedChildModules = [];
-    for (const child of thisChildren) {
-      const absChildPath = path.resolve(absModulePath, child);
-      const resolved = path.relative("/", absChildPath);
-      resolvedChildModules.push(resolved);
-    }
-    moduleCalls[module] = resolvedChildModules;
-  }
-  return moduleCalls;
-}
 
 /**
  * Recursively finds all directories that call the specified module,
@@ -226,7 +202,7 @@ const findCallers = (moduleCalls: ModuleCalls, module: string): string[] => {
  * This is useful for determining which directories are affected
  * when a module is changed.
  *
- * @param moduleCalls - A relative path from git_root_dir to module caller => relative paths from git_root_dir to modules
+ * @param moduleCalls
  * @returns Relative path from git_root_dir to module => Relative paths from git_root_dir to module callers
  */
 export const buildModuleToCallers = (

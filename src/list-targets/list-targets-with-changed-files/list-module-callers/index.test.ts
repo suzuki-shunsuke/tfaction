@@ -1,75 +1,5 @@
-import { resolveRelativeCallTree, buildModuleToCallers } from "./";
+import { buildModuleToCallers } from "./";
 import { expect, describe, it } from "vitest";
-
-describe("resolveRelativeCallTree", () => {
-  it("resolves relative paths in terraform-config-inspect", () => {
-    const actual = resolveRelativeCallTree({
-      "modules/a": ["../b/v2", "../c", "../../d"],
-      "modules/c": ["../e"],
-      d: ["../modules/g"],
-    });
-    expect(actual).toEqual({
-      // caller : [caller, ...]
-      "modules/a": ["modules/b/v2", "modules/c", "d"],
-      "modules/c": ["modules/e"],
-      d: ["modules/g"],
-    });
-  });
-
-  it("handles empty input", () => {
-    const actual = resolveRelativeCallTree({});
-    expect(actual).toEqual({});
-  });
-
-  it("handles single module with no children", () => {
-    const actual = resolveRelativeCallTree({
-      "modules/a": [],
-    });
-    expect(actual).toEqual({
-      "modules/a": [],
-    });
-  });
-
-  it("handles current directory reference", () => {
-    const actual = resolveRelativeCallTree({
-      "modules/a": ["./submodule", "./nested/deep"],
-    });
-    expect(actual).toEqual({
-      "modules/a": ["modules/a/submodule", "modules/a/nested/deep"],
-    });
-  });
-
-  it("handles deeply nested paths", () => {
-    const actual = resolveRelativeCallTree({
-      "a/b/c/d/e": ["../../../shared", "../../../../common"],
-    });
-    expect(actual).toEqual({
-      "a/b/c/d/e": ["a/b/shared", "a/common"],
-    });
-  });
-
-  it("handles root level modules", () => {
-    const actual = resolveRelativeCallTree({
-      terraform: ["../modules/vpc", "../modules/iam"],
-    });
-    expect(actual).toEqual({
-      terraform: ["modules/vpc", "modules/iam"],
-    });
-  });
-
-  it("handles multiple modules calling same target", () => {
-    const actual = resolveRelativeCallTree({
-      "app/dev": ["../../modules/shared"],
-      "app/prod": ["../../modules/shared"],
-      "web/dev": ["../../modules/shared"],
-    });
-    expect(actual).toEqual({
-      "app/dev": ["modules/shared"],
-      "app/prod": ["modules/shared"],
-      "web/dev": ["modules/shared"],
-    });
-  });
-});
 
 describe("buildModuleToCallers", () => {
   // Input (moduleCalls):
@@ -80,16 +10,15 @@ describe("buildModuleToCallers", () => {
   //   value: relative paths from github.workspace to module callers
 
   it("creates a map from callee to its direct callers and transitive callers", () => {
-    const actual = buildModuleToCallers(
-      resolveRelativeCallTree({
-        // These are working directories or modules that call other modules
-        "modules/a": ["../b/v2", "../c", "../../d"],
-        "modules/c": ["../e"],
-        "modules/e": ["../f"],
-        d: ["../modules/g"],
-        "modules/x": ["../b/v2", "../e"],
-      }),
-    );
+    const actual = buildModuleToCallers({
+      // These are working directories or modules that call other modules
+      // All paths are relative from git_root_dir (already normalized)
+      "modules/a": ["modules/b/v2", "modules/c", "d"],
+      "modules/c": ["modules/e"],
+      "modules/e": ["modules/f"],
+      d: ["modules/g"],
+      "modules/x": ["modules/b/v2", "modules/e"],
+    });
     expect(actual).toEqual({
       // module : [callers...]
       "modules/b/v2": ["modules/a", "modules/x"],
