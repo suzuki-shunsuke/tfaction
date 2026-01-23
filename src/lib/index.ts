@@ -632,7 +632,7 @@ export const listWorkingDirFiles = async (
   return arr;
 };
 
-type Issue = {
+export type Issue = {
   url: string;
   number: number;
   state: string;
