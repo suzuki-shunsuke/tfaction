@@ -79,9 +79,9 @@ const buildConftestArgs = (
   ];
 
   if (typeof policy.policy === "string") {
-    // workingDir => policy
-    // policy.policy configDir => policy
-    // workingDir configDir => workingDir
+    // workingDir: relative path from git_root_dir
+    // policy.policy: relative path from git_root_dir
+    // result: relative path from workingDir to policy
     args.push("-p", path.relative(workingDir, policy.policy));
   } else if (policy.policy) {
     for (const p of policy.policy) {
