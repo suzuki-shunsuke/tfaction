@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import { main } from "./run";
 import * as testAction from "./test-action";
 import * as testActionTerragrunt from "./test-action-terragrunt";
-import { generateJSONSchema } from "./lib";
+import { generateJSONSchema } from "./lib/json_schema";
 import * as env from "./lib/env";
 import * as input from "./lib/input";
 

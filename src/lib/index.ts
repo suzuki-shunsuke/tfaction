@@ -34,20 +34,6 @@ export const aquaConfig = path.join(
   "aqua.yaml",
 );
 
-export const generateJSONSchema = (dir: string) => {
-  const configJSONSchema = z.toJSONSchema(RawConfig);
-  fs.writeFileSync(
-    path.join(dir, "tfaction-root.json"),
-    JSON.stringify(configJSONSchema, null, 2),
-  );
-
-  const targetConfigJSONSchema = z.toJSONSchema(TargetConfig);
-  fs.writeFileSync(
-    path.join(dir, "tfaction.json"),
-    JSON.stringify(targetConfigJSONSchema, null, 2),
-  );
-};
-
 export const applyConfigDefaults = async (
   raw: z.input<typeof RawConfig>,
   configPath: string,
