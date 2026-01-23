@@ -3,6 +3,7 @@ node_modules
 .DS_Store
 build
 dist
+coverage
 .terraform
 schema
 terragrunt.rendered.json
