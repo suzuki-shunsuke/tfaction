@@ -13,7 +13,7 @@ terraform_command: tofu
 
 conftest:
   policies:
-    - policy: ../conftest/policy
+    - policy: tests/conftest/policy
       tf: true
 
 update_local_path_module_caller:
@@ -50,4 +50,4 @@ replace_target:
       replace: /
 
 target_groups:
-  - working_directory: ""
+  - working_directory: tests/opentofu

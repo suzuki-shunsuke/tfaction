@@ -11,9 +11,9 @@ providers_lock_opts: -platform=linux_amd64 -platform=darwin_amd64
 
 conftest:
   policies:
-    - policy: conftest/policy/hcl
+    - policy: tests/conftest/policy/hcl
       tf: true
-    - policy: conftest/policy/plan
+    - policy: tests/conftest/policy/plan
       plan: true
 
 update_local_path_module_caller:
@@ -50,10 +50,10 @@ replace_target:
       replace: /
 
 target_groups:
-  - working_directory: ""
+  - working_directory: tests
     aws_region: ap-northeast-1
     s3_bucket_name_tfmigrate_history: 0000-0000-0000-suzuki-shunsuke-tfmigrate-history
-    template_dir: templates/github
+    template_dir: tests/templates/github
     terraform_plan_config:
       aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_plan
     tfmigrate_plan_config:
