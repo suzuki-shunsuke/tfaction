@@ -130,13 +130,13 @@ jobs:
         env:
           - key: terraform
             TFACTION_CONFIG: yoo/tests/tfaction-root.yaml
-            TFACTION_WORKING_DIR: yoo/tests/foo-2
+            TFACTION_WORKING_DIR: tests/foo-2
           - key: opentofu
-            TFACTION_WORKING_DIR: yoo/tests/opentofu/bar-2
             TFACTION_CONFIG: yoo/tests/opentofu/tfaction-root.yaml
+            TFACTION_WORKING_DIR: tests/opentofu/bar-2
           - key: terragrunt
             TFACTION_CONFIG: yoo/tests/terragrunt/tfaction-root.yaml
-            TFACTION_WORKING_DIR: yoo/tests/terragrunt/zoo-2
+            TFACTION_WORKING_DIR: tests/terragrunt/zoo-2
     env:
       TFACTION_CONFIG: ${{matrix.env.TFACTION_CONFIG}}
       TFACTION_WORKING_DIR: ${{matrix.env.TFACTION_WORKING_DIR}}
