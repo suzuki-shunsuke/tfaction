@@ -3,11 +3,11 @@ import { expect, describe, it } from "vitest";
 
 describe("buildModuleToCallers", () => {
   // Input (moduleCalls):
-  //   key: relative path from github.workspace to module caller (working directory)
-  //   value: absolute paths to modules (modules being called)
+  //   key: relative path from git_root_dir to module caller (working directory)
+  //   value: relative paths from git_root_dir to modules (modules being called)
   // Output (ModuleToCallers):
-  //   key: absolute path to module
-  //   value: relative paths from github.workspace to module callers
+  //   key: relative path from git_root_dir to module
+  //   value: relative paths from git_root_dir to module callers
 
   it("creates a map from callee to its direct callers and transitive callers", () => {
     const actual = buildModuleToCallers({
