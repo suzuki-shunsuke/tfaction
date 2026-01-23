@@ -32,10 +32,10 @@ modules:
 ## Usage
 
 ```yaml
-  setup:
-    outputs:
-      targets: ${{steps.list-targets.outputs.targets}}
-      modules: ${{steps.list-targets.outputs.modules}}
+setup:
+  outputs:
+    targets: ${{steps.list-targets.outputs.targets}}
+    modules: ${{steps.list-targets.outputs.modules}}
 ```
 
 ```yaml
