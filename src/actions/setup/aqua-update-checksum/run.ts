@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import * as fs from "fs";
 import * as path from "path";
 import * as aqua from "../../../aqua";
-import * as lib from "../../../lib";
+import * as types from "../../../lib/types";
 import * as git from "../../../lib/git";
 import * as commit from "../../../commit";
 
@@ -84,7 +84,7 @@ const checkIfChanged = async (
 export const main = async (
   executor: aqua.Executor,
   workingDir: string,
-  cfg: lib.Config,
+  cfg: types.Config,
   inputs: Inputs,
 ) => {
   await runAquaUpdateChecksum(

@@ -6,6 +6,7 @@ import Handlebars from "handlebars";
 import { z } from "zod";
 
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
@@ -112,7 +113,7 @@ interface GeneratePRParamsInput {
 }
 
 const generatePRParams = (
-  cfg: lib.Config,
+  cfg: types.Config,
   targetConfig: TargetConfig,
   input: GeneratePRParamsInput,
 ): PRParams => {

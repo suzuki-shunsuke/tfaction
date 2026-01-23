@@ -1,4 +1,5 @@
-import { JobType } from "./index";
+import { JobType } from "./types";
+import { aquaConfig } from "./index";
 
 export const path = process.env.PATH ?? "";
 
@@ -44,9 +45,14 @@ export const ciInfoPrAuthor = process.env.CI_INFO_PR_AUTHOR ?? "";
 
 // tools
 export const tfmigrateExecPath = process.env.TFMIGRATE_EXEC_PATH ?? "";
-export const aquaRootDir = process.env.AQUA_ROOT_DIR ?? "";
 export const xdgDataHome = process.env.XDG_DATA_HOME ?? "";
+
+// aqua
+export const aquaRootDir = process.env.AQUA_ROOT_DIR ?? "";
 export const aquaGlobalConfigEnv = process.env.AQUA_GLOBAL_CONFIG ?? "";
+export const aquaGlobalConfig = aquaGlobalConfigEnv
+  ? `${aquaGlobalConfigEnv}:${aquaConfig}`
+  : aquaConfig;
 
 // tests
 export const targetConfig = process.env.TARGET_CONFIG ?? "";

@@ -5,6 +5,7 @@ import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
+import * as env from "../../lib/env";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../../conftest";
 
@@ -275,7 +276,7 @@ export const runTerraformPlan = async (
     ignoreReturnCode: true,
     env: {
       GITHUB_TOKEN: inputs.githubToken,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+      AQUA_GLOBAL_CONFIG: env.aquaGlobalConfig,
       TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
     },
   });

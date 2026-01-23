@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as types from "../lib/types";
 import * as env from "../lib/env";
 
 type Inputs = {
@@ -35,7 +36,7 @@ export const main = async () => {
 
 export const getSkipTerraform = (
   inputs: Inputs,
-  config: lib.Config,
+  config: types.Config,
   labels: string[],
 ): boolean => {
   // https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr

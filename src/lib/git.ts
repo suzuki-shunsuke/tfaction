@@ -128,3 +128,20 @@ export const listWorkingDirFiles = async (
   }
   return arr;
 };
+
+/**
+ *
+ * @param cwd a relative path from github.workspace to tfaction-root.yaml
+ * @returns an absolute path to the root directory of the git repository
+ */
+export const getRootDir = async (cwd: string): Promise<string> => {
+  const out = await exec.getExecOutput(
+    "git",
+    ["rev-parse", "--show-toplevel"],
+    {
+      silent: true,
+      cwd,
+    },
+  );
+  return out.stdout.trim();
+};

@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 
@@ -28,8 +29,8 @@ function setSecretToMap(secrets: Array<Secret>, m: Map<string, string>) {
 }
 
 const getSecrets = (
-  targetConfig: lib.TargetConfig,
-  jobConfig: lib.JobConfig | undefined,
+  targetConfig: types.TargetConfig,
+  jobConfig: types.JobConfig | undefined,
 ): Map<string, string> => {
   const targetSecrets = targetConfig.secrets;
   const secrets = new Map<string, string>();

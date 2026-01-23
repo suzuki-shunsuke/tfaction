@@ -5,9 +5,9 @@ import * as semver from "semver";
 import * as core from "@actions/core";
 import * as input from "../../../../lib/input";
 import * as aqua from "../../../../aqua";
-import * as lib from "../../../../lib";
+import * as types from "../../../../lib/types";
 
-export const main = async (executor: aqua.Executor, cfg: lib.Config) => {
+export const main = async (executor: aqua.Executor, cfg: types.Config) => {
   const configFiles = fs
     .readFileSync(input.getRequiredConfigFiles(), "utf8")
     .trim()

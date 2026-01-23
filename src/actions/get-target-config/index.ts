@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import * as path from "path";
 
@@ -7,7 +8,7 @@ type Inputs = {
   target?: string;
   workingDir?: string;
   isApply: boolean;
-  jobType: lib.JobType;
+  jobType: types.JobType;
 };
 
 export type Result = {
@@ -48,7 +49,7 @@ export interface TargetConfig {
 
 export const getTargetConfig = async (
   inputs: Inputs,
-  config: lib.Config,
+  config: types.Config,
 ): Promise<TargetConfig> => {
   const workingDirectoryFile = config.working_directory_file;
 
@@ -234,7 +235,7 @@ export const main = async () => {
 
 export const run = async (
   inputs: Inputs,
-  config: lib.Config,
+  config: types.Config,
 ): Promise<Result> => {
   const targetConfig = await getTargetConfig(inputs, config);
 

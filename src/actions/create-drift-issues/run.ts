@@ -2,6 +2,7 @@ import * as github from "@actions/github";
 import { Octokit } from "@octokit/core";
 import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
 import * as git from "../../lib/git";
 import * as path from "path";
 
@@ -35,7 +36,7 @@ export type RunInput = {
   graphqlOctokit: GraphQLPaginator;
   repoOwner: string;
   repoName: string;
-  config: lib.Config;
+  config: types.Config;
   logger: Logger;
 };
 
@@ -141,14 +142,14 @@ export type GetTargetGroupFn = (
   config: {
     config_path: string;
     working_directory_file: string;
-    target_groups: lib.TargetGroup[];
-    replace_target?: lib.Replace | undefined;
+    target_groups: types.TargetGroup[];
+    replace_target?: types.Replace | undefined;
   },
   target?: string,
   workingDir?: string,
 ) => Promise<lib.Target>;
 
-export type ReadTargetConfigFn = (p: string) => lib.TargetConfig;
+export type ReadTargetConfigFn = (p: string) => types.TargetConfig;
 
 export type RunDependencies = {
   createIssue: CreateIssueFn;

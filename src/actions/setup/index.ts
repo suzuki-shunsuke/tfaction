@@ -95,7 +95,7 @@ const setupSSHKey = async (sshKey: string): Promise<void> => {
 };
 
 export const main = async () => {
-  core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
+  core.exportVariable("AQUA_GLOBAL_CONFIG", env.aquaGlobalConfig);
   const githubToken = input.getRequiredGitHubToken();
 
   const octokit = github.getOctokit(githubToken);

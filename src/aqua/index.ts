@@ -6,7 +6,6 @@ import { chmod, readFile, rm } from "fs/promises";
 import { join, dirname } from "path";
 import { arch, homedir, platform, tmpdir } from "os";
 import { mkdtempSync, existsSync, renameSync, mkdirSync } from "fs";
-import * as lib from "../lib";
 import * as env from "../lib/env";
 
 const Version = "v2.56.2";
@@ -146,7 +145,7 @@ export class Executor {
       env: {
         ...process.env,
         ...options?.env,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+        AQUA_GLOBAL_CONFIG: env.aquaGlobalConfig,
         ...(this.githubToken && {
           AQUA_GITHUB_TOKEN: this.githubToken,
         }),
@@ -166,7 +165,7 @@ export class Executor {
       env: {
         ...process.env,
         ...options?.env,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+        AQUA_GLOBAL_CONFIG: env.aquaGlobalConfig,
         ...(this.githubToken && {
           AQUA_GITHUB_TOKEN: this.githubToken,
         }),

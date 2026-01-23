@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as types from "../lib/types";
 import { TargetConfig } from "../actions/get-target-config";
 import * as aqua from "../aqua";
 import * as path from "path";
@@ -17,7 +18,7 @@ type Inputs = {
 };
 
 const getConftestPaths = (
-  policy: lib.ConftestPolicyConfig,
+  policy: types.ConftestPolicyConfig,
   workingDir: string,
   planJsonPath?: string,
 ): string[] => {
@@ -61,7 +62,7 @@ const getConftestPaths = (
  * @returns
  */
 const buildConftestArgs = (
-  policy: lib.ConftestPolicyConfig,
+  policy: types.ConftestPolicyConfig,
   target: string,
   workingDir: string,
   paths: string[],
@@ -161,12 +162,12 @@ const buildConftestArgs = (
 };
 
 const buildPolicies = (
-  config: lib.Config,
-  targetGroup: lib.TargetGroup,
-  wdConfig: lib.TargetConfig,
+  config: types.Config,
+  targetGroup: types.TargetGroup,
+  wdConfig: types.TargetConfig,
   isPlan: boolean,
-): lib.ConftestPolicyConfig[] => {
-  const policyMap = new Map<string, lib.ConftestPolicyConfig>();
+): types.ConftestPolicyConfig[] => {
+  const policyMap = new Map<string, types.ConftestPolicyConfig>();
 
   if (!config.conftest) {
     return [];
@@ -206,7 +207,7 @@ const buildPolicies = (
     }
   }
 
-  const policies: lib.ConftestPolicyConfig[] = [];
+  const policies: types.ConftestPolicyConfig[] = [];
   for (const policy of conftest.policies.concat(...policyMap.values())) {
     if (policy.enabled !== false && isPlan === !!policy.plan) {
       policies.push(policy);
@@ -218,7 +219,7 @@ const buildPolicies = (
 
 export const run = async (
   inputs: Inputs,
-  config: lib.Config,
+  config: types.Config,
   targetConfig: TargetConfig,
 ) => {
   const executor = inputs.executor;

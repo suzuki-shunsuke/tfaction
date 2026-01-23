@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import * as path from "path";
 
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as git from "../../lib/git";
@@ -10,9 +11,9 @@ import { run } from "./run";
 
 // Check if drift detection is enabled
 const checkEnabled = (
-  config: lib.Config,
-  targetGroup: lib.TargetGroup,
-  wdConfig: lib.TargetConfig,
+  config: types.Config,
+  targetGroup: types.TargetGroup,
+  wdConfig: types.TargetConfig,
 ): boolean => {
   // Check wdConfig first
   if (wdConfig.drift_detection !== undefined) {
@@ -37,9 +38,9 @@ const checkEnabled = (
 
 // Get runs_on value with priority: wdConfig.terraform_plan_config > wdConfig > targetGroup.terraform_plan_config > targetGroup > config
 const getRunsOn = (
-  config: lib.Config,
-  targetGroup: lib.TargetGroup,
-  wdConfig: lib.TargetConfig,
+  config: types.Config,
+  targetGroup: types.TargetGroup,
+  wdConfig: types.TargetConfig,
 ): string => {
   const candidates = [
     wdConfig.terraform_plan_config?.runs_on,
@@ -63,7 +64,7 @@ const getRunsOn = (
 // Get target name from working directory path
 const getTargetByWorkingDirectory = (
   workingDirectoryPath: string,
-  config: lib.Config,
+  config: types.Config,
 ): string => {
   for (const pattern of config.replace_target?.patterns ?? []) {
     workingDirectoryPath = workingDirectoryPath.replace(
@@ -76,7 +77,7 @@ const getTargetByWorkingDirectory = (
 
 // List targets with runs_on
 const listTargets = async (
-  config: lib.Config,
+  config: types.Config,
 ): Promise<Map<string, string>> => {
   const files = await git.listWorkingDirFiles(
     config.git_root_dir,
@@ -99,7 +100,7 @@ const listTargets = async (
     }
 
     // Read working directory config
-    let wdConfig: lib.TargetConfig;
+    let wdConfig: types.TargetConfig;
     try {
       wdConfig = lib.readTargetConfig(path.join(pwd, file));
     } catch {

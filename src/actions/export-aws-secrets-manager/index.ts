@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import {
   SecretsManagerClient,
@@ -27,7 +28,7 @@ function exportSecret(
 
 async function exportSecrets(
   client: SecretsManagerClient,
-  secrets: Array<lib.AWSSecretsManagerSecret>,
+  secrets: Array<types.AWSSecretsManagerSecret>,
 ) {
   for (let i = 0; i < secrets.length; i++) {
     const secret = secrets[i];

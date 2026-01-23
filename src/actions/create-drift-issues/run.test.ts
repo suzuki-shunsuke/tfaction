@@ -11,7 +11,7 @@ import {
   type RunDependencies,
   type Issue,
 } from "./run";
-import type * as lib from "../../lib";
+import type * as types from "../../lib/types";
 
 describe("titlePattern", () => {
   it("matches valid drift issue titles", () => {
@@ -270,8 +270,8 @@ describe("run", () => {
   });
 
   const createMockConfig = (
-    driftDetection?: lib.Config["drift_detection"],
-  ): lib.Config =>
+    driftDetection?: types.Config["drift_detection"],
+  ): types.Config =>
     ({
       drift_detection: driftDetection,
       working_directory_file: "tfaction.yaml",
@@ -279,7 +279,7 @@ describe("run", () => {
       target_groups: [{ working_directory: "aws" }],
       replace_target: undefined,
       config_path: "/workspace/tfaction-root.yaml",
-    }) as lib.Config;
+    }) as types.Config;
 
   const createMockDeps = (
     workingDirFiles: string[] = [],

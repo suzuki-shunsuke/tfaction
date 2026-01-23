@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import { Octokit } from "@octokit/core";
 import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as path from "path";
@@ -50,7 +51,7 @@ export const main = async () => {
 };
 
 const run = async (
-  cfg: lib.Config,
+  cfg: types.Config,
   inputs: Inputs,
 ): Promise<Result | undefined> => {
   if (!cfg.drift_detection) {
