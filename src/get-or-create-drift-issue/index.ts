@@ -68,7 +68,7 @@ const run = async (
   const tg = await lib.getTargetGroup(cfg, inputs.target, inputs.workingDir);
 
   const wdConfig = lib.readTargetConfig(
-    path.join(cfg.config_dir, tg.workingDir, cfg.working_directory_file),
+    path.join(cfg.git_root_dir, tg.workingDir, cfg.working_directory_file),
   );
 
   if (!lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {

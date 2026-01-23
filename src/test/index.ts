@@ -31,7 +31,7 @@ export const main = async () => {
   );
 
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
   const destroy = targetConfig.destroy ?? false;
@@ -46,7 +46,7 @@ export const main = async () => {
 
   await runConftest(
     {
-      configDir: config.config_dir,
+      gitRootDir: config.git_root_dir,
       githubToken,
       plan: false,
       executor,

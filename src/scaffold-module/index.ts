@@ -4,6 +4,7 @@ import * as path from "path";
 import Handlebars from "handlebars";
 
 import * as aqua from "../aqua";
+import * as lib from "../lib";
 import * as env from "../lib/env";
 import * as input from "../lib/input";
 import * as git from "../lib/git";
@@ -49,7 +50,7 @@ const replaceInFiles = async (
 export const main = async () => {
   const githubToken = input.githubToken;
 
-  const configDir = path.dirname(env.tfactionConfig);
+  const config = await lib.getConfig();
 
   // Validate inputs
   if (!env.tfactionModulePath) {
@@ -59,8 +60,11 @@ export const main = async () => {
     throw new Error("env.TFACTION_MODULE_TEMPLATE_DIR is required");
   }
 
-  const modulePath = path.join(configDir, env.tfactionModulePath);
-  const templateDir = path.join(configDir, env.tfactionModuleTemplateDir);
+  const modulePath = path.join(config.git_root_dir, env.tfactionModulePath);
+  const templateDir = path.join(
+    config.git_root_dir,
+    env.tfactionModuleTemplateDir,
+  );
 
   // Check if module path already exists
   if (fs.existsSync(modulePath)) {

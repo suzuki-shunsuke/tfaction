@@ -75,12 +75,12 @@ export const main = async () => {
   );
 
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
   const target = targetConfig.target;
   const templateDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.template_dir ?? "",
   );
   const s3Bucket = targetConfig.s3_bucket_name_tfmigrate_history;

@@ -7,9 +7,9 @@ export const main = async () => {
     {
       name: "get-target-config",
       expected: {
-        working_directory: "aws/foo/dev",
+        working_directory: "tests/aws/foo/dev",
         providers_lock_opts: "-platform=linux_amd64 -platform=darwin_amd64",
-        template_dir: "templates/github",
+        template_dir: "tests/templates/github",
         enable_tflint: "true",
         enable_trivy: "true",
         tflint_fix: "true",
