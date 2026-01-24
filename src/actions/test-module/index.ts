@@ -46,20 +46,16 @@ export const main = async () => {
     cwd: workingDir,
   });
 
-  await executor.exec(
-    terraformCommand,
-    ["init"],
-    {
-      cwd: workingDir,
-      group: `${terraformCommand} init`,
-    },
-    {
+  await executor.exec(terraformCommand, ["init"], {
+    cwd: workingDir,
+    group: `${terraformCommand} init`,
+    comment: {
       token: githubToken,
       vars: {
         tfaction_target: target,
       },
     },
-  );
+  });
 
   if (enableTrivy) {
     await runTrivy({

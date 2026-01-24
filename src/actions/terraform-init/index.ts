@@ -77,16 +77,12 @@ export const main = async () => {
       },
     );
     if (initResult !== 0) {
-      await executor.exec(
-        tfCommand,
-        ["init", "-input=false", "-upgrade"],
-        {
-          cwd: workingDir,
-        },
-        {
+      await executor.exec(tfCommand, ["init", "-input=false", "-upgrade"], {
+        cwd: workingDir,
+        comment: {
           token: githubToken,
         },
-      );
+      });
     }
     core.endGroup();
 
@@ -102,9 +98,9 @@ export const main = async () => {
         group: terragruntRunAvailable
           ? `${tfCommand} run -- providers lock`
           : `${tfCommand} providers lock`,
-      },
-      {
-        token: githubToken,
+        comment: {
+          token: githubToken,
+        },
       },
     );
 

@@ -177,22 +177,18 @@ export const runTfmigratePlan = async (
 
   const executor = inputs.executor;
 
-  await executor.exec(
-    "tfmigrate",
-    ["plan", "--out", tempPlanBinary],
-    {
-      cwd: inputs.workingDirectory,
-      env: tfmigrateEnv,
-      group: "tfmigrate plan",
-    },
-    {
+  await executor.exec("tfmigrate", ["plan", "--out", tempPlanBinary], {
+    cwd: inputs.workingDirectory,
+    env: tfmigrateEnv,
+    group: "tfmigrate plan",
+    comment: {
       token: inputs.githubToken,
       key: "tfmigrate-plan",
       vars: {
         tfaction_target: inputs.target,
       },
     },
-  );
+  });
 
   // Run terraform show to convert plan to JSON
   core.startGroup(`${inputs.tfCommand} show`);
@@ -294,9 +290,9 @@ export const runTerraformPlan = async (
       cwd: inputs.workingDirectory,
       silent: true,
       group: `${inputs.tfCommand} show`,
-    },
-    {
-      token: inputs.githubToken,
+      comment: {
+        token: inputs.githubToken,
+      },
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);

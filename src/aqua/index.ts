@@ -141,6 +141,7 @@ export type Comment = {
 export interface ExecOptions extends exec.ExecOptions {
   env?: env.dynamicEnvs;
   group?: string;
+  comment?: Comment;
 }
 
 type Args = {
@@ -156,10 +157,7 @@ export class Executor {
     this.githubToken = githubToken;
   }
 
-  env(
-    options?: ExecOptions,
-    comment?: Comment,
-  ):
+  env(options?: ExecOptions):
     | {
         [key: string]: string;
       }
@@ -173,8 +171,8 @@ export class Executor {
     if (this.githubToken) {
       dynamicEnv.AQUA_GITHUB_TOKEN = this.githubToken;
     }
-    if (comment) {
-      dynamicEnv.GITHUB_TOKEN = comment.token;
+    if (options?.comment) {
+      dynamicEnv.GITHUB_TOKEN = options?.comment.token;
       dynamicEnv.GH_COMMENT_CONFIG = lib.GitHubCommentConfig;
     }
 
@@ -185,23 +183,18 @@ export class Executor {
     };
   }
 
-  buildArgs(
-    command: string,
-    args?: string[],
-    options?: ExecOptions,
-    comment?: Comment,
-  ): Args {
-    if (!comment) {
+  buildArgs(command: string, args?: string[], options?: ExecOptions): Args {
+    if (!options?.comment) {
       return {
         command,
         args,
       };
     }
     const newArgs = ["exec"];
-    if (comment.vars) {
+    if (options?.comment.vars) {
       for (const key of _varKeys) {
-        if (comment.vars[key]) {
-          newArgs.push("-var", `${key}:${comment.vars[key]}`);
+        if (options?.comment.vars[key]) {
+          newArgs.push("-var", `${key}:${options?.comment.vars[key]}`);
         }
       }
     }
@@ -217,16 +210,15 @@ export class Executor {
     command: string,
     args?: string[],
     options?: ExecOptions,
-    comment?: Comment,
   ): Promise<number> {
-    const bArgs = this.buildArgs(command, args, options, comment);
+    const bArgs = this.buildArgs(command, args, options);
     try {
       if (options?.group) {
         core.startGroup(options.group);
       }
       return await exec.exec(bArgs.command, bArgs.args, {
         ...options,
-        env: this.env(options, comment),
+        env: this.env(options),
       });
     } finally {
       if (options?.group) {
@@ -239,12 +231,11 @@ export class Executor {
     command: string,
     args?: string[],
     options?: ExecOptions,
-    comment?: Comment,
   ): Promise<exec.ExecOutput> {
-    const bArgs = this.buildArgs(command, args, options, comment);
+    const bArgs = this.buildArgs(command, args, options);
     return await exec.getExecOutput(bArgs.command, bArgs.args, {
       ...options,
-      env: this.env(options, comment),
+      env: this.env(options),
     });
   }
 }

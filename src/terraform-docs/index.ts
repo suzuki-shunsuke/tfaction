@@ -75,11 +75,11 @@ export const run = async (inputs: Inputs): Promise<void> => {
       {
         cwd: inputs.workingDirectory, // TODO FIX
         ignoreReturnCode: true,
-      },
-      {
-        token: inputs.githubToken,
-        vars: {
-          tfaction_target: env.all.TFACTION_TARGET,
+        comment: {
+          token: inputs.githubToken,
+          vars: {
+            tfaction_target: env.all.TFACTION_TARGET,
+          },
         },
       },
     );

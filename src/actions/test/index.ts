@@ -1,4 +1,3 @@
-import * as core from "@actions/core";
 import * as path from "path";
 
 import * as lib from "../../lib";
@@ -56,22 +55,17 @@ export const main = async () => {
   );
 
   if (!destroy) {
-    core.startGroup(`${tfCommand} validate`);
-    await executor.exec(
-      tfCommand,
-      ["validate"],
-      {
-        cwd: workingDir,
-      },
-      {
+    await executor.exec(tfCommand, ["validate"], {
+      cwd: workingDir,
+      group: `${tfCommand} validate`,
+      comment: {
         token: githubToken,
         key: "terraform-validate",
         vars: {
           tfaction_target: target,
         },
       },
-    );
-    core.endGroup();
+    });
   }
 
   // Step 5: trivy (conditional)

@@ -225,21 +225,16 @@ export const run = async (
   const policies = buildPolicies(config, targetConfig, wdConfig, inputs.plan);
 
   if (policies.length !== 0) {
-    core.startGroup("conftest -v");
-    await executor.exec(
-      "conftest",
-      ["-v"],
-      {
-        cwd: workingDir,
-      },
-      {
+    await executor.exec("conftest", ["-v"], {
+      cwd: workingDir,
+      group: "conftest -v",
+      comment: {
         token: inputs.githubToken,
         vars: {
           tfaction_target: targetConfig.target,
         },
       },
-    );
-    core.endGroup();
+    });
   }
 
   for (const policy of policies) {
@@ -253,21 +248,16 @@ export const run = async (
       targetConfig.working_directory,
       paths,
     );
-    core.startGroup("conftest");
-    await executor.exec(
-      "conftest",
-      args,
-      {
-        cwd: workingDir,
-      },
-      {
+    await executor.exec("conftest", args, {
+      cwd: workingDir,
+      group: "conftest",
+      comment: {
         token: inputs.githubToken,
         key: "conftest",
         vars: {
           tfaction_target: targetConfig.target,
         },
       },
-    );
-    core.endGroup();
+    });
   }
 };
