@@ -94,6 +94,7 @@ export const main = async () => {
     securefixActionAppPrivateKey: securefixAppPrivateKey,
     securefixActionServerRepository: securefixServerRepository,
     executor,
+    repoRoot: config.git_root_dir,
   });
 
   let fmtOutput = "";

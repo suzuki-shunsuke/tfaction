@@ -126,6 +126,7 @@ export const main = async () => {
       securefixActionAppPrivateKey: securefixAppPrivateKey,
       securefixActionServerRepository: serverRepository,
       executor,
+      repoRoot: config.git_root_dir,
     });
   }
 };

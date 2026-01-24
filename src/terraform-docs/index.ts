@@ -8,7 +8,9 @@ import * as env from "../lib/env";
 import * as aqua from "../aqua";
 
 type Inputs = {
+  /** A relative path from github.workspace */
   workingDirectory: string;
+  repoRoot: string;
   githubToken: string;
   securefixActionAppId: string;
   securefixActionAppPrivateKey: string;
@@ -47,8 +49,7 @@ const findConfigFile = (
 };
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const pwd = env.GITHUB_WORKSPACE; // TODO FIX
-  const readmePath = path.join(inputs.workingDirectory, "README.md"); // TODO FIX
+  const readmePath = path.join(inputs.workingDirectory, "README.md");
   const executor = inputs.executor;
 
   // Check if README.md exists
@@ -59,11 +60,11 @@ export const run = async (inputs: Inputs): Promise<void> => {
   try {
     // Check terraform-docs version
     await executor.exec("terraform-docs", ["-v"], {
-      cwd: inputs.workingDirectory, // TODO FIX
+      cwd: inputs.workingDirectory,
     });
 
     // Search for config file
-    const config = findConfigFile(inputs.workingDirectory, pwd); // TODO FIX
+    const config = findConfigFile(inputs.workingDirectory, inputs.repoRoot);
 
     // Build terraform-docs arguments
     const opts = config ? ["-c", config] : ["markdown"];
@@ -73,7 +74,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
       "terraform-docs",
       [...opts, "."],
       {
-        cwd: inputs.workingDirectory, // TODO FIX
+        cwd: inputs.workingDirectory,
         ignoreReturnCode: true,
         comment: {
           token: inputs.githubToken,
