@@ -32,7 +32,7 @@ export const main = async () => {
     issueState: env.all.TFACTION_DRIFT_ISSUE_STATE,
     repoOwner: driftIssueRepo.owner,
     repoName: driftIssueRepo.name,
-    skipTerraform: env.tfactionSkipTerraform,
+    skipTerraform: env.TFACTION_SKIP_TERRAFORM,
   };
 
   await run(inputs);

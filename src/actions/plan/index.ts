@@ -7,7 +7,6 @@ import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as git from "../../lib/git";
 import { getTargetConfig } from "../get-target-config";
-import * as checkTerraformSkip from "../../check-terraform-skip";
 import { main as runPlan } from "./run";
 import { create as createCommit } from "../../commit";
 
@@ -29,8 +28,7 @@ export const main = async () => {
 
   let skipTerraform = false;
   if (jobType === "terraform" && !driftIssueNumber) {
-    await checkTerraformSkip.main();
-    skipTerraform = env.tfactionSkipTerraform;
+    skipTerraform = env.TFACTION_SKIP_TERRAFORM;
   }
   core.setOutput("skipped", skipTerraform);
 

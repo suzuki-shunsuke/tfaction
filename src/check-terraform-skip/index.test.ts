@@ -6,7 +6,7 @@ test("normal", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "octocat",
         target: "foo",
       },
@@ -21,7 +21,7 @@ test("target is required", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "octocat",
       },
       {},
@@ -35,7 +35,7 @@ test("skip label", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "octocat",
         target: "foo",
       },
@@ -50,7 +50,7 @@ test("renovate", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "renovate[bot]",
         target: "foo",
       },
@@ -65,7 +65,7 @@ test("skip_terraform_by_renovate", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "renovate[bot]",
         target: "foo",
       },
@@ -82,7 +82,7 @@ test("skip_terraform_by_renovate skip", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "renovate[bot]",
         target: "foo",
       },
@@ -99,7 +99,7 @@ test("custom renovate_login", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "my-renovate-bot",
         target: "foo",
       },
@@ -117,7 +117,7 @@ test("custom renovate_terraform_labels", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "renovate[bot]",
         target: "foo",
       },
@@ -135,7 +135,7 @@ test("skip label does not match different target", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "octocat",
         target: "foo",
       },
@@ -150,7 +150,7 @@ test("multiple labels with matching skip label", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "octocat",
         target: "foo",
       },

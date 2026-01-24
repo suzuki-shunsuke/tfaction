@@ -1,4 +1,3 @@
-import * as checkTerraformSkip from "../../check-terraform-skip";
 import * as terraformApply from "./terraform-apply";
 import * as tfmigrateApply from "./tfmigrate-apply";
 import * as env from "../../lib/env";
@@ -8,8 +7,7 @@ export const main = async () => {
 
   if (jobType === "terraform") {
     // Check if terraform should be skipped
-    await checkTerraformSkip.main();
-    const skipTerraform = env.tfactionSkipTerraform;
+    const skipTerraform = env.TFACTION_SKIP_TERRAFORM;
 
     if (!skipTerraform) {
       await terraformApply.main();
