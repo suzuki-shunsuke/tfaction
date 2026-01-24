@@ -18,9 +18,8 @@ aqua i -l
 
 After you update code, you have to run the following things.
 
-- Build TypeScript: `npm run build`
 - Test TypeScript: `npm t`
-- Lint TypeScript: `npx eslint`
+- Lint TypeScript: `npm run lint`
 - Format code: `npm run fmt`
 - [Update Document](website)
 
