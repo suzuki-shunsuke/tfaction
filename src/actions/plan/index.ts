@@ -16,16 +16,16 @@ export const main = async () => {
   const config = await lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
-      isApply: env.getIsApply(),
-      jobType: env.getJobType(),
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
+      isApply: env.isApply,
+      jobType: lib.getJobType(),
     },
     config,
   );
 
-  const jobType = env.tfactionJobType;
-  const driftIssueNumber = env.tfactionDriftIssueNumber;
+  const jobType = env.all.TFACTION_JOB_TYPE;
+  const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
 
   let skipTerraform = false;
   if (jobType === "terraform" && !driftIssueNumber) {
@@ -40,8 +40,8 @@ export const main = async () => {
       githubToken: input.githubToken,
       jobType: jobType,
       driftIssueNumber: driftIssueNumber || undefined,
-      prAuthor: env.ciInfoPrAuthor || undefined,
-      ciInfoTempDir: env.ciInfoTempDir || undefined,
+      prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,
+      ciInfoTempDir: env.all.CI_INFO_TEMP_DIR || undefined,
     });
 
     // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)

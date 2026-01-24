@@ -28,7 +28,7 @@ export const main = async () => {
         data.aws_role_session_name = "";
         return data;
       },
-      actual: env.targetConfig,
+      actual: env.all.TARGET_CONFIG,
     },
     {
       name: "get-global-config",
@@ -59,7 +59,7 @@ export const main = async () => {
         securefix_action_server_repository: "",
         securefix_action_pull_request_base_branch: "",
       },
-      actual: env.globalConfig,
+      actual: env.all.GLOBAL_CONFIG,
     },
   ];
   let failed = false;

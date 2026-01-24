@@ -31,10 +31,10 @@ export const main = async () => {
   // Get target config
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
-      isApply: env.getIsApply(),
-      jobType: env.getJobType(),
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
+      isApply: env.isApply,
+      jobType: lib.getJobType(),
     },
     config,
   );
@@ -55,7 +55,7 @@ export const main = async () => {
   });
 
   // Generate temp file name
-  const runId = env.githubRunId;
+  const runId = env.all.GITHUB_RUN_ID;
   const timestamp = new Date()
     .toISOString()
     .replace(/[-:T]/g, "")
@@ -68,7 +68,7 @@ export const main = async () => {
     "tfcmt",
     [
       "-output",
-      env.githubStepSummary,
+      env.all.GITHUB_STEP_SUMMARY,
       "-var",
       `target:${targetConfig.target}`,
       "plan",

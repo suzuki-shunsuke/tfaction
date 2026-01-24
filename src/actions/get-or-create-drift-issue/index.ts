@@ -2,6 +2,8 @@ import * as core from "@actions/core";
 import { Octokit } from "@octokit/core";
 import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
+import * as drift from "../../lib/drift";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as path from "path";
@@ -33,10 +35,10 @@ export const main = async () => {
   }
 
   const result = await run(cfg, {
-    target: env.tfactionTarget,
-    workingDir: env.tfactionWorkingDir,
+    target: env.all.TFACTION_TARGET,
+    workingDir: env.all.TFACTION_WORKING_DIR,
     ghToken: input.getRequiredGitHubToken(),
-    repo: env.githubRepository,
+    repo: env.all.GITHUB_REPOSITORY,
   });
 
   if (result === undefined) {
@@ -50,7 +52,7 @@ export const main = async () => {
 };
 
 const run = async (
-  cfg: lib.Config,
+  cfg: types.Config,
   inputs: Inputs,
 ): Promise<Result | undefined> => {
   if (!cfg.drift_detection) {
@@ -71,7 +73,7 @@ const run = async (
     path.join(cfg.git_root_dir, tg.workingDir, cfg.working_directory_file),
   );
 
-  if (!lib.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
+  if (!drift.checkDriftDetectionEnabled(cfg, tg.group, wdConfig)) {
     core.info("drift detection is disabled");
     return;
   }
@@ -88,7 +90,7 @@ const run = async (
   );
   if (issue === undefined) {
     core.info("creating a drift issue");
-    issue = await lib.createIssue(
+    issue = await drift.createIssue(
       tg.target,
       inputs.ghToken,
       repoOwner,

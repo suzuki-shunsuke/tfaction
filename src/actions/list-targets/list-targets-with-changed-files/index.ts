@@ -3,8 +3,10 @@ import * as github from "@actions/github";
 
 import * as path from "path";
 import * as lib from "../../../lib";
+import * as types from "../../../lib/types";
 import * as env from "../../../lib/env";
 import * as input from "../../../lib/input";
+import * as git from "../../../lib/git";
 import * as aqua from "../../../aqua";
 import * as ciInfo from "../../../ci-info";
 import {
@@ -18,16 +20,16 @@ type TargetConfig = {
   working_directory: string;
   runs_on: string | string[];
   job_type: string;
-  environment?: lib.GitHubEnvironment;
-  secrets?: lib.GitHubSecrets;
+  environment?: types.GitHubEnvironment;
+  secrets?: types.GitHubSecrets;
 };
 
 const getTargetConfigByTarget = (
-  targets: Array<lib.TargetGroup>,
+  targets: Array<types.TargetGroup>,
   wd: string,
   target: string,
   isApply: boolean,
-  jobType: lib.JobType,
+  jobType: types.JobType,
 ): TargetConfig | undefined => {
   const tg = lib.getTargetFromTargetGroupsByWorkingDir(targets, wd);
   if (tg === undefined) {
@@ -86,8 +88,8 @@ type ModuleData = {
 
 const createTargetMaps = (
   workingDirs: string[],
-  targetGroups: lib.TargetGroup[],
-  replaceTarget: lib.Replace | undefined,
+  targetGroups: types.TargetGroup[],
+  replaceTarget: types.Replace | undefined,
 ): { wdTargetMap: Map<string, string>; targetWDMap: Map<string, string> } => {
   const wdTargetMap = lib.createWDTargetMap(
     workingDirs,
@@ -178,7 +180,7 @@ const addTargetsFromChangedWorkingDirs = (
   wdTargetMap: Map<string, string>,
   terraformTargets: Set<string>,
   tfmigrates: Set<string>,
-  targetGroups: lib.TargetGroup[],
+  targetGroups: types.TargetGroup[],
   isApply: boolean,
   terraformTargetObjs: TargetConfig[],
 ): void => {
@@ -325,9 +327,9 @@ export const run = async (input: Input): Promise<Result> => {
 
 type Input = {
   config: {
-    target_groups: lib.TargetGroup[];
-    replace_target?: lib.Replace;
-    label_prefixes?: lib.LabelPrefixes;
+    target_groups: types.TargetGroup[];
+    replace_target?: types.Replace;
+    label_prefixes?: types.LabelPrefixes;
   };
   isApply: boolean;
   labels: string[];
@@ -369,8 +371,8 @@ const handleLabels = (
   labels: string[],
   isApply: boolean,
   targetWDMap: Map<string, string>,
-  labelPrefixes: lib.LabelPrefixes | undefined,
-  targetGroups: lib.TargetGroup[],
+  labelPrefixes: types.LabelPrefixes | undefined,
+  targetGroups: types.TargetGroup[],
   tfmigrateObjs: Array<TargetConfig>,
   tfmigrates: Set<string>,
 ) => {
@@ -415,11 +417,11 @@ const handleLabels = (
 export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   const cfg = await lib.getConfig();
 
-  const configFiles = await lib.listWorkingDirFiles(
+  const configFiles = await git.listWorkingDirFiles(
     cfg.git_root_dir,
     cfg.working_directory_file,
   );
-  const modules = await lib.listWorkingDirFiles(
+  const modules = await git.listWorkingDirFiles(
     cfg.git_root_dir,
     cfg.module_file,
   );
@@ -437,7 +439,7 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   const result = await run({
     labels: pr.pr?.data.labels?.map((l) => l.name) ?? [],
     config: cfg,
-    isApply: env.getIsApply(),
+    isApply: env.isApply,
     changedFiles:
       pr.pr?.files.map((file) => path.join(cfg.git_root_dir, file)) ?? [],
     configFiles,

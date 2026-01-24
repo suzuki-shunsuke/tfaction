@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../../lib";
+import * as drift from "../../lib/drift";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 
@@ -14,11 +15,11 @@ export const main = async () => {
   const issue: Issue = JSON.parse(issueInput);
 
   const config = await lib.getConfig();
-  const driftIssueRepo = lib.getDriftIssueRepo(config);
+  const driftIssueRepo = drift.getDriftIssueRepo(config);
 
   const repoOwner = driftIssueRepo.owner;
   const repoName = driftIssueRepo.name;
-  const serverUrl = env.githubServerUrl || "https://github.com";
+  const serverUrl = env.GITHUB_SERVER_URL || "https://github.com";
 
   // TFCMT environment variables
   core.exportVariable("TFCMT_REPO_OWNER", repoOwner);

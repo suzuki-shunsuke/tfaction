@@ -31,10 +31,6 @@ const writeSkipCreatePrSummary = (
   target: string,
   draftPr: boolean,
 ): void => {
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const runId = env.githubRunId;
-  const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
-
   let draftOpt = "";
   if (draftPr) {
     draftOpt = "-d ";
@@ -49,7 +45,7 @@ Please run the following command in your terminal.
 gh pr create -R "${repository}" ${draftOpt}\\
   -H "${branch}" \\
   -t "Scaffold a working directory (${target})" \\
-  -b "This pull request was created by [GitHub Actions](${runUrl})"
+  -b "This pull request was created by [GitHub Actions](${env.runURL})"
 \`\`\`
 
 [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
@@ -76,8 +72,8 @@ export const main = async () => {
   // Get target config
   const targetConfigResult = await getTargetConfig.getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
       isApply: false,
       jobType: "scaffold_working_dir",
     },
@@ -85,8 +81,8 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfigResult.working_directory || env.tfactionWorkingDir;
-  const target = targetConfigResult.target || env.tfactionTarget;
+    targetConfigResult.working_directory || env.all.TFACTION_WORKING_DIR;
+  const target = targetConfigResult.target || env.all.TFACTION_TARGET;
 
   if (!target) {
     throw new Error("TFACTION_TARGET is required");
@@ -109,17 +105,13 @@ export const main = async () => {
     return;
   }
 
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
-  const actor = env.githubActor;
-  const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+  const actor = env.all.GITHUB_ACTOR;
 
   const vars = {
     target: target,
     working_dir: workingDir,
     actor,
-    run_url: runUrl,
+    run_url: env.runURL,
   };
   const commitMessage = `scaffold a working directory (${target})`;
 
@@ -134,13 +126,13 @@ export const main = async () => {
         config?.scaffold_working_directory?.pull_request?.body,
       )(vars)
     : `This pull request scaffolds a working directory \`${workingDir}\`.
-    [@${actor} created this pull request by GitHub Actions](${runUrl}).`;
+    [@${actor} created this pull request by GitHub Actions](${env.runURL}).`;
 
   const prComment = config?.scaffold_working_directory?.pull_request?.comment
     ? Handlebars.compile(
         config?.scaffold_working_directory?.pull_request?.comment,
       )(vars)
-    : `@${actor} This pull request was created by [GitHub Actions](${runUrl}) you ran.
+    : `@${actor} This pull request was created by [GitHub Actions](${env.runURL}) you ran.
     Please handle this pull request.`;
 
   await commit.create({
@@ -165,6 +157,11 @@ export const main = async () => {
 
   // Write step summary if skip_create_pr is true
   if (skipCreatePr) {
-    writeSkipCreatePrSummary(repository, branch, target, draftPr);
+    writeSkipCreatePrSummary(
+      env.all.GITHUB_REPOSITORY,
+      branch,
+      target,
+      draftPr,
+    );
   }
 };

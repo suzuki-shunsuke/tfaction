@@ -66,8 +66,8 @@ export const main = async () => {
   const config = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
       isApply: false,
       jobType: "scaffold_working_dir",
     },

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as lib from "../lib";
+import * as types from "../lib/types";
 import * as env from "../lib/env";
 
 type Inputs = {
@@ -13,17 +14,17 @@ type Inputs = {
 
 export const main = async () => {
   const config = await lib.getConfig();
-  if (!env.ciInfoTempDir) {
+  if (!env.all.CI_INFO_TEMP_DIR) {
     throw new Error("CI_INFO_TEMP_DIR is not set");
   }
-  if (!env.ciInfoPrAuthor) {
+  if (!env.all.CI_INFO_PR_AUTHOR) {
     throw new Error("CI_INFO_PR_AUTHOR is not set");
   }
   const inputs = {
     skipLabelPrefix: config.label_prefixes.skip,
-    labels: path.join(env.ciInfoTempDir, "labels.txt"),
-    prAuthor: env.ciInfoPrAuthor,
-    target: env.tfactionTarget,
+    labels: path.join(env.all.CI_INFO_TEMP_DIR, "labels.txt"),
+    prAuthor: env.all.CI_INFO_PR_AUTHOR,
+    target: env.all.TFACTION_TARGET,
   };
   // labels is pull request's labels.
   const labels = fs.readFileSync(inputs.labels, "utf8").split("\n");
@@ -35,7 +36,7 @@ export const main = async () => {
 
 export const getSkipTerraform = (
   inputs: Inputs,
-  config: lib.Config,
+  config: types.Config,
   labels: string[],
 ): boolean => {
   // https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr

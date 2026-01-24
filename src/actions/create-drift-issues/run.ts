@@ -2,9 +2,12 @@ import * as github from "@actions/github";
 import { Octokit } from "@octokit/core";
 import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
+import * as drift from "../../lib/drift";
+import * as git from "../../lib/git";
 import * as path from "path";
 
-export type Issue = lib.Issue;
+export type Issue = drift.Issue;
 
 export type Result = {
   number: number;
@@ -34,7 +37,7 @@ export type RunInput = {
   graphqlOctokit: GraphQLPaginator;
   repoOwner: string;
   repoName: string;
-  config: lib.Config;
+  config: types.Config;
   logger: Logger;
 };
 
@@ -129,7 +132,7 @@ export type CreateIssueFn = (
   ghToken: string,
   repoOwner: string,
   repoName: string,
-) => Promise<lib.Issue>;
+) => Promise<drift.Issue>;
 
 export type ListWorkingDirFilesFn = (
   gitRootDir: string,
@@ -140,29 +143,29 @@ export type GetTargetGroupFn = (
   config: {
     config_path: string;
     working_directory_file: string;
-    target_groups: lib.TargetGroup[];
-    replace_target?: lib.Replace | undefined;
+    target_groups: types.TargetGroup[];
+    replace_target?: types.Replace | undefined;
   },
   target?: string,
   workingDir?: string,
 ) => Promise<lib.Target>;
 
-export type ReadTargetConfigFn = (p: string) => lib.TargetConfig;
+export type ReadTargetConfigFn = (p: string) => types.TargetConfig;
 
 export type RunDependencies = {
   createIssue: CreateIssueFn;
   listWorkingDirFiles: ListWorkingDirFilesFn;
   getTargetGroup: GetTargetGroupFn;
   readTargetConfig: ReadTargetConfigFn;
-  checkDriftDetectionEnabled: typeof lib.checkDriftDetectionEnabled;
+  checkDriftDetectionEnabled: typeof drift.checkDriftDetectionEnabled;
 };
 
 export const defaultDependencies: RunDependencies = {
-  createIssue: lib.createIssue,
-  listWorkingDirFiles: lib.listWorkingDirFiles,
+  createIssue: drift.createIssue,
+  listWorkingDirFiles: git.listWorkingDirFiles,
   getTargetGroup: lib.getTargetGroup,
   readTargetConfig: lib.readTargetConfig,
-  checkDriftDetectionEnabled: lib.checkDriftDetectionEnabled,
+  checkDriftDetectionEnabled: drift.checkDriftDetectionEnabled,
 };
 
 export const run = async (

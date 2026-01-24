@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../../lib";
+import * as drift from "../../lib/drift";
 import * as env from "../../lib/env";
 
 export const main = async () => {
@@ -11,8 +12,8 @@ export const main = async () => {
     );
   }
 
-  const driftIssueRepo = lib.getDriftIssueRepo(config);
-  const driftIssueNumber = env.tfactionDriftIssueNumber;
+  const driftIssueRepo = drift.getDriftIssueRepo(config);
+  const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
 
   // Set outputs
   core.setOutput("working_directory_file", config.working_directory_file);

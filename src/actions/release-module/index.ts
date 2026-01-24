@@ -29,9 +29,9 @@ export const main = async () => {
 
   const octokit = github.getOctokit(githubToken);
   const { owner, repo } = github.context.repo;
-  const sha = env.githubSha;
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
+  const sha = env.all.GITHUB_SHA;
+  const serverUrl = env.GITHUB_SERVER_URL;
+  const repository = env.all.GITHUB_REPOSITORY;
 
   // Create tag
   core.info(`Creating tag ${tag}`);

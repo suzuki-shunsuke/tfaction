@@ -17,8 +17,8 @@ export const main = async () => {
   const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
 
   const config = await lib.getConfig();
-  const target = env.tfactionTarget;
-  const wd = env.tfactionWorkingDir;
+  const target = env.all.TFACTION_TARGET;
+  const wd = env.all.TFACTION_WORKING_DIR;
 
   if (!wd && !target) {
     throw new Error(

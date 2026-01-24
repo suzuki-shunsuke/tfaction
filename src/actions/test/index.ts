@@ -22,10 +22,10 @@ export const main = async () => {
   // Step 1: Get target config
   const targetConfig = await getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
-      isApply: env.getIsApply(),
-      jobType: env.getJobType(),
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
+      isApply: env.isApply,
+      jobType: lib.getJobType(),
     },
     config,
   );

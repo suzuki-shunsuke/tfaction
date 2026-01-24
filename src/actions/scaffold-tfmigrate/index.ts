@@ -111,9 +111,6 @@ const outputSkipCreatePrGuide = (
   draftPr: boolean,
 ): void => {
   const draftFlag = draftPr ? "-d " : "";
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
 
   const guide = `
 ## Create a pull request
@@ -121,11 +118,11 @@ const outputSkipCreatePrGuide = (
 Please run the following command in your terminal.
 
 \`\`\`
-gh pr create -R "${repository}" ${draftFlag}\\
+gh pr create -R "${env.all.GITHUB_REPOSITORY}" ${draftFlag}\\
   -l "${label}" \\
   -H "${branch}" \\
   -t "Scaffold tfmigrate migration (${target})" \\
-  -b "This pull request was created by [GitHub Actions](${serverUrl}/${repository}/actions/runs/${runId}). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
+  -b "This pull request was created by [GitHub Actions](${env.runURL}). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
 \`\`\`
 
 Then please fix the generated migration file.
@@ -133,7 +130,7 @@ Then please fix the generated migration file.
 [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
 `;
 
-  fs.appendFileSync(env.githubStepSummary, guide);
+  fs.appendFileSync(env.all.GITHUB_STEP_SUMMARY, guide);
   core.info("Output skip-create-pr guide to GitHub Step Summary");
 };
 
@@ -186,8 +183,8 @@ export const main = async () => {
   const config = await lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
       isApply: false,
       jobType: "scaffold_working_dir",
     },
@@ -208,10 +205,7 @@ export const main = async () => {
     config.securefix_action?.pull_request?.base_branch ?? "";
 
   const label = `${labelPrefix}${target}`;
-  const actor = env.githubActor;
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
+  const actor = env.all.GITHUB_ACTOR;
 
   const executor = await aqua.NewExecutor({
     githubToken,
@@ -260,13 +254,11 @@ export const main = async () => {
 
   const commitMessage = `chore: scaffold a tfmigrate migration (${target})`;
 
-  const runURL = `${serverUrl}/${repository}/actions/runs/${runId}`;
-
   const vars = {
     target: target,
     working_dir: workingDir,
     actor,
-    run_url: runURL,
+    run_url: env.runURL,
   };
 
   const prTitle = config?.scaffold_tfmigrate?.pull_request?.title
@@ -275,7 +267,7 @@ export const main = async () => {
 
   const prBody = config?.scaffold_tfmigrate?.pull_request?.body
     ? Handlebars.compile(config?.scaffold_tfmigrate?.pull_request?.body)(vars)
-    : `@${actor} This pull request was created by [GitHub Actions workflow_dispatch event](${runURL})
+    : `@${actor} This pull request was created by [GitHub Actions workflow_dispatch event](${env.runURL})
     About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
     [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
     Please fix the generated migration file.`;
@@ -284,7 +276,7 @@ export const main = async () => {
     ? Handlebars.compile(config?.scaffold_tfmigrate?.pull_request?.comment)(
         vars,
       )
-    : `@${actor} This pull request was created by [GitHub Actions](${runURL}) you ran.
+    : `@${actor} This pull request was created by [GitHub Actions](${env.runURL}) you ran.
     Please handle this pull request.`;
 
   const shouldSkipPr = skipCreatePr || !!prNumber;

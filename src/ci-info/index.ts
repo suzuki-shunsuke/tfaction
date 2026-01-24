@@ -12,7 +12,7 @@ interface PRFile {
 }
 
 const getPRNumberFromMergeGroup = (): number | undefined => {
-  const refName = env.githubRefName;
+  const refName = env.all.GITHUB_REF_NAME;
   if (!refName) {
     return undefined;
   }

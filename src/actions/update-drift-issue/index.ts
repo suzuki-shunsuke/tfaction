@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as lib from "../../lib";
+import * as drift from "../../lib/drift";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 
@@ -15,20 +16,20 @@ type Inputs = {
 };
 
 export const main = async () => {
-  const issueNumberStr = env.tfactionDriftIssueNumber;
+  const issueNumberStr = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   if (!issueNumberStr) {
     core.info("TFACTION_DRIFT_ISSUE_NUMBER is not set, skipping");
     return;
   }
 
   const config = await lib.getConfig();
-  const driftIssueRepo = lib.getDriftIssueRepo(config);
+  const driftIssueRepo = drift.getDriftIssueRepo(config);
 
   const inputs: Inputs = {
     ghToken: input.getRequiredGitHubToken(),
     status: input.getRequiredStatus(),
     issueNumber: parseInt(issueNumberStr, 10),
-    issueState: env.tfactionDriftIssueState,
+    issueState: env.all.TFACTION_DRIFT_ISSUE_STATE,
     repoOwner: driftIssueRepo.owner,
     repoName: driftIssueRepo.name,
     skipTerraform: env.tfactionSkipTerraform,
@@ -62,13 +63,6 @@ const run = async (inputs: Inputs) => {
     core.info("Reopening drift issue");
     await reopenIssue(inputs);
   }
-};
-
-const getJobUrl = (): string => {
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repo = env.githubRepository;
-  const runId = env.githubRunId;
-  return `${serverUrl}/${repo}/actions/runs/${runId}`;
 };
 
 const getLatestCommentBody = async (inputs: Inputs): Promise<string> => {
@@ -109,18 +103,17 @@ const postCommentIfNeeded = async (inputs: Inputs) => {
     return;
   }
 
-  const jobUrl = getJobUrl();
   const latestCommentBody = await getLatestCommentBody(inputs);
 
   // If the latest comment already contains the job URL, skip posting
-  if (latestCommentBody.includes(jobUrl)) {
+  if (latestCommentBody.includes(env.runURL)) {
     core.info("Latest comment already contains the job URL, skipping");
     return;
   }
 
   const comment = `## :x: CI failed
 
-[Build link](${jobUrl})
+[Build link](${env.runURL})
 `;
 
   const octokit = github.getOctokit(inputs.ghToken);

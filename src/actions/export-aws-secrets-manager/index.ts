@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as lib from "../../lib";
+import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import {
   SecretsManagerClient,
@@ -27,7 +28,7 @@ function exportSecret(
 
 async function exportSecrets(
   client: SecretsManagerClient,
-  secrets: Array<lib.AWSSecretsManagerSecret>,
+  secrets: Array<types.AWSSecretsManagerSecret>,
 ) {
   for (let i = 0; i < secrets.length; i++) {
     const secret = secrets[i];
@@ -71,12 +72,12 @@ async function exportSecrets(
 
 export const main = async (): Promise<void> => {
   const config = await lib.getConfig();
-  const targetS = env.tfactionTarget;
-  const wd = env.tfactionWorkingDir;
-  const jobType = env.getJobType();
-  const isApply = env.getIsApply();
-  const t = await lib.getTargetGroup(config, targetS, wd);
-  const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
+  const t = await lib.getTargetGroup(
+    config,
+    env.all.TFACTION_TARGET,
+    env.all.TFACTION_WORKING_DIR,
+  );
+  const jobConfig = lib.getJobConfig(t.group, env.isApply, lib.getJobType());
   let awsClient = null;
   if (t.group === undefined) {
     return;

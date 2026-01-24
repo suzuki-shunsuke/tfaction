@@ -33,14 +33,15 @@ export const create = async (inputs: Inputs): Promise<string> => {
       branch: inputs.branch,
       files: inputs.files,
       commitMessage: inputs.commitMessage,
-      workspace: env.githubWorkspace,
+      workspace: env.GITHUB_WORKSPACE,
       pr: inputs.pr,
     });
     return "";
   }
 
   const octokit = github.getOctokit(inputs.githubToken);
-  const branch = inputs.branch || env.githubHeadRef || env.githubRefName;
+  const branch =
+    inputs.branch || env.all.GITHUB_HEAD_REF || env.all.GITHUB_REF_NAME;
   await commit.createCommit(octokit, {
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,

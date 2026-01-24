@@ -4,7 +4,7 @@ import * as env from "../../lib/env";
 import { expect, test } from "vitest";
 
 test("default", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -150,7 +150,7 @@ test("scaffold_working_dir", async () => {
 });
 
 test("tfmigrate plan", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -201,7 +201,7 @@ test("tfmigrate plan", async () => {
 });
 
 test("tfmigrate apply", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -252,7 +252,7 @@ test("tfmigrate apply", async () => {
 });
 
 test("terraform apply", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -350,7 +350,7 @@ test("explicit aws_role_session_name overrides auto-generation", async () => {
 });
 
 test("terraform_docs enabled in root config", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -400,7 +400,7 @@ test("terraform_docs enabled in root config", async () => {
 });
 
 test("environment variables from targetGroup", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -453,7 +453,7 @@ test("environment variables from targetGroup", async () => {
 });
 
 test("environment variables from root config", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -504,7 +504,7 @@ test("environment variables from root config", async () => {
 });
 
 test("gcp configuration", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -571,7 +571,7 @@ test("gcp configuration", async () => {
 });
 
 test("gcp_access_token_scopes", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -623,7 +623,7 @@ test("gcp_access_token_scopes", async () => {
 });
 
 test("s3_bucket_name_tfmigrate_history", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -672,7 +672,7 @@ test("s3_bucket_name_tfmigrate_history", async () => {
 });
 
 test("gcs_bucket_name_tfmigrate_history", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],
@@ -721,7 +721,7 @@ test("gcs_bucket_name_tfmigrate_history", async () => {
 });
 
 test("providers_lock_opts override", async () => {
-  const runID = env.githubRunId;
+  const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([
       ["TFACTION_WORKING_DIR", "tests/aws/foo/dev"],

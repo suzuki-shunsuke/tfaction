@@ -26,10 +26,6 @@ const writeSkipCreatePrSummary = (
   modulePath: string,
   draftPr: boolean,
 ): void => {
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const runId = env.githubRunId;
-  const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
-
   let draftOpt = "";
   if (draftPr) {
     draftOpt = "-d ";
@@ -44,7 +40,7 @@ Please run the following command in your terminal.
 gh pr create -R "${repository}" ${draftOpt}\\
   -H "${branch}" \\
   -t "Scaffold a Terraform Module (${modulePath})" \\
-  -b "This pull request was created by [GitHub Actions](${runUrl})"
+  -b "This pull request was created by [GitHub Actions](${env.runURL})"
 \`\`\`
 
 [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
@@ -66,7 +62,7 @@ export const main = async () => {
     );
   }
 
-  const modulePath = env.tfactionModulePath;
+  const modulePath = env.all.TFACTION_MODULE_PATH;
   if (!modulePath) {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
@@ -97,18 +93,14 @@ export const main = async () => {
     return;
   }
 
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
-  const actor = env.githubActor;
-  const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+  const actor = env.all.GITHUB_ACTOR;
 
   const commitMessage = `chore(${modulePath}): scaffold a Terraform Module`;
 
   const vars = {
     module_path: modulePath,
     actor,
-    run_url: runUrl,
+    run_url: env.runURL,
   };
 
   const prTitle = config?.scaffold_module?.pull_request?.title
@@ -117,11 +109,11 @@ export const main = async () => {
 
   const prBody = config?.scaffold_module?.pull_request?.body
     ? Handlebars.compile(config?.scaffold_module?.pull_request?.body)(vars)
-    : `This pull request was created by [GitHub Actions](${runUrl})`;
+    : `This pull request was created by [GitHub Actions](${env.runURL})`;
 
   const prComment = config?.scaffold_module?.pull_request?.comment
     ? Handlebars.compile(config?.scaffold_module?.pull_request?.comment)(vars)
-    : `@${actor} This pull request was created by [GitHub Actions](${runUrl}) you ran.
+    : `@${actor} This pull request was created by [GitHub Actions](${env.runURL}) you ran.
     Please handle this pull request.`;
 
   await commit.create({
@@ -146,6 +138,11 @@ export const main = async () => {
 
   // Write step summary if skip_create_pr is true
   if (skipCreatePr) {
-    writeSkipCreatePrSummary(repository, branch, modulePath, draftPr);
+    writeSkipCreatePrSummary(
+      env.all.GITHUB_REPOSITORY,
+      branch,
+      modulePath,
+      draftPr,
+    );
   }
 };
