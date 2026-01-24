@@ -10,10 +10,7 @@ test("normal", () => {
         prAuthor: "octocat",
         target: "foo",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       [],
     ),
   ).toBe(false);
@@ -27,10 +24,7 @@ test("target is required", () => {
         labels: "",
         prAuthor: "octocat",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       [],
     );
   }).toThrow();
@@ -45,10 +39,7 @@ test("skip label", () => {
         prAuthor: "octocat",
         target: "foo",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       ["skip:foo"],
     ),
   ).toBe(true);
@@ -63,10 +54,7 @@ test("renovate", () => {
         prAuthor: "renovate[bot]",
         target: "foo",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       [],
     ),
   ).toBe(false);
@@ -82,8 +70,6 @@ test("skip_terraform_by_renovate", () => {
         target: "foo",
       },
       {
-        plan_workflow_name: "",
-        target_groups: [],
         skip_terraform_by_renovate: true,
       },
       [],
@@ -101,8 +87,6 @@ test("skip_terraform_by_renovate skip", () => {
         target: "foo",
       },
       {
-        plan_workflow_name: "",
-        target_groups: [],
         skip_terraform_by_renovate: true,
       },
       ["terraform"],
@@ -120,8 +104,6 @@ test("custom renovate_login", () => {
         target: "foo",
       },
       {
-        plan_workflow_name: "",
-        target_groups: [],
         renovate_login: "my-renovate-bot",
         skip_terraform_by_renovate: true,
       },
@@ -140,8 +122,6 @@ test("custom renovate_terraform_labels", () => {
         target: "foo",
       },
       {
-        plan_workflow_name: "",
-        target_groups: [],
         skip_terraform_by_renovate: true,
         renovate_terraform_labels: ["infra", "tf"],
       },
@@ -159,10 +139,7 @@ test("skip label does not match different target", () => {
         prAuthor: "octocat",
         target: "foo",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       ["skip:bar"],
     ),
   ).toBe(false);
@@ -177,10 +154,7 @@ test("multiple labels with matching skip label", () => {
         prAuthor: "octocat",
         target: "foo",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       ["enhancement", "skip:foo", "bug"],
     ),
   ).toBe(true);
