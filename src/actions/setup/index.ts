@@ -120,6 +120,7 @@ export const main = async () => {
         skipLabelPrefix: config.label_prefixes.skip,
         labels: ci.pr?.data.labels?.map((label) => label.name) ?? [],
         prAuthor: ci.pr?.data.user.login ?? "",
+        target: targetConfig.target,
       });
     }
   }
