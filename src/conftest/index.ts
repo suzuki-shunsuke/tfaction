@@ -1,4 +1,3 @@
-import * as core from "@actions/core";
 import * as lib from "../lib";
 import * as types from "../lib/types";
 import { TargetConfig } from "../actions/get-target-config";
