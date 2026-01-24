@@ -169,12 +169,7 @@ export const runTfmigratePlan = async (
   const tempPlanJson = path.join(tempDir, "tfplan.json");
 
   // Run tfmigrate plan
-  core.startGroup("tfmigrate plan");
-
-  const tfmigrateEnv: env.dynamicEnvs = {
-    GITHUB_TOKEN: inputs.githubToken,
-    GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-  };
+  const tfmigrateEnv: env.dynamicEnvs = {};
   // Set TFMIGRATE_EXEC_PATH if TF_COMMAND is not "terraform"
   if (!env.all.TFMIGRATE_EXEC_PATH && inputs.tfCommand !== "terraform") {
     tfmigrateEnv.TFMIGRATE_EXEC_PATH = inputs.tfCommand;
@@ -182,40 +177,31 @@ export const runTfmigratePlan = async (
 
   const executor = inputs.executor;
 
-  await executor.exec(
-    "github-comment",
-    [
-      "exec",
-      "-var",
-      `tfaction_target:${inputs.target}`,
-      "-k",
-      "tfmigrate-plan",
-      "--",
-      "tfmigrate",
-      "plan",
-      "--out",
-      tempPlanBinary,
-    ],
-    {
-      cwd: inputs.workingDirectory,
-      env: tfmigrateEnv,
+  await executor.exec("tfmigrate", ["plan", "--out", tempPlanBinary], {
+    cwd: inputs.workingDirectory,
+    env: tfmigrateEnv,
+    group: "tfmigrate plan",
+    comment: {
+      token: inputs.githubToken,
+      key: "tfmigrate-plan",
+      vars: {
+        tfaction_target: inputs.target,
+      },
     },
-  );
-  core.endGroup();
+  });
 
   // Run terraform show to convert plan to JSON
   core.startGroup(`${inputs.tfCommand} show`);
 
   const showResult = await executor.getExecOutput(
-    "github-comment",
-    ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
+    inputs.tfCommand,
+    ["show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-      },
       silent: true,
+      comment: {
+        token: inputs.githubToken,
+      },
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
@@ -296,22 +282,19 @@ export const runTerraformPlan = async (
   }
 
   // Run terraform show to convert plan to JSON
-  core.startGroup(`${inputs.tfCommand} show`);
-
   const showResult = await executor.getExecOutput(
-    "github-comment",
-    ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
+    inputs.tfCommand,
+    ["show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-      },
       silent: true,
+      group: `${inputs.tfCommand} show`,
+      comment: {
+        token: inputs.githubToken,
+      },
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
-  core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
   core.setOutput("plan_json_artifact_path", tempPlanJson); // Keep for backward compatibility

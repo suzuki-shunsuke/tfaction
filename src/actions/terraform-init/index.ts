@@ -49,16 +49,12 @@ export const main = async () => {
 
   if (!isPullRequestEvent()) {
     // Non-PR: just run init with github-comment
-    await executor.exec(
-      "github-comment",
-      ["exec", "--", tfCommand, "init", "-input=false"],
-      {
-        cwd: workingDir,
-        env: {
-          GITHUB_TOKEN: githubToken,
-        },
+    await executor.exec(tfCommand, ["init", "-input=false"], {
+      cwd: workingDir,
+      comment: {
+        token: githubToken,
       },
-    );
+    });
   } else {
     // PR: init with lock file handling
     const lockFile = workingDir
@@ -77,40 +73,32 @@ export const main = async () => {
       },
     );
     if (initResult !== 0) {
-      await executor.exec(
-        "github-comment",
-        ["exec", "--", tfCommand, "init", "-input=false", "-upgrade"],
-        {
-          cwd: workingDir,
-          env: {
-            GITHUB_TOKEN: githubToken,
-          },
+      await executor.exec(tfCommand, ["init", "-input=false", "-upgrade"], {
+        cwd: workingDir,
+        comment: {
+          token: githubToken,
         },
-      );
+      });
     }
     core.endGroup();
 
-    core.startGroup(
-      terragruntRunAvailable
-        ? `${tfCommand} run -- providers lock`
-        : `${tfCommand} providers lock`,
-    );
     const lockArgs = providersLockOpts.split(/\s+/).filter((s) => s.length > 0);
     await executor.exec(
-      "github-comment",
-      ["exec", "--", tfCommand].concat(
-        terragruntRunAvailable ? ["run", "--"] : [],
+      tfCommand,
+      (terragruntRunAvailable ? ["run", "--"] : []).concat(
         ["providers", "lock"],
         lockArgs,
       ),
       {
         cwd: workingDir,
-        env: {
-          GITHUB_TOKEN: githubToken,
+        group: terragruntRunAvailable
+          ? `${tfCommand} run -- providers lock`
+          : `${tfCommand} providers lock`,
+        comment: {
+          token: githubToken,
         },
       },
     );
-    core.endGroup();
 
     // Check if lock file changed
     if (
@@ -134,17 +122,14 @@ export const main = async () => {
     }
   }
 
-  core.startGroup(
-    terragruntRunAvailable
-      ? `${tfCommand} run -- providers`
-      : `${tfCommand} providers`,
-  );
   await executor.exec(
     tfCommand,
     terragruntRunAvailable ? ["run", "--", "providers"] : ["providers"],
     {
       cwd: workingDir,
+      group: terragruntRunAvailable
+        ? `${tfCommand} run -- providers`
+        : `${tfCommand} providers`,
     },
   );
-  core.endGroup();
 };

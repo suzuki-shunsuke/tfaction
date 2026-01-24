@@ -129,9 +129,34 @@ export const NewExecutor = async (
   return executor;
 };
 
+const _varKeys = ["tfaction_target", "pr_url"] as const;
+export type varKey = (typeof _varKeys)[number];
+
+export type Comment = {
+  token: string;
+  key?:
+    | "conftest"
+    | "terraform-validate"
+    | "tfmigrate-plan"
+    | "tfmigrate-apply"
+    | "drift-apply";
+  vars?: Partial<Record<varKey, string>>;
+  // For posting to different repos/issues (used in drift detection)
+  org?: string;
+  repo?: string;
+  pr?: string;
+};
+
 export interface ExecOptions extends exec.ExecOptions {
   env?: env.dynamicEnvs;
+  group?: string;
+  comment?: Comment;
 }
+
+type Args = {
+  command: string;
+  args?: string[];
+};
 
 export class Executor {
   installDir: string;
@@ -140,48 +165,99 @@ export class Executor {
     this.installDir = installDir;
     this.githubToken = githubToken;
   }
+
+  env(options?: ExecOptions):
+    | {
+        [key: string]: string;
+      }
+    | undefined {
+    const dynamicEnv: env.dynamicEnvs = {
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+    };
+    if (this.installDir) {
+      dynamicEnv.PATH = `${env.all.PATH}:${this.installDir}`;
+    }
+    if (this.githubToken) {
+      dynamicEnv.AQUA_GITHUB_TOKEN = this.githubToken;
+    }
+    if (options?.comment) {
+      dynamicEnv.GITHUB_TOKEN = options?.comment.token;
+      dynamicEnv.GH_COMMENT_CONFIG = lib.GitHubCommentConfig;
+    }
+
+    return {
+      ...process.env,
+      ...options?.env,
+      ...dynamicEnv,
+    };
+  }
+
+  buildArgs(command: string, args?: string[], options?: ExecOptions): Args {
+    if (!options?.comment) {
+      return {
+        command,
+        args,
+      };
+    }
+    const newArgs = ["exec"];
+    // Add org, repo, pr options for posting to different repos/issues
+    if (options?.comment.org) {
+      newArgs.push("-org", options.comment.org);
+    }
+    if (options?.comment.repo) {
+      newArgs.push("-repo", options.comment.repo);
+    }
+    if (options?.comment.pr) {
+      newArgs.push("-pr", options.comment.pr);
+    }
+    if (options?.comment.vars) {
+      for (const key of _varKeys) {
+        if (options?.comment.vars[key]) {
+          newArgs.push("-var", `${key}:${options?.comment.vars[key]}`);
+        }
+      }
+    }
+    if (options?.comment.key) {
+      newArgs.push("-k", options.comment.key);
+    }
+    newArgs.push("--", command);
+    newArgs.push(...(args ?? []));
+    return {
+      command: "github-comment",
+      args: newArgs,
+    };
+  }
+
   async exec(
     command: string,
     args?: string[],
     options?: ExecOptions,
   ): Promise<number> {
-    const dynamicEnv: env.dynamicEnvs = {
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-      ...(this.githubToken && {
-        AQUA_GITHUB_TOKEN: this.githubToken,
-      }),
-      ...(this.installDir && {
-        PATH: `${env.all.PATH}:${this.installDir}`,
-      }),
-    };
-
-    return await exec.exec(command, args, {
-      ...options,
-      env: {
-        ...process.env,
-        ...options?.env,
-        ...dynamicEnv,
-      },
-    });
+    const bArgs = this.buildArgs(command, args, options);
+    try {
+      if (options?.group) {
+        core.startGroup(options.group);
+      }
+      return await exec.exec(bArgs.command, bArgs.args, {
+        ...options,
+        env: this.env(options),
+      });
+    } finally {
+      if (options?.group) {
+        core.endGroup();
+      }
+    }
   }
+
   async getExecOutput(
     command: string,
     args?: string[],
     options?: ExecOptions,
   ): Promise<exec.ExecOutput> {
-    return await exec.getExecOutput(command, args, {
+    const bArgs = this.buildArgs(command, args, options);
+    return await exec.getExecOutput(bArgs.command, bArgs.args, {
       ...options,
-      env: {
-        ...process.env,
-        ...options?.env,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-        ...(this.githubToken && {
-          AQUA_GITHUB_TOKEN: this.githubToken,
-        }),
-        ...(this.installDir && {
-          PATH: `${env.all.PATH}:${this.installDir}`,
-        }),
-      },
+      env: this.env(options),
     });
   }
 }

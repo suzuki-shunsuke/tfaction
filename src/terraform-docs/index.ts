@@ -4,7 +4,6 @@ import * as path from "path";
 import * as fs from "fs";
 import * as tmp from "tmp";
 import * as commit from "../commit";
-import * as lib from "../lib";
 import * as env from "../lib/env";
 import * as aqua from "../aqua";
 
@@ -48,8 +47,8 @@ const findConfigFile = (
 };
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const pwd = env.GITHUB_WORKSPACE;
-  const readmePath = path.join(inputs.workingDirectory, "README.md");
+  const pwd = env.GITHUB_WORKSPACE; // TODO FIX
+  const readmePath = path.join(inputs.workingDirectory, "README.md"); // TODO FIX
   const executor = inputs.executor;
 
   // Check if README.md exists
@@ -60,30 +59,30 @@ export const run = async (inputs: Inputs): Promise<void> => {
   try {
     // Check terraform-docs version
     await executor.exec("terraform-docs", ["-v"], {
-      cwd: inputs.workingDirectory,
+      cwd: inputs.workingDirectory, // TODO FIX
     });
 
     // Search for config file
-    const config = findConfigFile(inputs.workingDirectory, pwd);
+    const config = findConfigFile(inputs.workingDirectory, pwd); // TODO FIX
 
     // Build terraform-docs arguments
     const opts = config ? ["-c", config] : ["markdown"];
 
-    const args = ["exec"];
-    if (env.all.TFACTION_TARGET) {
-      args.push("-var", `tfaction_target:${env.all.TFACTION_TARGET}`);
-    }
-    args.push("--", "terraform-docs", ...opts, ".");
-
     // Execute terraform-docs via github-comment
-    const result = await executor.getExecOutput("github-comment", args, {
-      cwd: inputs.workingDirectory,
-      ignoreReturnCode: true,
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+    const result = await executor.getExecOutput(
+      "terraform-docs",
+      [...opts, "."],
+      {
+        cwd: inputs.workingDirectory, // TODO FIX
+        ignoreReturnCode: true,
+        comment: {
+          token: inputs.githubToken,
+          vars: {
+            tfaction_target: env.all.TFACTION_TARGET,
+          },
+        },
       },
-    });
+    );
 
     // Write output to temp file
     fs.writeFileSync(tempFile.name, result.stdout);

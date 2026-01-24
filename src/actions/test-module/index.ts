@@ -46,19 +46,16 @@ export const main = async () => {
     cwd: workingDir,
   });
 
-  core.startGroup("terraform init");
-  await executor.exec(
-    "github-comment",
-    ["exec", "-var", `tfaction_target:${target}`, "--", "terraform", "init"],
-    {
-      cwd: workingDir,
-      env: {
-        GITHUB_TOKEN: githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+  await executor.exec(terraformCommand, ["init"], {
+    cwd: workingDir,
+    group: `${terraformCommand} init`,
+    comment: {
+      token: githubToken,
+      vars: {
+        tfaction_target: target,
       },
     },
-  );
-  core.endGroup();
+  });
 
   if (enableTrivy) {
     await runTrivy({

@@ -10,16 +10,17 @@
  *   },
  * },
  */
-export type dynamicEnvs = {
-  GITHUB_TOKEN?: string;
-  AQUA_GITHUB_TOKEN?: string;
-  AQUA_GLOBAL_CONFIG?: string;
-  PATH?: string;
-  GH_COMMENT_CONFIG?: string;
-  TFMIGRATE_EXEC_PATH?: string;
-  REVIEWDOG_GITHUB_API_TOKEN?: string;
-  TERRAGRUNT_LOG_DISABLE?: string;
-};
+type dynamicEnvKey =
+  | "GITHUB_TOKEN"
+  | "AQUA_GITHUB_TOKEN"
+  | "AQUA_GLOBAL_CONFIG"
+  | "PATH"
+  | "GH_COMMENT_CONFIG"
+  | "TFMIGRATE_EXEC_PATH"
+  | "REVIEWDOG_GITHUB_API_TOKEN"
+  | "TERRAGRUNT_LOG_DISABLE";
+
+export type dynamicEnvs = Partial<Record<dynamicEnvKey, string>>;
 
 /**
  * Type of keys of env.all and env.record is union, so typo is prevented.

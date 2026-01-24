@@ -1,4 +1,3 @@
-import * as core from "@actions/core";
 import * as lib from "../lib";
 import * as types from "../lib/types";
 import { TargetConfig } from "../actions/get-target-config";
@@ -67,17 +66,7 @@ const buildConftestArgs = (
   workingDir: string,
   paths: string[],
 ): string[] => {
-  const args = [
-    "exec",
-    "-var",
-    `tfaction_target:${target}`,
-    "-k",
-    "conftest",
-    "--",
-    "conftest",
-    "test",
-    "--no-color",
-  ];
+  const args = ["test", "--no-color"];
 
   if (typeof policy.policy === "string") {
     // workingDir: relative path from git_root_dir
@@ -235,26 +224,16 @@ export const run = async (
   const policies = buildPolicies(config, targetConfig, wdConfig, inputs.plan);
 
   if (policies.length !== 0) {
-    core.startGroup("conftest -v");
-    await executor.exec(
-      "github-comment",
-      [
-        "exec",
-        "-var",
-        `tfaction_target:${targetConfig.target}`,
-        "--",
-        "conftest",
-        "-v",
-      ],
-      {
-        cwd: workingDir,
-        env: {
-          GITHUB_TOKEN: inputs.githubToken,
-          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+    await executor.exec("conftest", ["-v"], {
+      cwd: workingDir,
+      group: "conftest -v",
+      comment: {
+        token: inputs.githubToken,
+        vars: {
+          tfaction_target: targetConfig.target,
         },
       },
-    );
-    core.endGroup();
+    });
   }
 
   for (const policy of policies) {
@@ -268,14 +247,16 @@ export const run = async (
       targetConfig.working_directory,
       paths,
     );
-    core.startGroup("conftest");
-    await executor.exec("github-comment", args, {
+    await executor.exec("conftest", args, {
       cwd: workingDir,
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+      group: "conftest",
+      comment: {
+        token: inputs.githubToken,
+        key: "conftest",
+        vars: {
+          tfaction_target: targetConfig.target,
+        },
       },
     });
-    core.endGroup();
   }
 };
