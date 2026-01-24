@@ -129,13 +129,17 @@ export const NewExecutor = async (
   return executor;
 };
 
-const _varKeys = ["tfaction_target"] as const;
+const _varKeys = ["tfaction_target", "pr_url"] as const;
 export type varKey = (typeof _varKeys)[number];
 
 export type Comment = {
   token: string;
-  key?: "conftest" | "terraform-validate" | "tfmigrate-plan";
-  vars?: Record<varKey, string>;
+  key?: "conftest" | "terraform-validate" | "tfmigrate-plan" | "tfmigrate-apply" | "drift-apply";
+  vars?: Partial<Record<varKey, string>>;
+  // For posting to different repos/issues (used in drift detection)
+  org?: string;
+  repo?: string;
+  pr?: string;
 };
 
 export interface ExecOptions extends exec.ExecOptions {
@@ -191,12 +195,25 @@ export class Executor {
       };
     }
     const newArgs = ["exec"];
+    // Add org, repo, pr options for posting to different repos/issues
+    if (options?.comment.org) {
+      newArgs.push("-org", options.comment.org);
+    }
+    if (options?.comment.repo) {
+      newArgs.push("-repo", options.comment.repo);
+    }
+    if (options?.comment.pr) {
+      newArgs.push("-pr", options.comment.pr);
+    }
     if (options?.comment.vars) {
       for (const key of _varKeys) {
         if (options?.comment.vars[key]) {
           newArgs.push("-var", `${key}:${options?.comment.vars[key]}`);
         }
       }
+    }
+    if (options?.comment.key) {
+      newArgs.push("-k", options.comment.key);
     }
     newArgs.push("--", command);
     newArgs.push(...(args ?? []));

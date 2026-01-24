@@ -57,40 +57,30 @@ export const main = async (): Promise<void> => {
   let exitCode = 0;
   try {
     await executor
-      .exec(
-        "github-comment",
-        [
-          "exec",
-          "-var",
-          `tfaction_target:${targetConfig.target}`,
-          "-k",
-          "tfmigrate-apply",
-          "--",
-          "tfmigrate",
-          "apply",
-        ],
-        {
-          cwd: workingDir,
-          ignoreReturnCode: true,
-          env: {
-            GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-            GITHUB_TOKEN: githubToken,
-            ...(env.all.TFMIGRATE_EXEC_PATH && {
-              TFMIGRATE_EXEC_PATH: env.all.TFMIGRATE_EXEC_PATH,
-            }),
+      .exec("tfmigrate", ["apply"], {
+        cwd: workingDir,
+        ignoreReturnCode: true,
+        env: env.all.TFMIGRATE_EXEC_PATH
+          ? { TFMIGRATE_EXEC_PATH: env.all.TFMIGRATE_EXEC_PATH }
+          : undefined,
+        listeners: {
+          stdout: (data: Buffer) => {
+            process.stdout.write(data);
+            outputStream.write(data);
           },
-          listeners: {
-            stdout: (data: Buffer) => {
-              process.stdout.write(data);
-              outputStream.write(data);
-            },
-            stderr: (data: Buffer) => {
-              process.stderr.write(data);
-              outputStream.write(data);
-            },
+          stderr: (data: Buffer) => {
+            process.stderr.write(data);
+            outputStream.write(data);
           },
         },
-      )
+        comment: {
+          token: githubToken,
+          key: "tfmigrate-apply",
+          vars: {
+            tfaction_target: targetConfig.target,
+          },
+        },
+      })
       .then((code) => {
         exitCode = code;
       });
@@ -104,36 +94,21 @@ export const main = async (): Promise<void> => {
   if (driftIssueNumber) {
     const prUrl = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/pull/${ciInfoPrNumber}`;
     try {
-      await executor.exec(
-        "github-comment",
-        [
-          "exec",
-          "-org",
-          driftIssueRepoOwner,
-          "-repo",
-          driftIssueRepoName,
-          "-pr",
-          driftIssueNumber,
-          "-var",
-          `pr_url:${prUrl}`,
-          "-var",
-          `tfaction_target:${targetConfig.target}`,
-          "-k",
-          "drift-apply",
-          "--",
-          "bash",
-          "-c",
-          `cat ${applyOutput} && exit ${exitCode}`,
-        ],
-        {
-          cwd: workingDir,
-          ignoreReturnCode: true,
-          env: {
-            GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-            GITHUB_TOKEN: githubToken,
+      await executor.exec("bash", ["-c", `cat ${applyOutput} && exit ${exitCode}`], {
+        cwd: workingDir,
+        ignoreReturnCode: true,
+        comment: {
+          token: githubToken,
+          key: "drift-apply",
+          org: driftIssueRepoOwner,
+          repo: driftIssueRepoName,
+          pr: driftIssueNumber,
+          vars: {
+            pr_url: prUrl,
+            tfaction_target: targetConfig.target,
           },
         },
-      );
+      });
     } catch (error) {
       // Ignore the failure
       core.warning(`Failed to post to drift issue: ${error}`);

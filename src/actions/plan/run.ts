@@ -194,15 +194,14 @@ export const runTfmigratePlan = async (
   core.startGroup(`${inputs.tfCommand} show`);
 
   const showResult = await executor.getExecOutput(
-    "github-comment",
-    ["exec", "--", inputs.tfCommand, "show", "-json", tempPlanBinary],
+    inputs.tfCommand,
+    ["show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-      },
       silent: true,
+      comment: {
+        token: inputs.githubToken,
+      },
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);

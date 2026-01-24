@@ -49,16 +49,12 @@ export const main = async () => {
 
   if (!isPullRequestEvent()) {
     // Non-PR: just run init with github-comment
-    await executor.exec(
-      "github-comment",
-      ["exec", "--", tfCommand, "init", "-input=false"],
-      {
-        cwd: workingDir,
-        env: {
-          GITHUB_TOKEN: githubToken,
-        },
+    await executor.exec(tfCommand, ["init", "-input=false"], {
+      cwd: workingDir,
+      comment: {
+        token: githubToken,
       },
-    );
+    });
   } else {
     // PR: init with lock file handling
     const lockFile = workingDir
