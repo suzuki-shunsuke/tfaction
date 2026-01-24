@@ -4,7 +4,7 @@ import * as tfmigrateApply from "./tfmigrate-apply";
 import * as env from "../../lib/env";
 
 export const main = async () => {
-  const jobType = env.tfactionJobType;
+  const jobType = env.all.TFACTION_JOB_TYPE;
 
   if (jobType === "terraform") {
     // Check if terraform should be skipped

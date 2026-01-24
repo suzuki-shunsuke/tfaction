@@ -111,9 +111,9 @@ const outputSkipCreatePrGuide = (
   draftPr: boolean,
 ): void => {
   const draftFlag = draftPr ? "-d " : "";
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
+  const serverUrl = env.GITHUB_SERVER_URL;
+  const repository = env.all.GITHUB_REPOSITORY;
+  const runId = env.all.GITHUB_RUN_ID;
 
   const guide = `
 ## Create a pull request
@@ -133,7 +133,7 @@ Then please fix the generated migration file.
 [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
 `;
 
-  fs.appendFileSync(env.githubStepSummary, guide);
+  fs.appendFileSync(env.all.GITHUB_STEP_SUMMARY, guide);
   core.info("Output skip-create-pr guide to GitHub Step Summary");
 };
 
@@ -186,8 +186,8 @@ export const main = async () => {
   const config = await lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
       isApply: false,
       jobType: "scaffold_working_dir",
     },
@@ -208,10 +208,10 @@ export const main = async () => {
     config.securefix_action?.pull_request?.base_branch ?? "";
 
   const label = `${labelPrefix}${target}`;
-  const actor = env.githubActor;
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
+  const actor = env.all.GITHUB_ACTOR;
+  const serverUrl = env.GITHUB_SERVER_URL;
+  const repository = env.all.GITHUB_REPOSITORY;
+  const runId = env.all.GITHUB_RUN_ID;
 
   const executor = await aqua.NewExecutor({
     githubToken,

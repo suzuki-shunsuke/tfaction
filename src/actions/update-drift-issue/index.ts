@@ -16,7 +16,7 @@ type Inputs = {
 };
 
 export const main = async () => {
-  const issueNumberStr = env.tfactionDriftIssueNumber;
+  const issueNumberStr = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   if (!issueNumberStr) {
     core.info("TFACTION_DRIFT_ISSUE_NUMBER is not set, skipping");
     return;
@@ -29,7 +29,7 @@ export const main = async () => {
     ghToken: input.getRequiredGitHubToken(),
     status: input.getRequiredStatus(),
     issueNumber: parseInt(issueNumberStr, 10),
-    issueState: env.tfactionDriftIssueState,
+    issueState: env.all.TFACTION_DRIFT_ISSUE_STATE,
     repoOwner: driftIssueRepo.owner,
     repoName: driftIssueRepo.name,
     skipTerraform: env.tfactionSkipTerraform,
@@ -66,9 +66,9 @@ const run = async (inputs: Inputs) => {
 };
 
 const getJobUrl = (): string => {
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repo = env.githubRepository;
-  const runId = env.githubRunId;
+  const serverUrl = env.GITHUB_SERVER_URL;
+  const repo = env.all.GITHUB_REPOSITORY;
+  const runId = env.all.GITHUB_RUN_ID;
   return `${serverUrl}/${repo}/actions/runs/${runId}`;
 };
 

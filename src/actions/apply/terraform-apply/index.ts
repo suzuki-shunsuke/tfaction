@@ -56,12 +56,12 @@ export const listRelatedPullRequests = async (
 
 export const main = async (): Promise<void> => {
   const githubToken = input.githubToken;
-  const driftIssueNumber = env.tfactionDriftIssueNumber;
+  const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
       isApply: true,
       jobType: lib.getJobType(),
     },
@@ -75,7 +75,7 @@ export const main = async (): Promise<void> => {
   const driftIssueRepo = drift.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;
-  const ciInfoPrNumber = env.ciInfoPrNumber;
+  const ciInfoPrNumber = env.all.CI_INFO_PR_NUMBER;
   const disableUpdateRelatedPullRequests = !(
     cfg.update_related_pull_requests?.enabled ?? true
   );
@@ -322,10 +322,10 @@ const downloadArtifact = async (
 const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   const cfg = await lib.getConfig();
   const githubToken = core.getInput("github_token");
-  const target = env.tfactionTarget;
+  const target = env.all.TFACTION_TARGET;
   const planWorkflowName = cfg.plan_workflow_name;
-  const ciInfoTempDir = env.ciInfoTempDir;
-  const branch = env.ciInfoHeadRef;
+  const ciInfoTempDir = env.all.CI_INFO_TEMP_DIR;
+  const branch = env.all.CI_INFO_HEAD_REF;
 
   const filename = "tfplan.binary";
   const artifactName = `terraform_plan_file_${target.replaceAll("/", "__")}`;

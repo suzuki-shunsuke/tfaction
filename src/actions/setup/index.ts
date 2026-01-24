@@ -32,7 +32,7 @@ const checkLatestCommit = async (): Promise<void> => {
     return;
   }
 
-  const tempDir = env.ciInfoTempDir;
+  const tempDir = env.all.CI_INFO_TEMP_DIR;
   if (!tempDir) {
     core.warning("CI_INFO_TEMP_DIR not set, skipping latest commit check");
     return;
@@ -59,7 +59,7 @@ const addLabelToPR = async (
   octokit: ReturnType<typeof github.getOctokit>,
   target: string,
 ): Promise<void> => {
-  const prNumber = env.ciInfoPrNumber;
+  const prNumber = env.all.CI_INFO_PR_NUMBER;
   if (!prNumber) {
     core.warning("CI_INFO_PR_NUMBER not set, skipping label");
     return;
@@ -112,8 +112,8 @@ export const main = async () => {
   const config = await lib.getConfig();
   const targetConfig = await getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
       isApply: env.getIsApply(),
       jobType: lib.getJobType(),
     },

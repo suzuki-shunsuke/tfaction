@@ -120,8 +120,8 @@ const generatePRParams = (
   const { prNumber, target, tempDir, serverUrl, repository, runId } = input;
 
   const runURL = `${serverUrl}/${repository}/actions/runs/${runId}`;
-  const actor = env.githubActor;
-  const prAuthor = env.ciInfoPrAuthor;
+  const actor = env.all.GITHUB_ACTOR;
+  const prAuthor = env.all.CI_INFO_PR_AUTHOR;
 
   const branch =
     `follow-up-${prNumber}-${target}-${new Date().toISOString().replace(/[-:]/g, "").replace(/\..+/, "")}`.replaceAll(
@@ -357,8 +357,8 @@ export const main = async () => {
   // Get target config
   const targetConfig = await getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
       isApply: env.getIsApply(),
       jobType,
     },
@@ -371,11 +371,11 @@ export const main = async () => {
   );
   const target = targetConfig.target;
 
-  const prNumber = env.ciInfoPrNumber;
-  const tempDir = env.ciInfoTempDir;
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
+  const prNumber = env.all.CI_INFO_PR_NUMBER;
+  const tempDir = env.all.CI_INFO_TEMP_DIR;
+  const serverUrl = env.GITHUB_SERVER_URL;
+  const repository = env.all.GITHUB_REPOSITORY;
+  const runId = env.all.GITHUB_RUN_ID;
 
   const executor = await aqua.NewExecutor({
     githubToken,

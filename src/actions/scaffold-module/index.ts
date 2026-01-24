@@ -53,17 +53,17 @@ export const main = async () => {
   const config = await lib.getConfig();
 
   // Validate inputs
-  if (!env.tfactionModulePath) {
+  if (!env.all.TFACTION_MODULE_PATH) {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
-  if (!env.tfactionModuleTemplateDir) {
+  if (!env.all.TFACTION_MODULE_TEMPLATE_DIR) {
     throw new Error("env.TFACTION_MODULE_TEMPLATE_DIR is required");
   }
 
-  const modulePath = path.join(config.git_root_dir, env.tfactionModulePath);
+  const modulePath = path.join(config.git_root_dir, env.all.TFACTION_MODULE_PATH);
   const templateDir = path.join(
     config.git_root_dir,
-    env.tfactionModuleTemplateDir,
+    env.all.TFACTION_MODULE_TEMPLATE_DIR,
   );
 
   // Check if module path already exists
@@ -93,7 +93,7 @@ export const main = async () => {
 
   // Get module name and path for replacements
   const moduleName = path.basename(modulePath);
-  const repository = env.githubRepository;
+  const repository = env.all.GITHUB_REPOSITORY;
   const ref = `module_${modulePath.replace(/\//g, "_")}_v0.1.0`;
 
   // Replace placeholders

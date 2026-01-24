@@ -17,7 +17,7 @@ export const main = async () => {
         "setup/test/terragrunt/module": ["setup/test/terragrunt/foo"],
       },
       actual: fs.readFileSync(
-        JSON.parse(env.listModuleCallers || "{}").file || "dummy",
+        JSON.parse(env.all.LIST_MODULE_CALLERS || "{}").file || "dummy",
         "utf8",
       ),
     },

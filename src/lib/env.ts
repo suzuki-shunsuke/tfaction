@@ -3,60 +3,102 @@
 // - Prevents typos in environment variable names by avoiding direct process.env references elsewhere
 // - env.ts MUST NOT depend on other modules
 
-export const path = process.env.PATH ?? "";
+/**
+ * env: {
+ *   ...env.dynamicEnvs{
+ *     GITHUB_TOKEN: input.githubToken,
+ *   },
+ * },
+ */
+export type dynamicEnvs = {
+  GITHUB_TOKEN: string;
+};
 
-// GitHub Actions
-export const githubServerUrl = process.env.GITHUB_SERVER_URL ?? "";
-export const githubRepository = process.env.GITHUB_REPOSITORY ?? "";
-export const githubRunId = process.env.GITHUB_RUN_ID ?? "";
-export const githubWorkspace = process.env.GITHUB_WORKSPACE ?? "";
-export const githubHeadRef = process.env.GITHUB_HEAD_REF ?? "";
-export const githubRefName = process.env.GITHUB_REF_NAME ?? "";
-export const githubActor = process.env.GITHUB_ACTOR ?? "";
-export const githubSha = process.env.GITHUB_SHA ?? "";
-export const githubStepSummary = process.env.GITHUB_STEP_SUMMARY ?? "";
-export const githubToken = process.env.GITHUB_TOKEN ?? "";
+/**
+ * Type of keys of env.all and env.record is union, so typo is prevented.
+ * Usage:
+ *   import * as env from "../../lib/env";
+ *   env.all.GITHUB_TOKEN; // Get an environment variable
+ *   env.all; // Get all environment variables
+ *   env: {
+ *     ...env.record("GITHUB_TOKEN", "GH_COMMENT_CONFIG"), // Pass only specific envs to envs
+ *   },
+ */
+const keys = [
+  "PATH",
+  "GITHUB_TOKEN",
+  // GitHub Actions
+  "GITHUB_SERVER_URL",
+  "GITHUB_REPOSITORY",
+  "GITHUB_RUN_ID",
+  "GITHUB_WORKSPACE",
+  "GITHUB_HEAD_REF",
+  "GITHUB_REF_NAME",
+  "GITHUB_ACTOR",
+  "GITHUB_SHA",
+  "GITHUB_STEP_SUMMARY",
+  // tfaction
+  "TFACTION_DRIFT_ISSUE_NUMBER",
+  "TFACTION_DRIFT_ISSUE_STATE",
+  "TFACTION_SKIP_TERRAFORM",
+  "TFACTION_JOB_TYPE",
+  "TFACTION_CONFIG",
+  "TFACTION_TARGET",
+  "TFACTION_WORKING_DIR",
+  "TFACTION_IS_APPLY",
+  "TFACTION_TEST_ACTION",
+  "TFACTION_TEST_ACTION_TERRAGRUNT",
+  "TFACTION_GENERATE_JSON_SCHEMA",
+  "TFACTION_MODULE_PATH",
+  "TFACTION_MODULE_TEMPLATE_DIR",
+  // ci-info
+  "CI_INFO_PR_NUMBER",
+  "CI_INFO_TEMP_DIR",
+  "CI_INFO_HEAD_REF",
+  "CI_INFO_PR_AUTHOR",
+  // tfmigrate
+  "TFMIGRATE_EXEC_PATH",
+  // xdg
+  "XDG_DATA_HOME",
+  // aqua
+  "AQUA_ROOT_DIR",
+  "AQUA_GLOBAL_CONFIG",
+  "AQUA_GITHUB_TOKEN",
+  // tests
+  "TARGET_CONFIG",
+  "GLOBAL_CONFIG",
+  "LIST_MODULE_CALLERS",
+  // exec only
+  "GH_COMMENT_CONFIG",
+  "REVIEWDOG_GITHUB_API_TOKEN",
+  "TERRAGRUNT_LOG_DISABLE",
+] as const;
+type env = (typeof keys)[number];
 
-// tfaction
-export const tfactionDriftIssueNumber =
-  process.env.TFACTION_DRIFT_ISSUE_NUMBER ?? "";
-export const tfactionDriftIssueState =
-  process.env.TFACTION_DRIFT_ISSUE_STATE ?? "";
+export const record = (...envs: env[]): Partial<Record<env, string>> => {
+  return envs.reduce<Partial<Record<env, string>>>((acc, key) => {
+    acc[key] = process.env[key] ?? "";
+    return acc;
+  }, {});
+};
+
+export const all: Record<env, string> = keys.reduce<Record<env, string>>(
+  (acc, key) => {
+    acc[key] = process.env[key] ?? "";
+    return acc;
+  },
+  {} as Record<env, string>,
+);
+
+// GitHub Actions (special logic)
+export const GITHUB_SERVER_URL =
+  process.env.GITHUB_SERVER_URL ?? "https://github.com";
+
+// tfaction (special logic)
 export const tfactionSkipTerraform =
   process.env.TFACTION_SKIP_TERRAFORM === "true";
-export const tfactionJobType = process.env.TFACTION_JOB_TYPE ?? "";
 export const tfactionConfig =
   process.env.TFACTION_CONFIG ?? "tfaction-root.yaml";
-export const tfactionTarget = process.env.TFACTION_TARGET ?? "";
-export const tfactionWorkingDir = process.env.TFACTION_WORKING_DIR ?? "";
-export const tfactionIsApply = process.env.TFACTION_IS_APPLY ?? "";
-export const tfactionTestAction = process.env.TFACTION_TEST_ACTION ?? "";
-export const tfactionTestActionTerragrunt =
-  process.env.TFACTION_TEST_ACTION_TERRAGRUNT ?? "";
-export const tfactionGenerateJsonSchema =
-  process.env.TFACTION_GENERATE_JSON_SCHEMA ?? "";
-export const tfactionModulePath = process.env.TFACTION_MODULE_PATH ?? "";
-export const tfactionModuleTemplateDir =
-  process.env.TFACTION_MODULE_TEMPLATE_DIR ?? "";
-
-// ci-info
-export const ciInfoPrNumber = process.env.CI_INFO_PR_NUMBER ?? "";
-export const ciInfoTempDir = process.env.CI_INFO_TEMP_DIR ?? "";
-export const ciInfoHeadRef = process.env.CI_INFO_HEAD_REF ?? "";
-export const ciInfoPrAuthor = process.env.CI_INFO_PR_AUTHOR ?? "";
-
-// tools
-export const tfmigrateExecPath = process.env.TFMIGRATE_EXEC_PATH ?? "";
-export const xdgDataHome = process.env.XDG_DATA_HOME ?? "";
-
-// aqua
-export const aquaRootDir = process.env.AQUA_ROOT_DIR ?? "";
-export const aquaGlobalConfigEnv = process.env.AQUA_GLOBAL_CONFIG ?? "";
-
-// tests
-export const targetConfig = process.env.TARGET_CONFIG ?? "";
-export const globalConfig = process.env.GLOBAL_CONFIG ?? "";
-export const listModuleCallers = process.env.LIST_MODULE_CALLERS ?? "";
 
 // Input retrieval functions
 

@@ -35,8 +35,8 @@ export const aquaConfig = path.join(
   "aqua.yaml",
 );
 
-export const aquaGlobalConfig = env.aquaGlobalConfigEnv
-  ? `${env.aquaGlobalConfigEnv}:${aquaConfig}`
+export const aquaGlobalConfig = env.all.AQUA_GLOBAL_CONFIG
+  ? `${env.all.AQUA_GLOBAL_CONFIG}:${aquaConfig}`
   : aquaConfig;
 
 export const getJobType = (): JobType => {

@@ -13,7 +13,7 @@ export const main = async () => {
   }
 
   const driftIssueRepo = drift.getDriftIssueRepo(config);
-  const driftIssueNumber = env.tfactionDriftIssueNumber;
+  const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
 
   // Set outputs
   core.setOutput("working_directory_file", config.working_directory_file);

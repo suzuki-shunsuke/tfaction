@@ -70,8 +70,8 @@ export const run = async (inputs: Inputs): Promise<void> => {
     const opts = config ? ["-c", config] : ["markdown"];
 
     const args = ["exec"];
-    if (env.tfactionTarget) {
-      args.push("-var", `tfaction_target:${env.tfactionTarget}`);
+    if (env.all.TFACTION_TARGET) {
+      args.push("-var", `tfaction_target:${env.all.TFACTION_TARGET}`);
     }
     args.push("--", "terraform-docs", ...opts, ".");
 

@@ -26,8 +26,8 @@ const writeSkipCreatePrSummary = (
   modulePath: string,
   draftPr: boolean,
 ): void => {
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const runId = env.githubRunId;
+  const serverUrl = env.GITHUB_SERVER_URL || "https://github.com";
+  const runId = env.all.GITHUB_RUN_ID;
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   let draftOpt = "";
@@ -66,7 +66,7 @@ export const main = async () => {
     );
   }
 
-  const modulePath = env.tfactionModulePath;
+  const modulePath = env.all.TFACTION_MODULE_PATH;
   if (!modulePath) {
     throw new Error("env.TFACTION_MODULE_PATH is required");
   }
@@ -97,10 +97,10 @@ export const main = async () => {
     return;
   }
 
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
-  const actor = env.githubActor;
+  const serverUrl = env.GITHUB_SERVER_URL;
+  const repository = env.all.GITHUB_REPOSITORY;
+  const runId = env.all.GITHUB_RUN_ID;
+  const actor = env.all.GITHUB_ACTOR;
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   const commitMessage = `chore(${modulePath}): scaffold a Terraform Module`;

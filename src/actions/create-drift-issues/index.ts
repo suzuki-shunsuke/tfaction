@@ -18,11 +18,9 @@ export const main = async () => {
   }
 
   const repoOwner =
-    cfg.drift_detection.issue_repo_owner ??
-    (env.githubRepository ?? "").split("/")[0];
+    cfg.drift_detection.issue_repo_owner ?? env.all.GITHUB_REPOSITORY.split("/")[0];
   const repoName =
-    cfg.drift_detection.issue_repo_name ??
-    (env.githubRepository ?? "").split("/")[1];
+    cfg.drift_detection.issue_repo_name ?? env.all.GITHUB_REPOSITORY.split("/")[1];
   if (!repoOwner || !repoName) {
     throw new Error("repo_owner and repo_name are required");
   }

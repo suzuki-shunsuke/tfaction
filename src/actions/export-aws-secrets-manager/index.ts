@@ -72,8 +72,8 @@ async function exportSecrets(
 
 export const main = async (): Promise<void> => {
   const config = await lib.getConfig();
-  const targetS = env.tfactionTarget;
-  const wd = env.tfactionWorkingDir;
+  const targetS = env.all.TFACTION_TARGET;
+  const wd = env.all.TFACTION_WORKING_DIR;
   const jobType = lib.getJobType();
   const isApply = env.getIsApply();
   const t = await lib.getTargetGroup(config, targetS, wd);

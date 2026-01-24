@@ -31,8 +31,8 @@ const writeSkipCreatePrSummary = (
   target: string,
   draftPr: boolean,
 ): void => {
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const runId = env.githubRunId;
+  const serverUrl = env.GITHUB_SERVER_URL || "https://github.com";
+  const runId = env.all.GITHUB_RUN_ID;
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   let draftOpt = "";
@@ -76,8 +76,8 @@ export const main = async () => {
   // Get target config
   const targetConfigResult = await getTargetConfig.getTargetConfig(
     {
-      target: env.tfactionTarget,
-      workingDir: env.tfactionWorkingDir,
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
       isApply: false,
       jobType: "scaffold_working_dir",
     },
@@ -85,8 +85,8 @@ export const main = async () => {
   );
 
   const workingDir =
-    targetConfigResult.working_directory || env.tfactionWorkingDir;
-  const target = targetConfigResult.target || env.tfactionTarget;
+    targetConfigResult.working_directory || env.all.TFACTION_WORKING_DIR;
+  const target = targetConfigResult.target || env.all.TFACTION_TARGET;
 
   if (!target) {
     throw new Error("TFACTION_TARGET is required");
@@ -109,10 +109,10 @@ export const main = async () => {
     return;
   }
 
-  const serverUrl = env.githubServerUrl || "https://github.com";
-  const repository = env.githubRepository;
-  const runId = env.githubRunId;
-  const actor = env.githubActor;
+  const serverUrl = env.GITHUB_SERVER_URL;
+  const repository = env.all.GITHUB_REPOSITORY;
+  const runId = env.all.GITHUB_RUN_ID;
+  const actor = env.all.GITHUB_ACTOR;
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   const vars = {

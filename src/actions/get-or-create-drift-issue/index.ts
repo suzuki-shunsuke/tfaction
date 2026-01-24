@@ -35,10 +35,10 @@ export const main = async () => {
   }
 
   const result = await run(cfg, {
-    target: env.tfactionTarget,
-    workingDir: env.tfactionWorkingDir,
+    target: env.all.TFACTION_TARGET,
+    workingDir: env.all.TFACTION_WORKING_DIR,
     ghToken: input.getRequiredGitHubToken(),
-    repo: env.githubRepository,
+    repo: env.all.GITHUB_REPOSITORY,
   });
 
   if (result === undefined) {

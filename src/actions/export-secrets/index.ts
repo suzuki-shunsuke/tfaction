@@ -56,8 +56,8 @@ export const main = async () => {
     `The list of secret names passed to the action: ${Array.from(secrets.keys()).join(", ")}`,
   );
 
-  const targetS = env.tfactionTarget;
-  const workingDir = env.tfactionWorkingDir;
+  const targetS = env.all.TFACTION_TARGET;
+  const workingDir = env.all.TFACTION_WORKING_DIR;
   const jobType = lib.getJobType();
   const isApply = env.getIsApply();
 

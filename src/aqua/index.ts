@@ -64,14 +64,14 @@ const getArch = (): string => {
 };
 
 const getInstallPath = (os: string): string => {
-  const aquaRoot = env.aquaRootDir;
+  const aquaRoot = env.all.AQUA_ROOT_DIR;
   if (os === "windows") {
     const base =
       aquaRoot || join(homedir(), "AppData", "Local", "aquaproj-aqua");
     return join(base, "bin", "aqua.exe");
   } else {
     const xdgDataHomeVal =
-      env.xdgDataHome || join(homedir(), ".local", "share");
+      env.all.XDG_DATA_HOME || join(homedir(), ".local", "share");
     const base = aquaRoot || join(xdgDataHomeVal, "aquaproj-aqua");
     return join(base, "bin", "aqua");
   }
@@ -151,7 +151,7 @@ export class Executor {
           AQUA_GITHUB_TOKEN: this.githubToken,
         }),
         ...(this.installDir && {
-          PATH: `${env.path}:${this.installDir}`,
+          PATH: `${env.all.PATH}:${this.installDir}`,
         }),
       },
     });
@@ -171,7 +171,7 @@ export class Executor {
           AQUA_GITHUB_TOKEN: this.githubToken,
         }),
         ...(this.installDir && {
-          PATH: `${env.path}:${this.installDir}`,
+          PATH: `${env.all.PATH}:${this.installDir}`,
         }),
       },
     });
