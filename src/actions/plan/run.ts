@@ -5,6 +5,7 @@ import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
+import * as env from "../../lib/env";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../../conftest";
 
@@ -170,13 +171,13 @@ export const runTfmigratePlan = async (
   // Run tfmigrate plan
   core.startGroup("tfmigrate plan");
 
-  const env: { [key: string]: string } = {
+  const tfmigrateEnv: env.dynamicEnvs = {
     GITHUB_TOKEN: inputs.githubToken,
     GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
   };
   // Set TFMIGRATE_EXEC_PATH if TF_COMMAND is not "terraform"
-  if (!env.tfmigrateExecPath && inputs.tfCommand !== "terraform") {
-    env.TFMIGRATE_EXEC_PATH = inputs.tfCommand;
+  if (!env.all.TFMIGRATE_EXEC_PATH && inputs.tfCommand !== "terraform") {
+    tfmigrateEnv.TFMIGRATE_EXEC_PATH = inputs.tfCommand;
   }
 
   const executor = inputs.executor;
@@ -197,7 +198,7 @@ export const runTfmigratePlan = async (
     ],
     {
       cwd: inputs.workingDirectory,
-      env: env,
+      env: tfmigrateEnv,
     },
   );
   core.endGroup();

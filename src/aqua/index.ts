@@ -129,6 +129,10 @@ export const NewExecutor = async (
   return executor;
 };
 
+export interface ExecOptions extends exec.ExecOptions {
+  env?: env.dynamicEnvs;
+}
+
 export class Executor {
   installDir: string;
   githubToken?: string;
@@ -139,27 +143,31 @@ export class Executor {
   async exec(
     command: string,
     args?: string[],
-    options?: exec.ExecOptions,
+    options?: ExecOptions,
   ): Promise<number> {
+    const dynamicEnv: env.dynamicEnvs = {
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+      ...(this.githubToken && {
+        AQUA_GITHUB_TOKEN: this.githubToken,
+      }),
+      ...(this.installDir && {
+        PATH: `${env.all.PATH}:${this.installDir}`,
+      }),
+    };
+
     return await exec.exec(command, args, {
       ...options,
       env: {
         ...process.env,
         ...options?.env,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-        ...(this.githubToken && {
-          AQUA_GITHUB_TOKEN: this.githubToken,
-        }),
-        ...(this.installDir && {
-          PATH: `${env.all.PATH}:${this.installDir}`,
-        }),
+        ...dynamicEnv,
       },
     });
   }
   async getExecOutput(
     command: string,
     args?: string[],
-    options?: exec.ExecOptions,
+    options?: ExecOptions,
   ): Promise<exec.ExecOutput> {
     return await exec.getExecOutput(command, args, {
       ...options,

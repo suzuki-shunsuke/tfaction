@@ -1,11 +1,11 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as fs from "fs";
 import * as path from "path";
 import Handlebars from "handlebars";
 
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
+import * as git from "../../lib/git";
 import * as getTargetConfig from "../get-target-config";
 
 const copyDirectory = (src: string, dest: string): void => {
@@ -31,24 +31,7 @@ const replaceInFiles = async (
   vars: Record<string, string | undefined>,
 ): Promise<void> => {
   // Get list of modified and new files
-  let output = "";
-  await exec.exec(
-    "git",
-    ["ls-files", "--modified", "--others", "--exclude-standard"],
-    {
-      cwd: workingDir,
-      listeners: {
-        stdout: (data: Buffer) => {
-          output += data.toString();
-        },
-      },
-    },
-  );
-
-  const files = output
-    .split("\n")
-    .map((f) => f.trim())
-    .filter((f) => f.length > 0);
+  const files = await git.getModifiedFiles(".", workingDir);
 
   for (const file of files) {
     const filePath = path.join(workingDir, file);
