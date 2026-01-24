@@ -45,6 +45,7 @@ test("default", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -101,6 +102,7 @@ test("config", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -144,6 +146,7 @@ test("scaffold_working_dir", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -195,6 +198,7 @@ test("tfmigrate plan", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -246,6 +250,7 @@ test("tfmigrate apply", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -297,6 +302,7 @@ test("terraform apply", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -344,6 +350,7 @@ test("explicit aws_role_session_name overrides auto-generation", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -394,6 +401,7 @@ test("terraform_docs enabled in root config", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -447,6 +455,7 @@ test("environment variables from targetGroup", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -498,6 +507,7 @@ test("environment variables from root config", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -565,6 +575,7 @@ test("gcp configuration", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -617,6 +628,7 @@ test("gcp_access_token_scopes", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -666,6 +678,7 @@ test("s3_bucket_name_tfmigrate_history", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -715,6 +728,7 @@ test("gcs_bucket_name_tfmigrate_history", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);
@@ -760,6 +774,7 @@ test("providers_lock_opts override", async () => {
           ],
         },
         "tests/tfaction-root.yaml",
+        "",
       ),
     ),
   ).toStrictEqual(result);

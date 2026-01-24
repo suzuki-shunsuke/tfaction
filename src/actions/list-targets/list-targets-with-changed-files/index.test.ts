@@ -1,5 +1,6 @@
 import { run } from "./index";
 import { expect, test } from "vitest";
+import * as aqua from "../../../aqua";
 
 test("normal", async () => {
   expect(
@@ -15,7 +16,7 @@ test("normal", async () => {
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "hello",
@@ -26,6 +27,7 @@ test("normal", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -64,7 +66,7 @@ test("job config", async () => {
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "hello",
@@ -75,6 +77,7 @@ test("job config", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -156,7 +159,7 @@ test("pr comment", async () => {
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml", "yoo/services/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "<!-- tfaction follow up pr target=yoo/dev -->",
@@ -167,6 +170,7 @@ test("pr comment", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual(prCommentExpected);
 });
@@ -179,7 +183,7 @@ test("pr comment with updated body", async () => {
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml", "yoo/services/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: `first line is added
@@ -192,6 +196,7 @@ test("pr comment with updated body", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual(prCommentExpected);
 });
@@ -214,7 +219,7 @@ test("module callers", async () => {
         "foo/bar/tfaction.yaml",
         "foo/baz/tfaction.yaml",
       ],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "hello",
@@ -228,6 +233,7 @@ test("module callers", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -274,7 +280,7 @@ test("nest", async () => {
       labels: [],
       changedFiles: ["foo/dev/bar/main.tf"],
       configFiles: ["foo/tfaction.yaml", "foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "hello",
@@ -285,6 +291,7 @@ test("nest", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -315,7 +322,7 @@ test("tfmigrate label", async () => {
       labels: ["tfmigrate:foo/dev"],
       changedFiles: [],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -326,6 +333,7 @@ test("tfmigrate label", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -356,7 +364,7 @@ test("tfmigrate label with changed files", async () => {
       labels: ["tfmigrate:foo/dev"],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -367,6 +375,7 @@ test("tfmigrate label with changed files", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -397,7 +406,7 @@ test("module change detection", async () => {
       labels: [],
       changedFiles: ["modules/vpc/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -408,6 +417,7 @@ test("module change detection", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: ["modules/vpc"],
@@ -429,7 +439,7 @@ test("module callers triggered", async () => {
       labels: [],
       changedFiles: ["modules/vpc/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -442,6 +452,7 @@ test("module callers triggered", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: ["modules/vpc"],
@@ -480,7 +491,7 @@ test("replace_target", async () => {
       labels: [],
       changedFiles: ["services/app/dev/main.tf"],
       configFiles: ["services/app/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -491,6 +502,7 @@ test("replace_target", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -518,13 +530,14 @@ test("custom label prefixes for tfmigrate", async () => {
         ],
         label_prefixes: {
           tfmigrate: "migrate:",
+          skip: "skip:",
         },
       },
       isApply: false,
       labels: ["migrate:foo/dev"],
       changedFiles: [],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -535,6 +548,7 @@ test("custom label prefixes for tfmigrate", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -566,7 +580,7 @@ test("skip label parses correctly", async () => {
       labels: ["skip:foo/dev", "other-label"],
       changedFiles: ["foo/bar/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -577,6 +591,7 @@ test("skip label parses correctly", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -604,13 +619,14 @@ test("custom skip label prefix", async () => {
         ],
         label_prefixes: {
           skip: "ignore:",
+          tfmigrate: "tfmigrate:",
         },
       },
       isApply: false,
       labels: ["ignore:foo/dev"],
       changedFiles: ["foo/bar/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -621,6 +637,7 @@ test("custom skip label prefix", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -651,7 +668,7 @@ test("tfmigrate label with unknown target throws error", async () => {
       labels: ["tfmigrate:unknown/target"],
       changedFiles: [],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -662,6 +679,7 @@ test("tfmigrate label with unknown target throws error", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).rejects.toThrow(
     "No working directory is found for the target unknown/target",
@@ -682,7 +700,7 @@ test("empty labels and changed files", async () => {
       labels: ["", ""],
       changedFiles: ["", ""],
       configFiles: ["foo/dev/tfaction.yaml", ""],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -693,6 +711,7 @@ test("empty labels and changed files", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -714,7 +733,7 @@ test("duplicate tfmigrate labels", async () => {
       labels: ["tfmigrate:foo/dev", "tfmigrate:foo/dev"],
       changedFiles: [],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -725,6 +744,7 @@ test("duplicate tfmigrate labels", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -755,7 +775,7 @@ test("isApply mode", async () => {
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -766,6 +786,7 @@ test("isApply mode", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -807,7 +828,7 @@ test("tfmigrate with job config", async () => {
       labels: ["tfmigrate:foo/dev"],
       changedFiles: [],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -818,6 +839,7 @@ test("tfmigrate with job config", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -858,7 +880,7 @@ test("tfmigrate apply with job config", async () => {
       labels: ["tfmigrate:foo/dev"],
       changedFiles: [],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -869,6 +891,7 @@ test("tfmigrate apply with job config", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -899,7 +922,7 @@ test("module caller is also a module", async () => {
       labels: [],
       changedFiles: ["modules/base/main.tf"],
       configFiles: ["terraform/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -915,6 +938,7 @@ test("module caller is also a module", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: ["modules/vpc", "modules/base"],
@@ -950,7 +974,7 @@ test("multiple target groups", async () => {
       labels: [],
       changedFiles: ["aws/dev/main.tf", "gcp/prod/main.tf"],
       configFiles: ["aws/dev/tfaction.yaml", "gcp/prod/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -961,6 +985,7 @@ test("multiple target groups", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -1010,7 +1035,7 @@ test("terraform plan job config", async () => {
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -1021,6 +1046,7 @@ test("terraform plan job config", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -1061,7 +1087,7 @@ test("terraform apply job config", async () => {
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -1072,6 +1098,7 @@ test("terraform apply job config", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],
@@ -1102,7 +1129,7 @@ test("multiple modules changed", async () => {
       labels: [],
       changedFiles: ["modules/vpc/main.tf", "modules/iam/main.tf"],
       configFiles: ["terraform/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -1116,6 +1143,7 @@ test("multiple modules changed", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: ["modules/vpc", "modules/iam"],
@@ -1138,7 +1166,7 @@ test("runs_on as array", async () => {
       labels: [],
       changedFiles: ["foo/dev/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml"],
-      pr: "",
+      prBody: "",
       payload: {
         pull_request: {
           body: "",
@@ -1149,6 +1177,7 @@ test("runs_on as array", async () => {
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
       maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     modules: [],

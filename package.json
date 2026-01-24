@@ -5,7 +5,8 @@
     "test": "vitest --run",
     "test:coverage": "vitest --run --coverage",
     "fmt": "prettier -w .",
-    "lint": "eslint"
+    "lint": "eslint && tsc --noEmit",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@actions/core": "2.0.2",
