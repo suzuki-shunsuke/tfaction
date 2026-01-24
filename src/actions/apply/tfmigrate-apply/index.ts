@@ -94,21 +94,25 @@ export const main = async (): Promise<void> => {
   if (driftIssueNumber) {
     const prUrl = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/pull/${ciInfoPrNumber}`;
     try {
-      await executor.exec("bash", ["-c", `cat ${applyOutput} && exit ${exitCode}`], {
-        cwd: workingDir,
-        ignoreReturnCode: true,
-        comment: {
-          token: githubToken,
-          key: "drift-apply",
-          org: driftIssueRepoOwner,
-          repo: driftIssueRepoName,
-          pr: driftIssueNumber,
-          vars: {
-            pr_url: prUrl,
-            tfaction_target: targetConfig.target,
+      await executor.exec(
+        "bash",
+        ["-c", `cat ${applyOutput} && exit ${exitCode}`],
+        {
+          cwd: workingDir,
+          ignoreReturnCode: true,
+          comment: {
+            token: githubToken,
+            key: "drift-apply",
+            org: driftIssueRepoOwner,
+            repo: driftIssueRepoName,
+            pr: driftIssueNumber,
+            vars: {
+              pr_url: prUrl,
+              tfaction_target: targetConfig.target,
+            },
           },
         },
-      });
+      );
     } catch (error) {
       // Ignore the failure
       core.warning(`Failed to post to drift issue: ${error}`);

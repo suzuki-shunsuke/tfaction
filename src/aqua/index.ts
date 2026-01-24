@@ -134,7 +134,12 @@ export type varKey = (typeof _varKeys)[number];
 
 export type Comment = {
   token: string;
-  key?: "conftest" | "terraform-validate" | "tfmigrate-plan" | "tfmigrate-apply" | "drift-apply";
+  key?:
+    | "conftest"
+    | "terraform-validate"
+    | "tfmigrate-plan"
+    | "tfmigrate-apply"
+    | "drift-apply";
   vars?: Partial<Record<varKey, string>>;
   // For posting to different repos/issues (used in drift detection)
   org?: string;
