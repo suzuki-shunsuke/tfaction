@@ -11,7 +11,14 @@
  * },
  */
 export type dynamicEnvs = {
-  GITHUB_TOKEN: string;
+  GITHUB_TOKEN?: string;
+  AQUA_GITHUB_TOKEN?: string;
+  AQUA_GLOBAL_CONFIG?: string;
+  PATH?: string;
+  GH_COMMENT_CONFIG?: string;
+  TFMIGRATE_EXEC_PATH?: string;
+  REVIEWDOG_GITHUB_API_TOKEN?: string;
+  TERRAGRUNT_LOG_DISABLE?: string;
 };
 
 /**
