@@ -31,10 +31,6 @@ const writeSkipCreatePrSummary = (
   target: string,
   draftPr: boolean,
 ): void => {
-  const serverUrl = env.GITHUB_SERVER_URL || "https://github.com";
-  const runId = env.all.GITHUB_RUN_ID;
-  const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
-
   let draftOpt = "";
   if (draftPr) {
     draftOpt = "-d ";
@@ -49,7 +45,7 @@ Please run the following command in your terminal.
 gh pr create -R "${repository}" ${draftOpt}\\
   -H "${branch}" \\
   -t "Scaffold a working directory (${target})" \\
-  -b "This pull request was created by [GitHub Actions](${runUrl})"
+  -b "This pull request was created by [GitHub Actions](${env.runURL})"
 \`\`\`
 
 [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
@@ -109,17 +105,13 @@ export const main = async () => {
     return;
   }
 
-  const serverUrl = env.GITHUB_SERVER_URL;
-  const repository = env.all.GITHUB_REPOSITORY;
-  const runId = env.all.GITHUB_RUN_ID;
   const actor = env.all.GITHUB_ACTOR;
-  const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   const vars = {
     target: target,
     working_dir: workingDir,
     actor,
-    run_url: runUrl,
+    run_url: env.runURL,
   };
   const commitMessage = `scaffold a working directory (${target})`;
 
@@ -134,13 +126,13 @@ export const main = async () => {
         config?.scaffold_working_directory?.pull_request?.body,
       )(vars)
     : `This pull request scaffolds a working directory \`${workingDir}\`.
-    [@${actor} created this pull request by GitHub Actions](${runUrl}).`;
+    [@${actor} created this pull request by GitHub Actions](${env.runURL}).`;
 
   const prComment = config?.scaffold_working_directory?.pull_request?.comment
     ? Handlebars.compile(
         config?.scaffold_working_directory?.pull_request?.comment,
       )(vars)
-    : `@${actor} This pull request was created by [GitHub Actions](${runUrl}) you ran.
+    : `@${actor} This pull request was created by [GitHub Actions](${env.runURL}) you ran.
     Please handle this pull request.`;
 
   await commit.create({
@@ -165,6 +157,6 @@ export const main = async () => {
 
   // Write step summary if skip_create_pr is true
   if (skipCreatePr) {
-    writeSkipCreatePrSummary(repository, branch, target, draftPr);
+    writeSkipCreatePrSummary(env.all.GITHUB_REPOSITORY, branch, target, draftPr);
   }
 };

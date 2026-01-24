@@ -66,10 +66,7 @@ const run = async (inputs: Inputs) => {
 };
 
 const getJobUrl = (): string => {
-  const serverUrl = env.GITHUB_SERVER_URL;
-  const repo = env.all.GITHUB_REPOSITORY;
-  const runId = env.all.GITHUB_RUN_ID;
-  return `${serverUrl}/${repo}/actions/runs/${runId}`;
+  return env.runURL;
 };
 
 const getLatestCommentBody = async (inputs: Inputs): Promise<string> => {

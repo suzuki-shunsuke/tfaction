@@ -109,3 +109,5 @@ export const getIsApply = (): boolean => {
 export const getGitHubWorkspace = (): string => {
   return process.env.GITHUB_WORKSPACE || process.cwd();
 };
+
+export const runURL = `${GITHUB_SERVER_URL}/${all.GITHUB_REPOSITORY}/actions/runs/${all.GITHUB_RUN_ID}`;

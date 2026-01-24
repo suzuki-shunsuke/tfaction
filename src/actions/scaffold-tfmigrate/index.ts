@@ -111,9 +111,6 @@ const outputSkipCreatePrGuide = (
   draftPr: boolean,
 ): void => {
   const draftFlag = draftPr ? "-d " : "";
-  const serverUrl = env.GITHUB_SERVER_URL;
-  const repository = env.all.GITHUB_REPOSITORY;
-  const runId = env.all.GITHUB_RUN_ID;
 
   const guide = `
 ## Create a pull request
@@ -121,11 +118,11 @@ const outputSkipCreatePrGuide = (
 Please run the following command in your terminal.
 
 \`\`\`
-gh pr create -R "${repository}" ${draftFlag}\\
+gh pr create -R "${env.all.GITHUB_REPOSITORY}" ${draftFlag}\\
   -l "${label}" \\
   -H "${branch}" \\
   -t "Scaffold tfmigrate migration (${target})" \\
-  -b "This pull request was created by [GitHub Actions](${serverUrl}/${repository}/actions/runs/${runId}). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
+  -b "This pull request was created by [GitHub Actions](${env.runURL}). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
 \`\`\`
 
 Then please fix the generated migration file.
@@ -209,9 +206,6 @@ export const main = async () => {
 
   const label = `${labelPrefix}${target}`;
   const actor = env.all.GITHUB_ACTOR;
-  const serverUrl = env.GITHUB_SERVER_URL;
-  const repository = env.all.GITHUB_REPOSITORY;
-  const runId = env.all.GITHUB_RUN_ID;
 
   const executor = await aqua.NewExecutor({
     githubToken,
@@ -260,13 +254,11 @@ export const main = async () => {
 
   const commitMessage = `chore: scaffold a tfmigrate migration (${target})`;
 
-  const runURL = `${serverUrl}/${repository}/actions/runs/${runId}`;
-
   const vars = {
     target: target,
     working_dir: workingDir,
     actor,
-    run_url: runURL,
+    run_url: env.runURL,
   };
 
   const prTitle = config?.scaffold_tfmigrate?.pull_request?.title
@@ -275,7 +267,7 @@ export const main = async () => {
 
   const prBody = config?.scaffold_tfmigrate?.pull_request?.body
     ? Handlebars.compile(config?.scaffold_tfmigrate?.pull_request?.body)(vars)
-    : `@${actor} This pull request was created by [GitHub Actions workflow_dispatch event](${runURL})
+    : `@${actor} This pull request was created by [GitHub Actions workflow_dispatch event](${env.runURL})
     About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
     [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
     Please fix the generated migration file.`;
@@ -284,7 +276,7 @@ export const main = async () => {
     ? Handlebars.compile(config?.scaffold_tfmigrate?.pull_request?.comment)(
         vars,
       )
-    : `@${actor} This pull request was created by [GitHub Actions](${runURL}) you ran.
+    : `@${actor} This pull request was created by [GitHub Actions](${env.runURL}) you ran.
     Please handle this pull request.`;
 
   const shouldSkipPr = skipCreatePr || !!prNumber;

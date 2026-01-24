@@ -107,9 +107,6 @@ interface GeneratePRParamsInput {
   prNumber: string;
   target: string;
   tempDir: string;
-  serverUrl: string;
-  repository: string;
-  runId: string;
 }
 
 const generatePRParams = (
@@ -117,9 +114,8 @@ const generatePRParams = (
   targetConfig: TargetConfig,
   input: GeneratePRParamsInput,
 ): PRParams => {
-  const { prNumber, target, tempDir, serverUrl, repository, runId } = input;
+  const { prNumber, target, tempDir } = input;
 
-  const runURL = `${serverUrl}/${repository}/actions/runs/${runId}`;
   const actor = env.all.GITHUB_ACTOR;
   const prAuthor = env.all.CI_INFO_PR_AUTHOR;
 
@@ -130,7 +126,7 @@ const generatePRParams = (
     );
   const commitMessage = `chore: create a commit to open follow up pull request
 Follow up #${prNumber}
-${runURL}`;
+${env.runURL}`;
 
   const assignees = new Set<string>();
   if (prAuthor && !prAuthor.endsWith("[bot]")) {
@@ -144,7 +140,7 @@ ${runURL}`;
   const mentions = assigneesArray.map((a) => `@${a}`).join(" ");
 
   let defaultPRBody = `This pull request was created automatically to follow up the failure of apply.
-      - Follow up #${prNumber} ([failed workflow](${runURL}))
+      - Follow up #${prNumber} ([failed workflow](${env.runURL}))
 
       Please write the description of this pull request below.
 
@@ -158,7 +154,7 @@ ${runURL}`;
     target: target,
     workingDir: targetConfig.working_directory,
     actor,
-    run_url: runURL,
+    run_url: env.runURL,
     pr_number: prNumber,
     mentions: mentions,
     original_pr_body: "",
@@ -227,8 +223,6 @@ ${prData.body}
 
 const createFailedPrsFile = (
   workingDir: string,
-  serverUrl: string,
-  repository: string,
   prNumber: string,
 ): string => {
   const tfactionDir = path.join(workingDir, ".tfaction");
@@ -247,7 +241,7 @@ const createFailedPrsFile = (
     );
   }
 
-  const prUrl = `${serverUrl}/${repository}/pull/${prNumber}`;
+  const prUrl = `${env.GITHUB_SERVER_URL}/${env.all.GITHUB_REPOSITORY}/pull/${prNumber}`;
   fs.appendFileSync(failedPrsFile, `${prUrl}\n`);
   core.info(`Updated ${failedPrsFile} with PR URL: ${prUrl}`);
 
@@ -373,9 +367,6 @@ export const main = async () => {
 
   const prNumber = env.all.CI_INFO_PR_NUMBER;
   const tempDir = env.all.CI_INFO_TEMP_DIR;
-  const serverUrl = env.GITHUB_SERVER_URL;
-  const repository = env.all.GITHUB_REPOSITORY;
-  const runId = env.all.GITHUB_RUN_ID;
 
   const executor = await aqua.NewExecutor({
     githubToken,
@@ -396,18 +387,12 @@ export const main = async () => {
     prNumber,
     target,
     tempDir,
-    serverUrl,
-    repository,
-    runId,
   });
 
   // Create failed-prs file
   const failedPrsFile = path.relative(
     config.git_root_dir,
-    path.join(
-      config.workspace,
-      createFailedPrsFile(workingDir, serverUrl, repository, prNumber),
-    ),
+    path.join(config.workspace, createFailedPrsFile(workingDir, prNumber)),
   );
 
   const labels: string[] = [];
@@ -473,7 +458,7 @@ export const main = async () => {
   if (skipCreatePr) {
     await postSkipCreateComment({
       githubToken,
-      repository,
+      repository: env.all.GITHUB_REPOSITORY,
       branch: prParams.branch,
       prTitle: prParams.prTitle,
       prNumber,
