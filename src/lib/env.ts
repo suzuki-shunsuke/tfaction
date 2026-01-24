@@ -99,15 +99,12 @@ export const all: Record<env, string> = keys.reduce<Record<env, string>>(
 );
 
 // GitHub Actions (special logic)
-export const GITHUB_SERVER_URL =
-  process.env.GITHUB_SERVER_URL ?? "https://github.com";
-export const GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE || process.cwd();
+export const GITHUB_SERVER_URL = all.GITHUB_SERVER_URL ?? "https://github.com";
+export const GITHUB_WORKSPACE = all.GITHUB_WORKSPACE || process.cwd();
 
 // tfaction (special logic)
-export const tfactionSkipTerraform =
-  process.env.TFACTION_SKIP_TERRAFORM === "true";
-export const tfactionConfig =
-  process.env.TFACTION_CONFIG ?? "tfaction-root.yaml";
+export const TFACTION_SKIP_TERRAFORM = all.TFACTION_SKIP_TERRAFORM === "true";
+export const TFACTION_CONFIG = all.TFACTION_CONFIG ?? "tfaction-root.yaml";
 
-export const isApply = (process.env.TFACTION_IS_APPLY ?? "") === "true";
+export const isApply = (all.TFACTION_IS_APPLY ?? "") === "true";
 export const runURL = `${GITHUB_SERVER_URL}/${all.GITHUB_REPOSITORY}/actions/runs/${all.GITHUB_RUN_ID}`;
