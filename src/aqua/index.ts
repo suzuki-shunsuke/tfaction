@@ -129,9 +129,24 @@ export const NewExecutor = async (
   return executor;
 };
 
+const _varKeys = ["tfaction_target"] as const;
+export type varKey = (typeof _varKeys)[number];
+
+export type Comment = {
+  token: string;
+  key?: "conftest" | "terraform-validate" | "tfmigrate-plan";
+  vars?: Record<varKey, string>;
+};
+
 export interface ExecOptions extends exec.ExecOptions {
   env?: env.dynamicEnvs;
+  group?: string;
 }
+
+type Args = {
+  command: string;
+  args?: string[];
+};
 
 export class Executor {
   installDir: string;
@@ -140,48 +155,96 @@ export class Executor {
     this.installDir = installDir;
     this.githubToken = githubToken;
   }
+
+  env(
+    options?: ExecOptions,
+    comment?: Comment,
+  ):
+    | {
+        [key: string]: string;
+      }
+    | undefined {
+    const dynamicEnv: env.dynamicEnvs = {
+      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+    };
+    if (this.installDir) {
+      dynamicEnv.PATH = `${env.all.PATH}:${this.installDir}`;
+    }
+    if (this.githubToken) {
+      dynamicEnv.AQUA_GITHUB_TOKEN = this.githubToken;
+    }
+    if (comment) {
+      dynamicEnv.GITHUB_TOKEN = comment.token;
+      dynamicEnv.GH_COMMENT_CONFIG = lib.GitHubCommentConfig;
+    }
+
+    return {
+      ...process.env,
+      ...options?.env,
+      ...dynamicEnv,
+    };
+  }
+
+  buildArgs(
+    command: string,
+    args?: string[],
+    options?: ExecOptions,
+    comment?: Comment,
+  ): Args {
+    if (!comment) {
+      return {
+        command,
+        args,
+      };
+    }
+    const newArgs = ["exec"];
+    if (comment.vars) {
+      for (const key of _varKeys) {
+        if (comment.vars[key]) {
+          newArgs.push("-var", `${key}:${comment.vars[key]}`);
+        }
+      }
+    }
+    newArgs.push("--", command);
+    newArgs.push(...(args ?? []));
+    return {
+      command: "github-comment",
+      args: newArgs,
+    };
+  }
+
   async exec(
     command: string,
     args?: string[],
     options?: ExecOptions,
+    comment?: Comment,
   ): Promise<number> {
-    const dynamicEnv: env.dynamicEnvs = {
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-      ...(this.githubToken && {
-        AQUA_GITHUB_TOKEN: this.githubToken,
-      }),
-      ...(this.installDir && {
-        PATH: `${env.all.PATH}:${this.installDir}`,
-      }),
-    };
-
-    return await exec.exec(command, args, {
-      ...options,
-      env: {
-        ...process.env,
-        ...options?.env,
-        ...dynamicEnv,
-      },
-    });
+    const bArgs = this.buildArgs(command, args, options, comment);
+    try {
+      if (options?.group) {
+        core.startGroup(options.group);
+      }
+      return await exec.exec(bArgs.command, bArgs.args, {
+        ...options,
+        env: this.env(options, comment),
+      });
+    } finally {
+      if (options?.group) {
+        core.endGroup();
+      }
+    }
   }
+
   async getExecOutput(
     command: string,
     args?: string[],
     options?: ExecOptions,
+    comment?: Comment,
   ): Promise<exec.ExecOutput> {
-    return await exec.getExecOutput(command, args, {
+    const bArgs = this.buildArgs(command, args, options, comment);
+    return await exec.getExecOutput(bArgs.command, bArgs.args, {
       ...options,
-      env: {
-        ...process.env,
-        ...options?.env,
-        AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-        ...(this.githubToken && {
-          AQUA_GITHUB_TOKEN: this.githubToken,
-        }),
-        ...(this.installDir && {
-          PATH: `${env.all.PATH}:${this.installDir}`,
-        }),
-      },
+      env: this.env(options, comment),
     });
   }
 }

@@ -58,22 +58,16 @@ export const main = async () => {
   if (!destroy) {
     core.startGroup(`${tfCommand} validate`);
     await executor.exec(
-      "github-comment",
-      [
-        "exec",
-        "-k",
-        "terraform-validate",
-        "-var",
-        `tfaction_target:${target}`,
-        "--",
-        tfCommand,
-        "validate",
-      ],
+      tfCommand,
+      ["validate"],
       {
         cwd: workingDir,
-        env: {
-          GITHUB_TOKEN: githubToken,
-          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+      },
+      {
+        token: githubToken,
+        key: "terraform-validate",
+        vars: {
+          tfaction_target: target,
         },
       },
     );
