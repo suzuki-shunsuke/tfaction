@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=../../schema/tfaction-root.json
 plan_workflow_name: test.yaml
 
 label_prefixes:
@@ -7,7 +8,6 @@ skip_terraform_by_renovate: true
 renovate_terraform_labels:
   - terraform
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_arm64
-tfcmt_plan_patch: true
 
 terraform_command: tofu
 
