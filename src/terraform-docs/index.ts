@@ -48,7 +48,7 @@ const findConfigFile = (
 };
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const pwd = env.getGitHubWorkspace();
+  const pwd = env.GITHUB_WORKSPACE;
   const readmePath = path.join(inputs.workingDirectory, "README.md");
   const executor = inputs.executor;
 

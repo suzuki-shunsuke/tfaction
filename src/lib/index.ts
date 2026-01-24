@@ -66,7 +66,7 @@ export const applyConfigDefaults = async (
 
 export const getConfig = async (): Promise<Config> => {
   const configPath = env.tfactionConfig;
-  const workspace = env.getGitHubWorkspace();
+  const workspace = env.GITHUB_WORKSPACE;
   const raw = RawConfig.parse(load(fs.readFileSync(configPath, "utf8")));
   return await applyConfigDefaults(raw, configPath, workspace);
 };
