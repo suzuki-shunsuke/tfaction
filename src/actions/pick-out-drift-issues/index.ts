@@ -85,7 +85,7 @@ const listTargets = async (
   );
 
   const targets = new Map<string, string>();
-  const pwd = env.all.GITHUB_WORKSPACE || process.cwd();
+  const pwd = env.GITHUB_WORKSPACE;
 
   for (const file of files) {
     const workingDirectoryPath = path.dirname(file);
