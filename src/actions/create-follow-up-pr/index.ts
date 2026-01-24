@@ -221,10 +221,7 @@ ${prData.body}
   };
 };
 
-const createFailedPrsFile = (
-  workingDir: string,
-  prNumber: string,
-): string => {
+const createFailedPrsFile = (workingDir: string, prNumber: string): string => {
   const tfactionDir = path.join(workingDir, ".tfaction");
   const failedPrsFile = path.join(tfactionDir, "failed-prs");
 

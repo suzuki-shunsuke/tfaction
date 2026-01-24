@@ -157,6 +157,11 @@ export const main = async () => {
 
   // Write step summary if skip_create_pr is true
   if (skipCreatePr) {
-    writeSkipCreatePrSummary(env.all.GITHUB_REPOSITORY, branch, target, draftPr);
+    writeSkipCreatePrSummary(
+      env.all.GITHUB_REPOSITORY,
+      branch,
+      target,
+      draftPr,
+    );
   }
 };

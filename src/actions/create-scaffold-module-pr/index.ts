@@ -26,7 +26,6 @@ const writeSkipCreatePrSummary = (
   modulePath: string,
   draftPr: boolean,
 ): void => {
-
   let draftOpt = "";
   if (draftPr) {
     draftOpt = "-d ";
@@ -139,6 +138,11 @@ export const main = async () => {
 
   // Write step summary if skip_create_pr is true
   if (skipCreatePr) {
-    writeSkipCreatePrSummary(env.all.GITHUB_REPOSITORY, branch, modulePath, draftPr);
+    writeSkipCreatePrSummary(
+      env.all.GITHUB_REPOSITORY,
+      branch,
+      modulePath,
+      draftPr,
+    );
   }
 };

@@ -60,7 +60,10 @@ export const main = async () => {
     throw new Error("env.TFACTION_MODULE_TEMPLATE_DIR is required");
   }
 
-  const modulePath = path.join(config.git_root_dir, env.all.TFACTION_MODULE_PATH);
+  const modulePath = path.join(
+    config.git_root_dir,
+    env.all.TFACTION_MODULE_PATH,
+  );
   const templateDir = path.join(
     config.git_root_dir,
     env.all.TFACTION_MODULE_TEMPLATE_DIR,
