@@ -26,30 +26,18 @@ const shouldSkipCIInfo = (): boolean => {
 };
 
 // Check if the PR head SHA is the latest
-const checkLatestCommit = async (): Promise<void> => {
-  const headSha = github.context.payload.pull_request?.head?.sha;
-  if (!headSha) {
-    return;
+const checkLatestCommit = async (latestHeadSHA: string): Promise<void> => {
+  const headSHA = github.context.payload.pull_request?.head?.sha;
+  if (!headSHA) {
+    throw new Error("Failed to get the current SHA from event payload");
+  }
+  if (!latestHeadSHA) {
+    throw new Error("Failed to get the pull request HEAD SHA");
   }
 
-  const tempDir = env.all.CI_INFO_TEMP_DIR;
-  if (!tempDir) {
-    core.warning("CI_INFO_TEMP_DIR not set, skipping latest commit check");
-    return;
-  }
-
-  const prJsonPath = path.join(tempDir, "pr.json");
-  if (!fs.existsSync(prJsonPath)) {
-    core.warning("pr.json not found, skipping latest commit check");
-    return;
-  }
-
-  const prData = JSON.parse(fs.readFileSync(prJsonPath, "utf8"));
-  const latestHeadSha = prData.head?.sha;
-
-  if (headSha !== latestHeadSha) {
+  if (headSHA !== latestHeadSHA) {
     throw new Error(
-      `The head sha (${headSha}) isn't latest (${latestHeadSha}).`,
+      `The head sha (${headSHA}) isn't latest (${latestHeadSHA}).`,
     );
   }
 };
@@ -58,18 +46,16 @@ const checkLatestCommit = async (): Promise<void> => {
 const addLabelToPR = async (
   octokit: ReturnType<typeof github.getOctokit>,
   target: string,
+  prNumber: number,
 ): Promise<void> => {
-  const prNumber = env.all.CI_INFO_PR_NUMBER;
-  if (!prNumber) {
-    core.warning("CI_INFO_PR_NUMBER not set, skipping label");
-    return;
+  if (prNumber <= 0) {
+    throw new Error("Failed to get a pull request number");
   }
-
   try {
     await octokit.rest.issues.addLabels({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
-      issue_number: parseInt(prNumber, 10),
+      issue_number: prNumber,
       labels: [target],
     });
     core.info(`Added label "${target}" to PR #${prNumber}`);
@@ -99,15 +85,7 @@ export const main = async () => {
   const githubToken = input.getRequiredGitHubToken();
 
   const octokit = github.getOctokit(githubToken);
-
-  if (!shouldSkipCIInfo()) {
-    await ciinfo.main();
-  }
-
-  if (isPullRequestEvent()) {
-    core.info("Checking if commit is latest...");
-    await checkLatestCommit();
-  }
+  const isPR = isPullRequestEvent();
 
   const config = await lib.getConfig();
   const targetConfig = await getTargetConfig(
@@ -124,6 +102,21 @@ export const main = async () => {
     targetConfig.working_directory,
   );
 
+  if (!shouldSkipCIInfo()) {
+    const ci = await ciinfo.main();
+    if (isPR) {
+      core.info("Checking if commit is latest...");
+
+      await checkLatestCommit(ci.pr?.data.head.sha ?? "");
+      // Add label to PR (only for PRs)
+      await addLabelToPR(
+        octokit,
+        targetConfig.target,
+        github.context.payload.pull_request?.number ?? 0,
+      );
+    }
+  }
+
   // Set environment variables from target config
   core.exportVariable("TFACTION_WORKING_DIR", targetConfig.working_directory);
   core.exportVariable("TFACTION_TARGET", targetConfig.target);
@@ -138,13 +131,6 @@ export const main = async () => {
     if (key !== "env" && key !== "target" && value !== undefined) {
       core.setOutput(key, value);
     }
-  }
-
-  const isPR = isPullRequestEvent();
-
-  // 5. Add label to PR (only for PRs)
-  if (isPR) {
-    await addLabelToPR(octokit, targetConfig.target);
   }
 
   const executor = await aqua.NewExecutor({
