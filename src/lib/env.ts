@@ -102,9 +102,7 @@ export const tfactionConfig =
 
 // Input retrieval functions
 
-export const getIsApply = (): boolean => {
-  return (process.env.TFACTION_IS_APPLY ?? "") === "true";
-};
+export const isApply = (process.env.TFACTION_IS_APPLY ?? "") === "true";
 
 export const getGitHubWorkspace = (): string => {
   return process.env.GITHUB_WORKSPACE || process.cwd();

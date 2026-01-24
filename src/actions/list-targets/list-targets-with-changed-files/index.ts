@@ -439,7 +439,7 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   const result = await run({
     labels: pr.pr?.data.labels?.map((l) => l.name) ?? [],
     config: cfg,
-    isApply: env.getIsApply(),
+    isApply: env.isApply,
     changedFiles:
       pr.pr?.files.map((file) => path.join(cfg.git_root_dir, file)) ?? [],
     configFiles,

@@ -114,7 +114,7 @@ export const main = async () => {
     {
       target: env.all.TFACTION_TARGET,
       workingDir: env.all.TFACTION_WORKING_DIR,
-      isApply: env.getIsApply(),
+      isApply: env.isApply,
       jobType: lib.getJobType(),
     },
     config,

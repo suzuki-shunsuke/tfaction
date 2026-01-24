@@ -75,7 +75,7 @@ export const main = async (): Promise<void> => {
   const targetS = env.all.TFACTION_TARGET;
   const wd = env.all.TFACTION_WORKING_DIR;
   const jobType = lib.getJobType();
-  const isApply = env.getIsApply();
+  const isApply = env.isApply;
   const t = await lib.getTargetGroup(config, targetS, wd);
   const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
   let awsClient = null;
