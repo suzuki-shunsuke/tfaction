@@ -72,12 +72,12 @@ async function exportSecrets(
 
 export const main = async (): Promise<void> => {
   const config = await lib.getConfig();
-  const targetS = env.all.TFACTION_TARGET;
-  const wd = env.all.TFACTION_WORKING_DIR;
-  const jobType = lib.getJobType();
-  const isApply = env.isApply;
-  const t = await lib.getTargetGroup(config, targetS, wd);
-  const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
+  const t = await lib.getTargetGroup(
+    config,
+    env.all.TFACTION_TARGET,
+    env.all.TFACTION_WORKING_DIR,
+  );
+  const jobConfig = lib.getJobConfig(t.group, env.isApply, lib.getJobType());
   let awsClient = null;
   if (t.group === undefined) {
     return;
