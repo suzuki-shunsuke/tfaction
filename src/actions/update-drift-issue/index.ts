@@ -65,10 +65,6 @@ const run = async (inputs: Inputs) => {
   }
 };
 
-const getJobUrl = (): string => {
-  return env.runURL;
-};
-
 const getLatestCommentBody = async (inputs: Inputs): Promise<string> => {
   const octokit = github.getOctokit(inputs.ghToken);
   const query = `
@@ -107,18 +103,17 @@ const postCommentIfNeeded = async (inputs: Inputs) => {
     return;
   }
 
-  const jobUrl = getJobUrl();
   const latestCommentBody = await getLatestCommentBody(inputs);
 
   // If the latest comment already contains the job URL, skip posting
-  if (latestCommentBody.includes(jobUrl)) {
+  if (latestCommentBody.includes(env.runURL)) {
     core.info("Latest comment already contains the job URL, skipping");
     return;
   }
 
   const comment = `## :x: CI failed
 
-[Build link](${jobUrl})
+[Build link](${env.runURL})
 `;
 
   const octokit = github.getOctokit(inputs.ghToken);
