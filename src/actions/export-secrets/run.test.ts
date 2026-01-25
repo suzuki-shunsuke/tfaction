@@ -18,9 +18,7 @@ describe("setSecretToMap", () => {
   });
 
   it("uses env_name as secret_name when only env_name is provided", () => {
-    const secrets: Secret[] = [
-      { env_name: "MY_ENV", secret_name: undefined },
-    ];
+    const secrets: Secret[] = [{ env_name: "MY_ENV", secret_name: undefined }];
     const m = new Map<string, string>();
     setSecretToMap(secrets, m);
     expect(m.get("MY_ENV")).toBe("MY_ENV");
@@ -166,9 +164,7 @@ describe("run", () => {
         { env_name: "TARGET_ENV1", secret_name: "target_secret1" },
         { env_name: "TARGET_ENV2", secret_name: "target_secret2" },
       ],
-      jobConfigSecrets: [
-        { env_name: "JOB_ENV", secret_name: "job_secret" },
-      ],
+      jobConfigSecrets: [{ env_name: "JOB_ENV", secret_name: "job_secret" }],
       inputSecrets: new Map([
         ["target_secret1", "value1"],
         ["target_secret2", "value2"],
