@@ -276,16 +276,6 @@ jobs:
           TFACTION_JOB_TYPE: terraform
           TFACTION_WORKING_DIR: tests/aws/foo/dev
 
-      - name: Test get-global-config
-        uses: ./
-        id: global-config
-        with:
-          action: get-global-config
-        env:
-          TFACTION_CONFIG: tests/tfaction-root.yaml
-          TFACTION_JOB_TYPE: terraform
-          TFACTION_WORKING_DIR: tests/aws/foo/dev
-
       - name: Test actions' outputs
         uses: ./
         with:
@@ -293,7 +283,6 @@ jobs:
         env:
           TFACTION_TEST_ACTION: "true"
           TARGET_CONFIG: ${{ toJSON(steps.target-config.outputs) }}
-          GLOBAL_CONFIG: ${{ toJSON(steps.global-config.outputs) }}
 
   test-drift-detection:
     timeout-minutes: 15
