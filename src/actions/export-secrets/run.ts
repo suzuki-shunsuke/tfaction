@@ -1,6 +1,6 @@
 export interface Secret {
-  env_name: string | undefined;
-  secret_name: string | undefined;
+  env_name?: string;
+  secret_name?: string;
 }
 
 export type SecretToExport = {
