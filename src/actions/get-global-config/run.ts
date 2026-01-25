@@ -69,7 +69,8 @@ export const run = (input: RunInput): RunResult => {
     tflint_fix: config.tflint?.fix ?? false,
     terraform_command: config.terraform_command,
     follow_up_pr_group_label_prefix:
-      config.follow_up_pr?.group_label?.prefix ?? "tfaction:follow-up-pr-group/",
+      config.follow_up_pr?.group_label?.prefix ??
+      "tfaction:follow-up-pr-group/",
     follow_up_pr_group_label_enabled:
       config.follow_up_pr?.group_label?.enabled ?? false,
     securefix_action_server_repository:

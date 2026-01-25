@@ -3,9 +3,7 @@ import { run, type DriftIssueRepo } from "./run";
 import type { Config } from "../../lib/types";
 
 // Helper to create a minimal valid config for testing
-const createMinimalConfig = (
-  overrides: Partial<Config> = {},
-): Config => ({
+const createMinimalConfig = (overrides: Partial<Config> = {}): Config => ({
   plan_workflow_name: "plan",
   working_directory_file: "tfaction.yaml",
   module_file: "tfaction_module.yaml",
