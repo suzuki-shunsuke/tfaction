@@ -7,22 +7,17 @@ import { run, type Issue } from "./run";
 
 export const main = async () => {
   // Retrieve inputs
-  const issueInput = input.getRequiredIssue();
-  const issue: Issue = JSON.parse(issueInput);
+  const issue: Issue = JSON.parse(input.getRequiredIssue());
 
   const config = await lib.getConfig();
   const driftIssueRepo = drift.getDriftIssueRepo(config);
 
-  const repoOwner = driftIssueRepo.owner;
-  const repoName = driftIssueRepo.name;
-  const serverUrl = env.GITHUB_SERVER_URL || "https://github.com";
-
   // Run business logic
   const result = run({
     issue,
-    repoOwner,
-    repoName,
-    serverUrl,
+    repoOwner: driftIssueRepo.owner,
+    repoName: driftIssueRepo.name,
+    serverUrl: env.GITHUB_SERVER_URL,
   });
 
   // Export environment variables
