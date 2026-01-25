@@ -1,5 +1,5 @@
-import * as terraformApply from "./terraform-apply";
-import * as tfmigrateApply from "./tfmigrate-apply";
+import * as terraformApply from "./terraform";
+import * as tfmigrateApply from "./tfmigrate";
 import * as env from "../../lib/env";
 
 export const main = async () => {
