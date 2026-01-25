@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
-import { runTerraformPlan, runTfmigratePlan, main, type RunInputs } from "./run";
+import {
+  runTerraformPlan,
+  runTfmigratePlan,
+  main,
+  type RunInputs,
+} from "./run";
 import type * as aqua from "../../aqua";
 import type * as getTargetConfig from "../get-target-config";
 
@@ -278,7 +283,9 @@ describe("runTerraformPlan", () => {
 
   it("skips renovate validation when renovate-change label exists", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
-    vi.mocked(fs.readFileSync).mockReturnValue("label1\nrenovate-change\nlabel2\n");
+    vi.mocked(fs.readFileSync).mockReturnValue(
+      "label1\nrenovate-change\nlabel2\n",
+    );
 
     mockExecutor.getExecOutput
       .mockResolvedValueOnce({
@@ -394,7 +401,7 @@ describe("runTfmigratePlan", () => {
   it("returns changed=true when .tfmigrate.hcl is created from S3 template", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
     vi.mocked(fs.readFileSync).mockReturnValue(
-      "bucket = \"%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%\"\nname = \"%%TARGET%%\"",
+      'bucket = "%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%"\nname = "%%TARGET%%"',
     );
 
     const inputs = {
@@ -416,7 +423,7 @@ describe("runTfmigratePlan", () => {
   it("returns changed=true when .tfmigrate.hcl is created from GCS template", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
     vi.mocked(fs.readFileSync).mockReturnValue(
-      "bucket = \"%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%\"\nname = \"%%TARGET%%\"",
+      'bucket = "%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%"\nname = "%%TARGET%%"',
     );
 
     const inputs = {
@@ -696,7 +703,9 @@ describe("main", () => {
 
   it("skips conftest when tfmigrate creates .tfmigrate.hcl", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
-    vi.mocked(fs.readFileSync).mockReturnValue("bucket = \"%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%\"");
+    vi.mocked(fs.readFileSync).mockReturnValue(
+      'bucket = "%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%"',
+    );
 
     const targetConfig: getTargetConfig.TargetConfig = {
       working_directory: "aws/test",
