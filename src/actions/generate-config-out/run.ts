@@ -71,8 +71,5 @@ export const generateTempFileName = (
  * @returns A timestamp string without separators
  */
 export const formatTimestamp = (date: Date): string => {
-  return date
-    .toISOString()
-    .replace(/[-:T]/g, "")
-    .replace(/\..+/, "");
+  return date.toISOString().replace(/[-:T]/g, "").replace(/\..+/, "");
 };
