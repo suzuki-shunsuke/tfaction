@@ -11,7 +11,6 @@ import * as aqua from "../../aqua";
 import * as ciinfo from "../../ci-info";
 import { getTargetConfig } from "../get-target-config";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
-import * as exportAWSSecretsManager from "../export-aws-secrets-manager";
 import * as checkTerraformSkip from "../../check-terraform-skip";
 
 // Check if this is a pull request event
@@ -165,8 +164,6 @@ export const main = async () => {
       throw error;
     }
   }
-
-  await exportAWSSecretsManager.main();
 
   if (input.sshKey) {
     core.info("Setting up SSH key...");
