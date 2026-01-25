@@ -7,6 +7,9 @@ import {
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
 
+/**
+ * Mask the secret value and output it as an environment variable.
+ */
 function exportSecret(
   envName: string,
   secretID: string,
@@ -26,12 +29,14 @@ function exportSecret(
   core.exportVariable(envName, secretValue);
 }
 
+/**
+ * Get secrets from AWS Secrets Manager and export them as environment variables.
+ */
 async function exportSecrets(
   client: SecretsManagerClient,
   secrets: Array<types.AWSSecretsManagerSecret>,
 ) {
-  for (let i = 0; i < secrets.length; i++) {
-    const secret = secrets[i];
+  for (const secret of secrets) {
     if (!secret.secret_id) {
       throw new Error("secret_id is required");
     }
@@ -43,8 +48,7 @@ async function exportSecrets(
       throw new Error(`SecretString is empty: secret_id=${secret.secret_id}`);
     }
     let secretJSON = null;
-    for (let j = 0; j < secret.envs.length; j++) {
-      const e = secret.envs[j];
+    for (const e of secret.envs) {
       if (!e.env_name) {
         throw new Error(`env_name is required: secret_id=${secret.secret_id}`);
       }
