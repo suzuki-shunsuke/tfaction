@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=../../schema/tfaction-root.json
 plan_workflow_name: test.yaml
 
 label_prefixes:
@@ -7,13 +8,12 @@ skip_terraform_by_renovate: true
 renovate_terraform_labels:
   - terraform
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_arm64
-tfcmt_plan_patch: true
 
 terraform_command: tofu
 
 conftest:
   policies:
-    - policy: ../conftest/policy
+    - policy: tests/conftest/policy
       tf: true
 
 update_local_path_module_caller:
@@ -44,10 +44,10 @@ drift_detection:
   minimum_detection_interval: 1
   num_of_issues: 1
 
-replace:
+replace_target:
   patterns:
     - regexp: /services/
       replace: /
 
 target_groups:
-  - working_directory: ""
+  - working_directory: tests/opentofu

@@ -4,12 +4,13 @@ import * as path from "path";
 import * as fs from "fs";
 import * as tmp from "tmp";
 import * as commit from "../commit";
-import * as lib from "../lib";
 import * as env from "../lib/env";
 import * as aqua from "../aqua";
 
 type Inputs = {
+  /** A relative path from github.workspace */
   workingDirectory: string;
+  repoRoot: string;
   githubToken: string;
   securefixActionAppId: string;
   securefixActionAppPrivateKey: string;
@@ -48,7 +49,6 @@ const findConfigFile = (
 };
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  const pwd = lib.getGitHubWorkspace();
   const readmePath = path.join(inputs.workingDirectory, "README.md");
   const executor = inputs.executor;
 
@@ -64,26 +64,26 @@ export const run = async (inputs: Inputs): Promise<void> => {
     });
 
     // Search for config file
-    const config = findConfigFile(inputs.workingDirectory, pwd);
+    const config = findConfigFile(inputs.workingDirectory, inputs.repoRoot);
 
     // Build terraform-docs arguments
     const opts = config ? ["-c", config] : ["markdown"];
 
-    const args = ["exec"];
-    if (env.tfactionTarget) {
-      args.push("-var", `tfaction_target:${env.tfactionTarget}`);
-    }
-    args.push("--", "terraform-docs", ...opts, ".");
-
     // Execute terraform-docs via github-comment
-    const result = await executor.getExecOutput("github-comment", args, {
-      cwd: inputs.workingDirectory,
-      ignoreReturnCode: true,
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+    const result = await executor.getExecOutput(
+      "terraform-docs",
+      [...opts, "."],
+      {
+        cwd: inputs.workingDirectory,
+        ignoreReturnCode: true,
+        comment: {
+          token: inputs.githubToken,
+          vars: {
+            tfaction_target: env.all.TFACTION_TARGET,
+          },
+        },
       },
-    });
+    );
 
     // Write output to temp file
     fs.writeFileSync(tempFile.name, result.stdout);

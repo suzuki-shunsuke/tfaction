@@ -1,41 +1,27 @@
-import * as fs from "fs";
-import * as path from "path";
 import * as core from "@actions/core";
-import * as lib from "../lib";
-import * as env from "../lib/env";
 
-type Inputs = {
+export type Inputs = {
   skipLabelPrefix: string;
-  labels: string;
+  labels: string[];
   prAuthor: string;
   target?: string;
 };
 
-export const main = async () => {
-  const config = await lib.getConfig();
-  if (!env.ciInfoTempDir) {
-    throw new Error("CI_INFO_TEMP_DIR is not set");
-  }
-  if (!env.ciInfoPrAuthor) {
-    throw new Error("CI_INFO_PR_AUTHOR is not set");
-  }
-  const inputs = {
-    skipLabelPrefix: config.label_prefixes.skip,
-    labels: path.join(env.ciInfoTempDir, "labels.txt"),
-    prAuthor: env.ciInfoPrAuthor,
-    target: env.tfactionTarget,
-  };
-  // labels is pull request's labels.
-  const labels = fs.readFileSync(inputs.labels, "utf8").split("\n");
+type SkipTerraformConfig = {
+  renovate_login?: string;
+  skip_terraform_by_renovate?: boolean;
+  renovate_terraform_labels?: string[];
+};
 
-  const isSkip = getSkipTerraform(inputs, config, labels);
+export const main = async (config: SkipTerraformConfig, inputs: Inputs) => {
+  const isSkip = getSkipTerraform(inputs, config, inputs.labels);
   core.exportVariable("TFACTION_SKIP_TERRAFORM", isSkip);
   core.setOutput("skip_terraform", isSkip);
 };
 
 export const getSkipTerraform = (
   inputs: Inputs,
-  config: lib.Config,
+  config: SkipTerraformConfig,
   labels: string[],
 ): boolean => {
   // https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr

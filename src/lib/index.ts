@@ -1,12 +1,20 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
-import * as github from "@actions/github";
 import { load } from "js-yaml";
 import { z } from "zod";
-import { fileURLToPath } from "node:url";
 import * as env from "./env";
+import { fileURLToPath } from "node:url";
+import { listWorkingDirFiles, getRootDir as getGitRootDir } from "./git";
+import {
+  RawConfig,
+  Config,
+  TargetGroup,
+  TargetConfig,
+  Replace,
+  JobType,
+  JobConfig,
+} from "./types";
 
 export const GitHubActionPath = path.join(
   fileURLToPath(import.meta.url),
@@ -26,425 +34,53 @@ export const aquaConfig = path.join(
   "aqua",
   "aqua.yaml",
 );
-export const aquaGlobalConfig = env.aquaGlobalConfigEnv
-  ? `${env.aquaGlobalConfigEnv}:${aquaConfig}`
+
+export const aquaGlobalConfig = env.all.AQUA_GLOBAL_CONFIG
+  ? `${env.all.AQUA_GLOBAL_CONFIG}:${aquaConfig}`
   : aquaConfig;
 
-const GitHubEnvironment = z.union([
-  z.string(),
-  z.object({
-    name: z.string(),
-    url: z.string(),
-  }),
-]);
-export type GitHubEnvironment = z.infer<typeof GitHubEnvironment>;
-
-const JobType = z.union([
-  z.literal("terraform"),
-  z.literal("tfmigrate"),
-  z.literal("scaffold_working_dir"),
-]);
-export type JobType = z.infer<typeof JobType>;
-
 export const getJobType = (): JobType => {
-  if (!env.tfactionJobType) {
+  const jobType = process.env.TFACTION_JOB_TYPE ?? "";
+  if (!jobType) {
     throw new Error("environment variable TFACTION_JOB_TYPE is required");
   }
-  return JobType.parse(env.tfactionJobType);
-};
-
-const ReviewdogConfig = z.object({
-  filter_mode: z.enum(["added", "diff_context", "file", "nofilter"]).optional(),
-  fail_level: z.enum(["none", "any", "info", "warning", "error"]).optional(),
-});
-
-const TflintConfig = z.object({
-  enabled: z.boolean().optional(),
-  fix: z.boolean().optional(),
-  reviewdog: ReviewdogConfig.optional(),
-});
-type TflintConfig = z.infer<typeof TflintConfig>;
-
-const TrivyConfig = z.object({
-  enabled: z.boolean().optional(),
-  reviewdog: ReviewdogConfig.optional(),
-});
-type TrivyConfig = z.infer<typeof TrivyConfig>;
-
-const TerraformDocsConfig = z.object({
-  enabled: z.boolean().optional(),
-});
-type TerraformDocsConfig = z.infer<typeof TerraformDocsConfig>;
-
-const ConftestPolicyConfig = z.object({
-  tf: z.boolean().optional(),
-  plan: z.boolean().optional(),
-  id: z.string().optional(),
-  enabled: z.boolean().optional(),
-  policy: z.union([z.string(), z.string().array()]),
-  data: z.union([z.string(), z.string().array()]).optional(),
-  fail_on_warn: z.boolean().optional(),
-  no_fail: z.boolean().optional(),
-  all_namespaces: z.boolean().optional(),
-  quiet: z.boolean().optional(),
-  trace: z.boolean().optional(),
-  strict: z.boolean().optional(),
-  show_builtin_errors: z.boolean().optional(),
-  junit_hide_message: z.boolean().optional(),
-  suppress_exceptions: z.boolean().optional(),
-  combine: z.boolean().optional(),
-  tls: z.boolean().optional(),
-  ignore: z.string().optional(),
-  parser: z.string().optional(),
-  capabilities: z.string().optional(),
-  output: z.string().optional(),
-  namespaces: z.string().array().optional(),
-  proto_file_dirs: z.string().array().optional(),
-  paths: z.string().array().optional(),
-});
-export type ConftestPolicyConfig = z.infer<typeof ConftestPolicyConfig>;
-
-const ConftestConfig = z.object({
-  disable_all: z.boolean().optional(),
-  policies: ConftestPolicyConfig.array().optional(),
-});
-type ConftestConfig = z.infer<typeof ConftestConfig>;
-
-const GitHubSecrets = z
-  .object({
-    env_name: z.string(),
-    secret_name: z.string(),
-  })
-  .array();
-export type GitHubSecrets = z.infer<typeof GitHubSecrets>;
-
-const AWSSecretsManagerSecretEnv = z.object({
-  env_name: z.string(),
-  secret_key: z.string().optional(),
-});
-type AWSSecretsManagerSecretEnv = z.infer<typeof AWSSecretsManagerSecretEnv>;
-
-const AWSSecretsManagerSecret = z.object({
-  envs: AWSSecretsManagerSecretEnv.array(),
-  secret_id: z.string(),
-  version_id: z.string().optional(),
-  version_stage: z.string().optional(),
-  aws_region: z.string().optional(),
-});
-export type AWSSecretsManagerSecret = z.infer<typeof AWSSecretsManagerSecret>;
-
-const JobConfig = z.object({
-  aws_assume_role_arn: z.string().optional(),
-  aws_role_session_name: z.string().optional(),
-  gcp_service_account: z.string().optional(),
-  gcp_workload_identity_provider: z.string().optional(),
-  gcp_access_token_scopes: z.string().optional(),
-  gcp_remote_backend_service_account: z.string().optional(),
-  gcp_remote_backend_workload_identity_provider: z.string().optional(),
-  environment: GitHubEnvironment.optional(),
-  secrets: GitHubSecrets.optional(),
-  runs_on: z.union([z.string(), z.string().array()]).optional(),
-  env: z.record(z.string(), z.string()).optional(),
-  aws_secrets_manager: AWSSecretsManagerSecret.array().optional(),
-});
-export type JobConfig = z.infer<typeof JobConfig>;
-
-const TargetGroup = z.object({
-  aws_region: z.string().optional(),
-  aws_assume_role_arn: z.string().optional(),
-  aws_role_session_name: z.string().optional(),
-  destroy: z.boolean().optional(),
-  env: z.record(z.string(), z.string()).optional(),
-  environment: GitHubEnvironment.optional(),
-  gcp_service_account: z.string().optional(),
-  gcp_workload_identity_provider: z.string().optional(),
-  gcp_remote_backend_service_account: z.string().optional(),
-  gcp_remote_backend_workload_identity_provider: z.string().optional(),
-  gcs_bucket_name_tfmigrate_history: z.string().optional(),
-  runs_on: z.union([z.string(), z.string().array()]).optional(),
-  secrets: GitHubSecrets.optional(),
-  s3_bucket_name_tfmigrate_history: z.string().optional(),
-  template_dir: z.string().optional(),
-  terraform_apply_config: JobConfig.optional(),
-  terraform_plan_config: JobConfig.optional(),
-  tfmigrate_apply_config: JobConfig.optional(),
-  tfmigrate_plan_config: JobConfig.optional(),
-  working_directory: z.string(),
-  aws_secrets_manager: AWSSecretsManagerSecret.array().optional(),
-  terraform_command: z.string().optional(),
-  conftest: ConftestConfig.optional(),
-  drift_detection: z
-    .object({
-      enabled: z.boolean().optional(),
-    })
-    .optional(),
-});
-export type TargetGroup = z.infer<typeof TargetGroup>;
-
-const TargetConfig = z.object({
-  aws_assume_role_arn: z.string().optional(),
-  aws_region: z.string().optional(),
-  destroy: z.boolean().optional(),
-  drift_detection: z
-    .object({
-      enabled: z.boolean().optional(),
-    })
-    .optional(),
-  env: z.record(z.string(), z.string()).optional(),
-  gcs_bucket_name_tfmigrate_history: z.string().optional(),
-  gcp_service_account: z.string().optional(),
-  gcp_workload_identity_provider: z.string().optional(),
-  providers_lock_opts: z.string().optional(),
-  s3_bucket_name_tfmigrate_history: z.string().optional(),
-  secrets: GitHubSecrets.optional(),
-  terraform_apply_config: JobConfig.optional(),
-  terraform_plan_config: JobConfig.optional(),
-  tfmigrate_apply_config: JobConfig.optional(),
-  tfmigrate_plan_config: JobConfig.optional(),
-  terraform_command: z.string().optional(),
-  terraform_docs: TerraformDocsConfig.optional(),
-  conftest: ConftestConfig.optional(),
-});
-export type TargetConfig = z.infer<typeof TargetConfig>;
-
-const LabelPrefixes = z.object({
-  skip: z.string().optional(),
-  tfmigrate: z.string().optional(),
-});
-export type LabelPrefixes = z.infer<typeof LabelPrefixes>;
-
-const Replace = z.object({
-  patterns: z
-    .object({
-      regexp: z.string(),
-      replace: z.string(),
-      flags: z.string().optional(),
-    })
-    .array(),
-});
-export type Replace = z.infer<typeof Replace>;
-
-const RawConfig = z.object({
-  aqua: z
-    .object({
-      update_checksum: z
-        .object({
-          enabled: z.boolean().optional(),
-          skip_push: z.boolean().optional(),
-          prune: z.boolean().optional(),
-        })
-        .optional(),
-    })
-    .optional(),
-  conftest: ConftestConfig.optional(),
-  draft_pr: z.boolean().optional(),
-  drift_detection: z
-    .object({
-      issue_repo_owner: z.string().optional(),
-      issue_repo_name: z.string().optional(),
-      num_of_issues: z.number().optional(),
-      minimum_detection_interval: z.number().optional(),
-      enabled: z.boolean().optional(),
-    })
-    .optional(),
-  env: z.record(z.string(), z.string()).optional(),
-  label_prefixes: LabelPrefixes.optional(),
-  module_file: z.string().optional(),
-  plan_workflow_name: z.string(),
-  renovate_login: z.string().optional(),
-  renovate_terraform_labels: z.string().array().optional(),
-  scaffold_working_directory: z
-    .object({
-      pull_request: z
-        .object({
-          title: z.string().optional(),
-          body: z.string().optional(),
-          comment: z.string().optional(),
-        })
-        .nullish(),
-    })
-    .nullish(),
-  follow_up_pr: z
-    .object({
-      pull_request: z
-        .object({
-          title: z.string().optional(),
-          body: z.string().optional(),
-          comment: z.string().optional(),
-        })
-        .nullish(),
-      group_label: z
-        .object({
-          enabled: z.boolean().optional(),
-          prefix: z.string().optional(),
-        })
-        .nullish(),
-    })
-    .nullish(),
-  scaffold_module: z
-    .object({
-      pull_request: z
-        .object({
-          title: z.string().optional(),
-          body: z.string().optional(),
-          comment: z.string().optional(),
-        })
-        .nullish(),
-    })
-    .nullish(),
-  scaffold_tfmigrate: z
-    .object({
-      pull_request: z
-        .object({
-          title: z.string().optional(),
-          body: z.string().optional(),
-          comment: z.string().optional(),
-        })
-        .nullish(),
-    })
-    .nullish(),
-  skip_create_pr: z.boolean().optional(),
-  skip_terraform_by_renovate: z.boolean().optional(),
-  target_groups: TargetGroup.array(),
-  tflint: TflintConfig.optional(),
-  trivy: TrivyConfig.optional(),
-  terraform_docs: TerraformDocsConfig.optional(),
-  update_local_path_module_caller: z
-    .object({
-      enabled: z.boolean().optional(),
-    })
-    .optional(),
-  terraform_command: z.string().optional(),
-  update_related_pull_requests: z
-    .object({
-      enabled: z.boolean().optional(),
-    })
-    .optional(),
-  working_directory_file: z.string().optional(),
-  replace: Replace.optional(),
-  providers_lock_opts: z.string().optional(),
-  securefix_action: z
-    .object({
-      server_repository: z.string(),
-      pull_request: z.object({
-        base_branch: z.string(),
-      }),
-    })
-    .optional(),
-  limit_changed_dirs: z
-    .object({
-      working_dirs: z.number().optional(),
-      modules: z.number().optional(),
-    })
-    .optional(),
-});
-export type RawConfig = z.infer<typeof RawConfig>;
-
-// Config with default values applied
-export interface Config extends Omit<
-  RawConfig,
-  | "working_directory_file"
-  | "module_file"
-  | "renovate_login"
-  | "draft_pr"
-  | "skip_create_pr"
-  | "terraform_command"
-  | "label_prefixes"
-  | "tflint"
-  | "trivy"
-> {
-  /** Absolute path to git root directory */
-  git_root_dir: string;
-  config_path: string;
-  config_dir: string;
-  workspace: string;
-  working_directory_file: string;
-  module_file: string;
-  renovate_login: string;
-  draft_pr: boolean;
-  skip_create_pr: boolean;
-  terraform_command: string;
-  label_prefixes: {
-    tfmigrate: string;
-    skip: string;
-  };
-  tflint: {
-    enabled: boolean;
-    fix: boolean;
-    reviewdog?: z.infer<typeof ReviewdogConfig>;
-  };
-  trivy: {
-    enabled: boolean;
-    reviewdog?: z.infer<typeof ReviewdogConfig>;
-  };
-}
-
-export const generateJSONSchema = (dir: string) => {
-  const configJSONSchema = z.toJSONSchema(RawConfig);
-  fs.writeFileSync(
-    path.join(dir, "tfaction-root.json"),
-    JSON.stringify(configJSONSchema, null, 2),
-  );
-
-  const targetConfigJSONSchema = z.toJSONSchema(TargetConfig);
-  fs.writeFileSync(
-    path.join(dir, "tfaction.json"),
-    JSON.stringify(targetConfigJSONSchema, null, 2),
-  );
+  return JobType.parse(jobType);
 };
 
 export const applyConfigDefaults = async (
-  raw: RawConfig,
+  raw: z.input<typeof RawConfig>,
   configPath: string,
+  workspace: string,
 ): Promise<Config> => {
+  const parsed = RawConfig.parse(raw);
   const configDir = path.dirname(configPath);
   const gitRootDir = await getGitRootDir(configDir);
-  const workspace = getGitHubWorkspace();
   return {
-    ...raw,
+    ...parsed,
     git_root_dir: gitRootDir,
     config_path: configPath,
     config_dir: configDir,
     workspace: workspace,
-    working_directory_file: raw.working_directory_file ?? "tfaction.yaml",
-    module_file: raw.module_file ?? "tfaction_module.yaml",
-    renovate_login: raw.renovate_login ?? "renovate[bot]",
-    draft_pr: raw.draft_pr ?? false,
-    skip_create_pr: raw.skip_create_pr ?? false,
-    terraform_command: raw.terraform_command ?? "terraform",
-    label_prefixes: {
-      tfmigrate: raw.label_prefixes?.tfmigrate ?? "tfmigrate:",
-      skip: raw.label_prefixes?.skip ?? "skip:",
-    },
-    tflint: {
-      enabled: raw.tflint?.enabled ?? true,
-      fix: raw.tflint?.fix ?? false,
-      reviewdog: raw.tflint?.reviewdog,
-    },
-    trivy: {
-      enabled: raw.trivy?.enabled ?? true,
-      reviewdog: raw.trivy?.reviewdog,
-    },
   };
 };
 
 export const getConfig = async (): Promise<Config> => {
-  const raw = RawConfig.parse(
-    load(fs.readFileSync(env.tfactionConfig, "utf8")),
-  );
-  return await applyConfigDefaults(raw, env.tfactionConfig);
+  const configPath = env.TFACTION_CONFIG;
+  const workspace = env.GITHUB_WORKSPACE;
+  const raw = RawConfig.parse(load(fs.readFileSync(configPath, "utf8")));
+  return await applyConfigDefaults(raw, configPath, workspace);
 };
 
 /**
  *
- * @param wds relative paths from tfaction-root.yaml
+ * @param wds relative paths from git root directory
  * @param config
  * @returns a map of working directory to target name
  */
 export const createWDTargetMap = (
   wds: string[],
   targetGroups: TargetGroup[],
-  replace: Replace | undefined,
+  replaceTarget: Replace | undefined,
 ): Map<string, string> => {
   const m = new Map<string, string>();
   for (const wd of wds) {
@@ -455,7 +91,7 @@ export const createWDTargetMap = (
       if (rel.startsWith("..") || path.isAbsolute(rel)) {
         continue;
       }
-      for (const pattern of replace?.patterns ?? []) {
+      for (const pattern of replaceTarget?.patterns ?? []) {
         target = target.replace(
           new RegExp(pattern.regexp, pattern.flags),
           pattern.replace,
@@ -466,10 +102,6 @@ export const createWDTargetMap = (
     m.set(wd, target);
   }
   return m;
-};
-
-export const getIsApply = (): boolean => {
-  return env.tfactionIsApply === "true";
 };
 
 /**
@@ -584,7 +216,7 @@ export const getTargetGroup = async (
     config_path: string;
     working_directory_file: string;
     target_groups: TargetGroup[];
-    replace?: Replace | undefined;
+    replace_target?: Replace | undefined;
   },
   target?: string,
   workingDir?: string,
@@ -602,7 +234,7 @@ export const getTargetGroup = async (
       };
     }
     target = workingDir;
-    for (const pattern of config.replace?.patterns ?? []) {
+    for (const pattern of config.replace_target?.patterns ?? []) {
       target = target.replace(new RegExp(pattern.regexp), pattern.replace);
     }
     return {
@@ -624,13 +256,12 @@ export const getTargetGroup = async (
   const wds: string[] = [];
   const files = await listWorkingDirFiles(
     gitRootDir,
-    configDir,
     config.working_directory_file,
   );
   for (const file of files) {
     wds.push(path.dirname(file));
   }
-  const m = createWDTargetMap(wds, config.target_groups, config.replace);
+  const m = createWDTargetMap(wds, config.target_groups, config.replace_target);
   for (const [wd, t] of m) {
     if (t === target) {
       workingDir = wd;
@@ -649,123 +280,4 @@ export const getTargetGroup = async (
     workingDir: workingDir,
     group: targetConfig,
   };
-};
-
-/**
- *
- * @param gitRootDir
- * @param configDir
- * @param fileName
- * @returns A relative file paths from tfaction-root.yaml to the config directory
- */
-export const listWorkingDirFiles = async (
-  gitRootDir: string,
-  configDir: string,
-  fileName: string,
-): Promise<string[]> => {
-  const result = await exec.getExecOutput(
-    "git",
-    ["ls-files", `*/${fileName}`],
-    {
-      ignoreReturnCode: true,
-      silent: true,
-      cwd: gitRootDir,
-    },
-  );
-
-  const arr: string[] = [];
-  for (const line of result.stdout.split("\n").map((l) => l.trim())) {
-    if (line === "") {
-      continue;
-    }
-    arr.push(path.relative(configDir, line));
-  }
-  return arr;
-};
-
-type Issue = {
-  url: string;
-  number: number;
-  state: string;
-  title: string;
-  target: string;
-};
-
-export const createIssue = async (
-  target: string,
-  ghToken: string,
-  repoOwner: string,
-  repoName: string,
-): Promise<Issue> => {
-  const octokit = github.getOctokit(ghToken);
-  const body = `
-  This issues was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
-
-  About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
-  `;
-
-  const issue = await octokit.rest.issues.create({
-    owner: repoOwner,
-    repo: repoName,
-    title: `Terraform Drift (${target})`,
-    body: body,
-  });
-  return {
-    url: issue.data.html_url,
-    number: issue.data.number,
-    title: issue.data.title,
-    target: target,
-    state: issue.data.state,
-  };
-};
-
-export const checkDriftDetectionEnabled = (
-  cfg: Config,
-  targetGroup: TargetGroup | undefined,
-  wdCfg: TargetConfig,
-): boolean => {
-  if (wdCfg.drift_detection) {
-    return wdCfg.drift_detection.enabled ?? true;
-  }
-  if (targetGroup?.drift_detection) {
-    return targetGroup.drift_detection.enabled ?? true;
-  }
-  return cfg.drift_detection?.enabled ?? false;
-};
-
-export interface DriftIssueRepo {
-  owner: string;
-  name: string;
-}
-
-export const getDriftIssueRepo = (cfg: Config): DriftIssueRepo => {
-  return {
-    owner: cfg.drift_detection?.issue_repo_owner ?? github.context.repo.owner,
-    name: cfg.drift_detection?.issue_repo_name ?? github.context.repo.repo,
-  };
-};
-
-/**
- *
- * @param cwd a relative path from github.workspace to tfaction-root.yaml
- * @returns an absolute path to the root directory of the git repository
- */
-export const getGitRootDir = async (cwd: string): Promise<string> => {
-  const out = await exec.getExecOutput(
-    "git",
-    ["rev-parse", "--show-toplevel"],
-    {
-      silent: true,
-      cwd,
-    },
-  );
-  return out.stdout.trim();
-};
-
-/**
- *
- * @returns an absolute path to github.workspace
- */
-export const getGitHubWorkspace = (): string => {
-  return env.githubWorkspace || process.cwd();
 };

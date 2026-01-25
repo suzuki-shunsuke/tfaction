@@ -6,14 +6,11 @@ test("normal", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "octocat",
         target: "foo",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       [],
     ),
   ).toBe(false);
@@ -24,13 +21,10 @@ test("target is required", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "octocat",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       [],
     );
   }).toThrow();
@@ -41,14 +35,11 @@ test("skip label", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "octocat",
         target: "foo",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       ["skip:foo"],
     ),
   ).toBe(true);
@@ -59,14 +50,11 @@ test("renovate", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "renovate[bot]",
         target: "foo",
       },
-      {
-        plan_workflow_name: "",
-        target_groups: [],
-      },
+      {},
       [],
     ),
   ).toBe(false);
@@ -77,13 +65,11 @@ test("skip_terraform_by_renovate", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "renovate[bot]",
         target: "foo",
       },
       {
-        plan_workflow_name: "",
-        target_groups: [],
         skip_terraform_by_renovate: true,
       },
       [],
@@ -96,16 +82,80 @@ test("skip_terraform_by_renovate skip", () => {
     getSkipTerraform(
       {
         skipLabelPrefix: "skip:",
-        labels: "",
+        labels: [],
         prAuthor: "renovate[bot]",
         target: "foo",
       },
       {
-        plan_workflow_name: "",
-        target_groups: [],
         skip_terraform_by_renovate: true,
       },
       ["terraform"],
     ),
   ).toBe(false);
+});
+
+test("custom renovate_login", () => {
+  expect(
+    getSkipTerraform(
+      {
+        skipLabelPrefix: "skip:",
+        labels: [],
+        prAuthor: "my-renovate-bot",
+        target: "foo",
+      },
+      {
+        renovate_login: "my-renovate-bot",
+        skip_terraform_by_renovate: true,
+      },
+      [],
+    ),
+  ).toBe(true);
+});
+
+test("custom renovate_terraform_labels", () => {
+  expect(
+    getSkipTerraform(
+      {
+        skipLabelPrefix: "skip:",
+        labels: [],
+        prAuthor: "renovate[bot]",
+        target: "foo",
+      },
+      {
+        skip_terraform_by_renovate: true,
+        renovate_terraform_labels: ["infra", "tf"],
+      },
+      ["infra"],
+    ),
+  ).toBe(false);
+});
+
+test("skip label does not match different target", () => {
+  expect(
+    getSkipTerraform(
+      {
+        skipLabelPrefix: "skip:",
+        labels: [],
+        prAuthor: "octocat",
+        target: "foo",
+      },
+      {},
+      ["skip:bar"],
+    ),
+  ).toBe(false);
+});
+
+test("multiple labels with matching skip label", () => {
+  expect(
+    getSkipTerraform(
+      {
+        skipLabelPrefix: "skip:",
+        labels: [],
+        prAuthor: "octocat",
+        target: "foo",
+      },
+      {},
+      ["enhancement", "skip:foo", "bug"],
+    ),
+  ).toBe(true);
 });

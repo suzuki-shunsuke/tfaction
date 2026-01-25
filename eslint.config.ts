@@ -13,6 +13,14 @@ export default defineConfig([
     languageOptions: {
       globals: globals.node,
     },
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          varsIgnorePattern: "^_",
+        },
+      ],
+    },
   },
   tseslint.configs.recommended,
   globalIgnores(["docusaurus.config.js", "website/*", "build/*", "dist/*"]),

@@ -45,19 +45,19 @@ jobs:
         env:
           - key: terraform
             TFACTION_CONFIG: tests/tfaction-root.yaml
-            TFACTION_WORKING_DIR: foo
+            TFACTION_WORKING_DIR: tests/foo
           - key: opentofu
-            TFACTION_WORKING_DIR: bar
+            TFACTION_WORKING_DIR: tests/opentofu/bar
             TFACTION_CONFIG: tests/opentofu/tfaction-root.yaml
           - key: terragrunt
             TFACTION_CONFIG: tests/terragrunt/tfaction-root.yaml
-            TFACTION_WORKING_DIR: zoo
+            TFACTION_WORKING_DIR: tests/terragrunt/zoo
     env:
       TFACTION_CONFIG: ${{matrix.env.TFACTION_CONFIG}}
       TFACTION_WORKING_DIR: ${{matrix.env.TFACTION_WORKING_DIR}}
       TFACTION_JOB_TYPE: terraform
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
       - run: gh pr checkout "$PR"
@@ -130,19 +130,19 @@ jobs:
         env:
           - key: terraform
             TFACTION_CONFIG: yoo/tests/tfaction-root.yaml
-            TFACTION_WORKING_DIR: foo-2
+            TFACTION_WORKING_DIR: tests/foo-2
           - key: opentofu
-            TFACTION_WORKING_DIR: bar-2
             TFACTION_CONFIG: yoo/tests/opentofu/tfaction-root.yaml
+            TFACTION_WORKING_DIR: tests/opentofu/bar-2
           - key: terragrunt
             TFACTION_CONFIG: yoo/tests/terragrunt/tfaction-root.yaml
-            TFACTION_WORKING_DIR: zoo-2
+            TFACTION_WORKING_DIR: tests/terragrunt/zoo-2
     env:
       TFACTION_CONFIG: ${{matrix.env.TFACTION_CONFIG}}
       TFACTION_WORKING_DIR: ${{matrix.env.TFACTION_WORKING_DIR}}
       TFACTION_JOB_TYPE: terraform
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
           path: yoo
@@ -213,10 +213,10 @@ jobs:
       issues: write
     env:
       TFACTION_CONFIG: tests/tfaction-root.yaml
-      TFACTION_WORKING_DIR: foo
+      TFACTION_WORKING_DIR: tests/foo
       TFACTION_JOB_TYPE: terraform
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
       - run: gh pr checkout "$PR"
@@ -247,15 +247,15 @@ jobs:
         if: |
           ! github.event.pull_request.head.repo.fork
         env:
-          TFACTION_WORKING_DIR: modules/foo
-          TFACTION_TARGET: modules/foo
+          TFACTION_WORKING_DIR: tests/modules/foo
+          TFACTION_TARGET: tests/modules/foo
 
       - name: Test scaffold-working-dir
         uses: ./
         with:
           action: scaffold-working-dir
         env:
-          TFACTION_WORKING_DIR: zoo
+          TFACTION_WORKING_DIR: tests/zoo
 
       - name: Test scaffold-module
         uses: ./
@@ -263,8 +263,8 @@ jobs:
           action: scaffold-module
         env:
           TFACTION_WORKING_DIR: ""
-          TFACTION_MODULE_PATH: modules/yoo
-          TFACTION_MODULE_TEMPLATE_DIR: templates/module-github
+          TFACTION_MODULE_PATH: tests/modules/yoo
+          TFACTION_MODULE_TEMPLATE_DIR: tests/templates/module-github
 
       - name: Test get-target-config
         uses: ./
@@ -274,7 +274,7 @@ jobs:
         env:
           TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
-          TFACTION_WORKING_DIR: aws/foo/dev
+          TFACTION_WORKING_DIR: tests/aws/foo/dev
 
       - name: Test get-global-config
         uses: ./
@@ -284,7 +284,7 @@ jobs:
         env:
           TFACTION_CONFIG: tests/tfaction-root.yaml
           TFACTION_JOB_TYPE: terraform
-          TFACTION_WORKING_DIR: aws/foo/dev
+          TFACTION_WORKING_DIR: tests/aws/foo/dev
 
       - name: Test actions' outputs
         uses: ./
@@ -303,7 +303,7 @@ jobs:
     env:
       TFACTION_CONFIG: tests/tfaction-root.yaml
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
       - run: gh pr checkout "$PR"
@@ -340,7 +340,7 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
           action: get-or-create-drift-issue
         env:
-          TFACTION_TARGET: aws/foo/dev-${{github.run_id}}
+          TFACTION_TARGET: tests/aws/foo/dev-${{github.run_id}}
       - run: git reset HEAD "tests/aws/foo/dev-${GITHUB_RUN_ID}"
       - name: Remove a dummy working directory
         run: rm -R "tests/aws/foo/dev-${GITHUB_RUN_ID}"
@@ -371,7 +371,7 @@ jobs:
     env:
       TFACTION_CONFIG: tests/tfaction-root.yaml
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0

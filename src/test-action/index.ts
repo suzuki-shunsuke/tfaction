@@ -7,9 +7,9 @@ export const main = async () => {
     {
       name: "get-target-config",
       expected: {
-        working_directory: "aws/foo/dev",
+        working_directory: "tests/aws/foo/dev",
         providers_lock_opts: "-platform=linux_amd64 -platform=darwin_amd64",
-        template_dir: "templates/github",
+        template_dir: "tests/templates/github",
         enable_tflint: "true",
         enable_trivy: "true",
         tflint_fix: "true",
@@ -28,7 +28,7 @@ export const main = async () => {
         data.aws_role_session_name = "";
         return data;
       },
-      actual: env.targetConfig,
+      actual: env.all.TARGET_CONFIG,
     },
     {
       name: "get-global-config",
@@ -59,7 +59,7 @@ export const main = async () => {
         securefix_action_server_repository: "",
         securefix_action_pull_request_base_branch: "",
       },
-      actual: env.globalConfig,
+      actual: env.all.GLOBAL_CONFIG,
     },
   ];
   let failed = false;

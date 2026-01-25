@@ -3,8 +3,8 @@
     "github>suzuki-shunsuke/renovate-config#3.3.1",
     "github>suzuki-shunsuke/renovate-config:nolimit#3.3.1",
     "github>suzuki-shunsuke/renovate-config:js-action#3.3.1",
-    "github>aquaproj/aqua-renovate-config#2.9.0",
-    "github>aquaproj/aqua-renovate-config:file#2.9.0(aqua/.*\\.yaml)",
+    "github>aquaproj/aqua-renovate-config#2.10.0",
+    "github>aquaproj/aqua-renovate-config:file#2.10.0(aqua/.*\\.yaml)",
   ],
   addLabels: ["renovate-change"],
 }

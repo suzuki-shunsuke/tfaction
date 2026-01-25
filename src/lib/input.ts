@@ -1,3 +1,8 @@
+// input.ts responsibility: Read GitHub Actions inputs
+// - Centralizes input retrieval side effects
+// - Prevents typos in input names by avoiding direct core.getInput calls elsewhere
+// - input.ts MUST NOT depend on other internal modules
+
 import * as core from "@actions/core";
 
 // Common inputs used across multiple actions

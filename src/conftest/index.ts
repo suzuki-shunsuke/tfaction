@@ -1,6 +1,6 @@
-import * as core from "@actions/core";
 import * as lib from "../lib";
-import { TargetConfig } from "../get-target-config";
+import * as types from "../lib/types";
+import { TargetConfig } from "../actions/get-target-config";
 import * as aqua from "../aqua";
 import * as path from "path";
 import fs from "fs";
@@ -8,8 +8,8 @@ import tmp from "tmp";
 import { globSync } from "glob";
 
 type Inputs = {
-  /** A relative path from github.workspace to the directory where tfaction-root.yaml is located */
-  configDir: string;
+  /** Absolute path to the git root directory */
+  gitRootDir: string;
   githubToken: string;
   plan: boolean;
   planJsonPath?: string;
@@ -17,7 +17,7 @@ type Inputs = {
 };
 
 const getConftestPaths = (
-  policy: lib.ConftestPolicyConfig,
+  policy: types.ConftestPolicyConfig,
   workingDir: string,
   planJsonPath?: string,
 ): string[] => {
@@ -56,34 +56,22 @@ const getConftestPaths = (
  *
  * @param policy
  * @param target
- * @param configDir A relative path from github.workspace to a directory where tfaction-root.yaml is located
- * @param workingDir A relative path from configDir to a working directory
+ * @param workingDir A relative path from git_root_dir to a working directory
  * @param paths
  * @returns
  */
 const buildConftestArgs = (
-  policy: lib.ConftestPolicyConfig,
+  policy: types.ConftestPolicyConfig,
   target: string,
-  configDir: string,
   workingDir: string,
   paths: string[],
 ): string[] => {
-  const args = [
-    "exec",
-    "-var",
-    `tfaction_target:${target}`,
-    "-k",
-    "conftest",
-    "--",
-    "conftest",
-    "test",
-    "--no-color",
-  ];
+  const args = ["test", "--no-color"];
 
   if (typeof policy.policy === "string") {
-    // workingDir => policy
-    // policy.policy configDir => policy
-    // workingDir configDir => workingDir
+    // workingDir: relative path from git_root_dir
+    // policy.policy: relative path from git_root_dir
+    // result: relative path from workingDir to policy
     args.push("-p", path.relative(workingDir, policy.policy));
   } else if (policy.policy) {
     for (const p of policy.policy) {
@@ -163,12 +151,12 @@ const buildConftestArgs = (
 };
 
 const buildPolicies = (
-  config: lib.Config,
-  targetGroup: lib.TargetGroup,
-  wdConfig: lib.TargetConfig,
+  config: types.Config,
+  targetGroup: types.TargetGroup,
+  wdConfig: types.TargetConfig,
   isPlan: boolean,
-): lib.ConftestPolicyConfig[] => {
-  const policyMap = new Map<string, lib.ConftestPolicyConfig>();
+): types.ConftestPolicyConfig[] => {
+  const policyMap = new Map<string, types.ConftestPolicyConfig>();
 
   if (!config.conftest) {
     return [];
@@ -208,7 +196,7 @@ const buildPolicies = (
     }
   }
 
-  const policies: lib.ConftestPolicyConfig[] = [];
+  const policies: types.ConftestPolicyConfig[] = [];
   for (const policy of conftest.policies.concat(...policyMap.values())) {
     if (policy.enabled !== false && isPlan === !!policy.plan) {
       policies.push(policy);
@@ -220,13 +208,13 @@ const buildPolicies = (
 
 export const run = async (
   inputs: Inputs,
-  config: lib.Config,
+  config: types.Config,
   targetConfig: TargetConfig,
 ) => {
   const executor = inputs.executor;
 
   const workingDir = path.join(
-    config.config_dir,
+    config.git_root_dir,
     targetConfig.working_directory,
   );
   const wdConfig = lib.readTargetConfig(
@@ -236,26 +224,16 @@ export const run = async (
   const policies = buildPolicies(config, targetConfig, wdConfig, inputs.plan);
 
   if (policies.length !== 0) {
-    core.startGroup("conftest -v");
-    await executor.exec(
-      "github-comment",
-      [
-        "exec",
-        "-var",
-        `tfaction_target:${targetConfig.target}`,
-        "--",
-        "conftest",
-        "-v",
-      ],
-      {
-        cwd: workingDir,
-        env: {
-          GITHUB_TOKEN: inputs.githubToken,
-          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+    await executor.exec("conftest", ["-v"], {
+      cwd: workingDir,
+      group: "conftest -v",
+      comment: {
+        token: inputs.githubToken,
+        vars: {
+          tfaction_target: targetConfig.target,
         },
       },
-    );
-    core.endGroup();
+    });
   }
 
   for (const policy of policies) {
@@ -266,18 +244,19 @@ export const run = async (
     const args = buildConftestArgs(
       policy,
       targetConfig.target,
-      inputs.configDir,
       targetConfig.working_directory,
       paths,
     );
-    core.startGroup("conftest");
-    await executor.exec("github-comment", args, {
+    await executor.exec("conftest", args, {
       cwd: workingDir,
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+      group: "conftest",
+      comment: {
+        token: inputs.githubToken,
+        key: "conftest",
+        vars: {
+          tfaction_target: targetConfig.target,
+        },
       },
     });
-    core.endGroup();
   }
 };

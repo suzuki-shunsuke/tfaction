@@ -1,0 +1,82 @@
+import * as core from "@actions/core";
+import * as fs from "fs";
+import * as path from "path";
+
+import * as lib from "../../lib";
+import * as env from "../../lib/env";
+import * as input from "../../lib/input";
+import * as git from "../../lib/git";
+import { getTargetConfig } from "../get-target-config";
+import { main as runPlan } from "./run";
+import { create as createCommit } from "../../commit";
+
+export const main = async () => {
+  // Step 1: Get target config
+  const config = await lib.getConfig();
+  const targetConfig = await getTargetConfig(
+    {
+      target: env.all.TFACTION_TARGET,
+      workingDir: env.all.TFACTION_WORKING_DIR,
+      isApply: env.isApply,
+      jobType: lib.getJobType(),
+    },
+    config,
+  );
+
+  const jobType = env.all.TFACTION_JOB_TYPE;
+  const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
+
+  let skipTerraform = false;
+  if (jobType === "terraform" && !driftIssueNumber) {
+    skipTerraform = env.TFACTION_SKIP_TERRAFORM;
+  }
+  core.setOutput("skipped", skipTerraform);
+
+  // Step 4: Run plan if not skipped
+  if (!skipTerraform) {
+    await runPlan(targetConfig, {
+      githubToken: input.githubToken,
+      jobType: jobType,
+      driftIssueNumber: driftIssueNumber || undefined,
+      prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,
+      ciInfoTempDir: env.all.CI_INFO_TEMP_DIR || undefined,
+    });
+
+    // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)
+    if (jobType === "tfmigrate") {
+      const workingDir = targetConfig.working_directory;
+      if (workingDir) {
+        const tfmigrateHclPath = path.join(
+          config.git_root_dir,
+          workingDir,
+          ".tfmigrate.hcl",
+        );
+        const serverRepository =
+          config.securefix_action?.server_repository ?? "";
+
+        if (fs.existsSync(tfmigrateHclPath)) {
+          // If the file is new or modified, commit it
+          if (
+            await git.hasFileChangedPorcelain(
+              tfmigrateHclPath,
+              config.git_root_dir,
+            )
+          ) {
+            core.info("Committing .tfmigrate.hcl");
+            await createCommit({
+              commitMessage: "chore(tfmigrate): add .tfmigrate.hcl",
+              githubToken: input.githubToken,
+              rootDir: config.git_root_dir,
+              files: new Set([
+                path.relative(config.git_root_dir, tfmigrateHclPath),
+              ]),
+              serverRepository,
+              appId: input.securefixActionAppId,
+              appPrivateKey: input.securefixActionAppPrivateKey,
+            });
+          }
+        }
+      }
+    }
+  }
+};
