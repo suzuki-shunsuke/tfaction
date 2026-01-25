@@ -16,6 +16,7 @@ import {
   FindOptions,
   DownloadArtifactOptions,
 } from "@actions/artifact";
+import * as run from "../run";
 
 type WorkflowRun = {
   headSha: string;
@@ -29,29 +30,12 @@ export const listRelatedPullRequests = async (
   const octokit = github.getOctokit(githubToken);
   const { owner, repo } = github.context.repo;
 
-  // Search pull requests using GraphQL
-  const query = `repo:${owner}/${repo} is:pr is:open label:"${target}" -label:tfaction:disable-auto-update`;
-
-  const result: {
-    search: {
-      nodes: Array<{ number: number }>;
-    };
-  } = await octokit.graphql(
-    `
-    query($q: String!) {
-      search(query: $q, type: ISSUE, first: 100) {
-        nodes {
-          ... on PullRequest {
-            number
-          }
-        }
-      }
-    }
-  `,
-    { q: query },
-  );
-
-  return result.search.nodes.map((pr) => pr.number);
+  return run.listRelatedPullRequests({
+    octokit,
+    owner,
+    repo,
+    target,
+  });
 };
 
 export const main = async (): Promise<void> => {
@@ -246,23 +230,19 @@ export const updateBranchBySecurefix = async (
   });
   try {
     const octokit = github.getOctokit(token.token);
-    for (const prNumber of prNumbers) {
-      try {
-        core.info(
-          `Updating a branch ${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/pull/${prNumber}`,
-        );
-        await updateBranchAction.update({
-          octokit,
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
-          pullRequestNumber: prNumber,
-          serverRepositoryOwner: serverRepoOwner,
-          serverRepositoryName: serverRepoName,
-        });
-      } catch (error) {
-        core.warning(`Failed to update branch for PR #${prNumber}: ${error}`);
-      }
-    }
+    const { owner, repo } = github.context.repo;
+
+    await run.updateBranchBySecurefix({
+      octokit,
+      serverRepoOwner,
+      serverRepoName,
+      owner,
+      repo,
+      serverUrl: github.context.serverUrl,
+      prNumbers,
+      updateBranchFn: updateBranchAction.update,
+      logger: core,
+    });
   } finally {
     await revoke(token);
   }
@@ -273,18 +253,15 @@ export const updateBranchByCommit = async (
   prNumbers: number[],
 ): Promise<void> => {
   const octokit = github.getOctokit(githubToken);
-  for (const prNumber of prNumbers) {
-    try {
-      const { data } = await octokit.rest.pulls.updateBranch({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        pull_number: prNumber,
-      });
-      core.notice(`Updated a branch ${data.url}`);
-    } catch (error) {
-      core.warning(`Failed to update branch for PR #${prNumber}: ${error}`);
-    }
-  }
+  const { owner, repo } = github.context.repo;
+
+  return run.updateBranchByCommit({
+    octokit,
+    owner,
+    repo,
+    prNumbers,
+    logger: core,
+  });
 };
 
 const downloadArtifact = async (
