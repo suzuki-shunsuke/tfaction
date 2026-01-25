@@ -1,77 +1,27 @@
 import * as core from "@actions/core";
 import * as lib from "../../lib";
-import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
+import { run, type SecretToExport } from "./run";
 
 /**
  * Mask the secret value and output it as an environment variable.
  */
-function exportSecret(
-  envName: string,
-  secretID: string,
-  secretValue: string,
-  secretKey: string,
-) {
-  if (secretKey) {
+function exportSecret(secret: SecretToExport): void {
+  if (secret.secretKey) {
     core.info(
-      `export the secret as the environment variable: secret_id=${secretID} env_name=${envName} secret_key=${secretKey}`,
+      `export the secret as the environment variable: secret_id=${secret.secretId} env_name=${secret.envName} secret_key=${secret.secretKey}`,
     );
   } else {
     core.info(
-      `export the secret as the environment variable: secret_id=${secretID} env_name=${envName}`,
+      `export the secret as the environment variable: secret_id=${secret.secretId} env_name=${secret.envName}`,
     );
   }
-  core.setSecret(secretValue);
-  core.exportVariable(envName, secretValue);
-}
-
-/**
- * Get secrets from AWS Secrets Manager and export them as environment variables.
- */
-async function exportSecrets(
-  client: SecretsManagerClient,
-  secrets: Array<types.AWSSecretsManagerSecret>,
-) {
-  for (const secret of secrets) {
-    if (!secret.secret_id) {
-      throw new Error("secret_id is required");
-    }
-    const command = new GetSecretValueCommand({
-      SecretId: secret.secret_id,
-    });
-    const response = await client.send(command);
-    if (!response.SecretString) {
-      throw new Error(`SecretString is empty: secret_id=${secret.secret_id}`);
-    }
-    let secretJSON = null;
-    for (const e of secret.envs) {
-      if (!e.env_name) {
-        throw new Error(`env_name is required: secret_id=${secret.secret_id}`);
-      }
-      if (!e.secret_key) {
-        exportSecret(e.env_name, secret.secret_id, response.SecretString, "");
-        continue;
-      }
-      if (!secretJSON) {
-        secretJSON = JSON.parse(response.SecretString);
-      }
-      if (!secretJSON[e.secret_key]) {
-        throw new Error(
-          `secret key isn't found: secret_key=${e.secret_key} secret_id=${secret.secret_id}`,
-        );
-      }
-      exportSecret(
-        e.env_name,
-        secret.secret_id,
-        secretJSON[e.secret_key],
-        e.secret_key,
-      );
-    }
-  }
+  core.setSecret(secret.secretValue);
+  core.exportVariable(secret.envName, secret.secretValue);
 }
 
 export const main = async (): Promise<void> => {
@@ -82,23 +32,40 @@ export const main = async (): Promise<void> => {
     env.all.TFACTION_WORKING_DIR,
   );
   const jobConfig = lib.getJobConfig(t.group, env.isApply, lib.getJobType());
-  let awsClient = null;
+
   if (t.group === undefined) {
     return;
   }
-  if (t.group.aws_secrets_manager) {
-    awsClient = new SecretsManagerClient({
-      region: t.group.aws_region,
-    });
-    await exportSecrets(awsClient, t.group.aws_secrets_manager);
+
+  const groupSecrets = t.group.aws_secrets_manager;
+  const jobConfigSecrets = jobConfig?.aws_secrets_manager;
+
+  if (!groupSecrets && !jobConfigSecrets) {
+    return;
   }
 
-  if (jobConfig && jobConfig.aws_secrets_manager) {
-    if (!awsClient) {
-      awsClient = new SecretsManagerClient({
-        region: t.group.aws_region,
-      });
+  const awsClient = new SecretsManagerClient({
+    region: t.group.aws_region,
+  });
+
+  const getSecretValue = async (secretId: string): Promise<string> => {
+    const command = new GetSecretValueCommand({
+      SecretId: secretId,
+    });
+    const response = await awsClient.send(command);
+    if (!response.SecretString) {
+      throw new Error(`SecretString is empty: secret_id=${secretId}`);
     }
-    await exportSecrets(awsClient, jobConfig.aws_secrets_manager);
+    return response.SecretString;
+  };
+
+  const secrets = await run({
+    groupSecrets,
+    jobConfigSecrets,
+    getSecretValue,
+  });
+
+  for (const secret of secrets) {
+    exportSecret(secret);
   }
 };
