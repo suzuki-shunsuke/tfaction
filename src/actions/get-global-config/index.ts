@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as lib from "../../lib";
 import * as drift from "../../lib/drift";
 import * as env from "../../lib/env";
+import { run } from "./run";
 
 export const main = async () => {
   const config = await lib.getConfig();
@@ -15,65 +16,63 @@ export const main = async () => {
   const driftIssueRepo = drift.getDriftIssueRepo(config);
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
 
+  const result = run({
+    config,
+    driftIssueNumber,
+    driftIssueRepo,
+  });
+
   // Set outputs
-  core.setOutput("working_directory_file", config.working_directory_file);
-  core.setOutput("module_file", config.module_file);
-  core.setOutput("renovate_login", config.renovate_login);
-  core.setOutput("draft_pr", config.draft_pr);
-  core.setOutput("skip_create_pr", config.skip_create_pr);
-  core.setOutput("plan_workflow_name", config.plan_workflow_name);
-  core.setOutput("label_prefix_tfmigrate", config.label_prefixes.tfmigrate);
-  core.setOutput("label_prefix_skip", config.label_prefixes.skip);
-  core.setOutput("drift_issue_repo_owner", driftIssueRepo.owner);
-  core.setOutput("drift_issue_repo_name", driftIssueRepo.name);
+  core.setOutput("working_directory_file", result.working_directory_file);
+  core.setOutput("module_file", result.module_file);
+  core.setOutput("renovate_login", result.renovate_login);
+  core.setOutput("draft_pr", result.draft_pr);
+  core.setOutput("skip_create_pr", result.skip_create_pr);
+  core.setOutput("plan_workflow_name", result.plan_workflow_name);
+  core.setOutput("label_prefix_tfmigrate", result.label_prefix_tfmigrate);
+  core.setOutput("label_prefix_skip", result.label_prefix_skip);
+  core.setOutput("drift_issue_repo_owner", result.drift_issue_repo_owner);
+  core.setOutput("drift_issue_repo_name", result.drift_issue_repo_name);
   core.setOutput(
     "disable_update_related_pull_requests",
-    !(config.update_related_pull_requests?.enabled ?? true),
+    result.disable_update_related_pull_requests,
   );
   core.setOutput(
     "update_local_path_module_caller",
-    config.update_local_path_module_caller?.enabled ?? false,
+    result.update_local_path_module_caller,
   );
   core.setOutput(
     "aqua_update_checksum_enabled",
-    config.aqua?.update_checksum?.enabled ?? false,
+    result.aqua_update_checksum_enabled,
   );
   core.setOutput(
     "aqua_update_checksum_prune",
-    config.aqua?.update_checksum?.prune ?? false,
+    result.aqua_update_checksum_prune,
   );
   core.setOutput(
     "aqua_update_checksum_skip_push",
-    driftIssueNumber
-      ? true
-      : (config.aqua?.update_checksum?.skip_push ?? false),
+    result.aqua_update_checksum_skip_push,
   );
-  core.setOutput("enable_tflint", config.tflint?.enabled ?? true);
-  core.setOutput("enable_trivy", config.trivy?.enabled ?? true);
-  core.setOutput("tflint_fix", config.tflint?.fix ?? false);
-  core.setOutput("terraform_command", config.terraform_command);
+  core.setOutput("enable_tflint", result.enable_tflint);
+  core.setOutput("enable_trivy", result.enable_trivy);
+  core.setOutput("tflint_fix", result.tflint_fix);
+  core.setOutput("terraform_command", result.terraform_command);
   core.setOutput(
     "follow_up_pr_group_label_prefix",
-    config.follow_up_pr?.group_label?.prefix ?? "tfaction:follow-up-pr-group/",
+    result.follow_up_pr_group_label_prefix,
   );
   core.setOutput(
     "follow_up_pr_group_label_enabled",
-    config.follow_up_pr?.group_label?.enabled ?? false,
+    result.follow_up_pr_group_label_enabled,
   );
   core.setOutput(
     "securefix_action_server_repository",
-    config.securefix_action?.server_repository ?? "",
+    result.securefix_action_server_repository,
   );
   core.setOutput(
     "securefix_action_pull_request_base_branch",
-    config.securefix_action?.pull_request?.base_branch ?? "",
+    result.securefix_action_pull_request_base_branch,
   );
-  core.setOutput(
-    "max_changed_working_dirs",
-    config.limit_changed_dirs?.working_dirs ?? 0,
-  );
-  core.setOutput(
-    "max_changed_modules",
-    config.limit_changed_dirs?.modules ?? 0,
-  );
+  core.setOutput("max_changed_working_dirs", result.max_changed_working_dirs);
+  core.setOutput("max_changed_modules", result.max_changed_modules);
 };
