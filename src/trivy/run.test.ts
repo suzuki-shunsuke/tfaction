@@ -165,8 +165,6 @@ describe("run", () => {
   });
 
   const createMockLogger = (): Logger => ({
-    startGroup: vi.fn(),
-    endGroup: vi.fn(),
     info: vi.fn(),
   });
 

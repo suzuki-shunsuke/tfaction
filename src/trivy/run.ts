@@ -29,8 +29,6 @@ export type Diagnostic = {
 };
 
 export type Logger = {
-  startGroup: (name: string) => void;
-  endGroup: () => void;
   info: (message: string) => void;
 };
 
@@ -108,12 +106,11 @@ export const run = async (input: RunInput): Promise<void> => {
     ? ["config", "--format", "json", "--config", input.configPath, "."]
     : ["config", "--format", "json", "."];
   const executor = input.executor;
-  input.logger.startGroup("trivy");
   const out = await executor.getExecOutput("trivy", args, {
     cwd: input.workingDirectory,
     ignoreReturnCode: true,
+    group: "trivy",
   });
-  input.logger.endGroup();
   input.logger.info("Parsing trivy config result");
   const outJSON: TrivyOutput = JSON.parse(out.stdout);
   if (outJSON.Results == null) {
@@ -198,7 +195,6 @@ ${table}`;
     reviewdogArgs.push("-fail-on-error", "1");
   }
 
-  input.logger.startGroup("reviewdog -name trivy");
   await executor.exec("reviewdog", reviewdogArgs, {
     input: Buffer.from(
       JSON.stringify({
@@ -210,11 +206,11 @@ ${table}`;
       }),
     ),
     cwd: input.workingDirectory,
+    group: "reviewdog -name trivy",
     env: {
       REVIEWDOG_GITHUB_API_TOKEN: input.githubToken,
     },
   });
-  input.logger.endGroup();
   if (out.exitCode != 0) {
     throw new Error("trivy failed");
   }

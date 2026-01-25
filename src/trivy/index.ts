@@ -21,8 +21,6 @@ export const run = async (inputs: Inputs): Promise<void> => {
     config: config,
     eventName: github.context.eventName,
     logger: {
-      startGroup: core.startGroup,
-      endGroup: core.endGroup,
       info: core.info,
     },
     githubCommentConfig: lib.GitHubCommentConfig,
