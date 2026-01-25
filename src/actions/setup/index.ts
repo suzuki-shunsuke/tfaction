@@ -12,34 +12,25 @@ import * as ciinfo from "../../ci-info";
 import { getTargetConfig } from "../get-target-config";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as checkTerraformSkip from "../../check-terraform-skip";
+import {
+  isPullRequestEvent as isPullRequestEventFn,
+  shouldSkipCIInfo as shouldSkipCIInfoFn,
+  checkLatestCommit as checkLatestCommitFn,
+} from "./run";
 
 // Check if this is a pull request event
 const isPullRequestEvent = (): boolean => {
-  const eventName = github.context.eventName;
-  return eventName === "pull_request" || eventName.startsWith("pull_request_");
+  return isPullRequestEventFn(github.context.eventName);
 };
 
 // Check if ci-info should be skipped
 const shouldSkipCIInfo = (): boolean => {
-  const eventName = github.context.eventName;
-  return eventName === "workflow_dispatch" || eventName === "schedule";
+  return shouldSkipCIInfoFn(github.context.eventName);
 };
 
 // Check if the PR head SHA is the latest
-const checkLatestCommit = async (latestHeadSHA: string): Promise<void> => {
-  const headSHA = github.context.payload.pull_request?.head?.sha;
-  if (!headSHA) {
-    throw new Error("Failed to get the current SHA from event payload");
-  }
-  if (!latestHeadSHA) {
-    throw new Error("Failed to get the pull request HEAD SHA");
-  }
-
-  if (headSHA !== latestHeadSHA) {
-    throw new Error(
-      `The head sha (${headSHA}) isn't latest (${latestHeadSHA}).`,
-    );
-  }
+const checkLatestCommit = (latestHeadSHA: string): void => {
+  checkLatestCommitFn(github.context.payload.pull_request, latestHeadSHA);
 };
 
 // Add label to PR
