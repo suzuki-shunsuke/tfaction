@@ -3,17 +3,17 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import * as lib from "../../../lib";
-import * as drift from "../../../lib/drift";
-import * as env from "../../../lib/env";
-import * as input from "../../../lib/input";
-import * as aqua from "../../../aqua";
-import * as getTargetConfig from "../../get-target-config";
+import * as lib from "../../lib";
+import * as drift from "../../lib/drift";
+import * as env from "../../lib/env";
+import * as input from "../../lib/input";
+import * as aqua from "../../aqua";
+import * as getTargetConfig from "../get-target-config";
 import {
   listRelatedPullRequests,
   updateBranchBySecurefix,
   updateBranchByCommit,
-} from "../terraform-apply";
+} from "./terraform";
 
 export const main = async (): Promise<void> => {
   const githubToken = input.githubToken;
