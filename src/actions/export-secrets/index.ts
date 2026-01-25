@@ -16,17 +16,16 @@ export const main = async () => {
     `The list of secret names passed to the action: ${Array.from(inputSecrets.keys()).join(", ")}`,
   );
 
-  const targetS = env.all.TFACTION_TARGET;
-  const workingDir = env.all.TFACTION_WORKING_DIR;
-  const jobType = lib.getJobType();
-  const isApply = env.isApply;
-
-  const t = await lib.getTargetGroup(config, targetS, workingDir);
-
-  const jobConfig = lib.getJobConfig(t.group, isApply, jobType);
+  const t = await lib.getTargetGroup(
+    config,
+    env.all.TFACTION_TARGET,
+    env.all.TFACTION_WORKING_DIR,
+  );
   if (t.group === undefined) {
     return;
   }
+
+  const jobConfig = lib.getJobConfig(t.group, env.isApply, lib.getJobType());
 
   const result = run({
     targetSecrets: t.group.secrets,
