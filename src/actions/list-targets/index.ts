@@ -6,6 +6,7 @@ import * as aqua from "../../aqua";
 import * as lib from "../../lib";
 import * as input from "../../lib/input";
 import * as listTargetsWithChangedFiles from "./list-targets-with-changed-files";
+import { shouldSkipCiInfo, isPREvent, validateHeadSha } from "./run";
 
 export const main = async () => {
   core.exportVariable("AQUA_GLOBAL_CONFIG", lib.aquaGlobalConfig);
@@ -15,8 +16,7 @@ export const main = async () => {
 
   // Step 2: Run ci-info (skip for workflow_dispatch and schedule events)
   const eventName = github.context.eventName;
-  const skipCiInfo =
-    eventName === "workflow_dispatch" || eventName === "schedule";
+  const skipCiInfo = shouldSkipCiInfo(eventName);
 
   let pr: ciInfo.Result = {};
 
@@ -25,18 +25,11 @@ export const main = async () => {
   }
 
   // Step 3: Check if commit is latest (for PR events)
-  const isPREvent =
-    eventName === "pull_request" || eventName.startsWith("pull_request_");
-  if (isPREvent) {
+  if (isPREvent(eventName)) {
     if (pr.pr) {
       const latestHeadSha = pr.pr.data.head.sha;
       const headSha = github.context.payload.pull_request?.head?.sha;
-
-      if (headSha && latestHeadSha && headSha !== latestHeadSha) {
-        throw new Error(
-          `The head sha (${headSha}) isn't latest (${latestHeadSha}).`,
-        );
-      }
+      validateHeadSha(headSha, latestHeadSha);
     }
   }
 
