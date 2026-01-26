@@ -27,7 +27,7 @@ const TflintConfig = z.object({
   fix: z.boolean().default(tflintDefaults.fix),
   reviewdog: ReviewdogConfig.optional(),
 });
-type TflintConfig = z.infer<typeof TflintConfig>;
+export type TflintConfig = z.infer<typeof TflintConfig>;
 
 const trivyDefaults = { enabled: true } as const;
 const TrivyConfig = z.object({

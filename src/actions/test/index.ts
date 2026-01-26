@@ -95,6 +95,7 @@ export const main = async () => {
       securefixActionAppId: securefixAppId,
       securefixActionAppPrivateKey: securefixAppPrivateKey,
       executor,
+      tflint: config.tflint,
     });
   }
 
