@@ -1,7 +1,11 @@
+import * as exec from "@actions/exec";
+import * as github from "@actions/github";
+import * as fs from "fs";
+import * as tmp from "tmp";
 import * as path from "path";
-import type * as exec from "@actions/exec";
 import type * as aqua from "../aqua";
-import type * as commit from "../commit";
+import * as commit from "../commit";
+import * as env from "../lib/env";
 
 export type FileSystem = {
   existsSync: (path: string) => boolean;
@@ -22,12 +26,12 @@ export type RunInput = {
   securefixActionAppPrivateKey: string;
   securefixActionServerRepository: string;
   executor: aqua.Executor;
-  eventName: string;
-  tfactionTarget: string;
-  fs: FileSystem;
-  createTempFile: () => TempFile;
-  commitCreate: typeof commit.create;
-  execGetExecOutput: typeof exec.getExecOutput;
+  eventName?: string;
+  tfactionTarget?: string;
+  fileSystem?: FileSystem;
+  createTempFile?: () => TempFile;
+  commitCreate?: typeof commit.create;
+  execGetExecOutput?: typeof exec.getExecOutput;
 };
 
 export const findConfigFile = (
@@ -64,13 +68,22 @@ export const findConfigFile = (
 export const run = async (input: RunInput): Promise<void> => {
   const readmePath = path.join(input.workingDirectory, "README.md");
   const executor = input.executor;
-  const fs = input.fs;
+  const eventName = input.eventName ?? github.context.eventName;
+  const tfactionTarget = input.tfactionTarget ?? env.all.TFACTION_TARGET;
+  const fileSystem = input.fileSystem ?? {
+    existsSync: fs.existsSync,
+    readFileSync: fs.readFileSync,
+    writeFileSync: fs.writeFileSync,
+  };
+  const createTempFile = input.createTempFile ?? (() => tmp.fileSync());
+  const commitCreate = input.commitCreate ?? commit.create;
+  const execGetExecOutput = input.execGetExecOutput ?? exec.getExecOutput;
 
   // Check if README.md exists
-  const created = !fs.existsSync(readmePath);
+  const created = !fileSystem.existsSync(readmePath);
 
   // Create temporary file
-  const tempFile = input.createTempFile();
+  const tempFile = createTempFile();
   try {
     // Check terraform-docs version
     await executor.exec("terraform-docs", ["-v"], {
@@ -78,7 +91,7 @@ export const run = async (input: RunInput): Promise<void> => {
     });
 
     // Search for config file
-    const config = findConfigFile(input.workingDirectory, input.repoRoot, fs);
+    const config = findConfigFile(input.workingDirectory, input.repoRoot, fileSystem);
 
     // Build terraform-docs arguments
     const opts = config ? ["-c", config] : ["markdown"];
@@ -93,14 +106,14 @@ export const run = async (input: RunInput): Promise<void> => {
         comment: {
           token: input.githubToken,
           vars: {
-            tfaction_target: input.tfactionTarget,
+            tfaction_target: tfactionTarget,
           },
         },
       },
     );
 
     // Write output to temp file
-    fs.writeFileSync(tempFile.name, result.stdout);
+    fileSystem.writeFileSync(tempFile.name, result.stdout);
 
     // Check if command failed
     if (result.exitCode !== 0) {
@@ -110,7 +123,7 @@ export const run = async (input: RunInput): Promise<void> => {
     }
 
     // Check for error: .terraform-docs.yml is required
-    const output = fs.readFileSync(tempFile.name, "utf8");
+    const output = fileSystem.readFileSync(tempFile.name, "utf8");
     if (output.includes("Available Commands:")) {
       throw new Error(".terraform-docs.yml is required");
     }
@@ -118,14 +131,14 @@ export const run = async (input: RunInput): Promise<void> => {
     // Check if README.md has the BEGIN_TF_DOCS marker
     // If not, write the entire output to README.md
     if (
-      !fs.existsSync(readmePath) ||
-      !fs.readFileSync(readmePath, "utf8").includes("<!-- BEGIN_TF_DOCS -->")
+      !fileSystem.existsSync(readmePath) ||
+      !fileSystem.readFileSync(readmePath, "utf8").includes("<!-- BEGIN_TF_DOCS -->")
     ) {
-      fs.writeFileSync(readmePath, output);
+      fileSystem.writeFileSync(readmePath, output);
     }
 
     // Check if README.md has changed
-    const diffResult = await input.execGetExecOutput(
+    const diffResult = await execGetExecOutput(
       "git",
       ["diff", "--quiet", "README.md"],
       {
@@ -138,14 +151,14 @@ export const run = async (input: RunInput): Promise<void> => {
 
     if (changed) {
       if (
-        input.eventName !== "pull_request" &&
-        input.eventName !== "pull_request_target"
+        eventName !== "pull_request" &&
+        eventName !== "pull_request_target"
       ) {
         throw new Error(
           "Please generate Module's README.md with terraform-docs.",
         );
       }
-      await input.commitCreate({
+      await commitCreate({
         githubToken: input.githubToken,
         commitMessage: "docs: generate document by terraform-docs",
         appId: input.securefixActionAppId,

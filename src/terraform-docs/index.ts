@@ -1,10 +1,4 @@
-import * as exec from "@actions/exec";
-import * as github from "@actions/github";
-import * as fs from "fs";
-import * as tmp from "tmp";
-import * as commit from "../commit";
-import * as env from "../lib/env";
-import * as aqua from "../aqua";
+import type * as aqua from "../aqua";
 import { run as runImpl } from "./run";
 
 type Inputs = {
@@ -27,15 +21,5 @@ export const run = async (inputs: Inputs): Promise<void> => {
     securefixActionAppPrivateKey: inputs.securefixActionAppPrivateKey,
     securefixActionServerRepository: inputs.securefixActionServerRepository,
     executor: inputs.executor,
-    eventName: github.context.eventName,
-    tfactionTarget: env.all.TFACTION_TARGET,
-    fs: {
-      existsSync: fs.existsSync,
-      readFileSync: fs.readFileSync,
-      writeFileSync: fs.writeFileSync,
-    },
-    createTempFile: () => tmp.fileSync(),
-    commitCreate: commit.create,
-    execGetExecOutput: exec.getExecOutput,
   });
 };
