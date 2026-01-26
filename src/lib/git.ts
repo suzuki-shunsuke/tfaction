@@ -145,3 +145,21 @@ export const getRootDir = async (cwd: string): Promise<string> => {
   );
   return out.stdout.trim();
 };
+
+/**
+ * Check which files from the given list have changed
+ * @param files - List of file paths to check
+ * @returns Object containing array of changed file paths
+ */
+export const checkGitDiff = async (
+  files: string[],
+): Promise<{ changedFiles: string[] }> => {
+  const changedFiles: string[] = [];
+  for (const file of files) {
+    const changed = await hasFileChangedPorcelain(file);
+    if (changed) {
+      changedFiles.push(file);
+    }
+  }
+  return { changedFiles };
+};

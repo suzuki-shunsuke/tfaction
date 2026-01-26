@@ -1,12 +1,58 @@
-import * as exec from "@actions/exec";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
-import * as commit from "../commit";
-import * as lib from "../lib";
 import * as aqua from "../aqua";
+import * as types from "../lib/types";
+import { GitHubCommentConfig } from "../lib";
+import { checkGitDiff as defaultCheckGitDiff } from "../lib/git";
+import { create as defaultCreateCommit } from "../commit";
 
-type Inputs = {
+export type DiagnosticCode = {
+  value: string;
+  url: string;
+};
+
+export type DiagnosticLocationRangePoint = {
+  line: number;
+};
+
+export type DiagnosticLocationRange = {
+  start: DiagnosticLocationRangePoint;
+  end: DiagnosticLocationRangePoint;
+};
+
+export type DiagnosticLocation = {
+  path: string;
+  range: DiagnosticLocationRange;
+};
+
+export type Diagnostic = {
+  message: string;
+  code: DiagnosticCode;
+  location: DiagnosticLocation;
+  severity: string;
+};
+
+export type Logger = {
+  info: (message: string) => void;
+  setOutput: (name: string, value: string) => void;
+};
+
+export type CommitCreator = (params: {
+  commitMessage: string;
+  githubToken: string;
+  files: Set<string>;
+  serverRepository: string;
+  appId: string;
+  appPrivateKey: string;
+}) => Promise<string>;
+
+export type GitDiffChecker = (
+  files: string[],
+) => Promise<{ changedFiles: string[] }>;
+
+export type RunInput = {
+  executor: aqua.Executor;
   workingDirectory: string;
   githubToken: string;
   githubTokenForTflintInit: string;
@@ -15,10 +61,15 @@ type Inputs = {
   serverRepository: string;
   securefixActionAppId: string;
   securefixActionAppPrivateKey: string;
-  executor: aqua.Executor;
+  tflint?: types.TflintConfig;
+  eventName?: string;
+  logger?: Logger;
+  githubCommentConfig?: string;
+  createCommit?: CommitCreator;
+  checkGitDiff?: GitDiffChecker;
 };
 
-const getSeverity = (s: string): string => {
+export const getSeverity = (s: string): string => {
   if (s == "error") {
     return "ERROR";
   }
@@ -31,33 +82,7 @@ const getSeverity = (s: string): string => {
   return "";
 };
 
-class DiagnosticCode {
-  value = "";
-  url = "";
-}
-
-class DiagnosticLocation {
-  path = "";
-  range = new DiagnosticLocationRange();
-}
-
-class DiagnosticLocationRange {
-  start = new DiagnosticLocationRangePoint();
-  end = new DiagnosticLocationRangePoint();
-}
-
-class DiagnosticLocationRangePoint {
-  line = 0;
-}
-
-class Diagnostic {
-  message = "";
-  code = new DiagnosticCode();
-  location = new DiagnosticLocation();
-  severity = "";
-}
-
-const generateTable = (diagnostics: Array<Diagnostic>): string => {
+export const generateTable = (diagnostics: Array<Diagnostic>): string => {
   const lines: Array<string> = [
     "rule | severity | filepath | range | message",
     "--- | --- | --- | --- | ---",
@@ -86,31 +111,61 @@ const generateTable = (diagnostics: Array<Diagnostic>): string => {
   return lines.join("\n");
 };
 
-export const run = async (inputs: Inputs): Promise<void> => {
-  if (!inputs.githubToken) {
+type TflintIssue = {
+  message: string;
+  rule: {
+    name: string;
+    link: string;
+    severity: string;
+  };
+  range: {
+    filename: string;
+    start: { line: number };
+    end: { line: number };
+  };
+};
+
+type TflintError = {
+  message: string;
+  severity: string;
+  range: {
+    filename: string;
+    start: { line: number };
+    end: { line: number };
+  };
+};
+
+type TflintOutput = {
+  issues?: TflintIssue[];
+  errors?: TflintError[];
+};
+
+export const run = async (input: RunInput): Promise<void> => {
+  if (!input.githubToken) {
     throw new Error("github_token is required");
   }
-  if (!inputs.githubTokenForTflintInit) {
-    inputs.githubTokenForTflintInit = inputs.githubToken;
-  }
-  if (!inputs.githubTokenForFix) {
-    inputs.githubTokenForFix = inputs.githubToken;
-  }
-  const executor = inputs.executor;
+  const githubTokenForTflintInit =
+    input.githubTokenForTflintInit || input.githubToken;
+  const githubTokenForFix = input.githubTokenForFix || input.githubToken;
+  const executor = input.executor;
+  const eventName = input.eventName ?? github.context.eventName;
+  const logger = input.logger ?? { info: core.info, setOutput: core.setOutput };
+  const githubCommentConfig = input.githubCommentConfig ?? GitHubCommentConfig;
+  const createCommit = input.createCommit ?? defaultCreateCommit;
+  const checkGitDiff = input.checkGitDiff ?? defaultCheckGitDiff;
 
-  core.startGroup("tflint --init");
   await executor.exec("tflint", ["--init"], {
-    cwd: inputs.workingDirectory,
+    cwd: input.workingDirectory,
+    group: "tflint --init",
     env: {
-      GITHUB_TOKEN: inputs.githubTokenForTflintInit,
+      GITHUB_TOKEN: githubTokenForTflintInit,
     },
   });
-  core.endGroup();
 
   const args = ["--format", "json"];
 
   const help = await executor.getExecOutput("tflint", ["--help"], {
-    cwd: inputs.workingDirectory,
+    cwd: input.workingDirectory,
     silent: true,
   });
   if (help.stdout.includes("--call-module-type")) {
@@ -118,17 +173,16 @@ export const run = async (inputs: Inputs): Promise<void> => {
   } else {
     args.push("--module");
   }
-  if (inputs.fix) {
+  if (input.fix) {
     args.push("--fix");
   }
 
-  core.startGroup("tflint");
   const out = await executor.getExecOutput("tflint", args, {
-    cwd: inputs.workingDirectory,
+    cwd: input.workingDirectory,
+    group: "tflint",
     ignoreReturnCode: true,
   });
-  core.endGroup();
-  const outJSON = JSON.parse(out.stdout);
+  const outJSON: TflintOutput = JSON.parse(out.stdout);
   const diagnostics = new Array<Diagnostic>();
   if (outJSON.issues) {
     for (let i = 0; i < outJSON.issues.length; i++) {
@@ -157,48 +211,52 @@ export const run = async (inputs: Inputs): Promise<void> => {
   if (outJSON.errors) {
     for (let i = 0; i < outJSON.errors.length; i++) {
       const err = outJSON.errors[i];
-      const diagnostic = new Diagnostic();
-      diagnostic.message = err.message;
-      diagnostic.location.path = err.range.filename;
-      diagnostic.location.range.start.line = err.range.start.line;
-      diagnostic.location.range.end.line = err.range.end.line;
-      diagnostic.severity = getSeverity(err.severity);
-      diagnostics.push(diagnostic);
+      diagnostics.push({
+        message: err.message,
+        code: {
+          value: "",
+          url: "",
+        },
+        location: {
+          path: err.range.filename,
+          range: {
+            start: {
+              line: err.range.start.line,
+            },
+            end: {
+              line: err.range.end.line,
+            },
+          },
+        },
+        severity: getSeverity(err.severity),
+      });
     }
   }
-  if (inputs.fix) {
+  if (input.fix) {
     const files = new Set(
       diagnostics.map((d) =>
-        path.join(inputs.workingDirectory, d.location.path),
+        path.join(input.workingDirectory, d.location.path),
       ),
     );
     if (files.size == 0) {
       return;
     }
-    const out = await exec.getExecOutput(
-      "git",
-      ["diff", "--name-only"].concat([...files]),
-      {
-        ignoreReturnCode: true,
-      },
-    );
-    const changedFiles = out.stdout.split("\n").filter((f) => f.length > 0);
+    const { changedFiles } = await checkGitDiff([...files]);
     if (changedFiles.length !== 0) {
-      core.setOutput("fixed_files", changedFiles.join("\n"));
-      await commit.create({
+      logger.setOutput("fixed_files", changedFiles.join("\n"));
+      await createCommit({
         commitMessage: "fix(tflint): auto fix",
-        githubToken: inputs.githubTokenForFix,
+        githubToken: githubTokenForFix,
         files: new Set(changedFiles),
-        serverRepository: inputs.serverRepository,
-        appId: inputs.securefixActionAppId,
-        appPrivateKey: inputs.securefixActionAppPrivateKey,
+        serverRepository: input.serverRepository,
+        appId: input.securefixActionAppId,
+        appPrivateKey: input.securefixActionAppPrivateKey,
       });
       throw new Error("code is fixed by tflint --fix");
     }
   }
 
-  const config = await lib.getConfig();
-  const filterMode = config.tflint?.reviewdog?.filter_mode ?? "nofilter";
+  const filterMode = input.tflint?.reviewdog?.filter_mode ?? "nofilter";
 
   if (filterMode === "nofilter" && diagnostics.length > 0) {
     const table = generateTable(diagnostics);
@@ -206,14 +264,14 @@ export const run = async (inputs: Inputs): Promise<void> => {
 
 {{template "link" .}} | [tflint](https://github.com/terraform-linters/tflint) | [tflint Annotations to disable rules](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/annotations.md) | [tflint Config](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/config.md)
 
-Working Directory: \`${inputs.workingDirectory}\`
+Working Directory: \`${input.workingDirectory}\`
 
 ${table}`;
     await executor.exec("github-comment", ["post", "-stdin-template"], {
       input: Buffer.from(githubCommentTemplate),
       env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        GITHUB_TOKEN: input.githubToken,
+        GH_COMMENT_CONFIG: githubCommentConfig,
       },
     });
   }
@@ -226,11 +284,9 @@ ${table}`;
     diagnostics: diagnostics,
   });
   const reporter =
-    github.context.eventName == "pull_request"
-      ? "github-pr-review"
-      : "github-check";
-  core.info(`Reviewdog input: ${reviewDogInput}`);
-  core.info("Running reviewdog");
+    eventName == "pull_request" ? "github-pr-review" : "github-check";
+  logger.info(`Reviewdog input: ${reviewDogInput}`);
+  logger.info("Running reviewdog");
 
   const reviewdogArgs = [
     "-f",
@@ -244,9 +300,9 @@ ${table}`;
     "-level",
     "warning",
   ];
-  const failLevel = config.tflint?.reviewdog?.fail_level ?? "any";
+  const failLevel = input.tflint?.reviewdog?.fail_level ?? "any";
   const reviewdogHelp = await executor.getExecOutput("reviewdog", ["--help"], {
-    cwd: inputs.workingDirectory,
+    cwd: input.workingDirectory,
     silent: true,
     ignoreReturnCode: true,
   });
@@ -259,13 +315,12 @@ ${table}`;
     reviewdogArgs.push("-fail-on-error", "1");
   }
 
-  core.startGroup("reviewdog");
   await executor.exec("reviewdog", reviewdogArgs, {
     input: Buffer.from(reviewDogInput),
-    cwd: inputs.workingDirectory,
+    cwd: input.workingDirectory,
+    group: "reviewdog",
     env: {
-      REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
+      REVIEWDOG_GITHUB_API_TOKEN: input.githubToken,
     },
   });
-  core.endGroup();
 };
