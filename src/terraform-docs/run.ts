@@ -91,7 +91,11 @@ export const run = async (input: RunInput): Promise<void> => {
     });
 
     // Search for config file
-    const config = findConfigFile(input.workingDirectory, input.repoRoot, fileSystem);
+    const config = findConfigFile(
+      input.workingDirectory,
+      input.repoRoot,
+      fileSystem,
+    );
 
     // Build terraform-docs arguments
     const opts = config ? ["-c", config] : ["markdown"];
@@ -132,7 +136,9 @@ export const run = async (input: RunInput): Promise<void> => {
     // If not, write the entire output to README.md
     if (
       !fileSystem.existsSync(readmePath) ||
-      !fileSystem.readFileSync(readmePath, "utf8").includes("<!-- BEGIN_TF_DOCS -->")
+      !fileSystem
+        .readFileSync(readmePath, "utf8")
+        .includes("<!-- BEGIN_TF_DOCS -->")
     ) {
       fileSystem.writeFileSync(readmePath, output);
     }
@@ -150,10 +156,7 @@ export const run = async (input: RunInput): Promise<void> => {
     const changed = created || diffResult.exitCode !== 0;
 
     if (changed) {
-      if (
-        eventName !== "pull_request" &&
-        eventName !== "pull_request_target"
-      ) {
+      if (eventName !== "pull_request" && eventName !== "pull_request_target") {
         throw new Error(
           "Please generate Module's README.md with terraform-docs.",
         );
