@@ -177,7 +177,10 @@ describe("writeOutputFiles", () => {
 
     await writeOutputFiles(tempDir, prData, files);
 
-    const content = await fs.readFile(path.join(tempDir, "labels.txt"), "utf-8");
+    const content = await fs.readFile(
+      path.join(tempDir, "labels.txt"),
+      "utf-8",
+    );
     expect(content).toBe("bug\nenhancement\nurgent");
   });
 
@@ -187,7 +190,10 @@ describe("writeOutputFiles", () => {
 
     await writeOutputFiles(tempDir, prData, files);
 
-    const content = await fs.readFile(path.join(tempDir, "labels.txt"), "utf-8");
+    const content = await fs.readFile(
+      path.join(tempDir, "labels.txt"),
+      "utf-8",
+    );
     expect(content).toBe("");
   });
 
@@ -197,7 +203,10 @@ describe("writeOutputFiles", () => {
 
     await writeOutputFiles(tempDir, prData, files);
 
-    const content = await fs.readFile(path.join(tempDir, "labels.txt"), "utf-8");
+    const content = await fs.readFile(
+      path.join(tempDir, "labels.txt"),
+      "utf-8",
+    );
     expect(content).toBe("");
   });
 
