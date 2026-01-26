@@ -1,6 +1,9 @@
+import * as core from "@actions/core";
+import * as github from "@actions/github";
 import * as path from "path";
 import * as aqua from "../aqua";
 import * as types from "../lib/types";
+import { GitHubCommentConfig } from "../lib";
 
 export type DiagnosticCode = {
   value: string;
@@ -42,9 +45,9 @@ export type RunInput = {
   githubToken: string;
   configPath: string;
   config: Config;
-  eventName: string;
-  logger: Logger;
-  githubCommentConfig: string;
+  eventName?: string;
+  logger?: Logger;
+  githubCommentConfig?: string;
 };
 
 export const getSeverity = (s: string): string => {
@@ -110,15 +113,18 @@ export const run = async (input: RunInput): Promise<void> => {
     ? ["config", "--format", "json", "--config", input.configPath, "."]
     : ["config", "--format", "json", "."];
   const executor = input.executor;
+  const eventName = input.eventName ?? github.context.eventName;
+  const logger = input.logger ?? { info: core.info };
+  const githubCommentConfig = input.githubCommentConfig ?? GitHubCommentConfig;
   const out = await executor.getExecOutput("trivy", args, {
     cwd: input.workingDirectory,
     ignoreReturnCode: true,
     group: "trivy",
   });
-  input.logger.info("Parsing trivy config result");
+  logger.info("Parsing trivy config result");
   const outJSON: TrivyOutput = JSON.parse(out.stdout);
   if (outJSON.Results == null) {
-    input.logger.info("trivy config is null");
+    logger.info("trivy config is null");
     return;
   }
   const diagnostics = new Array<Diagnostic>();
@@ -164,13 +170,13 @@ ${table}`;
       input: Buffer.from(githubCommentTemplate),
       env: {
         GITHUB_TOKEN: input.githubToken,
-        GH_COMMENT_CONFIG: input.githubCommentConfig,
+        GH_COMMENT_CONFIG: githubCommentConfig,
       },
     });
   }
 
   const reporter =
-    input.eventName == "pull_request" ? "github-pr-review" : "github-check";
+    eventName == "pull_request" ? "github-pr-review" : "github-check";
 
   const reviewdogArgs = [
     "-f",

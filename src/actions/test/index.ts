@@ -1,5 +1,3 @@
-import * as core from "@actions/core";
-import * as github from "@actions/github";
 import * as path from "path";
 
 import * as lib from "../../lib";
@@ -78,9 +76,6 @@ export const main = async () => {
       configPath: "",
       config,
       executor,
-      eventName: github.context.eventName,
-      logger: { info: core.info },
-      githubCommentConfig: lib.GitHubCommentConfig,
     });
   }
 
