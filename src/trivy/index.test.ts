@@ -6,7 +6,7 @@ import {
   type RunInput,
   type Diagnostic,
   type Logger,
-} from "./run";
+} from "./index";
 import type { Config } from "../lib/types";
 
 describe("getSeverity", () => {
