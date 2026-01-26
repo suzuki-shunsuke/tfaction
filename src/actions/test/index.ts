@@ -12,7 +12,7 @@ import { run as runTrivy } from "../../trivy";
 import { run as runTflint } from "../../tflint";
 import { run as runTerraformDocs } from "../../terraform-docs";
 import { create as createCommit } from "../../commit";
-import { hasFileChangedPorcelain } from "../../lib/git";
+import { checkGitDiff } from "../../lib/git";
 import { fmt } from "./fmt";
 
 export const main = async () => {
@@ -104,16 +104,7 @@ export const main = async () => {
       },
       githubCommentConfig: lib.GitHubCommentConfig,
       createCommit,
-      checkGitDiff: async (files: string[]) => {
-        const changedFiles: string[] = [];
-        for (const file of files) {
-          const changed = await hasFileChangedPorcelain(file);
-          if (changed) {
-            changedFiles.push(file);
-          }
-        }
-        return { changedFiles };
-      },
+      checkGitDiff,
     });
   }
 
