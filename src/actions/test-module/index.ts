@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -63,11 +62,8 @@ export const main = async () => {
       workingDirectory: workingDir,
       githubToken,
       configPath: "",
-      config,
+      trivy: config.trivy,
       executor,
-      eventName: github.context.eventName,
-      logger: { info: core.info },
-      githubCommentConfig: lib.GitHubCommentConfig,
     });
   }
 
