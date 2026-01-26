@@ -35,16 +35,12 @@ export type Logger = {
   info: (message: string) => void;
 };
 
-export type Config = {
-  trivy?: types.TrivyConfig;
-};
-
 export type RunInput = {
   executor: aqua.Executor;
   workingDirectory: string;
   githubToken: string;
   configPath: string;
-  config: Config;
+  trivy?: types.TrivyConfig;
   eventName?: string;
   logger?: Logger;
   githubCommentConfig?: string;
@@ -155,7 +151,7 @@ export const run = async (input: RunInput): Promise<void> => {
     }
   }
 
-  const filterMode = input.config.trivy?.reviewdog?.filter_mode ?? "nofilter";
+  const filterMode = input.trivy?.reviewdog?.filter_mode ?? "nofilter";
 
   if (filterMode === "nofilter" && diagnostics.length > 0) {
     const table = generateTable(diagnostics, input.workingDirectory);
@@ -190,7 +186,7 @@ ${table}`;
     "-level",
     "warning",
   ];
-  const failLevel = input.config.trivy?.reviewdog?.fail_level ?? "any";
+  const failLevel = input.trivy?.reviewdog?.fail_level ?? "any";
   const reviewdogHelp = await executor.getExecOutput("reviewdog", ["--help"], {
     cwd: input.workingDirectory,
     silent: true,

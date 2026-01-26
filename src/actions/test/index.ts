@@ -74,7 +74,7 @@ export const main = async () => {
       workingDirectory: workingDir,
       githubToken,
       configPath: "",
-      config,
+      trivy: config.trivy,
       executor,
     });
   }
