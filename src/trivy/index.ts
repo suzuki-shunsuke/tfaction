@@ -1,43 +1,66 @@
-import * as core from "@actions/core";
-import * as github from "@actions/github";
 import * as path from "path";
-import * as lib from "../lib";
 import * as aqua from "../aqua";
+import * as types from "../lib/types";
 
-type Inputs = {
+export type DiagnosticCode = {
+  value: string;
+  url: string;
+};
+
+export type DiagnosticLocationRangePoint = {
+  line: number;
+};
+
+export type DiagnosticLocationRange = {
+  start: DiagnosticLocationRangePoint;
+  end: DiagnosticLocationRangePoint;
+};
+
+export type DiagnosticLocation = {
+  path: string;
+  range: DiagnosticLocationRange;
+};
+
+export type Diagnostic = {
+  message: string;
+  code: DiagnosticCode;
+  location: DiagnosticLocation;
+  severity: string;
+};
+
+export type Logger = {
+  info: (message: string) => void;
+};
+
+export type Config = {
+  trivy?: types.TrivyConfig;
+};
+
+export type RunInput = {
+  executor: aqua.Executor;
   workingDirectory: string;
   githubToken: string;
   configPath: string;
-  executor: aqua.Executor;
+  config: Config;
+  eventName: string;
+  logger: Logger;
+  githubCommentConfig: string;
 };
 
-class DiagnosticCode {
-  value = "";
-  url = "";
-}
+export const getSeverity = (s: string): string => {
+  if (s.startsWith("HIGH") || s.startsWith("CRITICAL")) {
+    return "ERROR";
+  }
+  if (s.startsWith("MEDIUM")) {
+    return "WARNING";
+  }
+  if (s.startsWith("LOW")) {
+    return "INFO";
+  }
+  return "";
+};
 
-class DiagnosticLocation {
-  path = "";
-  range = new DiagnosticLocationRange();
-}
-
-class DiagnosticLocationRange {
-  start = new DiagnosticLocationRangePoint();
-  end = new DiagnosticLocationRangePoint();
-}
-
-class DiagnosticLocationRangePoint {
-  line = 0;
-}
-
-class Diagnostic {
-  message = "";
-  code = new DiagnosticCode();
-  location = new DiagnosticLocation();
-  severity = "";
-}
-
-const generateTable = (
+export const generateTable = (
   diagnostics: Array<Diagnostic>,
   basePath: string,
 ): string => {
@@ -62,34 +85,40 @@ const generateTable = (
   return lines.join("\n");
 };
 
-const getSeverity = (s: string): string => {
-  if (s.startsWith("HIGH") || s.startsWith("CRITICAL")) {
-    return "ERROR";
-  }
-  if (s.startsWith("MEDIUM")) {
-    return "WARNING";
-  }
-  if (s.startsWith("LOW")) {
-    return "INFO";
-  }
-  return "";
+type TrivyMisconfiguration = {
+  ID: string;
+  Message: string;
+  PrimaryURL: string;
+  Severity: string;
+  CauseMetadata: {
+    StartLine: number;
+    EndLine: number;
+  };
 };
 
-export const run = async (inputs: Inputs): Promise<void> => {
-  const args = inputs.configPath
-    ? ["config", "--format", "json", "--config", inputs.configPath, "."]
+type TrivyResult = {
+  Target: string;
+  Misconfigurations?: TrivyMisconfiguration[];
+};
+
+type TrivyOutput = {
+  Results?: TrivyResult[];
+};
+
+export const run = async (input: RunInput): Promise<void> => {
+  const args = input.configPath
+    ? ["config", "--format", "json", "--config", input.configPath, "."]
     : ["config", "--format", "json", "."];
-  const executor = inputs.executor;
-  core.startGroup("trivy");
+  const executor = input.executor;
   const out = await executor.getExecOutput("trivy", args, {
-    cwd: inputs.workingDirectory,
+    cwd: input.workingDirectory,
     ignoreReturnCode: true,
+    group: "trivy",
   });
-  core.endGroup();
-  core.info("Parsing trivy config result");
-  const outJSON = JSON.parse(out.stdout);
+  input.logger.info("Parsing trivy config result");
+  const outJSON: TrivyOutput = JSON.parse(out.stdout);
   if (outJSON.Results == null) {
-    core.info("trivy config is null");
+    input.logger.info("trivy config is null");
     return;
   }
   const diagnostics = new Array<Diagnostic>();
@@ -120,31 +149,28 @@ export const run = async (inputs: Inputs): Promise<void> => {
     }
   }
 
-  const config = await lib.getConfig();
-  const filterMode = config.trivy?.reviewdog?.filter_mode ?? "nofilter";
+  const filterMode = input.config.trivy?.reviewdog?.filter_mode ?? "nofilter";
 
   if (filterMode === "nofilter" && diagnostics.length > 0) {
-    const table = generateTable(diagnostics, inputs.workingDirectory);
+    const table = generateTable(diagnostics, input.workingDirectory);
     const githubCommentTemplate = `## :x: Trivy error
 
 {{template "link" .}} | [trivy](https://aquasecurity.github.io/trivy)
 
-Working Directory: \`${inputs.workingDirectory}\`
+Working Directory: \`${input.workingDirectory}\`
 
 ${table}`;
     await executor.exec("github-comment", ["post", "-stdin-template"], {
       input: Buffer.from(githubCommentTemplate),
       env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
+        GITHUB_TOKEN: input.githubToken,
+        GH_COMMENT_CONFIG: input.githubCommentConfig,
       },
     });
   }
 
   const reporter =
-    github.context.eventName == "pull_request"
-      ? "github-pr-review"
-      : "github-check";
+    input.eventName == "pull_request" ? "github-pr-review" : "github-check";
 
   const reviewdogArgs = [
     "-f",
@@ -158,9 +184,9 @@ ${table}`;
     "-level",
     "warning",
   ];
-  const failLevel = config.trivy?.reviewdog?.fail_level ?? "any";
+  const failLevel = input.config.trivy?.reviewdog?.fail_level ?? "any";
   const reviewdogHelp = await executor.getExecOutput("reviewdog", ["--help"], {
-    cwd: inputs.workingDirectory,
+    cwd: input.workingDirectory,
     silent: true,
     ignoreReturnCode: true,
   });
@@ -173,7 +199,6 @@ ${table}`;
     reviewdogArgs.push("-fail-on-error", "1");
   }
 
-  core.startGroup("reviewdog -name trivy");
   await executor.exec("reviewdog", reviewdogArgs, {
     input: Buffer.from(
       JSON.stringify({
@@ -184,12 +209,12 @@ ${table}`;
         diagnostics: diagnostics,
       }),
     ),
-    cwd: inputs.workingDirectory,
+    cwd: input.workingDirectory,
+    group: "reviewdog -name trivy",
     env: {
-      REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
+      REVIEWDOG_GITHUB_API_TOKEN: input.githubToken,
     },
   });
-  core.endGroup();
   if (out.exitCode != 0) {
     throw new Error("trivy failed");
   }

@@ -34,7 +34,7 @@ const TrivyConfig = z.object({
   enabled: z.boolean().default(trivyDefaults.enabled),
   reviewdog: ReviewdogConfig.optional(),
 });
-type TrivyConfig = z.infer<typeof TrivyConfig>;
+export type TrivyConfig = z.infer<typeof TrivyConfig>;
 
 const TerraformDocsConfig = z.object({
   enabled: z.boolean().optional(),
