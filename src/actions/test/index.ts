@@ -96,13 +96,6 @@ export const main = async () => {
       securefixActionAppPrivateKey: securefixAppPrivateKey,
       executor,
       tflint: config.tflint,
-      eventName: github.context.eventName,
-      logger: {
-        info: core.info,
-        setOutput: core.setOutput,
-      },
-      githubCommentConfig: lib.GitHubCommentConfig,
-      createCommit,
     });
   }
 

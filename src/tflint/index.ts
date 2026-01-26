@@ -1,7 +1,11 @@
+import * as core from "@actions/core";
+import * as github from "@actions/github";
 import * as path from "path";
 import * as aqua from "../aqua";
 import * as types from "../lib/types";
+import { GitHubCommentConfig } from "../lib";
 import { checkGitDiff as defaultCheckGitDiff } from "../lib/git";
+import { create as defaultCreateCommit } from "../commit";
 
 export type DiagnosticCode = {
   value: string;
@@ -58,10 +62,10 @@ export type RunInput = {
   securefixActionAppId: string;
   securefixActionAppPrivateKey: string;
   tflint?: types.TflintConfig;
-  eventName: string;
-  logger: Logger;
-  githubCommentConfig: string;
-  createCommit: CommitCreator;
+  eventName?: string;
+  logger?: Logger;
+  githubCommentConfig?: string;
+  createCommit?: CommitCreator;
   checkGitDiff?: GitDiffChecker;
 };
 
@@ -144,6 +148,11 @@ export const run = async (input: RunInput): Promise<void> => {
     input.githubTokenForTflintInit || input.githubToken;
   const githubTokenForFix = input.githubTokenForFix || input.githubToken;
   const executor = input.executor;
+  const eventName = input.eventName ?? github.context.eventName;
+  const logger = input.logger ?? { info: core.info, setOutput: core.setOutput };
+  const githubCommentConfig = input.githubCommentConfig ?? GitHubCommentConfig;
+  const createCommit = input.createCommit ?? defaultCreateCommit;
+  const checkGitDiff = input.checkGitDiff ?? defaultCheckGitDiff;
 
   await executor.exec("tflint", ["--init"], {
     cwd: input.workingDirectory,
@@ -232,11 +241,10 @@ export const run = async (input: RunInput): Promise<void> => {
     if (files.size == 0) {
       return;
     }
-    const checkGitDiff = input.checkGitDiff ?? defaultCheckGitDiff;
     const { changedFiles } = await checkGitDiff([...files]);
     if (changedFiles.length !== 0) {
-      input.logger.setOutput("fixed_files", changedFiles.join("\n"));
-      await input.createCommit({
+      logger.setOutput("fixed_files", changedFiles.join("\n"));
+      await createCommit({
         commitMessage: "fix(tflint): auto fix",
         githubToken: githubTokenForFix,
         files: new Set(changedFiles),
@@ -263,7 +271,7 @@ ${table}`;
       input: Buffer.from(githubCommentTemplate),
       env: {
         GITHUB_TOKEN: input.githubToken,
-        GH_COMMENT_CONFIG: input.githubCommentConfig,
+        GH_COMMENT_CONFIG: githubCommentConfig,
       },
     });
   }
@@ -276,9 +284,9 @@ ${table}`;
     diagnostics: diagnostics,
   });
   const reporter =
-    input.eventName == "pull_request" ? "github-pr-review" : "github-check";
-  input.logger.info(`Reviewdog input: ${reviewDogInput}`);
-  input.logger.info("Running reviewdog");
+    eventName == "pull_request" ? "github-pr-review" : "github-check";
+  logger.info(`Reviewdog input: ${reviewDogInput}`);
+  logger.info("Running reviewdog");
 
   const reviewdogArgs = [
     "-f",
