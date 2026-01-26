@@ -1,14 +1,24 @@
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
-import * as path from "path";
 import * as fs from "fs";
 import * as tmp from "tmp";
+import * as path from "path";
+import type * as aqua from "../aqua";
 import * as commit from "../commit";
 import * as env from "../lib/env";
-import * as aqua from "../aqua";
 
-type Inputs = {
-  /** A relative path from github.workspace */
+export type FileSystem = {
+  existsSync: (path: string) => boolean;
+  readFileSync: (path: string, encoding: BufferEncoding) => string;
+  writeFileSync: (path: string, data: string) => void;
+};
+
+export type TempFile = {
+  name: string;
+  removeCallback: () => void;
+};
+
+export type RunInput = {
   workingDirectory: string;
   repoRoot: string;
   githubToken: string;
@@ -16,11 +26,18 @@ type Inputs = {
   securefixActionAppPrivateKey: string;
   securefixActionServerRepository: string;
   executor: aqua.Executor;
+  eventName?: string;
+  target?: string;
+  fs?: FileSystem;
+  createTempFile?: () => TempFile;
+  commitCreate?: typeof commit.create;
+  execGetExecOutput?: typeof exec.getExecOutput;
 };
 
-const findConfigFile = (
+export const findConfigFile = (
   workingDirectory: string,
   repositoryRoot: string,
+  fs: FileSystem,
 ): string => {
   const configFiles = [
     ".terraform-docs.yml",
@@ -48,23 +65,37 @@ const findConfigFile = (
   return "";
 };
 
-export const run = async (inputs: Inputs): Promise<void> => {
-  const readmePath = path.join(inputs.workingDirectory, "README.md");
-  const executor = inputs.executor;
+export const run = async (input: RunInput): Promise<void> => {
+  const readmePath = path.join(input.workingDirectory, "README.md");
+  const executor = input.executor;
+  const eventName = input.eventName ?? github.context.eventName;
+  const target = input.target ?? env.all.TFACTION_TARGET;
+  const fileSystem = input.fs ?? {
+    existsSync: fs.existsSync,
+    readFileSync: fs.readFileSync,
+    writeFileSync: fs.writeFileSync,
+  };
+  const createTempFile = input.createTempFile ?? (() => tmp.fileSync());
+  const commitCreate = input.commitCreate ?? commit.create;
+  const execGetExecOutput = input.execGetExecOutput ?? exec.getExecOutput;
 
   // Check if README.md exists
-  const created = !fs.existsSync(readmePath);
+  const created = !fileSystem.existsSync(readmePath);
 
   // Create temporary file
-  const tempFile = tmp.fileSync();
+  const tempFile = createTempFile();
   try {
     // Check terraform-docs version
     await executor.exec("terraform-docs", ["-v"], {
-      cwd: inputs.workingDirectory,
+      cwd: input.workingDirectory,
     });
 
     // Search for config file
-    const config = findConfigFile(inputs.workingDirectory, inputs.repoRoot);
+    const config = findConfigFile(
+      input.workingDirectory,
+      input.repoRoot,
+      fileSystem,
+    );
 
     // Build terraform-docs arguments
     const opts = config ? ["-c", config] : ["markdown"];
@@ -74,19 +105,19 @@ export const run = async (inputs: Inputs): Promise<void> => {
       "terraform-docs",
       [...opts, "."],
       {
-        cwd: inputs.workingDirectory,
+        cwd: input.workingDirectory,
         ignoreReturnCode: true,
         comment: {
-          token: inputs.githubToken,
+          token: input.githubToken,
           vars: {
-            tfaction_target: env.all.TFACTION_TARGET,
+            tfaction_target: target,
           },
         },
       },
     );
 
     // Write output to temp file
-    fs.writeFileSync(tempFile.name, result.stdout);
+    fileSystem.writeFileSync(tempFile.name, result.stdout);
 
     // Check if command failed
     if (result.exitCode !== 0) {
@@ -96,7 +127,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
     }
 
     // Check for error: .terraform-docs.yml is required
-    const output = fs.readFileSync(tempFile.name, "utf8");
+    const output = fileSystem.readFileSync(tempFile.name, "utf8");
     if (output.includes("Available Commands:")) {
       throw new Error(".terraform-docs.yml is required");
     }
@@ -104,18 +135,20 @@ export const run = async (inputs: Inputs): Promise<void> => {
     // Check if README.md has the BEGIN_TF_DOCS marker
     // If not, write the entire output to README.md
     if (
-      !fs.existsSync(readmePath) ||
-      !fs.readFileSync(readmePath, "utf8").includes("<!-- BEGIN_TF_DOCS -->")
+      !fileSystem.existsSync(readmePath) ||
+      !fileSystem
+        .readFileSync(readmePath, "utf8")
+        .includes("<!-- BEGIN_TF_DOCS -->")
     ) {
-      fs.writeFileSync(readmePath, output);
+      fileSystem.writeFileSync(readmePath, output);
     }
 
     // Check if README.md has changed
-    const diffResult = await exec.getExecOutput(
+    const diffResult = await execGetExecOutput(
       "git",
       ["diff", "--quiet", "README.md"],
       {
-        cwd: inputs.workingDirectory,
+        cwd: input.workingDirectory,
         ignoreReturnCode: true,
       },
     );
@@ -123,19 +156,18 @@ export const run = async (inputs: Inputs): Promise<void> => {
     const changed = created || diffResult.exitCode !== 0;
 
     if (changed) {
-      const eventName = github.context.eventName;
       if (eventName !== "pull_request" && eventName !== "pull_request_target") {
         throw new Error(
           "Please generate Module's README.md with terraform-docs.",
         );
       }
-      await commit.create({
-        githubToken: inputs.githubToken,
+      await commitCreate({
+        githubToken: input.githubToken,
         commitMessage: "docs: generate document by terraform-docs",
-        appId: inputs.securefixActionAppId,
-        appPrivateKey: inputs.securefixActionAppPrivateKey,
-        serverRepository: inputs.securefixActionServerRepository,
-        files: new Set([path.join(inputs.workingDirectory, "README.md")]),
+        appId: input.securefixActionAppId,
+        appPrivateKey: input.securefixActionAppPrivateKey,
+        serverRepository: input.securefixActionServerRepository,
+        files: new Set([path.join(input.workingDirectory, "README.md")]),
       });
       throw new Error("document is generated by terraform-docs");
     }
