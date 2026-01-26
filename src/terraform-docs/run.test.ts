@@ -102,8 +102,8 @@ describe("run", () => {
       securefixActionServerRepository: "",
       executor: createMockExecutor() as unknown as RunInput["executor"],
       eventName: "pull_request",
-      tfactionTarget: "target",
-      fileSystem: createMockFs({
+      target: "target",
+      fs: createMockFs({
         existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
         fileContents: new Map([
           [
@@ -134,7 +134,7 @@ describe("run", () => {
   it("creates README.md when it does not exist", async () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
-      fileSystem: createMockFs({
+      fs: createMockFs({
         existingPaths: ["/work/.terraform-docs.yml"],
         fileContents: new Map(),
         writtenFiles,
@@ -195,7 +195,7 @@ describe("run", () => {
 
   it("executes terraform-docs with markdown mode when no config file found", async () => {
     const input = createBaseInput({
-      fileSystem: createMockFs({
+      fs: createMockFs({
         existingPaths: ["/work/README.md"],
         fileContents: new Map([
           [
@@ -244,7 +244,7 @@ describe("run", () => {
   it("throws error when output contains Available Commands (missing config)", async () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
-      fileSystem: createMockFs({
+      fs: createMockFs({
         existingPaths: ["/work/README.md"],
         fileContents: new Map([
           ["/work/README.md", "<!-- BEGIN_TF_DOCS -->"],
@@ -257,7 +257,7 @@ describe("run", () => {
       }),
     });
     // Override readFileSync to return the written content
-    const fs = input.fileSystem!;
+    const fs = input.fs!;
     const originalReadFileSync = fs.readFileSync;
     fs.readFileSync = (path: string, encoding: BufferEncoding) => {
       if (writtenFiles.has(path)) {
@@ -281,7 +281,7 @@ describe("run", () => {
   it("writes output to README.md when BEGIN_TF_DOCS marker is missing", async () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
-      fileSystem: createMockFs({
+      fs: createMockFs({
         existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
         fileContents: new Map([
           ["/work/README.md", "# Old README without marker"],
@@ -290,7 +290,7 @@ describe("run", () => {
       }),
     });
     // Override readFileSync to return the written content for temp file
-    const fs = input.fileSystem!;
+    const fs = input.fs!;
     const originalReadFileSync = fs.readFileSync;
     fs.readFileSync = (path: string, encoding: BufferEncoding) => {
       if (writtenFiles.has(path)) {
@@ -318,14 +318,14 @@ describe("run", () => {
     const existingContent =
       "# Module\n\n<!-- BEGIN_TF_DOCS -->\nold docs\n<!-- END_TF_DOCS -->";
     const input = createBaseInput({
-      fileSystem: createMockFs({
+      fs: createMockFs({
         existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
         fileContents: new Map([["/work/README.md", existingContent]]),
         writtenFiles,
       }),
     });
     // Override readFileSync to return the written content for temp file
-    const fs = input.fileSystem!;
+    const fs = input.fs!;
     const originalReadFileSync = fs.readFileSync;
     fs.readFileSync = (path: string, encoding: BufferEncoding) => {
       if (writtenFiles.has(path)) {
@@ -376,14 +376,14 @@ describe("run", () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
       eventName: "push",
-      fileSystem: createMockFs({
+      fs: createMockFs({
         existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
         fileContents: new Map([["/work/README.md", "<!-- BEGIN_TF_DOCS -->"]]),
         writtenFiles,
       }),
     });
     // Override readFileSync to return the written content for temp file
-    const fs = input.fileSystem!;
+    const fs = input.fs!;
     const originalReadFileSync = fs.readFileSync;
     fs.readFileSync = (path: string, encoding: BufferEncoding) => {
       if (writtenFiles.has(path)) {
@@ -417,14 +417,14 @@ describe("run", () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
       eventName: "pull_request",
-      fileSystem: createMockFs({
+      fs: createMockFs({
         existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
         fileContents: new Map([["/work/README.md", "<!-- BEGIN_TF_DOCS -->"]]),
         writtenFiles,
       }),
     });
     // Override readFileSync to return the written content for temp file
-    const fs = input.fileSystem!;
+    const fs = input.fs!;
     const originalReadFileSync = fs.readFileSync;
     fs.readFileSync = (path: string, encoding: BufferEncoding) => {
       if (writtenFiles.has(path)) {
@@ -467,14 +467,14 @@ describe("run", () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
       eventName: "pull_request_target",
-      fileSystem: createMockFs({
+      fs: createMockFs({
         existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
         fileContents: new Map([["/work/README.md", "<!-- BEGIN_TF_DOCS -->"]]),
         writtenFiles,
       }),
     });
     // Override readFileSync to return the written content for temp file
-    const fs = input.fileSystem!;
+    const fs = input.fs!;
     const originalReadFileSync = fs.readFileSync;
     fs.readFileSync = (path: string, encoding: BufferEncoding) => {
       if (writtenFiles.has(path)) {
@@ -549,7 +549,7 @@ describe("run", () => {
 
   it("passes tfactionTarget to comment vars", async () => {
     const input = createBaseInput({
-      tfactionTarget: "my-target",
+      target: "my-target",
     });
     const executor = input.executor as unknown as ReturnType<
       typeof createMockExecutor

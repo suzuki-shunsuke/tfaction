@@ -27,8 +27,8 @@ export type RunInput = {
   securefixActionServerRepository: string;
   executor: aqua.Executor;
   eventName?: string;
-  tfactionTarget?: string;
-  fileSystem?: FileSystem;
+  target?: string;
+  fs?: FileSystem;
   createTempFile?: () => TempFile;
   commitCreate?: typeof commit.create;
   execGetExecOutput?: typeof exec.getExecOutput;
@@ -69,8 +69,8 @@ export const run = async (input: RunInput): Promise<void> => {
   const readmePath = path.join(input.workingDirectory, "README.md");
   const executor = input.executor;
   const eventName = input.eventName ?? github.context.eventName;
-  const tfactionTarget = input.tfactionTarget ?? env.all.TFACTION_TARGET;
-  const fileSystem = input.fileSystem ?? {
+  const target = input.target ?? env.all.TFACTION_TARGET;
+  const fileSystem = input.fs ?? {
     existsSync: fs.existsSync,
     readFileSync: fs.readFileSync,
     writeFileSync: fs.writeFileSync,
@@ -110,7 +110,7 @@ export const run = async (input: RunInput): Promise<void> => {
         comment: {
           token: input.githubToken,
           vars: {
-            tfaction_target: tfactionTarget,
+            tfaction_target: target,
           },
         },
       },
