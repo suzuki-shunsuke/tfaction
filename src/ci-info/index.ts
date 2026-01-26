@@ -6,13 +6,21 @@ import * as path from "path";
 import * as env from "../lib/env";
 import * as input from "../lib/input";
 
-interface PRFile {
+export interface PRFile {
   filename: string;
   previous_filename?: string;
 }
 
-const getPRNumberFromMergeGroup = (): number | undefined => {
-  const refName = env.all.GITHUB_REF_NAME;
+export type Logger = {
+  info: (message: string) => void;
+  warning: (message: string) => void;
+};
+
+export const getPRNumberFromMergeGroup = (
+  refName: string | undefined,
+  logger?: Logger,
+): number | undefined => {
+  const log = logger ?? { info: core.info, warning: core.warning };
   if (!refName) {
     return undefined;
   }
@@ -23,7 +31,7 @@ const getPRNumberFromMergeGroup = (): number | undefined => {
   const dashIndex = withoutPrefix.indexOf("-");
 
   if (dashIndex === -1) {
-    core.warning(
+    log.warning(
       `GITHUB_REF_NAME is not a valid merge_group format: ${refName}`,
     );
     return undefined;
@@ -33,19 +41,21 @@ const getPRNumberFromMergeGroup = (): number | undefined => {
   const prNumber = parseInt(prNumberStr, 10);
 
   if (isNaN(prNumber)) {
-    core.warning(`Failed to parse PR number from GITHUB_REF_NAME: ${refName}`);
+    log.warning(`Failed to parse PR number from GITHUB_REF_NAME: ${refName}`);
     return undefined;
   }
 
   return prNumber;
 };
 
-const getPRNumberFromSHA = async (
+export const getPRNumberFromSHA = async (
   octokit: ReturnType<typeof github.getOctokit>,
   owner: string,
   repo: string,
   sha: string,
+  logger?: Logger,
 ): Promise<number | undefined> => {
+  const log = logger ?? { info: core.info, warning: core.warning };
   try {
     const { data } =
       await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
@@ -60,12 +70,12 @@ const getPRNumberFromSHA = async (
 
     return data[0].number;
   } catch (error) {
-    core.warning(`Failed to get PR from SHA: ${error}`);
+    log.warning(`Failed to get PR from SHA: ${error}`);
     return undefined;
   }
 };
 
-const getPRFiles = async (
+export const getPRFiles = async (
   octokit: ReturnType<typeof github.getOctokit>,
   owner: string,
   repo: string,
@@ -118,7 +128,7 @@ const setValue = (
   core.exportVariable(`CI_INFO_${key.toUpperCase()}`, value);
 };
 
-interface PRData {
+export interface PRData {
   body: string | null;
   base: {
     ref: string;
@@ -136,7 +146,7 @@ interface PRData {
   }>;
 }
 
-const writeOutputFiles = async (
+export const writeOutputFiles = async (
   dir: string,
   prData: PRData,
   files: PRFile[],
@@ -186,43 +196,61 @@ export type Result = {
   };
 };
 
-export const main = async (): Promise<Result> => {
-  setValue("repo_owner", github.context.repo.owner);
-  setValue("repo_name", github.context.repo.repo);
+export type RunInput = {
+  repoOwner?: string;
+  repoName?: string;
+  prNumber?: number;
+  eventName?: string;
+  refName?: string;
+  sha?: string;
+  octokit: ReturnType<typeof github.getOctokit>;
+  tempDir?: string;
+  logger?: Logger;
+};
+
+export const run = async (input: RunInput): Promise<Result> => {
+  const repoOwner = input.repoOwner ?? github.context.repo.owner;
+  const repoName = input.repoName ?? github.context.repo.repo;
+  const eventName = input.eventName ?? github.context.eventName;
+  const refName = input.refName ?? env.all.GITHUB_REF_NAME;
+  const sha = input.sha ?? github.context.sha;
+  const logger = input.logger ?? { info: core.info, warning: core.warning };
+
+  setValue("repo_owner", repoOwner);
+  setValue("repo_name", repoName);
 
   // Determine PR number
-  let prNumber = github.context.payload.pull_request?.number;
+  let prNumber = input.prNumber;
   // Try to get PR number from merge_group event
-  if (!prNumber && github.context.eventName === "merge_group") {
-    core.info("Attempting to get PR number from merge_group event");
-    prNumber = getPRNumberFromMergeGroup();
+  if (!prNumber && eventName === "merge_group") {
+    logger.info("Attempting to get PR number from merge_group event");
+    prNumber = getPRNumberFromMergeGroup(refName, logger);
   }
   setValue("is_pr", prNumber !== undefined);
-
-  const octokit = github.getOctokit(input.getRequiredGitHubToken());
 
   // Try to get PR number from SHA
   if (!prNumber) {
     prNumber = await getPRNumberFromSHA(
-      octokit,
-      github.context.repo.owner,
-      github.context.repo.repo,
-      github.context.sha,
+      input.octokit,
+      repoOwner,
+      repoName,
+      sha,
+      logger,
     );
   }
   setValue("has_associated_pr", prNumber !== undefined);
 
   if (!prNumber) {
-    core.info("No PR number found - running in non-PR environment");
+    logger.info("No PR number found - running in non-PR environment");
     return {};
   }
   setValue("pr_number", prNumber);
 
   // Get PR details
-  core.info(`Fetching PR #${prNumber}`);
-  const { data: prData } = await octokit.rest.pulls.get({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
+  logger.info(`Fetching PR #${prNumber}`);
+  const { data: prData } = await input.octokit.rest.pulls.get({
+    owner: repoOwner,
+    repo: repoName,
     pull_number: prNumber,
   });
 
@@ -232,17 +260,13 @@ export const main = async (): Promise<Result> => {
   setValue("pr_merged", prData.merged);
 
   // Get PR files
-  core.info("Fetching PR files");
-  const files = await getPRFiles(
-    octokit,
-    github.context.repo.owner,
-    github.context.repo.repo,
-    prNumber,
-  );
-  core.info(`Found ${files.length} files`);
+  logger.info("Fetching PR files");
+  const files = await getPRFiles(input.octokit, repoOwner, repoName, prNumber);
+  logger.info(`Found ${files.length} files`);
 
   // Determine output directory
-  const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "ci-info"));
+  const outputDir =
+    input.tempDir ?? (await fs.mkdtemp(path.join(os.tmpdir(), "ci-info")));
   setValue("temp_dir", outputDir);
   // Write output files
   await writeOutputFiles(outputDir, prData, files);
@@ -254,4 +278,12 @@ export const main = async (): Promise<Result> => {
       files: files.map((f) => f.filename),
     },
   };
+};
+
+export const main = async (): Promise<Result> => {
+  const octokit = github.getOctokit(input.getRequiredGitHubToken());
+  return run({
+    prNumber: github.context.payload.pull_request?.number,
+    octokit,
+  });
 };
