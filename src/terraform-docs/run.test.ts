@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { findConfigFile, run, type RunInput, type FileSystem } from "./run";
+import { findConfigFile, run, type RunInput, type FileSystem } from "./index";
 
 describe("findConfigFile", () => {
   const createMockFs = (existingPaths: string[]): FileSystem => ({
