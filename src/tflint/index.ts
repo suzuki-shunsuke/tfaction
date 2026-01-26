@@ -29,8 +29,6 @@ export type Diagnostic = {
 };
 
 export type Logger = {
-  startGroup: (name: string) => void;
-  endGroup: () => void;
   info: (message: string) => void;
   setOutput: (name: string, value: string) => void;
 };
@@ -146,14 +144,13 @@ export const run = async (input: RunInput): Promise<void> => {
   const githubTokenForFix = input.githubTokenForFix || input.githubToken;
   const executor = input.executor;
 
-  input.logger.startGroup("tflint --init");
   await executor.exec("tflint", ["--init"], {
     cwd: input.workingDirectory,
+    group: "tflint --init",
     env: {
       GITHUB_TOKEN: githubTokenForTflintInit,
     },
   });
-  input.logger.endGroup();
 
   const args = ["--format", "json"];
 
@@ -170,12 +167,11 @@ export const run = async (input: RunInput): Promise<void> => {
     args.push("--fix");
   }
 
-  input.logger.startGroup("tflint");
   const out = await executor.getExecOutput("tflint", args, {
     cwd: input.workingDirectory,
+    group: "tflint",
     ignoreReturnCode: true,
   });
-  input.logger.endGroup();
   const outJSON: TflintOutput = JSON.parse(out.stdout);
   const diagnostics = new Array<Diagnostic>();
   if (outJSON.issues) {
@@ -309,13 +305,12 @@ ${table}`;
     reviewdogArgs.push("-fail-on-error", "1");
   }
 
-  input.logger.startGroup("reviewdog");
   await executor.exec("reviewdog", reviewdogArgs, {
     input: Buffer.from(reviewDogInput),
     cwd: input.workingDirectory,
+    group: "reviewdog",
     env: {
       REVIEWDOG_GITHUB_API_TOKEN: input.githubToken,
     },
   });
-  input.logger.endGroup();
 };
