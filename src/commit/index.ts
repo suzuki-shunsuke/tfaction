@@ -1,8 +1,8 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as securefix from "@csm-actions/securefix-action";
-import * as commit from "@suzuki-shunsuke/commit-ts";
 import * as env from "../lib/env";
+import { run } from "./run";
 
 type Inputs = {
   commitMessage: string;
@@ -42,65 +42,15 @@ export const create = async (inputs: Inputs): Promise<string> => {
   const octokit = github.getOctokit(inputs.githubToken);
   const branch =
     inputs.branch || env.all.GITHUB_HEAD_REF || env.all.GITHUB_REF_NAME;
-  await commit.createCommit(octokit, {
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
+
+  return run({
+    commitMessage: inputs.commitMessage,
+    files: inputs.files,
     branch,
-    message: inputs.commitMessage,
-    files: [...inputs.files],
-    deleteIfNotExist: true,
-    logger: {
-      info: core.info,
-    },
+    repoOwner: github.context.repo.owner,
+    repoName: github.context.repo.repo,
+    octokit,
+    logger: { info: core.info, notice: core.notice },
+    pr: inputs.pr,
   });
-  if (!inputs.pr) {
-    return "";
-  }
-  // create a pr
-  // add assignees
-  // add labels
-  const { data: repoData } = await octokit.rest.repos.get({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-  });
-  const baseBranch = repoData.default_branch;
-
-  const { data: pr } = await octokit.rest.pulls.create({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    head: branch,
-    base: baseBranch,
-    title: inputs.pr.title,
-    body: inputs.pr.body,
-    draft: inputs.pr.draft,
-  });
-  core.notice(`Created PR: ${pr.html_url}`);
-
-  if (inputs.pr.comment) {
-    await octokit.rest.issues.createComment({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      body: inputs.pr.comment,
-    });
-  }
-
-  if (inputs.pr.labels && inputs.pr.labels.length > 0) {
-    await octokit.rest.issues.addLabels({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      labels: inputs.pr.labels,
-    });
-  }
-
-  if (inputs.pr.assignees && inputs.pr.assignees.length > 0) {
-    await octokit.rest.issues.addAssignees({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pr.number,
-      assignees: inputs.pr.assignees,
-    });
-  }
-  return pr.html_url;
 };
