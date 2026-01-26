@@ -99,8 +99,6 @@ export const main = async () => {
       tflint: config.tflint,
       eventName: github.context.eventName,
       logger: {
-        startGroup: core.startGroup,
-        endGroup: core.endGroup,
         info: core.info,
         setOutput: core.setOutput,
       },
