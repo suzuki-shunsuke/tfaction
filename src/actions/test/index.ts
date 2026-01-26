@@ -12,7 +12,6 @@ import { run as runTrivy } from "../../trivy";
 import { run as runTflint } from "../../tflint";
 import { run as runTerraformDocs } from "../../terraform-docs";
 import { create as createCommit } from "../../commit";
-import { checkGitDiff } from "../../lib/git";
 import { fmt } from "./fmt";
 
 export const main = async () => {
@@ -104,7 +103,6 @@ export const main = async () => {
       },
       githubCommentConfig: lib.GitHubCommentConfig,
       createCommit,
-      checkGitDiff,
     });
   }
 

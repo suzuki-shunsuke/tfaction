@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as aqua from "../aqua";
 import * as types from "../lib/types";
+import { checkGitDiff as defaultCheckGitDiff } from "../lib/git";
 
 export type DiagnosticCode = {
   value: string;
@@ -61,7 +62,7 @@ export type RunInput = {
   logger: Logger;
   githubCommentConfig: string;
   createCommit: CommitCreator;
-  checkGitDiff: GitDiffChecker;
+  checkGitDiff?: GitDiffChecker;
 };
 
 export const getSeverity = (s: string): string => {
@@ -231,7 +232,8 @@ export const run = async (input: RunInput): Promise<void> => {
     if (files.size == 0) {
       return;
     }
-    const { changedFiles } = await input.checkGitDiff([...files]);
+    const checkGitDiff = input.checkGitDiff ?? defaultCheckGitDiff;
+    const { changedFiles } = await checkGitDiff([...files]);
     if (changedFiles.length !== 0) {
       input.logger.setOutput("fixed_files", changedFiles.join("\n"));
       await input.createCommit({
