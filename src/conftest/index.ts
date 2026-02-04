@@ -16,7 +16,7 @@ type Inputs = {
   executor: aqua.Executor;
 };
 
-const getConftestPaths = (
+export const getConftestPaths = (
   policy: types.ConftestPolicyConfig,
   workingDir: string,
   planJsonPath?: string,
@@ -60,7 +60,7 @@ const getConftestPaths = (
  * @param paths
  * @returns
  */
-const buildConftestArgs = (
+export const buildConftestArgs = (
   policy: types.ConftestPolicyConfig,
   target: string,
   workingDir: string,
@@ -150,7 +150,7 @@ const buildConftestArgs = (
   return args;
 };
 
-const buildPolicies = (
+export const buildPolicies = (
   config: types.Config,
   targetGroup: types.TargetGroup,
   wdConfig: types.TargetConfig,
