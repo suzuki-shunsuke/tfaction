@@ -95,8 +95,7 @@ export const run = async (input: RunInput): Promise<void> => {
     config,
   );
 
-  const workingDir =
-    targetConfigResult.working_directory || input.workingDir;
+  const workingDir = targetConfigResult.working_directory || input.workingDir;
   const target = targetConfigResult.target || input.target;
 
   if (!target) {
