@@ -18,7 +18,7 @@ export const main = async () => {
 
   await run({
     issueNumber,
-    comment: comment as Comment,
+    comment: comment as unknown as Comment,
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     octokit,
