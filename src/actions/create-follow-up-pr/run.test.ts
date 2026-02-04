@@ -332,11 +332,7 @@ describe("generatePRParams", () => {
       },
     } as unknown as Parameters<typeof generatePRParams>[0];
 
-    const result = generatePRParams(
-      config,
-      defaultTargetConfig,
-      defaultInput,
-    );
+    const result = generatePRParams(config, defaultTargetConfig, defaultInput);
     expect(result.prTitle).toBe("Follow up infra/env/prod #42");
     expect(result.prBody).toBe("Body for infra/env/prod");
     expect(result.comment).toBe("Comment for infra/env/prod by user1");
@@ -409,10 +405,9 @@ describe("createFailedPrsFile", () => {
       "owner/repo",
     );
 
-    expect(fs.mkdirSync).toHaveBeenCalledWith(
-      "/workspace/infra/.tfaction",
-      { recursive: true },
-    );
+    expect(fs.mkdirSync).toHaveBeenCalledWith("/workspace/infra/.tfaction", {
+      recursive: true,
+    });
   });
 
   it("creates failed-prs file with header if it doesn't exist", () => {
@@ -429,9 +424,7 @@ describe("createFailedPrsFile", () => {
 
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       "/workspace/infra/.tfaction/failed-prs",
-      expect.stringContaining(
-        "This file is created and updated by tfaction",
-      ),
+      expect.stringContaining("This file is created and updated by tfaction"),
     );
   });
 
@@ -493,11 +486,7 @@ describe("postSkipCreateComment", () => {
 
     expect(mockExecutor.exec).toHaveBeenCalledWith(
       "github-comment",
-      expect.arrayContaining([
-        "post",
-        "-k",
-        "skip-create-follow-up-pr",
-      ]),
+      expect.arrayContaining(["post", "-k", "skip-create-follow-up-pr"]),
       expect.objectContaining({
         cwd: "/workspace",
         env: {
@@ -609,11 +598,7 @@ describe("run", () => {
 
     expect(mockExecutor.exec).toHaveBeenCalledWith(
       "github-comment",
-      expect.arrayContaining([
-        "post",
-        "-k",
-        "create-follow-up-pr",
-      ]),
+      expect.arrayContaining(["post", "-k", "create-follow-up-pr"]),
       expect.objectContaining({
         env: {
           GITHUB_TOKEN: "test-token",
@@ -649,11 +634,7 @@ describe("run", () => {
     // Should post skip comment
     expect(mockExecutor.exec).toHaveBeenCalledWith(
       "github-comment",
-      expect.arrayContaining([
-        "post",
-        "-k",
-        "skip-create-follow-up-pr",
-      ]),
+      expect.arrayContaining(["post", "-k", "skip-create-follow-up-pr"]),
       expect.any(Object),
     );
   });
