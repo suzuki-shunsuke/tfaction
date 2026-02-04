@@ -1,5 +1,6 @@
 import * as github from "@actions/github";
 import * as input from "../../lib/input";
+import { run, type Comment } from "./run";
 
 export const main = async () => {
   const ghToken = input.getRequiredGitHubToken();
@@ -15,21 +16,11 @@ export const main = async () => {
     throw new Error("comment is required");
   }
 
-  const body = `This issue was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
-
-About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
-
-## Latest comment
-
-[${comment.created_at}](${comment.html_url})
-
-${comment.body}
-`;
-
-  await octokit.rest.issues.update({
+  await run({
+    issueNumber,
+    comment: comment as Comment,
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    issue_number: issueNumber,
-    body: body,
+    octokit,
   });
 };
