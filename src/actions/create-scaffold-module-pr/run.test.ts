@@ -41,9 +41,7 @@ import {
 describe("generateBranchName", () => {
   it("generates branch with scaffold-module- prefix and timestamp format YYYYMMDDTHHMMSS", () => {
     const branch = generateBranchName("my/module");
-    expect(branch).toMatch(
-      /^scaffold-module-my__module-\d{8}T\d{6}$/,
-    );
+    expect(branch).toMatch(/^scaffold-module-my__module-\d{8}T\d{6}$/);
   });
 
   it("replaces slashes with __", () => {
@@ -101,7 +99,13 @@ describe("writeSkipCreatePrSummary", () => {
 
   it("includes the runURL in the summary", () => {
     const runURL = "https://github.com/owner/repo/actions/runs/456";
-    writeSkipCreatePrSummary("owner/repo", "branch", "my/module", false, runURL);
+    writeSkipCreatePrSummary(
+      "owner/repo",
+      "branch",
+      "my/module",
+      false,
+      runURL,
+    );
 
     const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
     expect(summaryArg).toContain(runURL);
