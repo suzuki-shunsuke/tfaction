@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@actions/core": "3.0.0",
-    "@actions/exec": "^2.0.0",
+    "@actions/exec": "^3.0.0",
     "@actions/github": "7.0.0",
     "@actions/tool-cache": "^4.0.0",
     "@aws-sdk/client-secrets-manager": "3.980.0",
