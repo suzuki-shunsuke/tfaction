@@ -5,44 +5,6 @@ inputs:
     description: action
     required: true
 
-  # list-changed-modules
-  changed_files:
-    description: "Changed Files"
-    required: false
-  config_files:
-    description: "config file paths"
-    required: false
-  config:
-    description: "config file path"
-    required: false
-
-  # list-module-callers
-  module_files:
-    description: "module file paths"
-    required: false
-
-  # list-targets-with-changed-files
-  pull_request:
-    description: "pull request file"
-    required: false
-  module_callers:
-    description: "A json file that describes module's direct and transitive callers"
-    required: false
-  max_changed_working_dirs:
-    description: Maximum number of changed working directories
-    required: false
-    default: "0"
-  max_changed_modules:
-    description: Maximum number of changed modules
-    required: false
-    default: "0"
-
-  # conftest
-  plan:
-    description: |
-      Whether conftest is run on the terraform plan file
-    required: false
-    default: "false"
   github_token:
     description: |
       GitHub Access Token
@@ -52,34 +14,15 @@ inputs:
 
   # export-secrets
   secrets:
-    description: "A JSON representing a map whose keys are secret names and values are secret values"
+    description: A JSON representing a map whose keys are secret names and values are secret values. This is used by export-secrets to export secrets to environment variables.
     required: false
 
-  # trivy
-  working_directory:
-    description: Working Directory
+  # setup
+  ssh_key:
+    description: SSH private key to checkout private modules
     required: false
-
-  # tflint
-  tflint_fix:
-    description: Whether to enable tflint --fix
-    required: false
-    default: "false"
-  use_securefix_action:
-    description: Whether to enable Securefix Action
-    required: false
-    default: "false"
 
   # commit
-  commit_message:
-    description: Commit message for the commit action
-    required: false
-  files:
-    description: Files to commit
-    required: false
-  securefix_action_server_repository:
-    description: Securefix Action Server Repository
-    required: false
   securefix_action_app_id:
     description: GitHub App ID
     required: false
@@ -89,10 +32,34 @@ inputs:
 
   # generate-config-out
   branch:
-    description: Branch name to be updated
+    description: Branch name to be updated by generate-config-out
     required: false
   file:
-    description: File name to be updated
+    description: File name to be updated by generate-config-out
+    required: false
+
+  # release-module
+  module_path:
+    description: Module path to be released by release-module
+    required: false
+  version:
+    description: Version to be released by release-module
+    required: false
+
+  # scaffold-tfmigrate
+  migration_name:
+    description: Migration name. scaffold-tfmigrate uses this to create migration files.
+    required: false
+  pr_number:
+    description: Pull request number. scaffold-tfmigrate uses this to update pull requests.
+    required: false
+
+  # update-drift-issue
+  issue:
+    description: The issue number. update-drift-issue uses this to update drift issues
+    required: false
+  status:
+    description: Job status. update-drift-issue uses this to update drift issues
     required: false
 
 outputs:
