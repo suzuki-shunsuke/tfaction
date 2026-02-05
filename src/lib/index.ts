@@ -129,7 +129,15 @@ export const readTargetConfig = (p: string): TargetConfig => {
 };
 
 export const getJobConfig = (
-  config: TargetConfig | undefined,
+  config:
+    | Pick<
+        TargetConfig,
+        | "terraform_apply_config"
+        | "terraform_plan_config"
+        | "tfmigrate_apply_config"
+        | "tfmigrate_plan_config"
+      >
+    | undefined,
   isApply: boolean,
   jobType: JobType,
 ): JobConfig | undefined => {

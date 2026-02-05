@@ -42,6 +42,7 @@ export interface TargetConfig {
   // Only for non-scaffold_working_dir job types
   destroy?: boolean;
   enable_terraform_docs?: boolean;
+  accept_change_by_renovate?: boolean;
 
   // Additional envs from config (dynamic)
   env?: Record<string, string>;
@@ -190,6 +191,7 @@ export const getTargetConfig = async (
     }
 
     result.destroy = wdConfig.destroy ? true : false;
+    result.accept_change_by_renovate = wdConfig.accept_change_by_renovate;
     result.enable_terraform_docs =
       wdConfig?.terraform_docs?.enabled ??
       config?.terraform_docs?.enabled ??
