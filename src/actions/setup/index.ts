@@ -17,6 +17,7 @@ import {
   shouldSkipCIInfo as shouldSkipCIInfoFn,
   checkLatestCommit as checkLatestCommitFn,
 } from "./run";
+import { updatePRBranch } from "@suzuki-shunsuke/update-pr-branch";
 
 // Check if this is a pull request event
 const isPullRequestEvent = (): boolean => {
@@ -98,7 +99,40 @@ export const main = async () => {
     if (isPR) {
       core.info("Checking if commit is latest...");
 
-      await checkLatestCommit(ci.pr?.data.head.sha ?? "");
+      checkLatestCommit(ci.pr?.data.head.sha ?? "");
+
+      const prNumber = github.context.payload.pull_request?.number ?? 0;
+
+      let csmServerRepoOwner = github.context.repo.owner;
+      let csmServerRepoName = input.securefixActionServerRepository;
+      if (csmServerRepoName.includes("/")) {
+        csmServerRepoOwner = csmServerRepoName.split("/")[0];
+        csmServerRepoName = csmServerRepoName.split("/")[1];
+      }
+
+      const updateResult = await updatePRBranch({
+        files: new Set([targetConfig.working_directory + "/**"]),
+        repoOwner: github.context.repo.owner,
+        repoName: github.context.repo.repo,
+        prNumber: prNumber,
+        maxBehindBy: -1,
+        githubToken: githubToken,
+        defaultGitHubToken: "",
+        appID: "",
+        appPrivateKey: "",
+        csmServerRepoOwner: csmServerRepoOwner,
+        csmServerRepoName: csmServerRepoName,
+        csmAppID: input.securefixActionAppId,
+        csmAppPrivateKey: input.securefixActionAppPrivateKey,
+        baseBranch: github.context.payload.pull_request?.base?.ref ?? "",
+        headBranch: github.context.payload.pull_request?.head?.ref ?? "",
+        contextPRNumber: prNumber,
+        updateIf300Files: true,
+      });
+      if (updateResult.updated) {
+        throw new Error("PR branch is updated");
+      }
+
       // Add label to PR (only for PRs)
       await addLabelToPR(
         octokit,
