@@ -113,14 +113,14 @@ describe("run", () => {
     });
   });
 
-  it("conftest always runs", async () => {
+  it("conftest runs when destroy=false", async () => {
     const { conftestMod } = await getMocks();
     const input = createRunInput(mockExecutor);
     await run(input);
     expect(conftestMod.run).toHaveBeenCalledOnce();
   });
 
-  it("destroy=true skips validate, trivy, tflint, fmt, terraform-docs", async () => {
+  it("destroy=true skips conftest, validate, trivy, tflint, fmt, terraform-docs", async () => {
     const { conftestMod, trivyMod, tflintMod, terraformDocsMod, fmtMod } =
       await getMocks();
     const input = createRunInput(mockExecutor, undefined, {
@@ -132,7 +132,7 @@ describe("run", () => {
 
     await run(input);
 
-    expect(conftestMod.run).toHaveBeenCalledOnce();
+    expect(conftestMod.run).not.toHaveBeenCalled();
     expect(mockExecutor.exec).not.toHaveBeenCalled();
     expect(trivyMod.run).not.toHaveBeenCalled();
     expect(tflintMod.run).not.toHaveBeenCalled();
