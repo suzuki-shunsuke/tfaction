@@ -2,9 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 import {
   runTerraformPlan,
   runTfmigratePlan,
+  disableAutoMergeForRenovateChange,
   main,
   type RunInputs,
 } from "./run";
@@ -18,6 +20,10 @@ vi.mock("@actions/core", () => ({
   endGroup: vi.fn(),
   warning: vi.fn(),
   info: vi.fn(),
+}));
+
+vi.mock("@actions/github", () => ({
+  getOctokit: vi.fn(),
 }));
 
 vi.mock("@actions/artifact", () => ({
@@ -78,6 +84,12 @@ const createMockExecutor = () => ({
 
 type MockExecutor = ReturnType<typeof createMockExecutor>;
 
+// Helper to create a mock octokit with graphql
+const createMockOctokit = () => ({
+  graphql: vi.fn().mockResolvedValue({}),
+  rest: {},
+});
+
 // Base inputs for tests
 const createBaseInputs = (executor: MockExecutor) => ({
   githubToken: "test-token",
@@ -86,6 +98,7 @@ const createBaseInputs = (executor: MockExecutor) => ({
   destroy: false,
   tfCommand: "terraform",
   target: "aws/test/dev",
+  acceptChangeByRenovate: false,
   executor: executor as unknown as aqua.Executor,
 });
 
@@ -248,9 +261,18 @@ describe("runTerraformPlan", () => {
     );
   });
 
-  it("validates renovate change when PR author is renovate and no renovate-change label", async () => {
+  it("disables auto-merge when renovate PR has changes and auto_merge is enabled", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
     vi.mocked(fs.existsSync).mockReturnValue(true);
-    vi.mocked(fs.readFileSync).mockReturnValue("label1\nlabel2\n");
+    vi.mocked(fs.readFileSync).mockReturnValue(
+      JSON.stringify({
+        node_id: "PR_123",
+        auto_merge: { merge_method: "squash" },
+      }),
+    );
 
     mockExecutor.getExecOutput
       .mockResolvedValueOnce({
@@ -271,8 +293,11 @@ describe("runTerraformPlan", () => {
       ciInfoTempDir: "/tmp/ci-info",
     };
 
-    await expect(runTerraformPlan(inputs)).rejects.toThrow(
-      "Renovate PR must have 'No change' or 'renovate-change' label",
+    const result = await runTerraformPlan(inputs);
+    expect(result.detailedExitcode).toBe(2);
+    expect(mockOctokit.graphql).toHaveBeenCalledWith(
+      expect.stringContaining("disablePullRequestAutoMerge"),
+      { nodeId: "PR_123" },
     );
     expect(mockExecutor.exec).toHaveBeenCalledWith(
       "github-comment",
@@ -281,10 +306,13 @@ describe("runTerraformPlan", () => {
     );
   });
 
-  it("skips renovate validation when renovate-change label exists", async () => {
+  it("skips disabling auto-merge when auto_merge is not enabled", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.readFileSync).mockReturnValue(
-      "label1\nrenovate-change\nlabel2\n",
+      JSON.stringify({
+        node_id: "PR_123",
+        auto_merge: null,
+      }),
     );
 
     mockExecutor.getExecOutput
@@ -307,9 +335,10 @@ describe("runTerraformPlan", () => {
 
     const result = await runTerraformPlan(inputs);
     expect(result.detailedExitcode).toBe(2);
+    expect(mockExecutor.exec).not.toHaveBeenCalled();
   });
 
-  it("skips renovate validation when PR author is not renovate", async () => {
+  it("skips renovate check when PR author is not renovate", async () => {
     mockExecutor.getExecOutput
       .mockResolvedValueOnce({
         exitCode: 2,
@@ -380,6 +409,47 @@ describe("runTerraformPlan", () => {
       "plan_json_artifact_name",
       "terraform_plan_json_aws__test__dev",
     );
+  });
+});
+
+describe("disableAutoMergeForRenovateChange", () => {
+  let mockExecutor: MockExecutor;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockExecutor = createMockExecutor();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("skips when pr.json not found", async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(false);
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      prAuthor: "renovate[bot]",
+      ciInfoTempDir: "/tmp/ci-info",
+    };
+
+    await disableAutoMergeForRenovateChange(inputs);
+    expect(core.warning).toHaveBeenCalledWith(
+      "PR JSON file not found: /tmp/ci-info/pr.json",
+    );
+    expect(mockExecutor.exec).not.toHaveBeenCalled();
+  });
+
+  it("skips when acceptChangeByRenovate is true", async () => {
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      prAuthor: "renovate[bot]",
+      ciInfoTempDir: "/tmp/ci-info",
+      acceptChangeByRenovate: true,
+    };
+
+    await disableAutoMergeForRenovateChange(inputs);
+    expect(mockExecutor.exec).not.toHaveBeenCalled();
   });
 });
 

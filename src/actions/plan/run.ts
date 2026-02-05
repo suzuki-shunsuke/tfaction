@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
+import * as github from "@actions/github";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
@@ -21,6 +22,7 @@ type Inputs = {
   ciInfoTempDir?: string;
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
+  acceptChangeByRenovate: boolean;
   executor: aqua.Executor;
 };
 
@@ -45,27 +47,45 @@ type TfmigratePlanOutputs = {
   planJson?: string;
 };
 
-const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
+export const disableAutoMergeForRenovateChange = async (
+  inputs: Inputs,
+): Promise<void> => {
   // Skip if not a renovate PR
   if (inputs.prAuthor !== inputs.renovateLogin) {
     return;
   }
 
-  // Check if renovate-change label exists
-  const labelsFile = path.join(inputs.ciInfoTempDir || "", "labels.txt");
-  if (!fs.existsSync(labelsFile)) {
-    core.warning(`Labels file not found: ${labelsFile}`);
+  // Skip if changes are expected for this target
+  if (inputs.acceptChangeByRenovate) {
     return;
   }
 
-  const labels = fs.readFileSync(labelsFile, "utf8").split("\n");
-  const hasRenovateChangeLabel = labels.some(
-    (label) => label.trim() === "renovate-change",
+  // Read pr.json from ciInfoTempDir
+  const prJsonFile = path.join(inputs.ciInfoTempDir || "", "pr.json");
+  if (!fs.existsSync(prJsonFile)) {
+    core.warning(`PR JSON file not found: ${prJsonFile}`);
+    return;
+  }
+
+  const prData = JSON.parse(fs.readFileSync(prJsonFile, "utf8"));
+
+  // If auto_merge is not enabled, nothing to do
+  if (!prData.auto_merge) {
+    return;
+  }
+
+  // Disable auto-merge via GraphQL
+  const octokit = github.getOctokit(inputs.githubToken);
+  await octokit.graphql(
+    `mutation ($nodeId: ID!) {
+      disablePullRequestAutoMerge(input: {pullRequestId: $nodeId}) {
+        clientMutationId
+      }
+    }`,
+    {
+      nodeId: prData.node_id,
+    },
   );
-
-  if (hasRenovateChangeLabel) {
-    return;
-  }
 
   const executor = inputs.executor;
 
@@ -84,10 +104,6 @@ const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
     },
-  );
-
-  throw new Error(
-    "Renovate PR must have 'No change' or 'renovate-change' label",
   );
 };
 
@@ -321,7 +337,7 @@ export const runTerraformPlan = async (
 
   // If not drift detection mode, validate renovate changes
   if (!inputs.driftIssueNumber) {
-    await validateRenovateChange(inputs);
+    await disableAutoMergeForRenovateChange(inputs);
   }
 
   // If drift detection mode and there are changes, fail
@@ -364,6 +380,7 @@ export const main = async (
     s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
+    acceptChangeByRenovate: targetConfig.accept_change_by_renovate || false,
     executor,
   };
 
