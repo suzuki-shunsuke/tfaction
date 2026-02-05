@@ -31,16 +31,18 @@ export const run = async (input: RunInput): Promise<void> => {
   const target = targetConfig.target;
   const serverRepository = config.securefix_action?.server_repository ?? "";
 
-  await runConftest(
-    {
-      gitRootDir: config.git_root_dir,
-      githubToken,
-      plan: false,
-      executor,
-    },
-    config,
-    targetConfig,
-  );
+  if (!destroy) {
+    await runConftest(
+      {
+        gitRootDir: config.git_root_dir,
+        githubToken,
+        plan: false,
+        executor,
+      },
+      config,
+      targetConfig,
+    );
+  }
 
   if (!destroy) {
     await executor.exec(tfCommand, ["validate"], {
