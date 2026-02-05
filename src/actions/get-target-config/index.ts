@@ -191,8 +191,7 @@ export const getTargetConfig = async (
     }
 
     result.destroy = wdConfig.destroy ? true : false;
-    result.accept_change_by_renovate =
-      wdConfig.accept_change_by_renovate ?? false;
+    result.accept_change_by_renovate = wdConfig.accept_change_by_renovate;
     result.enable_terraform_docs =
       wdConfig?.terraform_docs?.enabled ??
       config?.terraform_docs?.enabled ??
