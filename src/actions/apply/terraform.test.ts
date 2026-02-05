@@ -131,8 +131,6 @@ const createMockExecutor = () => ({
   buildArgs: vi.fn(),
 });
 
-type MockExecutor = ReturnType<typeof createMockExecutor>;
-
 // Helper to create a mock write stream
 const createMockWriteStream = () => ({
   write: vi.fn(),
@@ -514,12 +512,8 @@ describe("main", () => {
     await main();
 
     // The artifact name should be terraform_plan_file_aws__dev__vpc
-    // This is verified through the artifact download call.
-    // The DefaultArtifactClient.getArtifact is called with the artifact name.
-    const { DefaultArtifactClient } = await import("@actions/artifact");
-    const artifactClient = new DefaultArtifactClient();
-    // We can verify the mock was set up - the test passes if main() succeeds
-    // because it downloads the artifact with the correct name
+    // Verified through the workflow run API call - main() succeeds because
+    // it downloads the artifact with the correctly transformed name
     expect(mockOctokit.rest.actions.listWorkflowRuns).toHaveBeenCalled();
   });
 
@@ -558,10 +552,8 @@ describe("main", () => {
     });
 
     // First exec call is tfcmt apply (succeeds), second is drift issue (fails)
-    let callCount = 0;
     mockExecutor.exec.mockImplementation(
       async (cmd: string, args?: string[]) => {
-        callCount++;
         if (
           cmd === "tfcmt" &&
           args &&
