@@ -17,6 +17,11 @@ inputs:
     description: A JSON representing a map whose keys are secret names and values are secret values. This is used by export-secrets to export secrets to environment variables.
     required: false
 
+  # setup
+  ssh_key:
+    description: SSH private key to checkout private modules
+    required: false
+
   # commit
   securefix_action_app_id:
     description: GitHub App ID
@@ -33,6 +38,14 @@ inputs:
     description: File name to be updated by generate-config-out
     required: false
 
+  # release-module
+  module_path:
+    description: Module path to be released by release-module
+    required: false
+  version:
+    description: Version to be released by release-module
+    required: false
+
   # scaffold-tfmigrate
   migration_name:
     description: Migration name. scaffold-tfmigrate uses this to create migration files.
@@ -42,6 +55,9 @@ inputs:
     required: false
 
   # update-drift-issue
+  issue:
+    description: The issue number. update-drift-issue uses this to update drift issues
+    required: false
   status:
     description: Job status. update-drift-issue uses this to update drift issues
     required: false
