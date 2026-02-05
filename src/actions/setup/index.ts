@@ -104,7 +104,7 @@ export const main = async () => {
       const prNumber = github.context.payload.pull_request?.number ?? 0;
 
       let csmServerRepoOwner = github.context.repo.owner;
-      let csmServerRepoName = input.securefixActionServerRepository;
+      let csmServerRepoName = config.securefix_action?.server_repository ?? "";
       if (csmServerRepoName.includes("/")) {
         csmServerRepoOwner = csmServerRepoName.split("/")[0];
         csmServerRepoName = csmServerRepoName.split("/")[1];

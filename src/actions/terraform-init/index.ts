@@ -47,7 +47,7 @@ export const main = async () => {
     gitRootDir: config.git_root_dir,
     terragruntRunAvailable,
     executor,
-    serverRepository: input.securefixActionServerRepository,
+    serverRepository: config.securefix_action?.server_repository ?? "",
     appId: input.securefixActionAppId,
     appPrivateKey: input.securefixActionAppPrivateKey,
   });

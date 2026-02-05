@@ -11,50 +11,30 @@ export const securefixActionAppId = core.getInput("securefix_action_app_id");
 export const securefixActionAppPrivateKey = core.getInput(
   "securefix_action_app_private_key",
 );
-export const securefixActionServerRepository = core.getInput(
-  "securefix_action_server_repository",
-);
+
+// For all actions
+export const action = core.getInput("action");
+
+// For setup
 export const sshKey = core.getInput("ssh_key");
 
-// Action-specific inputs
-export const action = core.getInput("action");
-export const status = core.getInput("status");
-export const issue = core.getInput("issue");
-export const modulePath = core.getInput("module_path");
-export const version = core.getInput("version");
+// For scaffold-tfmigrate
 export const migrationName = core.getInput("migration_name") || "main";
 export const prNumber = core.getInput("pr_number");
+
+// For generate-config-out
 export const branch = core.getInput("branch");
 export const file = core.getInput("file");
+
+// For export-secrets
 export const secrets = core.getInput("secrets");
-export const configFiles = core.getInput("config_files");
-export const moduleFiles = core.getInput("module_files");
 
 // Helper functions to get inputs with required option
 export const getRequiredGitHubToken = (): string => {
   return core.getInput("github_token", { required: true });
 };
 
-export const getRequiredStatus = (): string => {
-  return core.getInput("status", { required: true });
-};
-
 export const getRequiredIssue = (): string => {
+  // update-drift-issue
   return core.getInput("issue", { required: true });
-};
-
-export const getRequiredModulePath = (): string => {
-  return core.getInput("module_path", { required: true });
-};
-
-export const getRequiredVersion = (): string => {
-  return core.getInput("version", { required: true });
-};
-
-export const getRequiredConfigFiles = (): string => {
-  return core.getInput("config_files", { required: true });
-};
-
-export const getRequiredModuleFiles = (): string => {
-  return core.getInput("module_files", { required: true });
 };
