@@ -8,6 +8,16 @@ import { arch, homedir, platform, tmpdir } from "os";
 import { mkdtempSync, existsSync, renameSync, mkdirSync } from "fs";
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import {
+  type Comment,
+  getOS as _getOS,
+  getArch as _getArch,
+  getInstallPath as _getInstallPath,
+  buildArgs as _buildArgs,
+  buildEnv as _buildEnv,
+} from "./run";
+export type { Comment, varKey, Args, EnvDeps } from "./run";
+export { getOS, getArch, getInstallPath, buildArgs, buildEnv } from "./run";
 
 const Version = "v2.56.2";
 const CHECKSUMS = new Map([
@@ -37,45 +47,7 @@ const CHECKSUMS = new Map([
   ],
 ]);
 
-const getOS = (): string => {
-  const os = platform();
-  switch (os) {
-    case "darwin":
-      return "darwin";
-    case "linux":
-      return "linux";
-    case "win32":
-      return "windows";
-    default:
-      throw new Error(`Unsupported OS: ${os}`);
-  }
-};
-
-const getArch = (): string => {
-  const architecture = arch();
-  switch (architecture) {
-    case "x64":
-      return "amd64";
-    case "arm64":
-      return "arm64";
-    default:
-      throw new Error(`Unsupported architecture: ${architecture}`);
-  }
-};
-
-const getInstallPath = (os: string): string => {
-  const aquaRoot = env.all.AQUA_ROOT_DIR;
-  if (os === "windows") {
-    const base =
-      aquaRoot || join(homedir(), "AppData", "Local", "aquaproj-aqua");
-    return join(base, "bin", "aqua.exe");
-  } else {
-    const xdgDataHomeVal =
-      env.all.XDG_DATA_HOME || join(homedir(), ".local", "share");
-    const base = aquaRoot || join(xdgDataHomeVal, "aquaproj-aqua");
-    return join(base, "bin", "aqua");
-  }
-};
+// getOS, getArch, getInstallPath are re-exported from ./run
 
 const downloadFile = async (url: string): Promise<string> => {
   core.info(`Downloading ${url} ...`);
@@ -129,34 +101,11 @@ export const NewExecutor = async (
   return executor;
 };
 
-const _varKeys = ["tfaction_target", "pr_url"] as const;
-export type varKey = (typeof _varKeys)[number];
-
-export type Comment = {
-  token: string;
-  key?:
-    | "conftest"
-    | "terraform-validate"
-    | "tfmigrate-plan"
-    | "tfmigrate-apply"
-    | "drift-apply";
-  vars?: Partial<Record<varKey, string>>;
-  // For posting to different repos/issues (used in drift detection)
-  org?: string;
-  repo?: string;
-  pr?: string;
-};
-
 export interface ExecOptions extends exec.ExecOptions {
   env?: env.dynamicEnvs;
   group?: string;
   comment?: Comment;
 }
-
-type Args = {
-  command: string;
-  args?: string[];
-};
 
 export class Executor {
   installDir: string;
@@ -171,61 +120,21 @@ export class Executor {
         [key: string]: string;
       }
     | undefined {
-    const dynamicEnv: env.dynamicEnvs = {
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
-    };
-    if (this.installDir) {
-      dynamicEnv.PATH = `${env.all.PATH}:${this.installDir}`;
-    }
-    if (this.githubToken) {
-      dynamicEnv.AQUA_GITHUB_TOKEN = this.githubToken;
-    }
-    if (options?.comment) {
-      dynamicEnv.GITHUB_TOKEN = options?.comment.token;
-      dynamicEnv.GH_COMMENT_CONFIG = lib.GitHubCommentConfig;
-    }
-
-    return {
-      ...process.env,
-      ...options?.env,
-      ...dynamicEnv,
-    };
+    return _buildEnv(
+      {
+        processEnv: process.env as Record<string, string | undefined>,
+        path: env.all.PATH,
+        aquaGlobalConfig: lib.aquaGlobalConfig,
+        gitHubCommentConfig: lib.GitHubCommentConfig,
+      },
+      this.installDir,
+      this.githubToken,
+      options,
+    ) as { [key: string]: string } | undefined;
   }
 
-  buildArgs(command: string, args?: string[], options?: ExecOptions): Args {
-    if (!options?.comment) {
-      return {
-        command,
-        args,
-      };
-    }
-    const newArgs = ["exec"];
-    // Add org, repo, pr options for posting to different repos/issues
-    if (options?.comment.org) {
-      newArgs.push("-org", options.comment.org);
-    }
-    if (options?.comment.repo) {
-      newArgs.push("-repo", options.comment.repo);
-    }
-    if (options?.comment.pr) {
-      newArgs.push("-pr", options.comment.pr);
-    }
-    if (options?.comment.vars) {
-      for (const key of _varKeys) {
-        if (options?.comment.vars[key]) {
-          newArgs.push("-var", `${key}:${options?.comment.vars[key]}`);
-        }
-      }
-    }
-    if (options?.comment.key) {
-      newArgs.push("-k", options.comment.key);
-    }
-    newArgs.push("--", command);
-    newArgs.push(...(args ?? []));
-    return {
-      command: "github-comment",
-      args: newArgs,
-    };
+  buildArgs(command: string, args?: string[], options?: ExecOptions) {
+    return _buildArgs(command, args, options);
   }
 
   async exec(
@@ -278,10 +187,15 @@ export const install = async (): Promise<string> => {
     // aqua is not installed, continue with installation
   }
 
-  const os = getOS();
-  const architecture = getArch();
+  const os = _getOS(platform());
+  const architecture = _getArch(arch());
 
-  const installPath = getInstallPath(os);
+  const installPath = _getInstallPath(
+    os,
+    env.all.AQUA_ROOT_DIR,
+    env.all.XDG_DATA_HOME,
+    homedir(),
+  );
   const installDir = dirname(installPath);
   core.addPath(installDir);
 
