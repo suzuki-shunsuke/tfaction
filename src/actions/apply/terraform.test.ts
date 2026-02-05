@@ -173,13 +173,15 @@ const createMockTargetConfig = (overrides: Record<string, unknown> = {}) => ({
 });
 
 // Helper to set up all mocks for main() tests
-const setupMainMocks = async (options: {
-  config?: Record<string, unknown>;
-  targetConfig?: Record<string, unknown>;
-  envOverrides?: Record<string, string>;
-  workflowRuns?: Array<{ head_sha: string; id: number }>;
-  prHeadSha?: string;
-} = {}) => {
+const setupMainMocks = async (
+  options: {
+    config?: Record<string, unknown>;
+    targetConfig?: Record<string, unknown>;
+    envOverrides?: Record<string, string>;
+    workflowRuns?: Array<{ head_sha: string; id: number }>;
+    prHeadSha?: string;
+  } = {},
+) => {
   const lib = await import("../../lib");
   const aquaMod = await import("../../aqua");
   const getTargetConfigMod = await import("../get-target-config");
@@ -326,14 +328,13 @@ describe("updateBranchBySecurefix", () => {
   });
 
   it("creates GitHub App token and delegates to run.updateBranchBySecurefix, then revokes token", async () => {
-    const githubAppTokenMod = await import(
-      "@suzuki-shunsuke/github-app-token"
-    );
-    const updateBranchMod = await import(
-      "@csm-actions/update-branch-action"
-    );
+    const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
+    const updateBranchMod = await import("@csm-actions/update-branch-action");
     const mockOctokit = { rest: {} };
-    const mockToken = { token: "app-token-123", expiresAt: "2099-01-01T00:00:00Z" };
+    const mockToken = {
+      token: "app-token-123",
+      expiresAt: "2099-01-01T00:00:00Z",
+    };
 
     vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
     vi.mocked(githubAppTokenMod.hasExpired).mockReturnValue(false);
@@ -365,10 +366,11 @@ describe("updateBranchBySecurefix", () => {
   });
 
   it("revokes token even when run.updateBranchBySecurefix throws", async () => {
-    const githubAppTokenMod = await import(
-      "@suzuki-shunsuke/github-app-token"
-    );
-    const mockToken = { token: "app-token-456", expiresAt: "2099-01-01T00:00:00Z" };
+    const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
+    const mockToken = {
+      token: "app-token-456",
+      expiresAt: "2099-01-01T00:00:00Z",
+    };
 
     vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
     vi.mocked(githubAppTokenMod.hasExpired).mockReturnValue(false);
@@ -379,18 +381,19 @@ describe("updateBranchBySecurefix", () => {
       new Error("update failed"),
     );
 
-    await expect(
-      updateBranchBySecurefix("owner", "repo", [1]),
-    ).rejects.toThrow("update failed");
+    await expect(updateBranchBySecurefix("owner", "repo", [1])).rejects.toThrow(
+      "update failed",
+    );
 
     expect(githubAppTokenMod.revoke).toHaveBeenCalledWith("app-token-456");
   });
 
   it("skips revocation if token has expired", async () => {
-    const githubAppTokenMod = await import(
-      "@suzuki-shunsuke/github-app-token"
-    );
-    const mockToken = { token: "expired-token", expiresAt: "2020-01-01T00:00:00Z" };
+    const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
+    const mockToken = {
+      token: "expired-token",
+      expiresAt: "2020-01-01T00:00:00Z",
+    };
 
     vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
     vi.mocked(githubAppTokenMod.hasExpired).mockReturnValue(true);
@@ -556,17 +559,19 @@ describe("main", () => {
 
     // First exec call is tfcmt apply (succeeds), second is drift issue (fails)
     let callCount = 0;
-    mockExecutor.exec.mockImplementation(async (cmd: string, args?: string[]) => {
-      callCount++;
-      if (
-        cmd === "tfcmt" &&
-        args &&
-        args.some((a: string) => a.includes("tfcmt-drift.yaml"))
-      ) {
-        throw new Error("drift posting error");
-      }
-      return 0;
-    });
+    mockExecutor.exec.mockImplementation(
+      async (cmd: string, args?: string[]) => {
+        callCount++;
+        if (
+          cmd === "tfcmt" &&
+          args &&
+          args.some((a: string) => a.includes("tfcmt-drift.yaml"))
+        ) {
+          throw new Error("drift posting error");
+        }
+        return 0;
+      },
+    );
 
     // Should not throw
     await main();
@@ -587,7 +592,7 @@ describe("main", () => {
     await main();
   });
 
-  it('skips updating when update_related_pull_requests.enabled is false', async () => {
+  it("skips updating when update_related_pull_requests.enabled is false", async () => {
     await setupMainMocks({
       config: { update_related_pull_requests: { enabled: false } },
     });
@@ -601,9 +606,7 @@ describe("main", () => {
   });
 
   it("uses securefix when securefix_action.server_repository is configured", async () => {
-    const githubAppTokenMod = await import(
-      "@suzuki-shunsuke/github-app-token"
-    );
+    const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
     const mockToken = { token: "sf-token", expiresAt: "2099-01-01T00:00:00Z" };
     vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
     vi.mocked(githubAppTokenMod.hasExpired).mockReturnValue(false);
