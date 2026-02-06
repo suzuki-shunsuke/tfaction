@@ -14,9 +14,7 @@ vi.mock("@actions/github", () => ({
 import * as github from "@actions/github";
 import { createIssue, getDriftIssueRepo } from "./drift";
 
-const createMockConfig = (
-  driftDetection?: Config["drift_detection"],
-): Config =>
+const createMockConfig = (driftDetection?: Config["drift_detection"]): Config =>
   ({
     drift_detection: driftDetection,
     working_directory_file: "tfaction.yaml",
