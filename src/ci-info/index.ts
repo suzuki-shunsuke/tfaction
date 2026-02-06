@@ -18,9 +18,8 @@ export type Logger = {
 
 export const getPRNumberFromMergeGroup = (
   refName: string | undefined,
-  logger?: Logger,
+  logger: Logger,
 ): number | undefined => {
-  const log = logger ?? { info: core.info, warning: core.warning };
   if (!refName) {
     return undefined;
   }
@@ -31,7 +30,7 @@ export const getPRNumberFromMergeGroup = (
   const dashIndex = withoutPrefix.indexOf("-");
 
   if (dashIndex === -1) {
-    log.warning(
+    logger.warning(
       `GITHUB_REF_NAME is not a valid merge_group format: ${refName}`,
     );
     return undefined;
@@ -41,7 +40,9 @@ export const getPRNumberFromMergeGroup = (
   const prNumber = parseInt(prNumberStr, 10);
 
   if (isNaN(prNumber)) {
-    log.warning(`Failed to parse PR number from GITHUB_REF_NAME: ${refName}`);
+    logger.warning(
+      `Failed to parse PR number from GITHUB_REF_NAME: ${refName}`,
+    );
     return undefined;
   }
 
@@ -53,9 +54,8 @@ export const getPRNumberFromSHA = async (
   owner: string,
   repo: string,
   sha: string,
-  logger?: Logger,
+  logger: Logger,
 ): Promise<number | undefined> => {
-  const log = logger ?? { info: core.info, warning: core.warning };
   try {
     const { data } =
       await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
@@ -70,7 +70,7 @@ export const getPRNumberFromSHA = async (
 
     return data[0].number;
   } catch (error) {
-    log.warning(`Failed to get PR from SHA: ${error}`);
+    logger.warning(`Failed to get PR from SHA: ${error}`);
     return undefined;
   }
 };

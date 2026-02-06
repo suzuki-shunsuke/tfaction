@@ -33,6 +33,7 @@
       "Bash(npm test:*)",
       "Bash(npx tsc:*)",
       "Bash(npx eslint:*)",
+      "Bash(npx vitest run:*)",
       "Bash(sort:*)",
       "Bash(tree:*)",
       "Bash(wc:*)"
