@@ -1,0 +1,43 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run fmt && npm run lint"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git show:*)",
+      "Bash(git status:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(npm i:*)",
+      "Bash(npm run build)",
+      "Bash(npm run fmt)",
+      "Bash(npm run lint)",
+      "Bash(npm run test:coverage:*)",
+      "Bash(npm t:*)",
+      "Bash(npm test:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(sort:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)"
+    ],
+    "deny": ["Bash(curl:*)", "Bash(wget:*)", "Read(~/.aws/**)"],
+    "ask": ["Bash(rm:*)"]
+  }
+}
