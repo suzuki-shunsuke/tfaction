@@ -49,6 +49,9 @@ export const getPRNumberFromMergeGroup = (
   return prNumber;
 };
 
+export const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
 export const getPRNumberFromSHA = async (
   octokit: ReturnType<typeof github.getOctokit>,
   owner: string,
@@ -56,23 +59,35 @@ export const getPRNumberFromSHA = async (
   sha: string,
   logger: Logger,
 ): Promise<number | undefined> => {
-  try {
-    const { data } =
-      await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
-        owner,
-        repo,
-        commit_sha: sha,
-      });
+  const maxRetries = 8;
+  const retryIntervalMs = 5000;
 
-    if (data.length === 0) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const { data } =
+        await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+          owner,
+          repo,
+          commit_sha: sha,
+        });
+
+      if (data.length > 0) {
+        return data[0].number;
+      }
+    } catch (error) {
+      logger.warning(`Failed to get PR from SHA: ${error}`);
       return undefined;
     }
 
-    return data[0].number;
-  } catch (error) {
-    logger.warning(`Failed to get PR from SHA: ${error}`);
-    return undefined;
+    if (attempt < maxRetries) {
+      logger.info(
+        `No PRs found for SHA ${sha}, retrying in ${retryIntervalMs / 1000}s (attempt ${attempt + 1}/${maxRetries})`,
+      );
+      await sleep(retryIntervalMs);
+    }
   }
+
+  return undefined;
 };
 
 export const getPRFiles = async (

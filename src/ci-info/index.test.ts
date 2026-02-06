@@ -4,6 +4,7 @@ import * as path from "path";
 import * as os from "os";
 import {
   getPRNumberFromMergeGroup,
+  getPRNumberFromSHA,
   writeOutputFiles,
   run,
   type PRFile,
@@ -252,6 +253,163 @@ describe("writeOutputFiles", () => {
   });
 });
 
+describe("getPRNumberFromSHA", () => {
+  const createMockOctokit = () => ({
+    rest: {
+      repos: {
+        listPullRequestsAssociatedWithCommit: vi.fn(),
+      },
+    },
+  });
+
+  it("returns PR number on first attempt", async () => {
+    const octokit = createMockOctokit();
+    const logger = createMockLogger();
+
+    octokit.rest.repos.listPullRequestsAssociatedWithCommit.mockResolvedValue({
+      data: [{ number: 42 }],
+    });
+
+    const result = await getPRNumberFromSHA(
+      octokit as unknown as Parameters<typeof getPRNumberFromSHA>[0],
+      "owner",
+      "repo",
+      "abc123",
+      logger,
+    );
+
+    expect(result).toBe(42);
+    expect(
+      octokit.rest.repos.listPullRequestsAssociatedWithCommit,
+    ).toHaveBeenCalledTimes(1);
+  });
+
+  it("retries and succeeds on later attempt", async () => {
+    vi.useFakeTimers();
+    try {
+      const octokit = createMockOctokit();
+      const logger = createMockLogger();
+
+      octokit.rest.repos.listPullRequestsAssociatedWithCommit
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({ data: [{ number: 42 }] });
+
+      const resultPromise = getPRNumberFromSHA(
+        octokit as unknown as Parameters<typeof getPRNumberFromSHA>[0],
+        "owner",
+        "repo",
+        "abc123",
+        logger,
+      );
+
+      // Advance through 2 retries
+      await vi.advanceTimersByTimeAsync(5000);
+      await vi.advanceTimersByTimeAsync(5000);
+
+      const result = await resultPromise;
+
+      expect(result).toBe(42);
+      expect(
+        octokit.rest.repos.listPullRequestsAssociatedWithCommit,
+      ).toHaveBeenCalledTimes(3);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("returns undefined after max retries", async () => {
+    vi.useFakeTimers();
+    try {
+      const octokit = createMockOctokit();
+      const logger = createMockLogger();
+
+      octokit.rest.repos.listPullRequestsAssociatedWithCommit.mockResolvedValue(
+        { data: [] },
+      );
+
+      const resultPromise = getPRNumberFromSHA(
+        octokit as unknown as Parameters<typeof getPRNumberFromSHA>[0],
+        "owner",
+        "repo",
+        "abc123",
+        logger,
+      );
+
+      // Advance through all 8 retries
+      for (let i = 0; i < 8; i++) {
+        await vi.advanceTimersByTimeAsync(5000);
+      }
+
+      const result = await resultPromise;
+
+      expect(result).toBeUndefined();
+      // 1 initial + 8 retries = 9 total calls
+      expect(
+        octokit.rest.repos.listPullRequestsAssociatedWithCommit,
+      ).toHaveBeenCalledTimes(9);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not retry on API error", async () => {
+    const octokit = createMockOctokit();
+    const logger = createMockLogger();
+
+    octokit.rest.repos.listPullRequestsAssociatedWithCommit.mockRejectedValue(
+      new Error("API error"),
+    );
+
+    const result = await getPRNumberFromSHA(
+      octokit as unknown as Parameters<typeof getPRNumberFromSHA>[0],
+      "owner",
+      "repo",
+      "abc123",
+      logger,
+    );
+
+    expect(result).toBeUndefined();
+    expect(
+      octokit.rest.repos.listPullRequestsAssociatedWithCommit,
+    ).toHaveBeenCalledTimes(1);
+    expect(logger.warning).toHaveBeenCalledWith(
+      "Failed to get PR from SHA: Error: API error",
+    );
+  });
+
+  it("logs retry messages", async () => {
+    vi.useFakeTimers();
+    try {
+      const octokit = createMockOctokit();
+      const logger = createMockLogger();
+
+      octokit.rest.repos.listPullRequestsAssociatedWithCommit
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({ data: [{ number: 10 }] });
+
+      const resultPromise = getPRNumberFromSHA(
+        octokit as unknown as Parameters<typeof getPRNumberFromSHA>[0],
+        "owner",
+        "repo",
+        "abc123",
+        logger,
+      );
+
+      await vi.advanceTimersByTimeAsync(5000);
+
+      const result = await resultPromise;
+
+      expect(result).toBe(10);
+      expect(logger.info).toHaveBeenCalledWith(
+        "No PRs found for SHA abc123, retrying in 5s (attempt 1/8)",
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("run", () => {
   let tempDir: string;
 
@@ -277,29 +435,43 @@ describe("run", () => {
   });
 
   it("returns empty result when no PR number found", async () => {
-    const octokit = createMockOctokit();
-    const logger = createMockLogger();
+    vi.useFakeTimers();
+    try {
+      const octokit = createMockOctokit();
+      const logger = createMockLogger();
 
-    octokit.rest.repos.listPullRequestsAssociatedWithCommit.mockResolvedValue({
-      data: [],
-    });
+      octokit.rest.repos.listPullRequestsAssociatedWithCommit.mockResolvedValue(
+        {
+          data: [],
+        },
+      );
 
-    const input: RunInput = {
-      repoOwner: "owner",
-      repoName: "repo",
-      eventName: "push",
-      sha: "abc123",
-      octokit: octokit as unknown as RunInput["octokit"],
-      tempDir,
-      logger,
-    };
+      const input: RunInput = {
+        repoOwner: "owner",
+        repoName: "repo",
+        eventName: "push",
+        sha: "abc123",
+        octokit: octokit as unknown as RunInput["octokit"],
+        tempDir,
+        logger,
+      };
 
-    const result = await run(input);
+      const resultPromise = run(input);
 
-    expect(result).toEqual({});
-    expect(logger.info).toHaveBeenCalledWith(
-      "No PR number found - running in non-PR environment",
-    );
+      // Advance timers through all 8 retries (5s each)
+      for (let i = 0; i < 8; i++) {
+        await vi.advanceTimersByTimeAsync(5000);
+      }
+
+      const result = await resultPromise;
+
+      expect(result).toEqual({});
+      expect(logger.info).toHaveBeenCalledWith(
+        "No PR number found - running in non-PR environment",
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("extracts PR number from merge_group event ref name", async () => {
