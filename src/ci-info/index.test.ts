@@ -19,7 +19,9 @@ const createMockLogger = (): Logger => ({
 
 describe("getPRNumberFromMergeGroup", () => {
   it("returns PR number for valid merge_group format pr-123-abc", () => {
-    expect(getPRNumberFromMergeGroup("pr-123-abc", createMockLogger())).toBe(123);
+    expect(getPRNumberFromMergeGroup("pr-123-abc", createMockLogger())).toBe(
+      123,
+    );
   });
 
   it("returns PR number for pr-1-x", () => {
@@ -27,11 +29,15 @@ describe("getPRNumberFromMergeGroup", () => {
   });
 
   it("returns PR number with multiple dashes in suffix", () => {
-    expect(getPRNumberFromMergeGroup("pr-456-abc-def-123", createMockLogger())).toBe(456);
+    expect(
+      getPRNumberFromMergeGroup("pr-456-abc-def-123", createMockLogger()),
+    ).toBe(456);
   });
 
   it("returns undefined for undefined refName", () => {
-    expect(getPRNumberFromMergeGroup(undefined, createMockLogger())).toBeUndefined();
+    expect(
+      getPRNumberFromMergeGroup(undefined, createMockLogger()),
+    ).toBeUndefined();
   });
 
   it("returns undefined for empty string", () => {
@@ -62,7 +68,9 @@ describe("getPRNumberFromMergeGroup", () => {
   });
 
   it("handles large PR numbers", () => {
-    expect(getPRNumberFromMergeGroup("pr-99999-sha", createMockLogger())).toBe(99999);
+    expect(getPRNumberFromMergeGroup("pr-99999-sha", createMockLogger())).toBe(
+      99999,
+    );
   });
 });
 
