@@ -40,6 +40,7 @@ export const main = async () => {
       driftIssueNumber: driftIssueNumber || undefined,
       prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,
       ciInfoTempDir: env.all.CI_INFO_TEMP_DIR || undefined,
+      secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
     });
 
     // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)

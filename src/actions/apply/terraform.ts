@@ -38,7 +38,7 @@ export const listRelatedPullRequests = async (
   });
 };
 
-export const main = async (): Promise<void> => {
+export const main = async (secrets?: Record<string, string>): Promise<void> => {
   const githubToken = input.githubToken;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   const cfg = await lib.getConfig();
@@ -102,6 +102,7 @@ export const main = async (): Promise<void> => {
         {
           cwd: workingDir,
           ignoreReturnCode: true,
+          secretEnvs: secrets,
           env: {
             GITHUB_TOKEN: githubToken,
             TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt

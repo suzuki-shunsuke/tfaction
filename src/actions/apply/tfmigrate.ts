@@ -15,7 +15,7 @@ import {
   updateBranchByCommit,
 } from "./terraform";
 
-export const main = async (): Promise<void> => {
+export const main = async (secrets?: Record<string, string>): Promise<void> => {
   const githubToken = input.githubToken;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   const cfg = await lib.getConfig();
@@ -60,6 +60,7 @@ export const main = async (): Promise<void> => {
       .exec("tfmigrate", ["apply"], {
         cwd: workingDir,
         ignoreReturnCode: true,
+        secretEnvs: secrets,
         env: env.all.TFMIGRATE_EXEC_PATH
           ? { TFMIGRATE_EXEC_PATH: env.all.TFMIGRATE_EXEC_PATH }
           : undefined,

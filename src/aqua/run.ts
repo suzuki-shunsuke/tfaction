@@ -114,6 +114,7 @@ export type EnvDeps = {
 
 export type ExecOptionsForEnv = {
   env?: dynamicEnvs;
+  secretEnvs?: Record<string, string>;
   comment?: Comment;
 };
 
@@ -139,6 +140,7 @@ export const buildEnv = (
 
   return {
     ...deps.processEnv,
+    ...options?.secretEnvs,
     ...options?.env,
     ...dynamicEnv,
   };

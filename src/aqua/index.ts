@@ -103,6 +103,7 @@ export const NewExecutor = async (
 
 export interface ExecOptions extends exec.ExecOptions {
   env?: env.dynamicEnvs;
+  secretEnvs?: Record<string, string>;
   group?: string;
   comment?: Comment;
 }

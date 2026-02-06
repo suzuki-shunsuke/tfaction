@@ -50,5 +50,6 @@ export const main = async () => {
     serverRepository: config.securefix_action?.server_repository ?? "",
     appId: input.securefixActionAppId,
     appPrivateKey: input.securefixActionAppPrivateKey,
+    secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
   });
 };

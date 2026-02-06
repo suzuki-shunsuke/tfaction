@@ -12,9 +12,9 @@ inputs:
     required: false
     default: ${{ github.token }}
 
-  # export-secrets
+  # setup, terraform-init, plan, apply
   secrets:
-    description: A JSON representing a map whose keys are secret names and values are secret values. This is used by export-secrets to export secrets to environment variables.
+    description: A JSON representing a map whose keys are secret names and values are secret values. Used by setup to compute the secrets output, and by terraform-init, plan, and apply to pass secrets as environment variables during command execution.
     required: false
 
   # setup
@@ -98,6 +98,12 @@ outputs:
     description: If true, terraform plan is run with the `-destroy` option
   terraform_command:
     description: Terraform command. By default, the value is "terraform". If you use OpenTofu, the value is "tofu"
+
+  # setup
+  secrets:
+    description: >-
+      A JSON representing a map whose keys are environment variable names
+      and values are secret values. Output by setup action.
 
   # get-global-config
   working_directory_file:

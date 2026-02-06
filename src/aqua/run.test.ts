@@ -187,6 +187,27 @@ describe("buildEnv", () => {
     expect(result.GITHUB_TOKEN).toBe("comment-token");
     expect(result.GH_COMMENT_CONFIG).toBe("/path/to/gh-comment.yaml");
   });
+  it("includes secretEnvs when provided", () => {
+    const result = buildEnv(baseDeps, "", undefined, {
+      secretEnvs: { SECRET_KEY: "secret_value", API_TOKEN: "token123" },
+    });
+    expect(result.SECRET_KEY).toBe("secret_value");
+    expect(result.API_TOKEN).toBe("token123");
+    expect(result.EXISTING).toBe("val");
+  });
+  it("secretEnvs are overridden by options.env and dynamic env", () => {
+    const result = buildEnv(baseDeps, "/install", "gh-tok", {
+      secretEnvs: {
+        PATH: "/secret-path",
+        TFMIGRATE_EXEC_PATH: "from-secret",
+      },
+      env: { TFMIGRATE_EXEC_PATH: "from-opt" },
+    });
+    // dynamic env PATH wins over secretEnvs PATH
+    expect(result.PATH).toBe("/usr/bin:/install");
+    // options.env TFMIGRATE_EXEC_PATH wins over secretEnvs
+    expect(result.TFMIGRATE_EXEC_PATH).toBe("from-opt");
+  });
   it("merge precedence: dynamic env > options.env > processEnv", () => {
     const deps: EnvDeps = {
       processEnv: { PATH: "/proc", GITHUB_TOKEN: "proc-tok", FOO: "from-proc" },
