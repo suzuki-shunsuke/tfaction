@@ -160,8 +160,36 @@ export const main = async () => {
 
   // Set outputs from target config
   for (const [key, value] of Object.entries(targetConfig)) {
-    if (key !== "env" && key !== "target" && value !== undefined) {
+    if (
+      key !== "env" &&
+      key !== "target" &&
+      key !== "secretsConfig" &&
+      value !== undefined
+    ) {
       core.setOutput(key, value);
+    }
+  }
+
+  // Process secrets
+  if (input.secrets) {
+    const inputSecrets: Record<string, string> = JSON.parse(input.secrets);
+    core.info(
+      `The list of secret names passed to the action: ${Object.keys(inputSecrets).join(", ")}`,
+    );
+    if (targetConfig.secretsConfig) {
+      const secretsOutput: Record<string, string> = {};
+      for (const [envName, secretName] of Object.entries(
+        targetConfig.secretsConfig,
+      )) {
+        if (!(secretName in inputSecrets)) {
+          throw new Error(`secret is not found: ${secretName}`);
+        }
+        core.info(
+          `map the secret ${secretName} to the environment variable ${envName}`,
+        );
+        secretsOutput[envName] = inputSecrets[secretName];
+      }
+      core.setOutput("secrets", JSON.stringify(secretsOutput));
     }
   }
 

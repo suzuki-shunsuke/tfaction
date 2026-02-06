@@ -24,6 +24,7 @@ export type RunInput = {
   serverRepository: string;
   appId: string;
   appPrivateKey: string;
+  secrets?: Record<string, string>;
 };
 
 export const run = async (input: RunInput): Promise<void> => {
@@ -31,6 +32,7 @@ export const run = async (input: RunInput): Promise<void> => {
     // Non-PR: just run init with github-comment
     await input.executor.exec(input.tfCommand, ["init", "-input=false"], {
       cwd: input.workingDir,
+      secretEnvs: input.secrets,
       comment: {
         token: input.githubToken,
       },
@@ -50,6 +52,7 @@ export const run = async (input: RunInput): Promise<void> => {
       {
         cwd: input.workingDir,
         ignoreReturnCode: true,
+        secretEnvs: input.secrets,
       },
     );
     if (initResult !== 0) {
@@ -58,6 +61,7 @@ export const run = async (input: RunInput): Promise<void> => {
         ["init", "-input=false", "-upgrade"],
         {
           cwd: input.workingDir,
+          secretEnvs: input.secrets,
           comment: {
             token: input.githubToken,
           },

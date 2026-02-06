@@ -46,6 +46,9 @@ export interface TargetConfig {
 
   // Additional envs from config (dynamic)
   env?: Record<string, string>;
+
+  // Secrets mapping (env_name -> secret_name)
+  secretsConfig?: Record<string, string>;
 }
 
 export const getTargetConfig = async (
@@ -120,6 +123,22 @@ export const getTargetConfig = async (
       inputs.isApply,
       inputs.jobType,
     );
+
+    // Resolve secrets config: lower priority first, higher priority overwrites
+    const secretsConfig: Record<string, string> = {};
+    for (const secret of targetGroup?.secrets ?? []) {
+      const envName = secret.env_name || secret.secret_name;
+      const secretName = secret.secret_name || secret.env_name;
+      secretsConfig[envName] = secretName;
+    }
+    for (const secret of rootJobConfig?.secrets ?? []) {
+      const envName = secret.env_name || secret.secret_name;
+      const secretName = secret.secret_name || secret.env_name;
+      secretsConfig[envName] = secretName;
+    }
+    if (Object.keys(secretsConfig).length > 0) {
+      result.secretsConfig = secretsConfig;
+    }
 
     // Override with values from wdConfig, targetGroup, config
     const m1 = lib.setOutputs(
@@ -252,7 +271,12 @@ export const run = async (
 
   const outputs = new Map<string, string | boolean>();
   for (const [key, value] of Object.entries(targetConfig)) {
-    if (key !== "env" && key !== "target" && value !== undefined) {
+    if (
+      key !== "env" &&
+      key !== "target" &&
+      key !== "secretsConfig" &&
+      value !== undefined
+    ) {
       outputs.set(key, value);
     }
   }

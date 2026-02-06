@@ -24,6 +24,7 @@ type Inputs = {
   gcsBucketNameTfmigrateHistory?: string;
   acceptChangeByRenovate: boolean;
   executor: aqua.Executor;
+  secrets?: Record<string, string>;
 };
 
 export type RunInputs = {
@@ -32,6 +33,7 @@ export type RunInputs = {
   driftIssueNumber?: string;
   prAuthor?: string;
   ciInfoTempDir?: string;
+  secrets?: Record<string, string>;
 };
 
 type TerraformPlanOutputs = {
@@ -196,6 +198,7 @@ export const runTfmigratePlan = async (
   await executor.exec("tfmigrate", ["plan", "--out", tempPlanBinary], {
     cwd: inputs.workingDirectory,
     env: tfmigrateEnv,
+    secretEnvs: inputs.secrets,
     group: "tfmigrate plan",
     comment: {
       token: inputs.githubToken,
@@ -276,6 +279,7 @@ export const runTerraformPlan = async (
   const planResult = await executor.getExecOutput("tfcmt", planArgs, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
+    secretEnvs: inputs.secrets,
     env: {
       GITHUB_TOKEN: inputs.githubToken,
       AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
@@ -382,6 +386,7 @@ export const main = async (
       targetConfig.gcs_bucket_name_tfmigrate_history,
     acceptChangeByRenovate: targetConfig.accept_change_by_renovate || false,
     executor,
+    secrets: runInputs.secrets,
   };
 
   const jobType = runInputs.jobType;

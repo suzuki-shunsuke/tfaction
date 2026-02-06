@@ -21,7 +21,7 @@ export const securefixActionAppPrivateKey = core.getInput(
 // all actions
 export const action = core.getInput("action");
 
-// export-secrets
+// setup, terraform-init, plan, apply
 export const secrets = core.getInput("secrets");
 
 // generate-config-out
