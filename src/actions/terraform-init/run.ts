@@ -45,7 +45,6 @@ export const run = async (input: RunInput): Promise<void> => {
     const existedBefore = fs.existsSync(lockFile);
 
     // terraform init (try without upgrade first, then with upgrade on failure)
-    core.startGroup(`${input.tfCommand} init`);
     const initResult = await input.executor.exec(
       input.tfCommand,
       ["init", "-input=false"],
@@ -53,6 +52,7 @@ export const run = async (input: RunInput): Promise<void> => {
         cwd: input.workingDir,
         ignoreReturnCode: true,
         secretEnvs: input.secrets,
+        group: "${input.tfCommand} init",
       },
     );
     if (initResult !== 0) {
@@ -62,13 +62,13 @@ export const run = async (input: RunInput): Promise<void> => {
         {
           cwd: input.workingDir,
           secretEnvs: input.secrets,
+          group: "${input.tfCommand} init -upgrade",
           comment: {
             token: input.githubToken,
           },
         },
       );
     }
-    core.endGroup();
 
     const lockArgs = input.providersLockOpts
       .split(/\s+/)
@@ -106,6 +106,7 @@ export const run = async (input: RunInput): Promise<void> => {
         appId: input.appId,
         appPrivateKey: input.appPrivateKey,
       });
+      throw new Error(".terraform.lock.hcl is updated");
     }
   }
 
