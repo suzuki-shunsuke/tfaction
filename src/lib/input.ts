@@ -7,6 +7,9 @@ import * as core from "@actions/core";
 
 // Common inputs used across multiple actions
 export const githubToken = core.getInput("github_token");
+export const githubTokenForGitHubProvider = core.getInput(
+  "github_token_for_github_provider",
+);
 
 // Helper functions to get inputs with required option
 export const getRequiredGitHubToken = (): string => {

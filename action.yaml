@@ -12,6 +12,13 @@ inputs:
     required: false
     default: ${{ github.token }}
 
+  github_token_for_github_provider:
+    description: |
+      GitHub Access Token for Terraform GitHub Provider.
+      Set as GITHUB_TOKEN during terraform/tfmigrate plan and apply.
+      When unset, github_token is used as GITHUB_TOKEN (current behavior).
+    required: false
+
   # setup, terraform-init, plan, apply
   secrets:
     description: A JSON representing a map whose keys are secret names and values are secret values. Used by setup to compute the secrets output, and by terraform-init, plan, and apply to pass secrets as environment variables during command execution.

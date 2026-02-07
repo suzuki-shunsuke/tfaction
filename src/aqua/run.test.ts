@@ -180,11 +180,11 @@ describe("buildEnv", () => {
     const result = buildEnv(baseDeps, "", "gh-token");
     expect(result.AQUA_GITHUB_TOKEN).toBe("gh-token");
   });
-  it("sets GITHUB_TOKEN and GH_COMMENT_CONFIG when comment present", () => {
+  it("sets GITHUB_ACCESS_TOKEN and GH_COMMENT_CONFIG when comment present", () => {
     const result = buildEnv(baseDeps, "", undefined, {
       comment: { token: "comment-token" },
     });
-    expect(result.GITHUB_TOKEN).toBe("comment-token");
+    expect(result.GITHUB_ACCESS_TOKEN).toBe("comment-token");
     expect(result.GH_COMMENT_CONFIG).toBe("/path/to/gh-comment.yaml");
   });
   it("includes secretEnvs when provided", () => {
@@ -221,8 +221,8 @@ describe("buildEnv", () => {
     });
     // dynamic env (PATH with installDir) wins over options.env and processEnv
     expect(result.PATH).toBe("/proc:/install");
-    // dynamic env (GITHUB_TOKEN from comment) wins over processEnv
-    expect(result.GITHUB_TOKEN).toBe("comment-tok");
+    // dynamic env (GITHUB_ACCESS_TOKEN from comment) is set
+    expect(result.GITHUB_ACCESS_TOKEN).toBe("comment-tok");
     // processEnv value preserved when not overridden
     expect(result.FOO).toBe("from-proc");
   });

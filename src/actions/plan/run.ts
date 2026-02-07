@@ -12,6 +12,7 @@ import * as conftest from "../../conftest";
 
 type Inputs = {
   githubToken: string;
+  githubTokenForGitHubProvider?: string;
   workingDirectory: string;
   renovateLogin: string;
   destroy: boolean;
@@ -29,6 +30,7 @@ type Inputs = {
 
 export type RunInputs = {
   githubToken: string;
+  githubTokenForGitHubProvider?: string;
   jobType: string;
   driftIssueNumber?: string;
   prAuthor?: string;
@@ -197,7 +199,12 @@ export const runTfmigratePlan = async (
 
   await executor.exec("tfmigrate", ["plan", "--out", tempPlanBinary], {
     cwd: inputs.workingDirectory,
-    env: tfmigrateEnv,
+    env: {
+      ...tfmigrateEnv,
+      ...(inputs.githubTokenForGitHubProvider
+        ? { GITHUB_TOKEN: inputs.githubTokenForGitHubProvider }
+        : {}),
+    },
     secretEnvs: inputs.secrets,
     group: "tfmigrate plan",
     comment: {
@@ -281,8 +288,8 @@ export const runTerraformPlan = async (
     ignoreReturnCode: true,
     secretEnvs: inputs.secrets,
     env: {
-      GITHUB_TOKEN: inputs.githubToken,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+      GITHUB_TOKEN: inputs.githubTokenForGitHubProvider || inputs.githubToken,
+      TFCMT_GITHUB_TOKEN: inputs.githubToken,
       TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
     },
   });
@@ -373,6 +380,7 @@ export const main = async (
 
   const inputs: Inputs = {
     githubToken: runInputs.githubToken,
+    githubTokenForGitHubProvider: runInputs.githubTokenForGitHubProvider,
     workingDirectory: workingDir,
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.destroy || false,

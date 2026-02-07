@@ -9,14 +9,17 @@ export const main = async () => {
     ? JSON.parse(input.secrets)
     : undefined;
 
+  const githubTokenForGitHubProvider =
+    input.githubTokenForGitHubProvider || undefined;
+
   if (jobType === "terraform") {
     // Check if terraform should be skipped
     const skipTerraform = env.TFACTION_SKIP_TERRAFORM;
 
     if (!skipTerraform) {
-      await terraformApply.main(secrets);
+      await terraformApply.main(secrets, githubTokenForGitHubProvider);
     }
   } else if (jobType === "tfmigrate") {
-    await tfmigrateApply.main(secrets);
+    await tfmigrateApply.main(secrets, githubTokenForGitHubProvider);
   }
 };
