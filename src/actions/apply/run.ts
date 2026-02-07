@@ -73,6 +73,9 @@ export const listRelatedPullRequests = async (
   input: ListRelatedPullRequestsInput,
 ): Promise<number[]> => {
   const { octokit, owner, repo, target } = input;
+  if (!target) {
+    return [];
+  }
   const query = buildSearchQuery(owner, repo, target);
 
   const result: {
