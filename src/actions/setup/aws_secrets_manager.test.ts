@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { buildSecretsToExport, run, type RunInput } from "./run";
+import {
+  buildSecretsToExport,
+  run,
+  type RunInput,
+} from "./aws_secrets_manager";
 
 describe("buildSecretsToExport", () => {
   it("handles single secret without secret_key (plain string value)", () => {
