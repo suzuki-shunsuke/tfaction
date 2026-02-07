@@ -136,6 +136,18 @@ export const getTargetConfig = async (
       const secretName = secret.secret_name || secret.env_name;
       secretsConfig[envName] = secretName;
     }
+    core.info(
+      `[debug] matched target group working_directory: ${targetGroup?.working_directory}`,
+    );
+    core.info(
+      `[debug] targetGroup.secrets length: ${targetGroup?.secrets?.length ?? "undefined"}`,
+    );
+    core.info(
+      `[debug] rootJobConfig.secrets length: ${rootJobConfig?.secrets?.length ?? "undefined"}`,
+    );
+    core.info(
+      `[debug] resolved secretsConfig count: ${Object.keys(secretsConfig).length}`,
+    );
     if (Object.keys(secretsConfig).length > 0) {
       result.secretsConfig = secretsConfig;
     }
