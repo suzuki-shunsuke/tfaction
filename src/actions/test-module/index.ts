@@ -15,12 +15,6 @@ export const main = async () => {
   const target = env.all.TFACTION_TARGET;
   const wd = env.all.TFACTION_WORKING_DIR;
 
-  if (!wd && !target) {
-    throw new Error(
-      "Either TFACTION_WORKING_DIR or TFACTION_TARGET is required",
-    );
-  }
-
   // absolute path to working dir
   const workingDir = path.join(config.git_root_dir, wd || target);
 
