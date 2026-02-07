@@ -27,10 +27,6 @@ export const getSkipTerraform = (
   // https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr
   const renovateLogin = config.renovate_login ?? "renovate[bot]";
 
-  if (!inputs.target) {
-    throw new Error("TFACTION_TARGET is required");
-  }
-
   if (renovateLogin !== inputs.prAuthor) {
     // If pull request author isn't Renovate bot
     // If the pull request has the skip label of the target, terraform is skipped.

@@ -98,10 +98,6 @@ export const run = async (input: RunInput): Promise<void> => {
   const workingDir = targetConfigResult.working_directory || input.workingDir;
   const target = targetConfigResult.target || input.target;
 
-  if (!target) {
-    throw new Error("TFACTION_TARGET is required");
-  }
-
   await aqua.NewExecutor({
     cwd: workingDir,
     githubToken,

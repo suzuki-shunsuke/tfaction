@@ -152,22 +152,6 @@ describe("run", () => {
     vi.mocked(commit.create).mockResolvedValue("");
   });
 
-  it("throws when target is empty after getTargetConfig resolves", async () => {
-    vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
-      working_directory: "",
-      target: "",
-    } as unknown as Awaited<
-      ReturnType<typeof getTargetConfig.getTargetConfig>
-    >);
-
-    await expect(
-      run({
-        ...defaultRunInput,
-        target: "",
-      }),
-    ).rejects.toThrow("TFACTION_TARGET is required");
-  });
-
   it("returns early when no modified files found", async () => {
     vi.mocked(git.getModifiedFiles).mockResolvedValue([]);
 
