@@ -13,6 +13,7 @@ export const isPullRequestEvent = (eventName: string): boolean => {
 
 export type RunInput = {
   isPullRequest: boolean;
+  /** absolute path to the working directory */
   workingDir: string;
   tfCommand: string;
   providersLockOpts: string;
@@ -39,9 +40,8 @@ export const run = async (input: RunInput): Promise<void> => {
     });
   } else {
     // PR: init with lock file handling
-    const lockFile = input.workingDir
-      ? path.join(input.workingDir, ".terraform.lock.hcl")
-      : ".terraform.lock.hcl";
+    /** absolute path to the lock file */
+    const lockFile = path.join(input.workingDir, ".terraform.lock.hcl");
     const existedBefore = fs.existsSync(lockFile);
 
     // terraform init (try without upgrade first, then with upgrade on failure)
@@ -96,10 +96,7 @@ export const run = async (input: RunInput): Promise<void> => {
       (await git.hasFileChanged(".terraform.lock.hcl", input.workingDir))
     ) {
       // Commit the change
-      const lockFileFromGitRootDir = path.relative(
-        input.gitRootDir,
-        path.join(input.workspace, lockFile),
-      );
+      const lockFileFromGitRootDir = path.relative(input.gitRootDir, lockFile);
       await commit.create({
         commitMessage: "chore: update .terraform.lock.hcl",
         githubToken: input.githubToken,
