@@ -134,7 +134,7 @@ export const buildEnv = (
     dynamicEnv.AQUA_GITHUB_TOKEN = githubToken;
   }
   if (options?.comment) {
-    dynamicEnv.GITHUB_TOKEN = options.comment.token;
+    dynamicEnv.GITHUB_ACCESS_TOKEN = options.comment.token;
     dynamicEnv.GH_COMMENT_CONFIG = deps.gitHubCommentConfig;
   }
 

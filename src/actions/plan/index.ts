@@ -36,6 +36,8 @@ export const main = async () => {
   if (!skipTerraform) {
     await runPlan(targetConfig, {
       githubToken: input.githubToken,
+      githubTokenForGitHubProvider:
+        input.githubTokenForGitHubProvider || undefined,
       jobType: jobType,
       driftIssueNumber: driftIssueNumber || undefined,
       prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,

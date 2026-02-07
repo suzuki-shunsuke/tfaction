@@ -38,7 +38,10 @@ export const listRelatedPullRequests = async (
   });
 };
 
-export const main = async (secrets?: Record<string, string>): Promise<void> => {
+export const main = async (
+  secrets?: Record<string, string>,
+  githubTokenForGitHubProvider?: string,
+): Promise<void> => {
   const githubToken = input.githubToken;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   const cfg = await lib.getConfig();
@@ -104,7 +107,8 @@ export const main = async (secrets?: Record<string, string>): Promise<void> => {
           ignoreReturnCode: true,
           secretEnvs: secrets,
           env: {
-            GITHUB_TOKEN: githubToken,
+            GITHUB_TOKEN: githubTokenForGitHubProvider || githubToken,
+            TFCMT_GITHUB_TOKEN: githubToken,
             TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
           },
           listeners: {
@@ -163,7 +167,8 @@ export const main = async (secrets?: Record<string, string>): Promise<void> => {
           cwd: workingDir,
           ignoreReturnCode: true,
           env: {
-            GITHUB_TOKEN: githubToken,
+            GITHUB_TOKEN: githubTokenForGitHubProvider || githubToken,
+            TFCMT_GITHUB_TOKEN: githubToken,
           },
         },
       );
@@ -299,7 +304,7 @@ const downloadArtifact = async (
 
 const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   const cfg = await lib.getConfig();
-  const githubToken = core.getInput("github_token");
+  const githubToken = input.githubToken;
   const target = env.all.TFACTION_TARGET;
   const planWorkflowName = cfg.plan_workflow_name;
   const ciInfoTempDir = env.all.CI_INFO_TEMP_DIR;
