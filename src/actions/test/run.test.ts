@@ -263,10 +263,7 @@ describe("run", () => {
     expect(commitMod.create).toHaveBeenCalledWith({
       commitMessage: "style: terraform fmt -recursive",
       githubToken: "test-token",
-      files: new Set([
-        "/git/root/aws/test/main.tf",
-        "/git/root/aws/test/variables.tf",
-      ]),
+      files: new Set(["aws/test/main.tf", "aws/test/variables.tf"]),
       serverRepository: "",
       appId: "app-id",
       appPrivateKey: "app-key",
@@ -316,7 +313,7 @@ describe("run", () => {
 
     expect(commitMod.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        files: new Set(["/git/root/gcp/staging/outputs.tf"]),
+        files: new Set(["gcp/staging/outputs.tf"]),
       }),
     );
   });
