@@ -20,7 +20,7 @@ const createMockGraphqlOctokit = (
   return {
     graphql: {
       paginate: {
-        iterator: vi.fn().mockImplementation(async function* () {
+        iterator: vi.fn().mockImplementation(function* () {
           for (const page of pages) {
             yield { search: { nodes: page } };
           }

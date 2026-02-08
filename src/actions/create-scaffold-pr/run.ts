@@ -51,7 +51,7 @@ gh pr create -R "${repository}" ${draftOpt}\\
 `;
 
   core.summary.addRaw(summary);
-  core.summary.write();
+  void core.summary.write();
 };
 
 export interface RunInput {

@@ -297,7 +297,7 @@ export const run = async (input: RunInput): Promise<Result> => {
 
 export const main = async (): Promise<Result> => {
   const octokit = github.getOctokit(input.getRequiredGitHubToken());
-  return run({
+  return await run({
     prNumber: github.context.payload.pull_request?.number,
     octokit,
   });

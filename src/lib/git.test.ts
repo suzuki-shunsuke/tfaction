@@ -23,45 +23,45 @@ beforeEach(() => {
 
 describe("getModifiedFiles", () => {
   it("returns list of modified/untracked files from git output", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from("file1.tf\nfile2.tf\n"));
-      return 0;
+      return Promise.resolve(0);
     });
     const result = await getModifiedFiles(".");
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
   it("filters out empty lines", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from("file1.tf\n\n\nfile2.tf\n"));
-      return 0;
+      return Promise.resolve(0);
     });
     const result = await getModifiedFiles(".");
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
   it("trims whitespace from file names", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from("  file1.tf  \n  file2.tf  \n"));
-      return 0;
+      return Promise.resolve(0);
     });
     const result = await getModifiedFiles(".");
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
   it("returns empty array when no files modified", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from(""));
-      return 0;
+      return Promise.resolve(0);
     });
     const result = await getModifiedFiles(".");
     expect(result).toEqual([]);
   });
 
   it("passes dir and cwd to exec correctly", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from(""));
-      return 0;
+      return Promise.resolve(0);
     });
     await getModifiedFiles("src", "/workspace");
     expect(exec.exec).toHaveBeenCalledWith(
@@ -116,18 +116,18 @@ describe("isFileTracked", () => {
 
 describe("getCurrentBranch", () => {
   it("returns trimmed branch name", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from("feature/my-branch\n"));
-      return 0;
+      return Promise.resolve(0);
     });
     const result = await getCurrentBranch();
     expect(result).toBe("feature/my-branch");
   });
 
   it("passes cwd to exec", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from("main\n"));
-      return 0;
+      return Promise.resolve(0);
     });
     await getCurrentBranch("/workspace");
     expect(exec.exec).toHaveBeenCalledWith(
@@ -140,18 +140,18 @@ describe("getCurrentBranch", () => {
 
 describe("hasFileChangedPorcelain", () => {
   it("returns true when output is non-empty (file changed)", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from(" M main.tf\n"));
-      return 0;
+      return Promise.resolve(0);
     });
     const result = await hasFileChangedPorcelain("main.tf");
     expect(result).toBe(true);
   });
 
   it("returns false when output is empty (file unchanged)", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from(""));
-      return 0;
+      return Promise.resolve(0);
     });
     const result = await hasFileChangedPorcelain("main.tf");
     expect(result).toBe(false);
@@ -213,26 +213,26 @@ describe("getRootDir", () => {
 describe("checkGitDiff", () => {
   it("returns only changed files from the input list", async () => {
     vi.mocked(exec.exec)
-      .mockImplementationOnce(async (_cmd, _args, options) => {
+      .mockImplementationOnce((_cmd, _args, options) => {
         options?.listeners?.stdout?.(Buffer.from(" M file1.tf\n"));
-        return 0;
+        return Promise.resolve(0);
       })
-      .mockImplementationOnce(async (_cmd, _args, options) => {
+      .mockImplementationOnce((_cmd, _args, options) => {
         options?.listeners?.stdout?.(Buffer.from(""));
-        return 0;
+        return Promise.resolve(0);
       })
-      .mockImplementationOnce(async (_cmd, _args, options) => {
+      .mockImplementationOnce((_cmd, _args, options) => {
         options?.listeners?.stdout?.(Buffer.from("?? file3.tf\n"));
-        return 0;
+        return Promise.resolve(0);
       });
     const result = await checkGitDiff(["file1.tf", "file2.tf", "file3.tf"]);
     expect(result).toEqual({ changedFiles: ["file1.tf", "file3.tf"] });
   });
 
   it("returns empty array when no files changed", async () => {
-    vi.mocked(exec.exec).mockImplementation(async (_cmd, _args, options) => {
+    vi.mocked(exec.exec).mockImplementation((_cmd, _args, options) => {
       options?.listeners?.stdout?.(Buffer.from(""));
-      return 0;
+      return Promise.resolve(0);
     });
     const result = await checkGitDiff(["file1.tf", "file2.tf"]);
     expect(result).toEqual({ changedFiles: [] });
