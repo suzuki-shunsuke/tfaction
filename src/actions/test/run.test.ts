@@ -258,7 +258,9 @@ describe("run", () => {
     });
 
     const input = createRunInput(mockExecutor);
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(commitMod.create).toHaveBeenCalledWith({
       commitMessage: "style: terraform fmt -recursive",
@@ -309,7 +311,9 @@ describe("run", () => {
     const input = createRunInput(mockExecutor, undefined, {
       working_directory: "gcp/staging",
     });
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(commitMod.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -329,7 +333,9 @@ describe("run", () => {
     const input = createRunInput(mockExecutor, undefined, {
       terraform_command: "tofu",
     });
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(commitMod.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -384,7 +390,9 @@ describe("run", () => {
     });
 
     const input = createRunInput(mockExecutor);
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(commitMod.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -435,7 +443,9 @@ describe("run", () => {
       enable_terraform_docs: true,
     });
 
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(callOrder).toEqual([
       "conftest",
@@ -444,7 +454,6 @@ describe("run", () => {
       "tflint",
       "fmt",
       "commit",
-      "terraform-docs",
     ]);
   });
 
