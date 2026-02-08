@@ -276,7 +276,7 @@ describe("run", () => {
       drift_detection: driftDetection,
       working_directory_file: "tfaction.yaml",
       git_root_dir: "/workspace",
-      target_groups: [{ working_directory: "aws" }],
+      target_groups: [{ working_directory: "aws/**" }],
       replace_target: undefined,
       config_path: "/workspace/tfaction-root.yaml",
     }) as types.Config;

@@ -236,15 +236,14 @@ describe("run", () => {
     );
   });
 
-  it("copies from git root when template_dir is not set", async () => {
-    // When template_dir is undefined, path.join(git_root_dir, "") returns git_root_dir,
-    // which is truthy, so copyDirectory is called with git_root_dir as source.
+  it("creates working directory when template_dir is not set", async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(false);
     mockedReaddirSync.mockReturnValue([]);
 
     await run(defaultInput);
 
     expect(core.info).toHaveBeenCalledWith(
-      "Copied template from /repo to /repo/aws/dev",
+      "Created working directory: /repo/aws/dev",
     );
   });
 

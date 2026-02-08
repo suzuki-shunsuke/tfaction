@@ -40,7 +40,7 @@ test("default", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -96,7 +96,7 @@ test("config", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               aws_region: "ap-northeast-1",
               aws_role_session_name: "test",
@@ -142,7 +142,7 @@ test("scaffold_working_dir", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -192,7 +192,7 @@ test("tfmigrate plan", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               tfmigrate_plan_config: {
                 aws_assume_role_arn: "arn:aws:iam::123:role/tfmigrate-plan",
@@ -245,7 +245,7 @@ test("tfmigrate apply", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               tfmigrate_apply_config: {
                 aws_assume_role_arn: "arn:aws:iam::123:role/tfmigrate-apply",
@@ -298,7 +298,7 @@ test("terraform apply", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               terraform_apply_config: {
                 aws_assume_role_arn: "arn:aws:iam::123:role/terraform-apply",
@@ -349,7 +349,7 @@ test("explicit aws_role_session_name overrides auto-generation", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               aws_role_session_name: "custom-session-name",
             },
@@ -402,7 +402,7 @@ test("terraform_docs enabled in root config", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -453,7 +453,7 @@ test("environment variables from targetGroup", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               env: {
                 TF_VAR_env: "dev",
@@ -510,7 +510,7 @@ test("environment variables from root config", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -572,7 +572,7 @@ test("gcp configuration", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               gcp_service_account: "sa@project.iam.gserviceaccount.com",
               gcp_workload_identity_provider:
@@ -629,7 +629,7 @@ test("gcp_access_token_scopes", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               terraform_plan_config: {
                 gcp_access_token_scopes:
@@ -683,7 +683,7 @@ test("s3_bucket_name_tfmigrate_history", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               s3_bucket_name_tfmigrate_history: "my-tfmigrate-bucket",
             },
@@ -734,7 +734,7 @@ test("gcs_bucket_name_tfmigrate_history", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               gcs_bucket_name_tfmigrate_history: "my-gcs-tfmigrate-bucket",
             },
@@ -782,7 +782,7 @@ test("providers_lock_opts override", async () => {
           providers_lock_opts: "-platform=linux_amd64",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -828,7 +828,7 @@ test("aws_role_session_name truncation when target exceeds 64 characters", async
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
-            working_directory: "tests/aws",
+            working_directory: "tests/aws/**",
             template_dir: "tests/templates/github",
           },
         ],
@@ -881,7 +881,7 @@ test("only workingDir provided - target derived from workingDir", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -934,7 +934,7 @@ test("tflint_fix enabled in root config", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -989,7 +989,7 @@ test("target group env overrides root env", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               env: {
                 OVERRIDE_VAR: "target-group-value",
@@ -1025,7 +1025,7 @@ test("aws_role_session_name falls back to prefix with runID when target is very 
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
-            working_directory: "tests/aws",
+            working_directory: "tests/aws/**",
             template_dir: "tests/templates/github",
           },
         ],
