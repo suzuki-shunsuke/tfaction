@@ -27,7 +27,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from("file1.tf\nfile2.tf\n"));
       return Promise.resolve(0);
     });
-    const result = await getModifiedFiles(".");
+    const result = await getModifiedFiles(".", "/workspace");
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
@@ -36,7 +36,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from("file1.tf\n\n\nfile2.tf\n"));
       return Promise.resolve(0);
     });
-    const result = await getModifiedFiles(".");
+    const result = await getModifiedFiles(".", "/workspace");
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
@@ -45,7 +45,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from("  file1.tf  \n  file2.tf  \n"));
       return Promise.resolve(0);
     });
-    const result = await getModifiedFiles(".");
+    const result = await getModifiedFiles(".", "/workspace");
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
@@ -54,7 +54,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from(""));
       return Promise.resolve(0);
     });
-    const result = await getModifiedFiles(".");
+    const result = await getModifiedFiles(".", "/workspace");
     expect(result).toEqual([]);
   });
 
@@ -75,13 +75,13 @@ describe("getModifiedFiles", () => {
 describe("hasFileChanged", () => {
   it("returns true when exit code is non-zero (file changed)", async () => {
     vi.mocked(exec.exec).mockResolvedValue(1);
-    const result = await hasFileChanged("main.tf");
+    const result = await hasFileChanged("main.tf", "/workspace");
     expect(result).toBe(true);
   });
 
   it("returns false when exit code is 0 (file unchanged)", async () => {
     vi.mocked(exec.exec).mockResolvedValue(0);
-    const result = await hasFileChanged("main.tf");
+    const result = await hasFileChanged("main.tf", "/workspace");
     expect(result).toBe(false);
   });
 
@@ -103,13 +103,13 @@ describe("hasFileChanged", () => {
 describe("isFileTracked", () => {
   it("returns true when exit code is 0 (file tracked)", async () => {
     vi.mocked(exec.exec).mockResolvedValue(0);
-    const result = await isFileTracked("main.tf");
+    const result = await isFileTracked("main.tf", "/workspace");
     expect(result).toBe(true);
   });
 
   it("returns false when exit code is non-zero (file untracked)", async () => {
     vi.mocked(exec.exec).mockResolvedValue(1);
-    const result = await isFileTracked("main.tf");
+    const result = await isFileTracked("main.tf", "/workspace");
     expect(result).toBe(false);
   });
 });
@@ -120,7 +120,7 @@ describe("getCurrentBranch", () => {
       options?.listeners?.stdout?.(Buffer.from("feature/my-branch\n"));
       return Promise.resolve(0);
     });
-    const result = await getCurrentBranch();
+    const result = await getCurrentBranch("/workspace");
     expect(result).toBe("feature/my-branch");
   });
 
@@ -144,7 +144,7 @@ describe("hasFileChangedPorcelain", () => {
       options?.listeners?.stdout?.(Buffer.from(" M main.tf\n"));
       return Promise.resolve(0);
     });
-    const result = await hasFileChangedPorcelain("main.tf");
+    const result = await hasFileChangedPorcelain("main.tf", "/workspace");
     expect(result).toBe(true);
   });
 
@@ -153,7 +153,7 @@ describe("hasFileChangedPorcelain", () => {
       options?.listeners?.stdout?.(Buffer.from(""));
       return Promise.resolve(0);
     });
-    const result = await hasFileChangedPorcelain("main.tf");
+    const result = await hasFileChangedPorcelain("main.tf", "/workspace");
     expect(result).toBe(false);
   });
 });
@@ -225,7 +225,10 @@ describe("checkGitDiff", () => {
         options?.listeners?.stdout?.(Buffer.from("?? file3.tf\n"));
         return Promise.resolve(0);
       });
-    const result = await checkGitDiff(["file1.tf", "file2.tf", "file3.tf"]);
+    const result = await checkGitDiff(
+      ["file1.tf", "file2.tf", "file3.tf"],
+      "/workspace",
+    );
     expect(result).toEqual({ changedFiles: ["file1.tf", "file3.tf"] });
   });
 
@@ -234,7 +237,7 @@ describe("checkGitDiff", () => {
       options?.listeners?.stdout?.(Buffer.from(""));
       return Promise.resolve(0);
     });
-    const result = await checkGitDiff(["file1.tf", "file2.tf"]);
+    const result = await checkGitDiff(["file1.tf", "file2.tf"], "/workspace");
     expect(result).toEqual({ changedFiles: [] });
   });
 });
