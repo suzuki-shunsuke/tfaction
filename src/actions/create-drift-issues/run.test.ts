@@ -61,7 +61,7 @@ describe("listIssues", () => {
     return {
       graphql: {
         paginate: {
-          iterator: vi.fn().mockImplementation(async function* () {
+          iterator: vi.fn().mockImplementation(function* () {
             for (const page of pages) {
               yield { search: { nodes: page } };
             }
@@ -248,7 +248,7 @@ describe("run", () => {
   const createMockGraphqlOctokit = (issues: Issue[]): GraphQLPaginator => ({
     graphql: {
       paginate: {
-        iterator: vi.fn().mockImplementation(async function* () {
+        iterator: vi.fn().mockImplementation(function* () {
           yield {
             search: {
               nodes: issues.map((i) => ({
@@ -276,7 +276,7 @@ describe("run", () => {
       drift_detection: driftDetection,
       working_directory_file: "tfaction.yaml",
       git_root_dir: "/workspace",
-      target_groups: [{ working_directory: "aws" }],
+      target_groups: [{ working_directory: "aws/**" }],
       replace_target: undefined,
       config_path: "/workspace/tfaction-root.yaml",
     }) as types.Config;

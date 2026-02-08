@@ -19,7 +19,7 @@ const createMockConfig = (driftDetection?: Config["drift_detection"]): Config =>
     drift_detection: driftDetection,
     working_directory_file: "tfaction.yaml",
     git_root_dir: "/workspace",
-    target_groups: [{ working_directory: "aws" }],
+    target_groups: [{ working_directory: "aws/**" }],
     config_path: "/workspace/tfaction-root.yaml",
     config_dir: "/workspace",
     workspace: "/workspace",

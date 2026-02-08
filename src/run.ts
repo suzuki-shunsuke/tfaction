@@ -60,5 +60,5 @@ export const main = async (inputs: Inputs) => {
   if (action === undefined) {
     throw new Error(`Unknown action: ${inputs.action}`);
   }
-  action.main();
+  await action.main();
 };

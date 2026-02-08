@@ -185,6 +185,7 @@ describe("run", () => {
 
     expect(tflintMod.run).toHaveBeenCalledWith({
       workingDirectory: "/git/root/aws/test",
+      gitRootDir: "/git/root",
       githubToken: "test-token",
       githubTokenForTflintInit: "test-token",
       githubTokenForFix: "test-token",
@@ -259,7 +260,7 @@ describe("run", () => {
     const { commitMod } = await getMocks();
     // Simulate fmt producing output via the listeners.stdout callback
     mockExecutor.exec.mockImplementation(
-      async (
+      (
         cmd: string,
         args: string[],
         options?: { listeners?: { stdout?: (data: Buffer) => void } },
@@ -267,7 +268,7 @@ describe("run", () => {
         if (args[0] === "fmt") {
           options?.listeners?.stdout?.(Buffer.from("main.tf\nvariables.tf\n"));
         }
-        return 0;
+        return Promise.resolve(0);
       },
     );
 
@@ -299,7 +300,7 @@ describe("run", () => {
   it("commit message includes terraformCommand", async () => {
     const { commitMod } = await getMocks();
     mockExecutor.exec.mockImplementation(
-      async (
+      (
         cmd: string,
         args: string[],
         options?: { listeners?: { stdout?: (data: Buffer) => void } },
@@ -307,7 +308,7 @@ describe("run", () => {
         if (args[0] === "fmt") {
           options?.listeners?.stdout?.(Buffer.from("main.tf\n"));
         }
-        return 0;
+        return Promise.resolve(0);
       },
     );
 
@@ -329,7 +330,7 @@ describe("run", () => {
 
     const callOrder: string[] = [];
     mockExecutor.exec.mockImplementation(
-      async (
+      (
         cmd: string,
         args: string[],
         options?: { listeners?: { stdout?: (data: Buffer) => void } },
@@ -340,21 +341,24 @@ describe("run", () => {
           callOrder.push("fmt");
           options?.listeners?.stdout?.(Buffer.from("main.tf\n"));
         }
-        return 0;
+        return Promise.resolve(0);
       },
     );
-    vi.mocked(trivyMod.run).mockImplementation(async () => {
+    vi.mocked(trivyMod.run).mockImplementation(() => {
       callOrder.push("trivy");
+      return Promise.resolve();
     });
-    vi.mocked(tflintMod.run).mockImplementation(async () => {
+    vi.mocked(tflintMod.run).mockImplementation(() => {
       callOrder.push("tflint");
+      return Promise.resolve();
     });
-    vi.mocked(terraformDocsMod.run).mockImplementation(async () => {
+    vi.mocked(terraformDocsMod.run).mockImplementation(() => {
       callOrder.push("terraform-docs");
+      return Promise.resolve();
     });
-    vi.mocked(commitMod.create).mockImplementation(async () => {
+    vi.mocked(commitMod.create).mockImplementation(() => {
       callOrder.push("commit");
-      return "";
+      return Promise.resolve("");
     });
 
     const mockFs = createMockFs();
@@ -375,7 +379,7 @@ describe("run", () => {
   it("workingDirFromGitRoot is computed correctly", async () => {
     const { commitMod } = await getMocks();
     mockExecutor.exec.mockImplementation(
-      async (
+      (
         cmd: string,
         args: string[],
         options?: { listeners?: { stdout?: (data: Buffer) => void } },
@@ -383,7 +387,7 @@ describe("run", () => {
         if (args[0] === "fmt") {
           options?.listeners?.stdout?.(Buffer.from("outputs.tf\n"));
         }
-        return 0;
+        return Promise.resolve(0);
       },
     );
 

@@ -8,3 +8,5 @@ coverage
 schema
 terragrunt.rendered.json
 .terragrunt-cache
+
+ja

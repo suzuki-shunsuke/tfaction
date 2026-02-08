@@ -23,7 +23,7 @@ test("default", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
     ]),
   };
@@ -40,7 +40,7 @@ test("default", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -67,7 +67,7 @@ test("config", async () => {
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", false],
       ["enable_trivy", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["aws_region", "ap-northeast-1"],
       ["terraform_command", "tofu"],
       ["aws_role_session_name", "test"],
@@ -96,7 +96,7 @@ test("config", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               aws_region: "ap-northeast-1",
               aws_role_session_name: "test",
@@ -125,7 +125,7 @@ test("scaffold_working_dir", async () => {
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
       ["enable_trivy", true],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
     ]),
   };
@@ -142,7 +142,7 @@ test("scaffold_working_dir", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -173,7 +173,7 @@ test("tfmigrate plan", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_assume_role_arn", "arn:aws:iam::123:role/tfmigrate-plan"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -192,7 +192,7 @@ test("tfmigrate plan", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               tfmigrate_plan_config: {
                 aws_assume_role_arn: "arn:aws:iam::123:role/tfmigrate-plan",
@@ -226,7 +226,7 @@ test("tfmigrate apply", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_assume_role_arn", "arn:aws:iam::123:role/tfmigrate-apply"],
       ["aws_role_session_name", "tfaction-apply-tests_aws_foo_dev-" + runID],
@@ -245,7 +245,7 @@ test("tfmigrate apply", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               tfmigrate_apply_config: {
                 aws_assume_role_arn: "arn:aws:iam::123:role/tfmigrate-apply",
@@ -279,7 +279,7 @@ test("terraform apply", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_assume_role_arn", "arn:aws:iam::123:role/terraform-apply"],
       ["aws_role_session_name", "tfaction-apply-tests_aws_foo_dev-" + runID],
@@ -298,7 +298,7 @@ test("terraform apply", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               terraform_apply_config: {
                 aws_assume_role_arn: "arn:aws:iam::123:role/terraform-apply",
@@ -331,7 +331,7 @@ test("explicit aws_role_session_name overrides auto-generation", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "custom-session-name"],
     ]),
@@ -349,7 +349,7 @@ test("explicit aws_role_session_name overrides auto-generation", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               aws_role_session_name: "custom-session-name",
             },
@@ -381,7 +381,7 @@ test("terraform_docs enabled in root config", async () => {
       ["enable_terraform_docs", true],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
     ]),
@@ -402,7 +402,7 @@ test("terraform_docs enabled in root config", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -435,7 +435,7 @@ test("environment variables from targetGroup", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
     ]),
@@ -453,7 +453,7 @@ test("environment variables from targetGroup", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               env: {
                 TF_VAR_env: "dev",
@@ -489,7 +489,7 @@ test("environment variables from root config", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
     ]),
@@ -510,7 +510,7 @@ test("environment variables from root config", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -537,7 +537,7 @@ test("gcp configuration", async () => {
       ],
       ["enable_tflint", true],
       ["enable_trivy", true],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["template_dir", "tests/templates/github"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -572,7 +572,7 @@ test("gcp configuration", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               gcp_service_account: "sa@project.iam.gserviceaccount.com",
               gcp_workload_identity_provider:
@@ -610,7 +610,7 @@ test("gcp_access_token_scopes", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
       ["gcp_access_token_scopes", "https://www.googleapis.com/auth/bigquery"],
@@ -629,7 +629,7 @@ test("gcp_access_token_scopes", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               terraform_plan_config: {
                 gcp_access_token_scopes:
@@ -664,7 +664,7 @@ test("s3_bucket_name_tfmigrate_history", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
       ["s3_bucket_name_tfmigrate_history", "my-tfmigrate-bucket"],
@@ -683,7 +683,7 @@ test("s3_bucket_name_tfmigrate_history", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               s3_bucket_name_tfmigrate_history: "my-tfmigrate-bucket",
             },
@@ -715,7 +715,7 @@ test("gcs_bucket_name_tfmigrate_history", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
       ["gcs_bucket_name_tfmigrate_history", "my-gcs-tfmigrate-bucket"],
@@ -734,7 +734,7 @@ test("gcs_bucket_name_tfmigrate_history", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               gcs_bucket_name_tfmigrate_history: "my-gcs-tfmigrate-bucket",
             },
@@ -763,7 +763,7 @@ test("providers_lock_opts override", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
     ]),
@@ -782,7 +782,7 @@ test("providers_lock_opts override", async () => {
           providers_lock_opts: "-platform=linux_amd64",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -828,7 +828,7 @@ test("aws_role_session_name truncation when target exceeds 64 characters", async
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
-            working_directory: "tests/aws",
+            working_directory: "tests/aws/**",
             template_dir: "tests/templates/github",
           },
         ],
@@ -863,7 +863,7 @@ test("only workingDir provided - target derived from workingDir", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
     ]),
@@ -881,7 +881,7 @@ test("only workingDir provided - target derived from workingDir", async () => {
           plan_workflow_name: "plan.yaml",
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -934,7 +934,7 @@ test("tflint_fix enabled in root config", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
             },
           ],
@@ -967,7 +967,7 @@ test("target group env overrides root env", async () => {
       ["enable_terraform_docs", false],
       ["destroy", false],
       ["accept_change_by_renovate", false],
-      ["tflint_fix", false],
+      ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
     ]),
@@ -989,7 +989,7 @@ test("target group env overrides root env", async () => {
           },
           target_groups: [
             {
-              working_directory: "tests/aws",
+              working_directory: "tests/aws/**",
               template_dir: "tests/templates/github",
               env: {
                 OVERRIDE_VAR: "target-group-value",
@@ -1025,7 +1025,7 @@ test("aws_role_session_name falls back to prefix with runID when target is very 
         plan_workflow_name: "plan.yaml",
         target_groups: [
           {
-            working_directory: "tests/aws",
+            working_directory: "tests/aws/**",
             template_dir: "tests/templates/github",
           },
         ],

@@ -55,7 +55,6 @@ export const main = async (
     cwd: workingDir,
   });
 
-  core.startGroup("tfmigrate apply");
   // Run tfmigrate apply with github-comment
   let exitCode = 0;
   try {
@@ -64,6 +63,7 @@ export const main = async (
         cwd: workingDir,
         ignoreReturnCode: true,
         secretEnvs: secrets,
+        group: "tfmigrate apply",
         env: {
           ...(env.all.TFMIGRATE_EXEC_PATH
             ? { TFMIGRATE_EXEC_PATH: env.all.TFMIGRATE_EXEC_PATH }
@@ -96,8 +96,6 @@ export const main = async (
   } finally {
     outputStream.end();
   }
-
-  core.endGroup();
 
   // If this is a drift issue, post the result to the drift issue
   if (driftIssueNumber) {

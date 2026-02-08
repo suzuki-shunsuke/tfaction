@@ -21,7 +21,7 @@ const ReviewdogConfig = z.object({
   fail_level: z.enum(["none", "any", "info", "warning", "error"]).optional(),
 });
 
-const tflintDefaults = { enabled: true, fix: false } as const;
+const tflintDefaults = { enabled: true, fix: true } as const;
 const TflintConfig = z.object({
   enabled: z.boolean().default(tflintDefaults.enabled),
   fix: z.boolean().default(tflintDefaults.fix),

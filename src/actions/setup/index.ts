@@ -47,6 +47,9 @@ const addLabelToPR = async (
   if (prNumber <= 0) {
     throw new Error("Failed to get a pull request number");
   }
+  if (!target) {
+    return;
+  }
   try {
     await octokit.rest.issues.addLabels({
       owner: github.context.repo.owner,

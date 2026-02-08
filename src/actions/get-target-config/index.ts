@@ -77,7 +77,7 @@ export const getTargetConfig = async (
     enable_trivy: config.trivy.enabled,
     tflint_fix: config.tflint.fix,
     terraform_command: config.terraform_command,
-    template_dir: targetGroup?.template_dir,
+    template_dir: targetGroup.template_dir,
   };
 
   if (inputs.jobType === "scaffold_working_dir") {
@@ -132,7 +132,7 @@ export const getTargetConfig = async (
 
     // Resolve secrets config: lower priority first, higher priority overwrites
     const secretsConfig: Record<string, string> = {};
-    for (const secret of targetGroup?.secrets ?? []) {
+    for (const secret of targetGroup.secrets ?? []) {
       const envName = secret.env_name || secret.secret_name;
       const secretName = secret.secret_name || secret.env_name;
       secretsConfig[envName] = secretName;

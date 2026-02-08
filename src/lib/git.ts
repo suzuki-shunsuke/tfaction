@@ -5,7 +5,7 @@ import * as exec from "@actions/exec";
  */
 export const getModifiedFiles = async (
   dir: string,
-  cwd?: string,
+  cwd: string,
 ): Promise<string[]> => {
   let output = "";
   await exec.exec(
@@ -32,7 +32,7 @@ export const getModifiedFiles = async (
  */
 export const hasFileChanged = async (
   file: string,
-  cwd?: string,
+  cwd: string,
 ): Promise<boolean> => {
   const exitCode = await exec.exec("git", ["diff", "--quiet", "--", file], {
     cwd,
@@ -48,7 +48,7 @@ export const hasFileChanged = async (
  */
 export const isFileTracked = async (
   file: string,
-  cwd?: string,
+  cwd: string,
 ): Promise<boolean> => {
   const exitCode = await exec.exec(
     "git",
@@ -65,7 +65,7 @@ export const isFileTracked = async (
 /**
  * Get the current branch name
  */
-export const getCurrentBranch = async (cwd?: string): Promise<string> => {
+export const getCurrentBranch = async (cwd: string): Promise<string> => {
   let output = "";
   await exec.exec("git", ["branch", "--show-current"], {
     cwd,
@@ -84,7 +84,7 @@ export const getCurrentBranch = async (cwd?: string): Promise<string> => {
  */
 export const hasFileChangedPorcelain = async (
   file: string,
-  cwd?: string,
+  cwd: string,
 ): Promise<boolean> => {
   let output = "";
   await exec.exec("git", ["status", "--porcelain", file], {
@@ -153,10 +153,11 @@ export const getRootDir = async (cwd: string): Promise<string> => {
  */
 export const checkGitDiff = async (
   files: string[],
+  cwd: string,
 ): Promise<{ changedFiles: string[] }> => {
   const changedFiles: string[] = [];
   for (const file of files) {
-    const changed = await hasFileChangedPorcelain(file);
+    const changed = await hasFileChangedPorcelain(file, cwd);
     if (changed) {
       changedFiles.push(file);
     }

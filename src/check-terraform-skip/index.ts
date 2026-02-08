@@ -13,7 +13,7 @@ type SkipTerraformConfig = {
   renovate_terraform_labels?: string[];
 };
 
-export const main = async (config: SkipTerraformConfig, inputs: Inputs) => {
+export const main = (config: SkipTerraformConfig, inputs: Inputs) => {
   const isSkip = getSkipTerraform(inputs, config, inputs.labels);
   core.exportVariable("TFACTION_SKIP_TERRAFORM", isSkip);
   core.setOutput("skip_terraform", isSkip);
@@ -26,10 +26,6 @@ export const getSkipTerraform = (
 ): boolean => {
   // https://suzuki-shunsuke.github.io/tfaction/docs/feature/support-skipping-terraform-renovate-pr
   const renovateLogin = config.renovate_login ?? "renovate[bot]";
-
-  if (!inputs.target) {
-    throw new Error("TFACTION_TARGET is required");
-  }
 
   if (renovateLogin !== inputs.prAuthor) {
     // If pull request author isn't Renovate bot

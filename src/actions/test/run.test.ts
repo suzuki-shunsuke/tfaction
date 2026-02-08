@@ -237,6 +237,7 @@ describe("run", () => {
 
     expect(tflintMod.run).toHaveBeenCalledWith({
       workingDirectory: "/git/root/aws/test",
+      gitRootDir: "/git/root",
       githubToken: "test-token",
       githubTokenForTflintInit: "",
       githubTokenForFix: "",
@@ -258,15 +259,14 @@ describe("run", () => {
     });
 
     const input = createRunInput(mockExecutor);
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(commitMod.create).toHaveBeenCalledWith({
       commitMessage: "style: terraform fmt -recursive",
       githubToken: "test-token",
-      files: new Set([
-        "/git/root/aws/test/main.tf",
-        "/git/root/aws/test/variables.tf",
-      ]),
+      files: new Set(["aws/test/main.tf", "aws/test/variables.tf"]),
       serverRepository: "",
       appId: "app-id",
       appPrivateKey: "app-key",
@@ -312,11 +312,13 @@ describe("run", () => {
     const input = createRunInput(mockExecutor, undefined, {
       working_directory: "gcp/staging",
     });
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(commitMod.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        files: new Set(["/git/root/gcp/staging/outputs.tf"]),
+        files: new Set(["gcp/staging/outputs.tf"]),
       }),
     );
   });
@@ -332,7 +334,9 @@ describe("run", () => {
     const input = createRunInput(mockExecutor, undefined, {
       terraform_command: "tofu",
     });
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(commitMod.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -387,7 +391,9 @@ describe("run", () => {
     });
 
     const input = createRunInput(mockExecutor);
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(commitMod.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -407,29 +413,33 @@ describe("run", () => {
     } = await getMocks();
 
     const callOrder: string[] = [];
-    vi.mocked(conftestMod.run).mockImplementation(async () => {
+    vi.mocked(conftestMod.run).mockImplementation(() => {
       callOrder.push("conftest");
+      return Promise.resolve();
     });
-    mockExecutor.exec.mockImplementation(async () => {
+    mockExecutor.exec.mockImplementation(() => {
       callOrder.push("validate");
-      return 0;
+      return Promise.resolve(0);
     });
-    vi.mocked(trivyMod.run).mockImplementation(async () => {
+    vi.mocked(trivyMod.run).mockImplementation(() => {
       callOrder.push("trivy");
+      return Promise.resolve();
     });
-    vi.mocked(tflintMod.run).mockImplementation(async () => {
+    vi.mocked(tflintMod.run).mockImplementation(() => {
       callOrder.push("tflint");
+      return Promise.resolve();
     });
-    vi.mocked(fmtMod.fmt).mockImplementation(async () => {
+    vi.mocked(fmtMod.fmt).mockImplementation(() => {
       callOrder.push("fmt");
-      return { exitCode: 0, stdout: "main.tf\n", stderr: "" };
+      return Promise.resolve({ exitCode: 0, stdout: "main.tf\n", stderr: "" });
     });
-    vi.mocked(commitMod.create).mockImplementation(async () => {
+    vi.mocked(commitMod.create).mockImplementation(() => {
       callOrder.push("commit");
-      return "";
+      return Promise.resolve("");
     });
-    vi.mocked(terraformDocsMod.run).mockImplementation(async () => {
+    vi.mocked(terraformDocsMod.run).mockImplementation(() => {
       callOrder.push("terraform-docs");
+      return Promise.resolve();
     });
 
     const input = createRunInput(mockExecutor, undefined, {
@@ -438,7 +448,9 @@ describe("run", () => {
       enable_terraform_docs: true,
     });
 
-    await run(input);
+    await expect(run(input)).rejects.toThrow(
+      "code will be automatically formatted",
+    );
 
     expect(callOrder).toEqual([
       "conftest",
@@ -447,7 +459,6 @@ describe("run", () => {
       "tflint",
       "fmt",
       "commit",
-      "terraform-docs",
     ]);
   });
 

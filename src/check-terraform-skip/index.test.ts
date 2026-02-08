@@ -16,20 +16,6 @@ test("normal", () => {
   ).toBe(false);
 });
 
-test("target is required", () => {
-  expect(() => {
-    getSkipTerraform(
-      {
-        skipLabelPrefix: "skip:",
-        labels: [],
-        prAuthor: "octocat",
-      },
-      {},
-      [],
-    );
-  }).toThrow();
-});
-
 test("skip label", () => {
   expect(
     getSkipTerraform(

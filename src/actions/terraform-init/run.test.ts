@@ -181,7 +181,7 @@ describe("run", () => {
     );
   });
 
-  it("PR, lock file changed: calls commit.create", async () => {
+  it("PR, lock file changed: calls commit.create and throws", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
     const gitMod = await import("../../lib/git");
     vi.mocked(gitMod.hasFileChanged).mockResolvedValue(true);
@@ -192,7 +192,7 @@ describe("run", () => {
       isPullRequest: true,
     };
 
-    await run(input);
+    await expect(run(input)).rejects.toThrow(".terraform.lock.hcl is updated");
 
     expect(commitMod.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -202,7 +202,7 @@ describe("run", () => {
     );
   });
 
-  it("PR, lock file new (did not exist before): calls commit.create without hasFileChanged", async () => {
+  it("PR, lock file new (did not exist before): calls commit.create without hasFileChanged and throws", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
     const gitMod = await import("../../lib/git");
     const commitMod = await import("../../commit");
@@ -212,7 +212,7 @@ describe("run", () => {
       isPullRequest: true,
     };
 
-    await run(input);
+    await expect(run(input)).rejects.toThrow(".terraform.lock.hcl is updated");
 
     expect(gitMod.hasFileChanged).not.toHaveBeenCalled();
     expect(commitMod.create).toHaveBeenCalledWith(

@@ -47,7 +47,7 @@ gh pr create -R "${repository}" ${draftOpt}\\
 `;
 
   core.summary.addRaw(summary);
-  core.summary.write();
+  void core.summary.write();
 };
 
 export interface RunInput {
@@ -101,7 +101,7 @@ export const run = async (input: RunInput): Promise<void> => {
   core.info(`Generated branch name: ${branch}`);
 
   // Get modified files
-  const files = await git.getModifiedFiles(modulePath);
+  const files = await git.getModifiedFiles(modulePath, config.git_root_dir);
   core.info(`Found ${files.length} modified files`);
   if (files.length === 0) {
     core.info("No files to commit");

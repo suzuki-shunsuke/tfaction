@@ -552,18 +552,16 @@ describe("main", () => {
     });
 
     // First exec call is tfcmt apply (succeeds), second is drift issue (fails)
-    mockExecutor.exec.mockImplementation(
-      async (cmd: string, args?: string[]) => {
-        if (
-          cmd === "tfcmt" &&
-          args &&
-          args.some((a: string) => a.includes("tfcmt-drift.yaml"))
-        ) {
-          throw new Error("drift posting error");
-        }
-        return 0;
-      },
-    );
+    mockExecutor.exec.mockImplementation((cmd: string, args?: string[]) => {
+      if (
+        cmd === "tfcmt" &&
+        args &&
+        args.some((a: string) => a.includes("tfcmt-drift.yaml"))
+      ) {
+        throw new Error("drift posting error");
+      }
+      return Promise.resolve(0);
+    });
 
     // Should not throw
     await main();
@@ -634,14 +632,12 @@ describe("main", () => {
     const { mockExecutor } = await setupMainMocks();
 
     // Make tfcmt apply return non-zero
-    mockExecutor.exec.mockImplementation(
-      async (_cmd: string, args?: string[]) => {
-        if (args && args.includes("apply") && args.includes("-auto-approve")) {
-          return 1;
-        }
-        return 0;
-      },
-    );
+    mockExecutor.exec.mockImplementation((_cmd: string, args?: string[]) => {
+      if (args && args.includes("apply") && args.includes("-auto-approve")) {
+        return Promise.resolve(1);
+      }
+      return Promise.resolve(0);
+    });
 
     await expect(main()).rejects.toThrow("terraform apply failed");
 

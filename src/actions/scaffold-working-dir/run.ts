@@ -66,10 +66,9 @@ export const run = async (input: RunInput): Promise<void> => {
     targetConfig.working_directory,
   );
   const target = targetConfig.target;
-  const templateDir = path.join(
-    config.git_root_dir,
-    targetConfig.template_dir ?? "",
-  );
+  const templateDir = targetConfig.template_dir
+    ? path.join(config.git_root_dir, targetConfig.template_dir)
+    : undefined;
   const s3Bucket = targetConfig.s3_bucket_name_tfmigrate_history;
   const gcsBucket = targetConfig.gcs_bucket_name_tfmigrate_history;
   const workingDirectoryFile = config.working_directory_file;
