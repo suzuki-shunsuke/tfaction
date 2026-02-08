@@ -217,21 +217,19 @@ export const runTfmigratePlan = async (
   });
 
   // Run terraform show to convert plan to JSON
-  core.startGroup(`${inputs.tfCommand} show`);
-
   const showResult = await executor.getExecOutput(
     inputs.tfCommand,
     ["show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
       silent: true,
+      group: `${inputs.tfCommand} show`,
       comment: {
         token: inputs.githubToken,
       },
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
-  core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
   core.setOutput("plan_binary", tempPlanBinary);
@@ -246,9 +244,6 @@ export const runTerraformPlan = async (
   inputs: Inputs,
 ): Promise<TerraformPlanOutputs> => {
   const installDir = path.join(lib.GitHubActionPath, "install");
-
-  // Run terraform plan with tfcmt
-  core.startGroup(`${inputs.tfCommand} plan`);
 
   // Create temp directory and copy plan binary
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
@@ -283,10 +278,12 @@ export const runTerraformPlan = async (
 
   const executor = inputs.executor;
 
+  // Run terraform plan with tfcmt
   const planResult = await executor.getExecOutput("tfcmt", planArgs, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
     secretEnvs: inputs.secrets,
+    group: `${inputs.tfCommand} plan`,
     env: {
       GITHUB_TOKEN: inputs.githubTokenForGitHubProvider || inputs.githubToken,
       TFCMT_GITHUB_TOKEN: inputs.githubToken,
@@ -295,7 +292,6 @@ export const runTerraformPlan = async (
   });
 
   const detailedExitcode = planResult.exitCode;
-  core.endGroup();
 
   // Set detailed_exitcode output immediately
   core.setOutput("detailed_exitcode", detailedExitcode);

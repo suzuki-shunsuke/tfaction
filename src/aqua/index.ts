@@ -93,11 +93,10 @@ export const NewExecutor = async (
 ): Promise<Executor> => {
   const installDir = await install();
   const executor = new Executor(installDir, options.githubToken);
-  core.startGroup("aqua i -l -a");
   await executor.exec("aqua", ["i", "-l", "-a"], {
     cwd: options.cwd,
+    group: "aqua i -l -a",
   });
-  core.endGroup();
   return executor;
 };
 
@@ -165,10 +164,19 @@ export class Executor {
     options?: ExecOptions,
   ): Promise<exec.ExecOutput> {
     const bArgs = this.buildArgs(command, args, options);
-    return await exec.getExecOutput(bArgs.command, bArgs.args, {
-      ...options,
-      env: this.env(options),
-    });
+    try {
+      if (options?.group) {
+        core.startGroup(options.group);
+      }
+      return await exec.getExecOutput(bArgs.command, bArgs.args, {
+        ...options,
+        env: this.env(options),
+      });
+    } finally {
+      if (options?.group) {
+        core.endGroup();
+      }
+    }
   }
 }
 
