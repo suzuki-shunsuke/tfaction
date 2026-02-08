@@ -19,6 +19,18 @@ inputs:
       When unset, github_token is used as GITHUB_TOKEN (current behavior).
     required: false
 
+  github_app_id:
+    description: |
+      GitHub App ID for generating installation access tokens.
+      When set together with github_app_private_key, takes priority over github_token.
+    required: false
+
+  github_app_private_key:
+    description: |
+      GitHub App Private Key for generating installation access tokens.
+      When set together with github_app_id, takes priority over github_token.
+    required: false
+
   # setup, terraform-init, plan, apply
   secrets:
     description: A JSON representing a map whose keys are secret names and values are secret values. Used by setup to compute the secrets output, and by terraform-init, plan, and apply to pass secrets as environment variables during command execution.

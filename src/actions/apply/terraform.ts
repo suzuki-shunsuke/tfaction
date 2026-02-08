@@ -39,10 +39,10 @@ export const listRelatedPullRequests = async (
 };
 
 export const main = async (
+  githubToken: string,
   secrets?: Record<string, string>,
   githubTokenForGitHubProvider?: string,
 ): Promise<void> => {
-  const githubToken = input.githubToken;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
@@ -72,7 +72,7 @@ export const main = async (
     githubToken: githubToken,
     cwd: workingDir,
   });
-  const planFilePath = await downloadPlanFile(executor);
+  const planFilePath = await downloadPlanFile(githubToken, executor);
   if (!planFilePath) {
     throw new Error("PLAN_FILE_PATH is not set");
   }
@@ -302,9 +302,11 @@ const downloadArtifact = async (
   await artifact.downloadArtifact(targetArtifact.id, artifactOpts);
 };
 
-const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
+const downloadPlanFile = async (
+  githubToken: string,
+  executor: aqua.Executor,
+): Promise<string> => {
   const cfg = await lib.getConfig();
-  const githubToken = input.githubToken;
   const target = env.all.TFACTION_TARGET;
   const planWorkflowName = cfg.plan_workflow_name;
   const ciInfoTempDir = env.all.CI_INFO_TEMP_DIR;

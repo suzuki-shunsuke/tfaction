@@ -16,6 +16,9 @@ export const getRequiredGitHubToken = (): string => {
   return core.getInput("github_token", { required: true });
 };
 
+export const githubAppId = core.getInput("github_app_id");
+export const githubAppPrivateKey = core.getInput("github_app_private_key");
+
 export const securefixActionAppId = core.getInput("securefix_action_app_id");
 export const securefixActionAppPrivateKey = core.getInput(
   "securefix_action_app_private_key",
