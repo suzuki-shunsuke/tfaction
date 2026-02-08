@@ -268,7 +268,21 @@ export const run = async (input: Input): Promise<Result> => {
   const config = input.config;
   const isApply = input.isApply;
 
-  const workingDirs = listWD(input.configFiles);
+  // Collect template_dir values from target groups
+  const templateDirs = config.target_groups
+    .map((tg) => tg.template_dir)
+    .filter((dir): dir is string => dir !== undefined);
+
+  // Filter out config files under template directories
+  const filteredConfigFiles = input.configFiles.filter((configFile) => {
+    const dir = path.dirname(configFile);
+    return !templateDirs.some((templateDir) => {
+      const rel = path.relative(templateDir, dir);
+      return rel === "" || !rel.startsWith("..");
+    });
+  });
+
+  const workingDirs = listWD(filteredConfigFiles);
   const { wdTargetMap, targetWDMap } = createTargetMaps(
     workingDirs,
     config.target_groups,
