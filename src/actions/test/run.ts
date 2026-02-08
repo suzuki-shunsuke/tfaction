@@ -104,6 +104,7 @@ export const run = async (input: RunInput): Promise<void> => {
           appId: input.securefixAppId,
           appPrivateKey: input.securefixAppPrivateKey,
         });
+        throw new Error("code will be automatically formatted");
       }
     }
   }
