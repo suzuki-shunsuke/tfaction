@@ -82,8 +82,6 @@ export const main = async (
   const applyOutput = path.join(tempDir, "apply_output.txt");
   const outputStream = fs.createWriteStream(applyOutput);
 
-  core.startGroup(`${tfCommand} apply`);
-
   // Run terraform apply with tfcmt
   let exitCode = 0;
   try {
@@ -106,6 +104,7 @@ export const main = async (
           cwd: workingDir,
           ignoreReturnCode: true,
           secretEnvs: secrets,
+          group: `${tfCommand} apply`,
           env: {
             GITHUB_TOKEN: githubTokenForGitHubProvider || githubToken,
             TFCMT_GITHUB_TOKEN: githubToken,
@@ -129,8 +128,6 @@ export const main = async (
   } finally {
     outputStream.end();
   }
-
-  core.endGroup();
 
   // If this is a drift issue, post the result to the drift issue
   if (driftIssueNumber) {
