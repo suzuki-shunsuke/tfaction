@@ -412,29 +412,33 @@ describe("run", () => {
     } = await getMocks();
 
     const callOrder: string[] = [];
-    vi.mocked(conftestMod.run).mockImplementation(async () => {
+    vi.mocked(conftestMod.run).mockImplementation(() => {
       callOrder.push("conftest");
+      return Promise.resolve();
     });
-    mockExecutor.exec.mockImplementation(async () => {
+    mockExecutor.exec.mockImplementation(() => {
       callOrder.push("validate");
-      return 0;
+      return Promise.resolve(0);
     });
-    vi.mocked(trivyMod.run).mockImplementation(async () => {
+    vi.mocked(trivyMod.run).mockImplementation(() => {
       callOrder.push("trivy");
+      return Promise.resolve();
     });
-    vi.mocked(tflintMod.run).mockImplementation(async () => {
+    vi.mocked(tflintMod.run).mockImplementation(() => {
       callOrder.push("tflint");
+      return Promise.resolve();
     });
-    vi.mocked(fmtMod.fmt).mockImplementation(async () => {
+    vi.mocked(fmtMod.fmt).mockImplementation(() => {
       callOrder.push("fmt");
-      return { exitCode: 0, stdout: "main.tf\n", stderr: "" };
+      return Promise.resolve({ exitCode: 0, stdout: "main.tf\n", stderr: "" });
     });
-    vi.mocked(commitMod.create).mockImplementation(async () => {
+    vi.mocked(commitMod.create).mockImplementation(() => {
       callOrder.push("commit");
-      return "";
+      return Promise.resolve("");
     });
-    vi.mocked(terraformDocsMod.run).mockImplementation(async () => {
+    vi.mocked(terraformDocsMod.run).mockImplementation(() => {
       callOrder.push("terraform-docs");
+      return Promise.resolve();
     });
 
     const input = createRunInput(mockExecutor, undefined, {

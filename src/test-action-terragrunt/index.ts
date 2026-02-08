@@ -8,7 +8,7 @@ type TestData = {
   actual: string;
 };
 
-export const main = async () => {
+export const main = () => {
   // Compare outputs
   const testdata: TestData[] = [
     {

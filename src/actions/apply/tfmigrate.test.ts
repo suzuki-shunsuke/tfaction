@@ -269,11 +269,11 @@ describe("main", () => {
     });
 
     // First exec call is tfmigrate apply (succeeds), second is drift issue (fails)
-    mockExecutor.exec.mockImplementation(async (cmd: string) => {
+    mockExecutor.exec.mockImplementation((cmd: string) => {
       if (cmd === "bash") {
         throw new Error("drift posting error");
       }
-      return 0;
+      return Promise.resolve(0);
     });
 
     // Should not throw

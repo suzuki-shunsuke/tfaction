@@ -42,9 +42,9 @@ describe("run", () => {
 
   it("calls exportVariable after NewExecutor resolves", async () => {
     const callOrder: string[] = [];
-    mockedNewExecutor.mockImplementation(async () => {
+    mockedNewExecutor.mockImplementation(() => {
       callOrder.push("NewExecutor");
-      return {} as aqua.Executor;
+      return Promise.resolve({} as aqua.Executor);
     });
     const exportVariable = vi.fn().mockImplementation(() => {
       callOrder.push("exportVariable");

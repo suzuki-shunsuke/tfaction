@@ -1,7 +1,7 @@
 import { diffString } from "json-diff";
 import * as env from "../lib/env";
 
-export const main = async () => {
+export const main = () => {
   // Compare outputs
   const testdata = [
     {

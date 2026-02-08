@@ -13,7 +13,7 @@ type SkipTerraformConfig = {
   renovate_terraform_labels?: string[];
 };
 
-export const main = async (config: SkipTerraformConfig, inputs: Inputs) => {
+export const main = (config: SkipTerraformConfig, inputs: Inputs) => {
   const isSkip = getSkipTerraform(inputs, config, inputs.labels);
   core.exportVariable("TFACTION_SKIP_TERRAFORM", isSkip);
   core.setOutput("skip_terraform", isSkip);
