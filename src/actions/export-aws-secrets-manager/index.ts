@@ -33,10 +33,6 @@ export const main = async (): Promise<void> => {
   );
   const jobConfig = lib.getJobConfig(t.group, env.isApply, lib.getJobType());
 
-  if (t.group === undefined) {
-    return;
-  }
-
   const groupSecrets = t.group.aws_secrets_manager;
   const jobConfigSecrets = jobConfig?.aws_secrets_manager;
 

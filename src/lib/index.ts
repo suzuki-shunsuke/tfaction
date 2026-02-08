@@ -206,7 +206,7 @@ export const setEnvs = (
 export type Target = {
   target: string;
   workingDir: string;
-  group?: TargetGroup;
+  group: TargetGroup;
 };
 
 /**
@@ -231,6 +231,13 @@ export const getTargetGroup = async (
       config.target_groups,
       workingDir,
     );
+    if (targetConfig === undefined) {
+      throw new Error(
+        `no target group matches the working directory "${workingDir}". ` +
+          `Check target_groups[].working_directory in your tfaction-root.yaml. ` +
+          `Available patterns: ${config.target_groups.map((tg) => tg.working_directory).join(", ")}`,
+      );
+    }
     if (target) {
       return {
         target: target,
@@ -280,6 +287,13 @@ export const getTargetGroup = async (
     config.target_groups,
     workingDir,
   );
+  if (targetConfig === undefined) {
+    throw new Error(
+      `no target group matches the working directory "${workingDir}". ` +
+        `Check target_groups[].working_directory in your tfaction-root.yaml. ` +
+        `Available patterns: ${config.target_groups.map((tg) => tg.working_directory).join(", ")}`,
+    );
+  }
   return {
     target: target,
     workingDir: workingDir,
