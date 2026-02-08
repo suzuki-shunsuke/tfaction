@@ -49,11 +49,15 @@ export type CommitCreator = (params: {
 
 export type GitDiffChecker = (
   files: string[],
+  cwd: string,
 ) => Promise<{ changedFiles: string[] }>;
 
 export type RunInput = {
   executor: aqua.Executor;
+  /** absolute path to the working directory */
   workingDirectory: string;
+  /** absolute path to the git root directory */
+  gitRootDir: string;
   githubToken: string;
   githubTokenForTflintInit: string;
   githubTokenForFix: string;
@@ -235,13 +239,16 @@ export const run = async (input: RunInput): Promise<void> => {
   if (input.fix) {
     const files = new Set(
       diagnostics.map((d) =>
-        path.join(input.workingDirectory, d.location.path),
+        path.relative(
+          input.gitRootDir,
+          path.join(input.workingDirectory, d.location.path),
+        ),
       ),
     );
     if (files.size == 0) {
       return;
     }
-    const { changedFiles } = await checkGitDiff([...files]);
+    const { changedFiles } = await checkGitDiff([...files], input.gitRootDir);
     if (changedFiles.length !== 0) {
       logger.setOutput("fixed_files", changedFiles.join("\n"));
       await createCommit({

@@ -108,7 +108,7 @@ export const run = async (input: RunInput): Promise<void> => {
   core.info(`Generated branch name: ${branch}`);
 
   // Get modified files
-  const files = await git.getModifiedFiles(workingDir);
+  const files = await git.getModifiedFiles(workingDir, config.git_root_dir);
   core.info(`Found ${files.length} modified files`);
   if (files.length === 0) {
     core.info("No files to commit");

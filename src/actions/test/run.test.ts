@@ -237,6 +237,7 @@ describe("run", () => {
 
     expect(tflintMod.run).toHaveBeenCalledWith({
       workingDirectory: "/git/root/aws/test",
+      gitRootDir: "/git/root",
       githubToken: "test-token",
       githubTokenForTflintInit: "",
       githubTokenForFix: "",
