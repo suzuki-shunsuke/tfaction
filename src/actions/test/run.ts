@@ -22,6 +22,7 @@ export type RunInput = {
 export const run = async (input: RunInput): Promise<void> => {
   const { config, targetConfig, githubToken, executor } = input;
 
+  /** absolute path to working directory */
   const workingDir = path.join(
     config.git_root_dir,
     targetConfig.working_directory,
@@ -92,7 +93,7 @@ export const run = async (input: RunInput): Promise<void> => {
         .split("\n")
         .map((f) => f.trim())
         .filter((f) => f.length > 0)
-        .map((f) => (workingDir ? `${workingDir}/${f}` : f));
+        .map((f) => path.join(targetConfig.working_directory, f));
 
       if (files.length > 0) {
         await createCommit({
