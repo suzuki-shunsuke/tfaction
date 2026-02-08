@@ -8,7 +8,7 @@ test("normal", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -50,7 +50,7 @@ test("job config", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
             runs_on: "macos-latest",
             secrets: [
               {
@@ -111,7 +111,7 @@ const prCommentConfig = {
   },
   target_groups: [
     {
-      working_directory: "foo/",
+      working_directory: "foo/**",
       runs_on: "macos-latest",
       secrets: [
         {
@@ -122,12 +122,12 @@ const prCommentConfig = {
       environment: "dev",
     },
     {
-      working_directory: "yoo/services/",
+      working_directory: "yoo/services/**",
       runs_on: "ubuntu-latest",
       environment: "yoo",
     },
     {
-      working_directory: "zoo/",
+      working_directory: "zoo/**",
     },
   ],
 };
@@ -207,7 +207,7 @@ test("module callers", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -272,7 +272,7 @@ test("nest", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -314,7 +314,7 @@ test("tfmigrate label", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -356,7 +356,7 @@ test("tfmigrate label with changed files", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -398,7 +398,7 @@ test("module change detection", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -431,7 +431,7 @@ test("module callers triggered", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -475,7 +475,7 @@ test("replace_target", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "services/",
+            working_directory: "services/**",
           },
         ],
         replace_target: {
@@ -525,7 +525,7 @@ test("custom label prefixes for tfmigrate", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
         label_prefixes: {
@@ -572,7 +572,7 @@ test("skip label parses correctly", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -614,7 +614,7 @@ test("custom skip label prefix", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
         label_prefixes: {
@@ -660,7 +660,7 @@ test("tfmigrate label with unknown target throws error", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -692,7 +692,7 @@ test("empty labels and changed files", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -725,7 +725,7 @@ test("duplicate tfmigrate labels", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -767,7 +767,7 @@ test("isApply mode", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
           },
         ],
       },
@@ -809,7 +809,7 @@ test("tfmigrate with job config", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
             runs_on: "ubuntu-latest",
             tfmigrate_plan_config: {
               runs_on: "macos-latest",
@@ -867,7 +867,7 @@ test("tfmigrate apply with job config", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
             runs_on: "ubuntu-latest",
             tfmigrate_apply_config: {
               runs_on: "self-hosted",
@@ -914,7 +914,7 @@ test("module caller is also a module", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "terraform/",
+            working_directory: "terraform/**",
           },
         ],
       },
@@ -961,11 +961,11 @@ test("multiple target groups", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "aws/",
+            working_directory: "aws/**",
             runs_on: "ubuntu-latest",
           },
           {
-            working_directory: "gcp/",
+            working_directory: "gcp/**",
             runs_on: "macos-latest",
           },
         ],
@@ -1016,7 +1016,7 @@ test("terraform plan job config", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
             runs_on: "ubuntu-latest",
             terraform_plan_config: {
               runs_on: "self-hosted",
@@ -1074,7 +1074,7 @@ test("terraform apply job config", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
             runs_on: "ubuntu-latest",
             terraform_apply_config: {
               runs_on: "production-runner",
@@ -1121,7 +1121,7 @@ test("multiple modules changed", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "terraform/",
+            working_directory: "terraform/**",
           },
         ],
       },
@@ -1157,7 +1157,7 @@ test("template_dir config files are excluded", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "aws/",
+            working_directory: "aws/**",
             template_dir: "templates/aws",
           },
         ],
@@ -1200,7 +1200,7 @@ test("template_dir with trailing slash", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "aws/",
+            working_directory: "aws/**",
             template_dir: "templates/aws/",
           },
         ],
@@ -1243,7 +1243,7 @@ test("runs_on as array", async () => {
       config: {
         target_groups: [
           {
-            working_directory: "foo/",
+            working_directory: "foo/**",
             runs_on: ["self-hosted", "linux", "x64"],
           },
         ],
