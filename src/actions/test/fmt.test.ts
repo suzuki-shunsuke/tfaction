@@ -2,11 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fmt } from "./fmt";
 import type * as aqua from "../../aqua";
 
-vi.mock("@actions/core", () => ({
-  startGroup: vi.fn(),
-  endGroup: vi.fn(),
-}));
-
 vi.mock("../../aqua", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../aqua")>();
   return {
@@ -37,37 +32,30 @@ describe("fmt", () => {
   });
 
   it("terraform fmt", async () => {
-    const core = await import("@actions/core");
     await fmt(
       "terraform",
       "/work/dir",
       mockExecutor as unknown as aqua.Executor,
     );
 
-    expect(core.startGroup).toHaveBeenCalledWith("terraform fmt");
     expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
       "terraform",
       ["fmt", "-recursive"],
-      { cwd: "/work/dir" },
+      { cwd: "/work/dir", group: "terraform fmt" },
     );
-    expect(core.endGroup).toHaveBeenCalledOnce();
   });
 
   it("tofu fmt", async () => {
-    const core = await import("@actions/core");
     await fmt("tofu", "/work/dir", mockExecutor as unknown as aqua.Executor);
 
-    expect(core.startGroup).toHaveBeenCalledWith("tofu fmt");
     expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
       "tofu",
       ["fmt", "-recursive"],
-      { cwd: "/work/dir" },
+      { cwd: "/work/dir", group: "tofu fmt" },
     );
-    expect(core.endGroup).toHaveBeenCalledOnce();
   });
 
   it("terragrunt with run available", async () => {
-    const core = await import("@actions/core");
     const aquaMod = await import("../../aqua");
     vi.mocked(aquaMod.checkTerrgruntRun).mockResolvedValue(true);
 
@@ -77,17 +65,14 @@ describe("fmt", () => {
       mockExecutor as unknown as aqua.Executor,
     );
 
-    expect(core.startGroup).toHaveBeenCalledWith("terragrunt run -- fmt");
     expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
       "terragrunt",
       ["run", "--", "fmt", "-recursive"],
-      { cwd: "/work/dir" },
+      { cwd: "/work/dir", group: "terragrunt run -- fmt" },
     );
-    expect(core.endGroup).toHaveBeenCalledOnce();
   });
 
   it("terragrunt with run unavailable", async () => {
-    const core = await import("@actions/core");
     const aquaMod = await import("../../aqua");
     vi.mocked(aquaMod.checkTerrgruntRun).mockResolvedValue(false);
 
@@ -97,13 +82,11 @@ describe("fmt", () => {
       mockExecutor as unknown as aqua.Executor,
     );
 
-    expect(core.startGroup).toHaveBeenCalledWith("terragrunt fmt");
     expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
       "terragrunt",
       ["fmt", "-recursive"],
-      { cwd: "/work/dir" },
+      { cwd: "/work/dir", group: "terragrunt fmt" },
     );
-    expect(core.endGroup).toHaveBeenCalledOnce();
   });
 
   it("does not call checkTerrgruntRun for non-terragrunt", async () => {

@@ -9,62 +9,62 @@ describe("findConfigFile", () => {
   });
 
   it("returns .terraform-docs.yml when found in working directory", () => {
-    const fs = createMockFs(["/work/.terraform-docs.yml"]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const fs = createMockFs(["/repo/work/.terraform-docs.yml"]);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe(".terraform-docs.yml");
   });
 
   it("returns .terraform-docs.yaml when found in working directory", () => {
-    const fs = createMockFs(["/work/.terraform-docs.yaml"]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const fs = createMockFs(["/repo/work/.terraform-docs.yaml"]);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe(".terraform-docs.yaml");
   });
 
   it("returns .config/.terraform-docs.yml when found in working directory", () => {
-    const fs = createMockFs(["/work/.config/.terraform-docs.yml"]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const fs = createMockFs(["/repo/work/.config/.terraform-docs.yml"]);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe(".config/.terraform-docs.yml");
   });
 
   it("returns .config/.terraform-docs.yaml when found in working directory", () => {
-    const fs = createMockFs(["/work/.config/.terraform-docs.yaml"]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const fs = createMockFs(["/repo/work/.config/.terraform-docs.yaml"]);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe(".config/.terraform-docs.yaml");
   });
 
   it("returns full path when config file is found in repository root", () => {
     const fs = createMockFs(["/repo/.terraform-docs.yml"]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe("/repo/.terraform-docs.yml");
   });
 
   it("returns full path for .terraform-docs.yaml in repository root", () => {
     const fs = createMockFs(["/repo/.terraform-docs.yaml"]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe("/repo/.terraform-docs.yaml");
   });
 
   it("prefers working directory over repository root", () => {
     const fs = createMockFs([
-      "/work/.terraform-docs.yaml",
+      "/repo/work/.terraform-docs.yaml",
       "/repo/.terraform-docs.yml",
     ]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe(".terraform-docs.yaml");
   });
 
   it("prefers .terraform-docs.yml over .terraform-docs.yaml in same directory", () => {
     const fs = createMockFs([
-      "/work/.terraform-docs.yml",
-      "/work/.terraform-docs.yaml",
+      "/repo/work/.terraform-docs.yml",
+      "/repo/work/.terraform-docs.yaml",
     ]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe(".terraform-docs.yml");
   });
 
   it("returns empty string when no config file is found", () => {
     const fs = createMockFs([]);
-    const result = findConfigFile("/work", "/repo", fs);
+    const result = findConfigFile("/repo/work", "/repo", fs);
     expect(result).toBe("");
   });
 });
@@ -94,7 +94,7 @@ describe("run", () => {
   const createBaseInput = (overrides?: Partial<RunInput>): RunInput => {
     const writtenFiles = new Map<string, string>();
     return {
-      workingDirectory: "/work",
+      workingDirectory: "/repo/work",
       repoRoot: "/repo",
       githubToken: "token",
       securefixActionAppId: "app-id",
@@ -104,10 +104,13 @@ describe("run", () => {
       eventName: "pull_request",
       target: "target",
       fs: createMockFs({
-        existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
+        existingPaths: [
+          "/repo/work/README.md",
+          "/repo/work/.terraform-docs.yml",
+        ],
         fileContents: new Map([
           [
-            "/work/README.md",
+            "/repo/work/README.md",
             "<!-- BEGIN_TF_DOCS -->\nold content\n<!-- END_TF_DOCS -->",
           ],
         ]),
@@ -135,7 +138,7 @@ describe("run", () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
       fs: createMockFs({
-        existingPaths: ["/work/.terraform-docs.yml"],
+        existingPaths: ["/repo/work/.terraform-docs.yml"],
         fileContents: new Map(),
         writtenFiles,
       }),
@@ -165,7 +168,7 @@ describe("run", () => {
     expect(input.commitCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         commitMessage: "docs: generate document by terraform-docs",
-        files: new Set(["/work/README.md"]),
+        files: new Set(["work/README.md"]),
       }),
     );
   });
@@ -187,7 +190,7 @@ describe("run", () => {
       "terraform-docs",
       ["-c", ".terraform-docs.yml", "."],
       expect.objectContaining({
-        cwd: "/work",
+        cwd: "/repo/work",
         ignoreReturnCode: true,
       }),
     );
@@ -196,10 +199,10 @@ describe("run", () => {
   it("executes terraform-docs with markdown mode when no config file found", async () => {
     const input = createBaseInput({
       fs: createMockFs({
-        existingPaths: ["/work/README.md"],
+        existingPaths: ["/repo/work/README.md"],
         fileContents: new Map([
           [
-            "/work/README.md",
+            "/repo/work/README.md",
             "<!-- BEGIN_TF_DOCS -->\nold content\n<!-- END_TF_DOCS -->",
           ],
         ]),
@@ -220,7 +223,7 @@ describe("run", () => {
       "terraform-docs",
       ["markdown", "."],
       expect.objectContaining({
-        cwd: "/work",
+        cwd: "/repo/work",
       }),
     );
   });
@@ -245,9 +248,9 @@ describe("run", () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
       fs: createMockFs({
-        existingPaths: ["/work/README.md"],
+        existingPaths: ["/repo/work/README.md"],
         fileContents: new Map([
-          ["/work/README.md", "<!-- BEGIN_TF_DOCS -->"],
+          ["/repo/work/README.md", "<!-- BEGIN_TF_DOCS -->"],
           [
             "/tmp/terraform-docs-output",
             "Available Commands:\n  help  Print this help message",
@@ -282,9 +285,12 @@ describe("run", () => {
     const writtenFiles = new Map<string, string>();
     const input = createBaseInput({
       fs: createMockFs({
-        existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
+        existingPaths: [
+          "/repo/work/README.md",
+          "/repo/work/.terraform-docs.yml",
+        ],
         fileContents: new Map([
-          ["/work/README.md", "# Old README without marker"],
+          ["/repo/work/README.md", "# Old README without marker"],
         ]),
         writtenFiles,
       }),
@@ -310,7 +316,9 @@ describe("run", () => {
 
     await run(input);
 
-    expect(writtenFiles.get("/work/README.md")).toBe("# New Generated Content");
+    expect(writtenFiles.get("/repo/work/README.md")).toBe(
+      "# New Generated Content",
+    );
   });
 
   it("does not modify README.md when it has BEGIN_TF_DOCS marker", async () => {
@@ -319,8 +327,11 @@ describe("run", () => {
       "# Module\n\n<!-- BEGIN_TF_DOCS -->\nold docs\n<!-- END_TF_DOCS -->";
     const input = createBaseInput({
       fs: createMockFs({
-        existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
-        fileContents: new Map([["/work/README.md", existingContent]]),
+        existingPaths: [
+          "/repo/work/README.md",
+          "/repo/work/.terraform-docs.yml",
+        ],
+        fileContents: new Map([["/repo/work/README.md", existingContent]]),
         writtenFiles,
       }),
     });
@@ -346,7 +357,7 @@ describe("run", () => {
     await run(input);
 
     // README.md should not be written (only temp file)
-    expect(writtenFiles.has("/work/README.md")).toBe(false);
+    expect(writtenFiles.has("/repo/work/README.md")).toBe(false);
   });
 
   it("does nothing when README.md has no changes", async () => {
@@ -377,8 +388,13 @@ describe("run", () => {
     const input = createBaseInput({
       eventName: "push",
       fs: createMockFs({
-        existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
-        fileContents: new Map([["/work/README.md", "<!-- BEGIN_TF_DOCS -->"]]),
+        existingPaths: [
+          "/repo/work/README.md",
+          "/repo/work/.terraform-docs.yml",
+        ],
+        fileContents: new Map([
+          ["/repo/work/README.md", "<!-- BEGIN_TF_DOCS -->"],
+        ]),
         writtenFiles,
       }),
     });
@@ -418,8 +434,13 @@ describe("run", () => {
     const input = createBaseInput({
       eventName: "pull_request",
       fs: createMockFs({
-        existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
-        fileContents: new Map([["/work/README.md", "<!-- BEGIN_TF_DOCS -->"]]),
+        existingPaths: [
+          "/repo/work/README.md",
+          "/repo/work/.terraform-docs.yml",
+        ],
+        fileContents: new Map([
+          ["/repo/work/README.md", "<!-- BEGIN_TF_DOCS -->"],
+        ]),
         writtenFiles,
       }),
     });
@@ -459,7 +480,7 @@ describe("run", () => {
       appId: "app-id",
       appPrivateKey: "private-key",
       serverRepository: "",
-      files: new Set(["/work/README.md"]),
+      files: new Set(["work/README.md"]),
     });
   });
 
@@ -468,8 +489,13 @@ describe("run", () => {
     const input = createBaseInput({
       eventName: "pull_request_target",
       fs: createMockFs({
-        existingPaths: ["/work/README.md", "/work/.terraform-docs.yml"],
-        fileContents: new Map([["/work/README.md", "<!-- BEGIN_TF_DOCS -->"]]),
+        existingPaths: [
+          "/repo/work/README.md",
+          "/repo/work/.terraform-docs.yml",
+        ],
+        fileContents: new Map([
+          ["/repo/work/README.md", "<!-- BEGIN_TF_DOCS -->"],
+        ]),
         writtenFiles,
       }),
     });
@@ -543,7 +569,7 @@ describe("run", () => {
     await run(input);
 
     expect(executor.exec).toHaveBeenCalledWith("terraform-docs", ["-v"], {
-      cwd: "/work",
+      cwd: "/repo/work",
     });
   });
 

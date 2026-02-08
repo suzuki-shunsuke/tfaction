@@ -1,4 +1,3 @@
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as aqua from "../../aqua";
 
@@ -11,10 +10,6 @@ export const fmt = async (
     tfCommand === "terragrunt" &&
     (await aqua.checkTerrgruntRun(executor, workingDir));
 
-  core.startGroup(
-    terragruntRunAvailable ? `${tfCommand} run -- fmt` : `${tfCommand} fmt`,
-  );
-
   const fmtResult = await executor.getExecOutput(
     tfCommand,
     terragruntRunAvailable
@@ -22,8 +17,10 @@ export const fmt = async (
       : ["fmt", "-recursive"],
     {
       cwd: workingDir,
+      group: terragruntRunAvailable
+        ? `${tfCommand} run -- fmt`
+        : `${tfCommand} fmt`,
     },
   );
-  core.endGroup();
   return fmtResult;
 };
