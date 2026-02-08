@@ -1151,6 +1151,92 @@ test("multiple modules changed", async () => {
   });
 });
 
+test("template_dir config files are excluded", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "aws/",
+            template_dir: "templates/aws",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["aws/dev/main.tf", "templates/aws/dev/main.tf"],
+      configFiles: ["aws/dev/tfaction.yaml", "templates/aws/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "aws/dev",
+        working_directory: "aws/dev",
+      },
+    ],
+  });
+});
+
+test("template_dir with trailing slash", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "aws/",
+            template_dir: "templates/aws/",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["aws/dev/main.tf"],
+      configFiles: ["aws/dev/tfaction.yaml", "templates/aws/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        target: "aws/dev",
+        working_directory: "aws/dev",
+      },
+    ],
+  });
+});
+
 test("runs_on as array", async () => {
   expect(
     await run({
