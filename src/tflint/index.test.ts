@@ -155,7 +155,8 @@ describe("run", () => {
 
   const createMockInput = (overrides?: Partial<RunInput>): RunInput => ({
     executor: createMockExecutor() as unknown as RunInput["executor"],
-    workingDirectory: "/work",
+    workingDirectory: "/repo/work",
+    gitRootDir: "/repo",
     githubToken: "token",
     githubTokenForTflintInit: "",
     githubTokenForFix: "",

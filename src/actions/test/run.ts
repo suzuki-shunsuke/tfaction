@@ -72,6 +72,7 @@ export const run = async (input: RunInput): Promise<void> => {
   if (!destroy && targetConfig.enable_tflint) {
     await runTflint({
       workingDirectory: workingDir,
+      gitRootDir: config.git_root_dir,
       githubToken,
       githubTokenForTflintInit: "",
       githubTokenForFix: "",
