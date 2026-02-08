@@ -50,5 +50,5 @@ replace_target:
       replace: /
 
 target_groups:
-  - working_directory: tests/terragrunt
+  - working_directory: tests/terragrunt/**
     template_dir: tests/templates/github

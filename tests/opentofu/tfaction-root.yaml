@@ -50,4 +50,4 @@ replace_target:
       replace: /
 
 target_groups:
-  - working_directory: tests/opentofu
+  - working_directory: tests/opentofu/**
