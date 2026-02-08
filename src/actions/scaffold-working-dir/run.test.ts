@@ -38,6 +38,7 @@ import * as fs from "fs";
 import * as lib from "../../lib";
 import * as git from "../../lib/git";
 import * as getTargetConfig from "../get-target-config";
+import { type GitRootPath } from "../../lib/paths";
 
 import { copyDirectory, replaceInFiles, run, type RunInput } from "./run";
 
@@ -123,39 +124,39 @@ describe("replaceInFiles", () => {
   });
 
   it("reads modified files and applies Handlebars templates", async () => {
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["main.tf"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue(["sub/main.tf"]);
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.statSync).mockReturnValue({ isFile: () => true } as fs.Stats);
     vi.mocked(fs.readFileSync).mockReturnValue(
       "bucket = {{s3_bucket_name_for_tfmigrate_history}}",
     );
 
-    await replaceInFiles("/work", {
+    await replaceInFiles("/work" as GitRootPath, "sub", {
       s3_bucket_name_for_tfmigrate_history: "my-bucket",
     });
 
     expect(fs.writeFileSync).toHaveBeenCalledWith(
-      "/work/main.tf",
+      "/work/sub/main.tf",
       "bucket = my-bucket",
     );
   });
 
   it("skips files where content does not change", async () => {
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["unchanged.tf"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue(["sub/unchanged.tf"]);
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.statSync).mockReturnValue({ isFile: () => true } as fs.Stats);
     vi.mocked(fs.readFileSync).mockReturnValue("no placeholders here");
 
-    await replaceInFiles("/work", { key: "value" });
+    await replaceInFiles("/work" as GitRootPath, "sub", { key: "value" });
 
     expect(fs.writeFileSync).not.toHaveBeenCalled();
   });
 
   it("skips non-existent files", async () => {
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["missing.tf"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue(["sub/missing.tf"]);
     vi.mocked(fs.existsSync).mockReturnValue(false);
 
-    await replaceInFiles("/work", { key: "value" });
+    await replaceInFiles("/work" as GitRootPath, "sub", { key: "value" });
 
     expect(fs.statSync).not.toHaveBeenCalled();
     expect(fs.readFileSync).not.toHaveBeenCalled();
@@ -163,13 +164,13 @@ describe("replaceInFiles", () => {
   });
 
   it("skips directories", async () => {
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["subdir"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue(["sub/subdir"]);
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.statSync).mockReturnValue({
       isFile: () => false,
     } as fs.Stats);
 
-    await replaceInFiles("/work", { key: "value" });
+    await replaceInFiles("/work" as GitRootPath, "sub", { key: "value" });
 
     expect(fs.readFileSync).not.toHaveBeenCalled();
     expect(fs.writeFileSync).not.toHaveBeenCalled();
@@ -313,7 +314,7 @@ describe("run", () => {
       ReturnType<typeof getTargetConfig.getTargetConfig>
     >);
 
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["config.tf"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue(["aws/dev/config.tf"]);
     vi.mocked(fs.statSync).mockReturnValue({ isFile: () => true } as fs.Stats);
     vi.mocked(fs.readFileSync).mockReturnValue(
       "bucket = {{s3_bucket_name_for_tfmigrate_history}}",
@@ -321,7 +322,7 @@ describe("run", () => {
 
     await run(defaultInput);
 
-    expect(git.getModifiedFiles).toHaveBeenCalledWith(".", "/repo/aws/dev");
+    expect(git.getModifiedFiles).toHaveBeenCalledWith("aws/dev", "/repo");
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       "/repo/aws/dev/config.tf",
       "bucket = my-bucket",

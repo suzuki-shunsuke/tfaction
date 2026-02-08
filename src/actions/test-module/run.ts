@@ -8,11 +8,12 @@ import { run as runTrivy } from "../../trivy";
 import { run as runTflint } from "../../tflint";
 import { run as runTerraformDocs } from "../../terraform-docs";
 import { create as createCommit } from "../../commit";
+import type { AbsolutePath } from "../../lib/paths";
 
 export type RunInput = {
   config: types.Config;
   target: string;
-  workingDir: string;
+  workingDir: AbsolutePath;
   githubToken: string;
   securefixAppId: string;
   securefixAppPrivateKey: string;

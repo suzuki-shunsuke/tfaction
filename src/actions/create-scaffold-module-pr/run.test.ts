@@ -30,6 +30,7 @@ import * as lib from "../../lib";
 import * as aqua from "../../aqua";
 import * as git from "../../lib/git";
 import * as commit from "../../commit";
+import type { GitRelativePath } from "../../lib/paths";
 
 import {
   generateBranchName,
@@ -134,7 +135,9 @@ describe("run", () => {
     vi.mocked(aqua.NewExecutor).mockResolvedValue(
       {} as unknown as Awaited<ReturnType<typeof aqua.NewExecutor>>,
     );
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["file1.tf"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue([
+      "file1.tf",
+    ] as GitRelativePath[]);
     vi.mocked(commit.create).mockResolvedValue("");
   });
 

@@ -54,6 +54,7 @@ export interface RunInput {
   githubToken: string;
   securefixAppId: string;
   securefixAppPrivateKey: string;
+  /** A relative path from the git root directory to the module */
   modulePath: string;
   actor: string;
   repository: string;

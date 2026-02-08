@@ -5,6 +5,12 @@ import Handlebars from "handlebars";
 
 import * as lib from "../../lib";
 import * as git from "../../lib/git";
+import {
+  type GitRootPath,
+  joinAbsolute,
+  toGitRelative,
+  resolveFromGitRoot,
+} from "../../lib/paths";
 import * as getTargetConfig from "../get-target-config";
 
 export const copyDirectory = (src: string, dest: string): void => {
@@ -26,14 +32,18 @@ export const copyDirectory = (src: string, dest: string): void => {
 };
 
 export const replaceInFiles = async (
+  gitRootDir: GitRootPath,
   workingDir: string,
   vars: Record<string, string | undefined>,
 ): Promise<void> => {
   // Get list of modified and new files
-  const files = await git.getModifiedFiles(".", workingDir);
+  const files = await git.getModifiedFiles(
+    toGitRelative(gitRootDir, joinAbsolute(gitRootDir, workingDir)),
+    gitRootDir,
+  );
 
   for (const file of files) {
-    const filePath = path.join(workingDir, file);
+    const filePath = resolveFromGitRoot(gitRootDir, file);
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const content = fs.readFileSync(filePath, "utf8");
       const newContent = Handlebars.compile(content)(vars);
@@ -61,7 +71,7 @@ export const run = async (input: RunInput): Promise<void> => {
     config,
   );
 
-  const workingDir = path.join(
+  const workingDir = joinAbsolute(
     config.git_root_dir,
     targetConfig.working_directory,
   );
@@ -117,7 +127,7 @@ export const run = async (input: RunInput): Promise<void> => {
   }
 
   // Replace placeholders in files
-  await replaceInFiles(workingDir, {
+  await replaceInFiles(config.git_root_dir, targetConfig.working_directory, {
     s3_bucket_name_for_tfmigrate_history: s3Bucket,
     gcs_bucket_name_for_tfmigrate_history: gcsBucket,
     working_directory: workingDir,

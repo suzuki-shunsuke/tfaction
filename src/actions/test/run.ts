@@ -2,6 +2,7 @@ import * as path from "path";
 
 import * as types from "../../lib/types";
 import * as aqua from "../../aqua";
+import { joinAbsolute } from "../../lib/paths";
 import { TargetConfig } from "../get-target-config";
 import { run as runConftest } from "../../conftest";
 import { run as runTrivy } from "../../trivy";
@@ -22,8 +23,7 @@ export type RunInput = {
 export const run = async (input: RunInput): Promise<void> => {
   const { config, targetConfig, githubToken, executor } = input;
 
-  /** absolute path to working directory */
-  const workingDir = path.join(
+  const workingDir = joinAbsolute(
     config.git_root_dir,
     targetConfig.working_directory,
   );

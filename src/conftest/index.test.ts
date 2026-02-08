@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getConftestPaths, buildConftestArgs, buildPolicies } from "./index";
 import type * as types from "../lib/types";
+import { absolutePath } from "../lib/paths";
 
 vi.mock("glob", () => ({
   globSync: vi.fn(),
@@ -413,7 +414,7 @@ describe("buildPolicies", () => {
     trivy: { enabled: true },
     terraform_command: "terraform",
     working_directory_file: "tfaction.yaml",
-    git_root_dir: "/repo",
+    git_root_dir: absolutePath("/repo"),
     config_path: "/repo/tfaction-root.yaml",
     config_dir: "/repo",
     workspace: "/repo",

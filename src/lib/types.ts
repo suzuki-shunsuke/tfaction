@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { GitRootPath } from "./paths";
 
 const GitHubEnvironment = z.union([
   z.string(),
@@ -315,8 +316,7 @@ type ParsedConfig = z.output<typeof RawConfig>;
 
 // Config with default values applied and dynamic fields added
 export interface Config extends ParsedConfig {
-  /** Absolute path to git root directory */
-  git_root_dir: string;
+  git_root_dir: GitRootPath;
   config_path: string;
   config_dir: string;
   workspace: string;
