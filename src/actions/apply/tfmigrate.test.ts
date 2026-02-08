@@ -66,9 +66,7 @@ vi.mock("../../lib/env", () => ({
   },
 }));
 
-vi.mock("../../lib/input", () => ({
-  githubToken: "mock-github-token",
-}));
+vi.mock("../../lib/input", () => ({}));
 
 vi.mock("../../aqua", () => ({
   NewExecutor: vi.fn(),
@@ -201,7 +199,7 @@ describe("main", () => {
   it("runs tfmigrate apply with correct arguments", async () => {
     const { mockExecutor } = await setupMainMocks();
 
-    await main();
+    await main("mock-github-token");
 
     expect(mockExecutor.exec).toHaveBeenCalledWith(
       "tfmigrate",
@@ -223,7 +221,7 @@ describe("main", () => {
       envOverrides: { TFMIGRATE_EXEC_PATH: "/usr/local/bin/terraform" },
     });
 
-    await main();
+    await main("mock-github-token");
 
     expect(mockExecutor.exec).toHaveBeenCalledWith(
       "tfmigrate",
@@ -239,7 +237,7 @@ describe("main", () => {
       envOverrides: { TFACTION_DRIFT_ISSUE_NUMBER: "99" },
     });
 
-    await main();
+    await main("mock-github-token");
 
     // Find the bash call for drift issue posting
     const execCalls = mockExecutor.exec.mock.calls;
@@ -277,7 +275,7 @@ describe("main", () => {
     });
 
     // Should not throw
-    await main();
+    await main("mock-github-token");
 
     expect(core.warning).toHaveBeenCalledWith(
       expect.stringContaining("Failed to post to drift issue"),
@@ -292,7 +290,7 @@ describe("main", () => {
     });
 
     // Should not throw
-    await main();
+    await main("mock-github-token");
   });
 
   it("skips updating when update_related_pull_requests.enabled is false", async () => {
@@ -300,7 +298,7 @@ describe("main", () => {
       config: { update_related_pull_requests: { enabled: false } },
     });
 
-    await main();
+    await main("mock-github-token");
 
     expect(core.info).toHaveBeenCalledWith(
       "Skip updating related pull requests",
@@ -319,7 +317,7 @@ describe("main", () => {
 
     vi.mocked(terraform.listRelatedPullRequests).mockResolvedValue([10]);
 
-    await main();
+    await main("mock-github-token");
 
     expect(terraform.updateBranchBySecurefix).toHaveBeenCalledWith(
       "test-owner",
@@ -333,7 +331,7 @@ describe("main", () => {
 
     vi.mocked(terraform.listRelatedPullRequests).mockResolvedValue([10, 20]);
 
-    await main();
+    await main("mock-github-token");
 
     expect(terraform.updateBranchByCommit).toHaveBeenCalledWith(
       "mock-github-token",
@@ -347,6 +345,8 @@ describe("main", () => {
     // Make tfmigrate apply return non-zero
     mockExecutor.exec.mockResolvedValue(1);
 
-    await expect(main()).rejects.toThrow("tfmigrate apply failed");
+    await expect(main("mock-github-token")).rejects.toThrow(
+      "tfmigrate apply failed",
+    );
   });
 });

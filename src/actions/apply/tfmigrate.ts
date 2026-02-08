@@ -6,7 +6,6 @@ import * as path from "path";
 import * as lib from "../../lib";
 import * as drift from "../../lib/drift";
 import * as env from "../../lib/env";
-import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../get-target-config";
 import {
@@ -16,10 +15,10 @@ import {
 } from "./terraform";
 
 export const main = async (
+  githubToken: string,
   secrets?: Record<string, string>,
   githubTokenForGitHubProvider?: string,
 ): Promise<void> => {
-  const githubToken = input.githubToken;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   const cfg = await lib.getConfig();
   const targetConfig = await getTargetConfig.getTargetConfig(
