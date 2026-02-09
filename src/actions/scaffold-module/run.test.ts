@@ -36,6 +36,7 @@ import * as fs from "fs";
 import * as lib from "../../lib";
 import * as aqua from "../../aqua";
 import * as git from "../../lib/git";
+import { type GitRelativePath, type GitRootPath } from "../../lib/paths";
 
 import { copyDirectory, replaceInFiles, run, type RunInput } from "./run";
 
@@ -132,53 +133,67 @@ describe("replaceInFiles", () => {
   });
 
   it("reads modified files and applies Handlebars templates", async () => {
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["main.tf"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue([
+      "sub/main.tf",
+    ] as GitRelativePath[]);
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.statSync).mockReturnValue({ isFile: () => true } as fs.Stats);
     vi.mocked(fs.readFileSync).mockReturnValue(
       "module {{module_name}} in {{module_path}}",
     );
 
-    await replaceInFiles("/work", {
+    await replaceInFiles("/work" as GitRootPath, "sub", {
       module_name: "my-mod",
       module_path: "/work/my-mod",
     });
 
     expect(fs.writeFileSync).toHaveBeenCalledWith(
-      "/work/main.tf",
+      "/work/sub/main.tf",
       "module my-mod in /work/my-mod",
     );
   });
 
   it("skips files where content does not change", async () => {
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["unchanged.tf"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue([
+      "sub/unchanged.tf",
+    ] as GitRelativePath[]);
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.statSync).mockReturnValue({ isFile: () => true } as fs.Stats);
     vi.mocked(fs.readFileSync).mockReturnValue("no placeholders here");
 
-    await replaceInFiles("/work", { module_name: "test" });
+    await replaceInFiles("/work" as GitRootPath, "sub", {
+      module_name: "test",
+    });
 
     expect(fs.writeFileSync).not.toHaveBeenCalled();
   });
 
   it("skips non-existent files", async () => {
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["missing.tf"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue([
+      "sub/missing.tf",
+    ] as GitRelativePath[]);
     vi.mocked(fs.existsSync).mockReturnValue(false);
 
-    await replaceInFiles("/work", { module_name: "test" });
+    await replaceInFiles("/work" as GitRootPath, "sub", {
+      module_name: "test",
+    });
 
     expect(fs.readFileSync).not.toHaveBeenCalled();
     expect(fs.writeFileSync).not.toHaveBeenCalled();
   });
 
   it("skips directories", async () => {
-    vi.mocked(git.getModifiedFiles).mockResolvedValue(["somedir"]);
+    vi.mocked(git.getModifiedFiles).mockResolvedValue([
+      "sub/somedir",
+    ] as GitRelativePath[]);
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.statSync).mockReturnValue({
       isFile: () => false,
     } as fs.Stats);
 
-    await replaceInFiles("/work", { module_name: "test" });
+    await replaceInFiles("/work" as GitRootPath, "sub", {
+      module_name: "test",
+    });
 
     expect(fs.readFileSync).not.toHaveBeenCalled();
     expect(fs.writeFileSync).not.toHaveBeenCalled();

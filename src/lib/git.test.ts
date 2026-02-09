@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { gitRelativePath, type GitRootPath } from "./paths";
 
 vi.mock("@actions/exec", () => ({
   exec: vi.fn(),
@@ -27,7 +28,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from("file1.tf\nfile2.tf\n"));
       return Promise.resolve(0);
     });
-    const result = await getModifiedFiles(".", "/workspace");
+    const result = await getModifiedFiles(".", "/workspace" as GitRootPath);
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
@@ -36,7 +37,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from("file1.tf\n\n\nfile2.tf\n"));
       return Promise.resolve(0);
     });
-    const result = await getModifiedFiles(".", "/workspace");
+    const result = await getModifiedFiles(".", "/workspace" as GitRootPath);
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
@@ -45,7 +46,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from("  file1.tf  \n  file2.tf  \n"));
       return Promise.resolve(0);
     });
-    const result = await getModifiedFiles(".", "/workspace");
+    const result = await getModifiedFiles(".", "/workspace" as GitRootPath);
     expect(result).toEqual(["file1.tf", "file2.tf"]);
   });
 
@@ -54,7 +55,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from(""));
       return Promise.resolve(0);
     });
-    const result = await getModifiedFiles(".", "/workspace");
+    const result = await getModifiedFiles(".", "/workspace" as GitRootPath);
     expect(result).toEqual([]);
   });
 
@@ -63,7 +64,7 @@ describe("getModifiedFiles", () => {
       options?.listeners?.stdout?.(Buffer.from(""));
       return Promise.resolve(0);
     });
-    await getModifiedFiles("src", "/workspace");
+    await getModifiedFiles("src", "/workspace" as GitRootPath);
     expect(exec.exec).toHaveBeenCalledWith(
       "git",
       ["ls-files", "--modified", "--others", "--exclude-standard", "src"],
@@ -120,7 +121,7 @@ describe("getCurrentBranch", () => {
       options?.listeners?.stdout?.(Buffer.from("feature/my-branch\n"));
       return Promise.resolve(0);
     });
-    const result = await getCurrentBranch("/workspace");
+    const result = await getCurrentBranch("/workspace" as GitRootPath);
     expect(result).toBe("feature/my-branch");
   });
 
@@ -129,7 +130,7 @@ describe("getCurrentBranch", () => {
       options?.listeners?.stdout?.(Buffer.from("main\n"));
       return Promise.resolve(0);
     });
-    await getCurrentBranch("/workspace");
+    await getCurrentBranch("/workspace" as GitRootPath);
     expect(exec.exec).toHaveBeenCalledWith(
       "git",
       ["branch", "--show-current"],
@@ -144,7 +145,10 @@ describe("hasFileChangedPorcelain", () => {
       options?.listeners?.stdout?.(Buffer.from(" M main.tf\n"));
       return Promise.resolve(0);
     });
-    const result = await hasFileChangedPorcelain("main.tf", "/workspace");
+    const result = await hasFileChangedPorcelain(
+      "main.tf",
+      "/workspace" as GitRootPath,
+    );
     expect(result).toBe(true);
   });
 
@@ -153,7 +157,10 @@ describe("hasFileChangedPorcelain", () => {
       options?.listeners?.stdout?.(Buffer.from(""));
       return Promise.resolve(0);
     });
-    const result = await hasFileChangedPorcelain("main.tf", "/workspace");
+    const result = await hasFileChangedPorcelain(
+      "main.tf",
+      "/workspace" as GitRootPath,
+    );
     expect(result).toBe(false);
   });
 });
@@ -165,7 +172,10 @@ describe("listWorkingDirFiles", () => {
       stderr: "",
       exitCode: 0,
     });
-    const result = await listWorkingDirFiles("/workspace", "tfaction.yaml");
+    const result = await listWorkingDirFiles(
+      "/workspace" as GitRootPath,
+      "tfaction.yaml",
+    );
     expect(result).toEqual(["aws/dev/tfaction.yaml", "gcp/prod/tfaction.yaml"]);
   });
 
@@ -175,7 +185,10 @@ describe("listWorkingDirFiles", () => {
       stderr: "",
       exitCode: 0,
     });
-    const result = await listWorkingDirFiles("/workspace", "tfaction.yaml");
+    const result = await listWorkingDirFiles(
+      "/workspace" as GitRootPath,
+      "tfaction.yaml",
+    );
     expect(result).toEqual(["aws/dev/tfaction.yaml", "gcp/prod/tfaction.yaml"]);
   });
 
@@ -185,7 +198,7 @@ describe("listWorkingDirFiles", () => {
       stderr: "",
       exitCode: 0,
     });
-    await listWorkingDirFiles("/workspace", "tfaction.yaml");
+    await listWorkingDirFiles("/workspace" as GitRootPath, "tfaction.yaml");
     expect(exec.getExecOutput).toHaveBeenCalledWith(
       "git",
       ["ls-files", "*/tfaction.yaml"],
@@ -226,8 +239,12 @@ describe("checkGitDiff", () => {
         return Promise.resolve(0);
       });
     const result = await checkGitDiff(
-      ["file1.tf", "file2.tf", "file3.tf"],
-      "/workspace",
+      [
+        gitRelativePath("file1.tf"),
+        gitRelativePath("file2.tf"),
+        gitRelativePath("file3.tf"),
+      ],
+      "/workspace" as GitRootPath,
     );
     expect(result).toEqual({ changedFiles: ["file1.tf", "file3.tf"] });
   });
@@ -237,7 +254,10 @@ describe("checkGitDiff", () => {
       options?.listeners?.stdout?.(Buffer.from(""));
       return Promise.resolve(0);
     });
-    const result = await checkGitDiff(["file1.tf", "file2.tf"], "/workspace");
+    const result = await checkGitDiff(
+      [gitRelativePath("file1.tf"), gitRelativePath("file2.tf")],
+      "/workspace" as GitRootPath,
+    );
     expect(result).toEqual({ changedFiles: [] });
   });
 });

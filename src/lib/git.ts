@@ -1,12 +1,13 @@
 import * as exec from "@actions/exec";
+import type { GitRelativePath, GitRootPath } from "./paths";
 
 /**
  * Get list of modified and untracked files
  */
 export const getModifiedFiles = async (
   dir: string,
-  cwd: string,
-): Promise<string[]> => {
+  cwd: GitRootPath,
+): Promise<GitRelativePath[]> => {
   let output = "";
   await exec.exec(
     "git",
@@ -23,7 +24,7 @@ export const getModifiedFiles = async (
   return output
     .split("\n")
     .map((f) => f.trim())
-    .filter((f) => f.length > 0);
+    .filter((f) => f.length > 0) as GitRelativePath[];
 };
 
 /**
@@ -65,7 +66,7 @@ export const isFileTracked = async (
 /**
  * Get the current branch name
  */
-export const getCurrentBranch = async (cwd: string): Promise<string> => {
+export const getCurrentBranch = async (cwd: GitRootPath): Promise<string> => {
   let output = "";
   await exec.exec("git", ["branch", "--show-current"], {
     cwd,
@@ -84,7 +85,7 @@ export const getCurrentBranch = async (cwd: string): Promise<string> => {
  */
 export const hasFileChangedPorcelain = async (
   file: string,
-  cwd: string,
+  cwd: GitRootPath,
 ): Promise<boolean> => {
   let output = "";
   await exec.exec("git", ["status", "--porcelain", file], {
@@ -106,9 +107,9 @@ export const hasFileChangedPorcelain = async (
  * @returns Relative file paths from git_root_dir
  */
 export const listWorkingDirFiles = async (
-  gitRootDir: string,
+  gitRootDir: GitRootPath,
   fileName: string,
-): Promise<string[]> => {
+): Promise<GitRelativePath[]> => {
   const result = await exec.getExecOutput(
     "git",
     ["ls-files", `*/${fileName}`],
@@ -119,12 +120,12 @@ export const listWorkingDirFiles = async (
     },
   );
 
-  const arr: string[] = [];
+  const arr: GitRelativePath[] = [];
   for (const line of result.stdout.split("\n").map((l) => l.trim())) {
     if (line === "") {
       continue;
     }
-    arr.push(line);
+    arr.push(line as GitRelativePath);
   }
   return arr;
 };
@@ -134,7 +135,7 @@ export const listWorkingDirFiles = async (
  * @param cwd a relative path from github.workspace to tfaction-root.yaml
  * @returns an absolute path to the root directory of the git repository
  */
-export const getRootDir = async (cwd: string): Promise<string> => {
+export const getRootDir = async (cwd: string): Promise<GitRootPath> => {
   const out = await exec.getExecOutput(
     "git",
     ["rev-parse", "--show-toplevel"],
@@ -143,19 +144,19 @@ export const getRootDir = async (cwd: string): Promise<string> => {
       cwd,
     },
   );
-  return out.stdout.trim();
+  return out.stdout.trim() as GitRootPath;
 };
 
 /**
  * Check which files from the given list have changed
- * @param files - List of file paths to check
+ * @param files - List of git-relative file paths to check
  * @returns Object containing array of changed file paths
  */
 export const checkGitDiff = async (
-  files: string[],
-  cwd: string,
-): Promise<{ changedFiles: string[] }> => {
-  const changedFiles: string[] = [];
+  files: GitRelativePath[],
+  cwd: GitRootPath,
+): Promise<{ changedFiles: GitRelativePath[] }> => {
+  const changedFiles: GitRelativePath[] = [];
   for (const file of files) {
     const changed = await hasFileChangedPorcelain(file, cwd);
     if (changed) {

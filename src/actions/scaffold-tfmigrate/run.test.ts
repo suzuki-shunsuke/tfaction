@@ -57,6 +57,7 @@ import * as aqua from "../../aqua";
 import * as git from "../../lib/git";
 import * as commit from "../../commit";
 import * as getTargetConfig from "../get-target-config";
+import type { GitRelativePath } from "../../lib/paths";
 
 import {
   generateBranchName,
@@ -409,7 +410,7 @@ describe("run", () => {
     vi.mocked(git.getModifiedFiles).mockResolvedValue([
       ".tfmigrate.hcl",
       "tfmigrate/20240101120000_main.hcl",
-    ]);
+    ] as GitRelativePath[]);
     vi.mocked(commit.create).mockResolvedValue("");
 
     // Default fs mocks for run: directories don't exist, template reads succeed

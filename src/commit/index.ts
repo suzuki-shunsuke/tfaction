@@ -1,17 +1,15 @@
-import * as path from "path";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as securefix from "@csm-actions/securefix-action";
 import * as env from "../lib/env";
 import { run } from "./run";
+import type { GitRelativePath } from "../lib/paths";
 
 type Inputs = {
   commitMessage: string;
   githubToken: string;
-  /** A relative path from github.workspace to Git Root Directory */
   rootDir?: string;
-  /** Relative paths from Git Root Directory */
-  files: Set<string>;
+  files: Set<GitRelativePath>;
   serverRepository: string;
   appId: string;
   appPrivateKey: string;
@@ -20,13 +18,6 @@ type Inputs = {
 };
 
 export const create = async (inputs: Inputs): Promise<string> => {
-  for (const file of inputs.files) {
-    if (path.isAbsolute(file)) {
-      throw new Error(
-        `commit file path must be relative from git root, but got absolute path: ${file}`,
-      );
-    }
-  }
   if (inputs.serverRepository) {
     if (!inputs.appId || !inputs.appPrivateKey) {
       throw new Error(

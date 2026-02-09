@@ -1,11 +1,16 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as path from "path";
 import * as aqua from "../aqua";
 import * as types from "../lib/types";
 import { GitHubCommentConfig } from "../lib";
 import { checkGitDiff as defaultCheckGitDiff } from "../lib/git";
 import { create as defaultCreateCommit } from "../commit";
+import {
+  type AbsolutePath,
+  type GitRelativePath,
+  joinAbsolute,
+  toGitRelative,
+} from "../lib/paths";
 
 export type DiagnosticCode = {
   value: string;
@@ -41,23 +46,21 @@ export type Logger = {
 export type CommitCreator = (params: {
   commitMessage: string;
   githubToken: string;
-  files: Set<string>;
+  files: Set<GitRelativePath>;
   serverRepository: string;
   appId: string;
   appPrivateKey: string;
 }) => Promise<string>;
 
 export type GitDiffChecker = (
-  files: string[],
-  cwd: string,
-) => Promise<{ changedFiles: string[] }>;
+  files: GitRelativePath[],
+  cwd: AbsolutePath,
+) => Promise<{ changedFiles: GitRelativePath[] }>;
 
 export type RunInput = {
   executor: aqua.Executor;
-  /** absolute path to the working directory */
-  workingDirectory: string;
-  /** absolute path to the git root directory */
-  gitRootDir: string;
+  workingDirectory: AbsolutePath;
+  gitRootDir: AbsolutePath;
   githubToken: string;
   githubTokenForTflintInit: string;
   githubTokenForFix: string;
@@ -239,9 +242,9 @@ export const run = async (input: RunInput): Promise<void> => {
   if (input.fix) {
     const files = new Set(
       diagnostics.map((d) =>
-        path.relative(
+        toGitRelative(
           input.gitRootDir,
-          path.join(input.workingDirectory, d.location.path),
+          joinAbsolute(input.workingDirectory, d.location.path),
         ),
       ),
     );

@@ -5,6 +5,7 @@ import * as lib from "../../lib";
 import * as types from "../../lib/types";
 import * as drift from "../../lib/drift";
 import * as git from "../../lib/git";
+import type { AbsolutePath, GitRelativePath } from "../../lib/paths";
 import * as path from "path";
 
 export type Issue = drift.Issue;
@@ -135,9 +136,9 @@ export type CreateIssueFn = (
 ) => Promise<drift.Issue>;
 
 export type ListWorkingDirFilesFn = (
-  gitRootDir: string,
+  gitRootDir: AbsolutePath,
   fileName: string,
-) => Promise<string[]>;
+) => Promise<GitRelativePath[]>;
 
 export type GetTargetGroupFn = (
   config: {

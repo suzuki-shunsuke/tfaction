@@ -6,6 +6,12 @@ import Handlebars from "handlebars";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
 import * as git from "../../lib/git";
+import {
+  type GitRootPath,
+  joinAbsolute,
+  toGitRelative,
+  resolveFromGitRoot,
+} from "../../lib/paths";
 
 export interface RunInput {
   githubToken: string;
@@ -33,13 +39,17 @@ export const copyDirectory = (src: string, dest: string): void => {
 };
 
 export const replaceInFiles = async (
+  gitRootDir: GitRootPath,
   workingDir: string,
   vars: Record<string, string>,
 ): Promise<void> => {
-  const files = await git.getModifiedFiles(".", workingDir);
+  const files = await git.getModifiedFiles(
+    toGitRelative(gitRootDir, joinAbsolute(gitRootDir, workingDir)),
+    gitRootDir,
+  );
 
   for (const file of files) {
-    const filePath = path.join(workingDir, file);
+    const filePath = resolveFromGitRoot(gitRootDir, file);
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const content = fs.readFileSync(filePath, "utf8");
 
@@ -62,8 +72,11 @@ export const run = async (input: RunInput): Promise<void> => {
     throw new Error("env.TFACTION_MODULE_TEMPLATE_DIR is required");
   }
 
-  const modulePath = path.join(config.git_root_dir, input.modulePath);
-  const templateDir = path.join(config.git_root_dir, input.moduleTemplateDir);
+  const modulePath = joinAbsolute(config.git_root_dir, input.modulePath);
+  const templateDir = joinAbsolute(
+    config.git_root_dir,
+    input.moduleTemplateDir,
+  );
 
   if (fs.existsSync(modulePath)) {
     throw new Error(`file exists: ${modulePath}`);
@@ -89,7 +102,7 @@ export const run = async (input: RunInput): Promise<void> => {
   const repository = input.repository;
   const ref = `module_${modulePath.replace(/\//g, "_")}_v0.1.0`;
 
-  await replaceInFiles(modulePath, {
+  await replaceInFiles(config.git_root_dir, input.modulePath, {
     module_name: moduleName,
     module_path: modulePath,
     github_repository: repository,

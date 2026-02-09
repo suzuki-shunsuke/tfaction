@@ -8,6 +8,7 @@ import {
   type Logger,
 } from "./index";
 import type { Config } from "../lib/types";
+import { absolutePath } from "../lib/paths";
 
 describe("getSeverity", () => {
   it("returns ERROR for HIGH severity", () => {
@@ -180,7 +181,7 @@ describe("run", () => {
     trivy: { enabled: true },
     terraform_command: "terraform",
     working_directory_file: "tfaction.yaml",
-    git_root_dir: "/repo",
+    git_root_dir: absolutePath("/repo"),
     config_path: "/repo/tfaction-root.yaml",
     config_dir: "/repo",
     workspace: "/repo",
