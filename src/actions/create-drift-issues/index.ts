@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
+import * as githubApp from "../../lib/github-app";
 import { run, createGraphQLOctokit } from "./run";
 
 export const main = async () => {
@@ -10,11 +11,6 @@ export const main = async () => {
   if (!cfg.drift_detection) {
     // drift detection is disabled
     return;
-  }
-
-  const ghToken = input.getRequiredGitHubToken();
-  if (ghToken === "") {
-    throw new Error("GITHUB_TOKEN is required");
   }
 
   const repoOwner =
@@ -27,27 +23,49 @@ export const main = async () => {
     throw new Error("repo_owner and repo_name are required");
   }
 
-  const result = await run(
-    {
-      octokit: github.getOctokit(ghToken),
-      graphqlOctokit: createGraphQLOctokit(ghToken),
-      repoOwner,
-      repoName,
-      config: cfg,
-      logger: {
-        info: core.info,
-        debug: core.debug,
+  let ghToken: string;
+  if (input.githubAppId && input.githubAppPrivateKey) {
+    ghToken = await githubApp.createToken({
+      appId: input.githubAppId,
+      privateKey: input.githubAppPrivateKey,
+      owner: repoOwner,
+      repositories: [repoName],
+      permissions: {
+        issues: "write",
       },
-    },
-    ghToken,
-  );
-
-  if (result === undefined) {
-    return;
+    });
+  } else {
+    ghToken = input.getRequiredGitHubToken();
+    if (ghToken === "") {
+      throw new Error("GITHUB_TOKEN is required");
+    }
   }
 
-  core.exportVariable("TFACTION_DRIFT_ISSUE_NUMBER", result.number);
-  core.exportVariable("TFACTION_DRIFT_ISSUE_STATE", result.state);
-  core.info(result.url);
-  core.summary.addRaw(`Drift Issue: ${result.url}`, true);
+  try {
+    const result = await run(
+      {
+        octokit: github.getOctokit(ghToken),
+        graphqlOctokit: createGraphQLOctokit(ghToken),
+        repoOwner,
+        repoName,
+        config: cfg,
+        logger: {
+          info: core.info,
+          debug: core.debug,
+        },
+      },
+      ghToken,
+    );
+
+    if (result === undefined) {
+      return;
+    }
+
+    core.exportVariable("TFACTION_DRIFT_ISSUE_NUMBER", result.number);
+    core.exportVariable("TFACTION_DRIFT_ISSUE_STATE", result.state);
+    core.info(result.url);
+    core.summary.addRaw(`Drift Issue: ${result.url}`, true);
+  } finally {
+    await githubApp.revokeAll();
+  }
 };

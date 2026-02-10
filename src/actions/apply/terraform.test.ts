@@ -88,7 +88,6 @@ vi.mock("../../lib/env", () => ({
 }));
 
 vi.mock("../../lib/input", () => ({
-  githubToken: "mock-github-token",
   securefixActionAppId: "mock-app-id",
   securefixActionAppPrivateKey: "mock-private-key",
 }));
@@ -431,7 +430,7 @@ describe("main", () => {
   it("runs full terraform apply flow", async () => {
     const { mockExecutor } = await setupMainMocks();
 
-    await main();
+    await main("mock-github-token");
 
     // Verify tfcmt apply was called with terraform
     expect(mockExecutor.exec).toHaveBeenCalledWith(
@@ -459,7 +458,7 @@ describe("main", () => {
       targetConfig: { terraform_command: "tofu" },
     });
 
-    await main();
+    await main("mock-github-token");
 
     expect(mockExecutor.exec).toHaveBeenCalledWith(
       "tfcmt",
@@ -473,7 +472,7 @@ describe("main", () => {
       targetConfig: { terraform_command: "" },
     });
 
-    await main();
+    await main("mock-github-token");
 
     expect(mockExecutor.exec).toHaveBeenCalledWith(
       "tfcmt",
@@ -490,7 +489,9 @@ describe("main", () => {
     // github-comment post should be called, then it throws
     mockExecutor.exec.mockResolvedValue(0);
 
-    await expect(main()).rejects.toThrow("No workflow run is found");
+    await expect(main("mock-github-token")).rejects.toThrow(
+      "No workflow run is found",
+    );
   });
 
   it("throws when workflow run head SHA does not match PR head SHA", async () => {
@@ -501,7 +502,7 @@ describe("main", () => {
 
     mockExecutor.exec.mockResolvedValue(0);
 
-    await expect(main()).rejects.toThrow(
+    await expect(main("mock-github-token")).rejects.toThrow(
       "workflow run's headSha (different-sha) is different from the associated pull request's head sha (abc123)",
     );
   });
@@ -509,7 +510,7 @@ describe("main", () => {
   it("replaces / with __ in artifact name", async () => {
     const { mockOctokit } = await setupMainMocks();
 
-    await main();
+    await main("mock-github-token");
 
     // The artifact name should be terraform_plan_file_aws__dev__vpc
     // Verified through the workflow run API call - main() succeeds because
@@ -522,7 +523,7 @@ describe("main", () => {
       envOverrides: { TFACTION_DRIFT_ISSUE_NUMBER: "99" },
     });
 
-    await main();
+    await main("mock-github-token");
 
     // Verify tfcmt was called a second time with drift issue config
     const execCalls = mockExecutor.exec.mock.calls;
@@ -564,7 +565,7 @@ describe("main", () => {
     });
 
     // Should not throw
-    await main();
+    await main("mock-github-token");
 
     expect(core.warning).toHaveBeenCalledWith(
       expect.stringContaining("Failed to post to drift issue"),
@@ -579,7 +580,7 @@ describe("main", () => {
     });
 
     // Should not throw
-    await main();
+    await main("mock-github-token");
   });
 
   it("skips updating when update_related_pull_requests.enabled is false", async () => {
@@ -587,7 +588,7 @@ describe("main", () => {
       config: { update_related_pull_requests: { enabled: false } },
     });
 
-    await main();
+    await main("mock-github-token");
 
     expect(core.info).toHaveBeenCalledWith(
       "Skip updating related pull requests",
@@ -612,7 +613,7 @@ describe("main", () => {
 
     vi.mocked(run.listRelatedPullRequests).mockResolvedValue([10]);
 
-    await main();
+    await main("mock-github-token");
 
     // updateBranchBySecurefix in ./run should have been called (via the wrapper)
     expect(run.updateBranchBySecurefix).toHaveBeenCalled();
@@ -623,7 +624,7 @@ describe("main", () => {
 
     vi.mocked(run.listRelatedPullRequests).mockResolvedValue([10, 20]);
 
-    await main();
+    await main("mock-github-token");
 
     expect(run.updateBranchByCommit).toHaveBeenCalled();
   });
@@ -639,7 +640,9 @@ describe("main", () => {
       return Promise.resolve(0);
     });
 
-    await expect(main()).rejects.toThrow("terraform apply failed");
+    await expect(main("mock-github-token")).rejects.toThrow(
+      "terraform apply failed",
+    );
 
     // PR updates should still have run before the throw
     // (listRelatedPullRequests is called after the apply even on failure)

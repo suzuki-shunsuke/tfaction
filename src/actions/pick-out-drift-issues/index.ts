@@ -7,6 +7,7 @@ import * as types from "../../lib/types";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as git from "../../lib/git";
+import * as githubApp from "../../lib/github-app";
 import { run } from "./run";
 
 // Check if drift detection is enabled
@@ -123,7 +124,6 @@ const listTargets = async (
 };
 
 export const main = async () => {
-  const githubToken = input.getRequiredGitHubToken();
   const config = await lib.getConfig();
 
   const repoOwner =
@@ -131,31 +131,50 @@ export const main = async () => {
   const repoName =
     config.drift_detection?.issue_repo_name || github.context.repo.repo;
 
-  // List targets with runs_on
-  const targets = await listTargets(config);
-  core.debug(`Found ${targets.size} targets with drift detection enabled`);
+  let githubToken: string;
+  if (input.githubAppId && input.githubAppPrivateKey) {
+    githubToken = await githubApp.createToken({
+      appId: input.githubAppId,
+      privateKey: input.githubAppPrivateKey,
+      owner: repoOwner,
+      repositories: [repoName],
+      permissions: {
+        issues: "read",
+      },
+    });
+  } else {
+    githubToken = input.getRequiredGitHubToken();
+  }
 
-  // Create octokit
-  const octokit = github.getOctokit(githubToken);
+  try {
+    // List targets with runs_on
+    const targets = await listTargets(config);
+    core.debug(`Found ${targets.size} targets with drift detection enabled`);
 
-  // Run the main logic
-  const result = await run({
-    driftDetection: config.drift_detection,
-    octokit,
-    targets,
-    repoOwner,
-    repoName,
-    now: new Date(),
-    serverUrl: github.context.serverUrl,
-    logger: {
-      info: core.info,
-      debug: core.debug,
-      notice: core.notice,
-    },
-  });
+    // Create octokit
+    const octokit = github.getOctokit(githubToken);
 
-  // Set outputs
-  core.setOutput("has_issues", result.hasIssues ? "true" : "false");
-  core.setOutput("issues", JSON.stringify(result.issues));
-  core.info(`Output ${result.issues.length} issues`);
+    // Run the main logic
+    const result = await run({
+      driftDetection: config.drift_detection,
+      octokit,
+      targets,
+      repoOwner,
+      repoName,
+      now: new Date(),
+      serverUrl: github.context.serverUrl,
+      logger: {
+        info: core.info,
+        debug: core.debug,
+        notice: core.notice,
+      },
+    });
+
+    // Set outputs
+    core.setOutput("has_issues", result.hasIssues ? "true" : "false");
+    core.setOutput("issues", JSON.stringify(result.issues));
+    core.info(`Output ${result.issues.length} issues`);
+  } finally {
+    await githubApp.revokeAll();
+  }
 };
