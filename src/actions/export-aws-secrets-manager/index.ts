@@ -25,6 +25,9 @@ function exportSecret(secret: SecretToExport): void {
 }
 
 export const main = async (): Promise<void> => {
+  core.warning(
+    "export-aws-secrets-manager is deprecated. AWS Secrets Manager secrets are now fetched by the setup action and included in the secrets output. Please remove export-aws-secrets-manager from your workflow.",
+  );
   const config = await lib.getConfig();
   const t = await lib.getTargetGroup(
     config,

@@ -49,6 +49,12 @@ export interface TargetConfig {
 
   // Secrets mapping (env_name -> secret_name)
   secretsConfig?: Record<string, string>;
+
+  // AWS Secrets Manager config (merged by env_name, jobConfig overrides group)
+  awsSecretsManagerConfig?: {
+    awsRegion?: string;
+    secrets: Array<{ envName: string; secretId: string; secretKey?: string }>;
+  };
 }
 
 export const getTargetConfig = async (
@@ -209,6 +215,38 @@ export const getTargetConfig = async (
       }
     }
 
+    // AWS Secrets Manager config: merge by env_name (jobConfig overrides group)
+    const awsSecretsMap = new Map<
+      string,
+      { secretId: string; secretKey?: string }
+    >();
+    for (const secret of targetGroup?.aws_secrets_manager ?? []) {
+      for (const e of secret.envs) {
+        awsSecretsMap.set(e.env_name, {
+          secretId: secret.secret_id,
+          secretKey: e.secret_key,
+        });
+      }
+    }
+    for (const secret of rootJobConfig?.aws_secrets_manager ?? []) {
+      for (const e of secret.envs) {
+        awsSecretsMap.set(e.env_name, {
+          secretId: secret.secret_id,
+          secretKey: e.secret_key,
+        });
+      }
+    }
+    if (awsSecretsMap.size > 0) {
+      result.awsSecretsManagerConfig = {
+        awsRegion: result.aws_region,
+        secrets: Array.from(awsSecretsMap.entries()).map(([envName, v]) => ({
+          envName,
+          secretId: v.secretId,
+          secretKey: v.secretKey,
+        })),
+      };
+    }
+
     result.destroy = wdConfig.destroy ? true : false;
     result.accept_change_by_renovate = wdConfig.accept_change_by_renovate;
     result.enable_terraform_docs =
@@ -275,6 +313,7 @@ export const run = async (
       key !== "env" &&
       key !== "target" &&
       key !== "secretsConfig" &&
+      key !== "awsSecretsManagerConfig" &&
       value !== undefined
     ) {
       outputs.set(key, value);
