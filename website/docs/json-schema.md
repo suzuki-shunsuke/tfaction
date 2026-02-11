@@ -10,7 +10,7 @@ By adding the following comment at the top of the configuration file, editors su
 
 ```yaml
 # yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/tfaction/refs/heads/latest/schema/tfaction-root.json
-````
+```
 
 The URL includes a JSON Schema reference (either a branch or a tag).
 

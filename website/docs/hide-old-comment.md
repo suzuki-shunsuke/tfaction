@@ -11,18 +11,18 @@ However, one issue is that old comments remain and continue to accumulate.
 
 There are two solutions:
 
-1. Hide old comments using [github-comment hide](https://suzuki-shunsuke.github.io/github-comment/hide/)  
-2. Use [tfcmt plan -patch](https://suzuki-shunsuke.github.io/tfcmt/plan-patch/) to update existing comments instead of creating new ones  
+1. Hide old comments using [github-comment hide](https://suzuki-shunsuke.github.io/github-comment/hide/)
+2. Use [tfcmt plan -patch](https://suzuki-shunsuke.github.io/tfcmt/plan-patch/) to update existing comments instead of creating new ones
 
 We recommend option 1.
 
 ## github-comment hide
 
-1. Add `github-comment` to `aqua.yaml`  
+1. Add `github-comment` to `aqua.yaml`
 
 ```sh
 aqua g -i suzuki-shunsuke/github-comment
-````
+```
 
 2. Install `github-comment` via aqua in GitHub Actions and run `github-comment hide`
 

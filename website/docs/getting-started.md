@@ -150,19 +150,19 @@ jobs:
           private-key: ${{ secrets.PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
-      
+
       - name: Set up
         uses: suzuki-shunsuke/tfaction@latest
         with:
           action: setup
           github_token: ${{ steps.token.outputs.token }}
-      
+
       - name: terraform init
         uses: suzuki-shunsuke/tfaction@latest
         with:
           action: terraform-init
           github_token: ${{ steps.token.outputs.token }}
-      
+
       - name: Plan
         uses: suzuki-shunsuke/tfaction@latest
         with:

@@ -32,7 +32,7 @@ The update is triggered when either of the following conditions is met:
 
 1. Files under the root module have been updated on the base branch
 1. 300 or more files have been updated on the base branch
-    1. Due to a limitation of GitHub's Compare Two Commits API, diffs can only be retrieved for up to 300 files. If 300 or more files have been updated, there is a possibility that files under the root module have been changed on the base branch
+   1. Due to a limitation of GitHub's Compare Two Commits API, diffs can only be retrieved for up to 300 files. If 300 or more files have been updated, there is a possibility that files under the root module have been changed on the base branch
 
 Unlike type 1, this feature currently cannot be disabled.
 This is because type 1 has the drawback of unnecessarily updating stale PRs, whereas type 2 only triggers when CI is run on a PR.

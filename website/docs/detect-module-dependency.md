@@ -33,8 +33,8 @@ Internally, dependencies are analyzed using a tool called [terraform-config-insp
 This feature is relatively popular, but personally I am not a big fan of it.
 
 1. It takes time
-    1. terraform-config-inspect needs to be built from source
-    1. terraform-config-inspect must be run on all root modules, so execution time increases proportionally with the number of root modules
+   1. terraform-config-inspect needs to be built from source
+   1. terraform-config-inspect must be run on all root modules, so execution time increases proportionally with the number of root modules
 1. Plan and apply run simultaneously on all dependent root modules
-    1. You cannot apply to a development environment before production
-    1. If a problem occurs in one root module causing a plan failure or a dangerous change, it blocks applying to all other root modules
+   1. You cannot apply to a development environment before production
+   1. If a problem occurs in one root module causing a plan failure or a dangerous change, it blocks applying to all other root modules

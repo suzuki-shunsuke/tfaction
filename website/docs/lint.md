@@ -16,23 +16,23 @@ You can perform linting and formatting using the `test` action.
 Run it after `terraform-init` and before `plan`.
 
 ```yaml
-      - name: terraform init
-        uses: suzuki-shunsuke/tfaction@latest
-        with:
-          action: terraform-init
-          github_token: ${{ steps.token.outputs.token }}
+- name: terraform init
+  uses: suzuki-shunsuke/tfaction@latest
+  with:
+    action: terraform-init
+    github_token: ${{ steps.token.outputs.token }}
 
-      - name: Lint
-        uses: suzuki-shunsuke/tfaction@latest
-        with:
-          action: test
-          github_token: ${{ steps.token.outputs.token }}
+- name: Lint
+  uses: suzuki-shunsuke/tfaction@latest
+  with:
+    action: test
+    github_token: ${{ steps.token.outputs.token }}
 
-      - name: Plan
-        uses: suzuki-shunsuke/tfaction@latest
-        with:
-          action: plan
-          github_token: ${{ steps.token.outputs.token }}
+- name: Plan
+  uses: suzuki-shunsuke/tfaction@latest
+  with:
+    action: plan
+    github_token: ${{ steps.token.outputs.token }}
 ```
 
 For now, let's disable tflint and trivy.
@@ -226,5 +226,5 @@ In addition, there are several tfaction-specific settings.
 
 - id: Optional. An ID to identify the policy. Required when you want to override a policy.
 - plan: Set to true to run against plan files. Default is false.
-- tf: Set to true to run against *.tf and *.tf.json files. Default is false.
+- tf: Set to true to run against _.tf and _.tf.json files. Default is false.
 - enabled: Default is true. Useful when you want to override and disable a setting.

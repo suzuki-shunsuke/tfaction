@@ -19,11 +19,11 @@ target_groups:
     terraform_plan_config:
       gcp_service_account: terraform-plan@gke-getting-started-277012.iam.gserviceaccount.com
       gcp_workload_identity_provider: projects/750433540665/locations/global/workloadIdentityPools/my-pool/providers/github-actions-terraform-plan
-      gcp_access_token_scopes: 'https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/userinfo.email, https://www.googleapis.com/auth/apps.groups.settings, https://www.googleapis.com/auth/admin.directory.group'
+      gcp_access_token_scopes: "https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/userinfo.email, https://www.googleapis.com/auth/apps.groups.settings, https://www.googleapis.com/auth/admin.directory.group"
     terraform_apply_config:
       gcp_service_account: terraform-apply@gke-getting-started-277012.iam.gserviceaccount.com
       gcp_workload_identity_provider: projects/750433540665/locations/global/workloadIdentityPools/my-pool/providers/github-actions-terraform-apply
-      gcp_access_token_scopes: 'https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/userinfo.email, https://www.googleapis.com/auth/apps.groups.settings, https://www.googleapis.com/auth/admin.directory.group'
+      gcp_access_token_scopes: "https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/userinfo.email, https://www.googleapis.com/auth/apps.groups.settings, https://www.googleapis.com/auth/admin.directory.group"
 ```
 
 Because you can use separate Service Accounts for terraform plan and apply, you can use a read-only Service Account for plan and a Service Account with stronger permissions for apply.
