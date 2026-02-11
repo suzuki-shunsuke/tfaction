@@ -12,34 +12,26 @@ import * as ciinfo from "../../ci-info";
 import { getTargetConfig } from "../get-target-config";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import * as checkTerraformSkip from "../../check-terraform-skip";
+import {
+  isPullRequestEvent as isPullRequestEventFn,
+  shouldSkipCIInfo as shouldSkipCIInfoFn,
+  checkLatestCommit as checkLatestCommitFn,
+} from "./run";
+import { updatePRBranch } from "@suzuki-shunsuke/update-pr-branch";
 
 // Check if this is a pull request event
 const isPullRequestEvent = (): boolean => {
-  const eventName = github.context.eventName;
-  return eventName === "pull_request" || eventName.startsWith("pull_request_");
+  return isPullRequestEventFn(github.context.eventName);
 };
 
 // Check if ci-info should be skipped
 const shouldSkipCIInfo = (): boolean => {
-  const eventName = github.context.eventName;
-  return eventName === "workflow_dispatch" || eventName === "schedule";
+  return shouldSkipCIInfoFn(github.context.eventName);
 };
 
 // Check if the PR head SHA is the latest
-const checkLatestCommit = async (latestHeadSHA: string): Promise<void> => {
-  const headSHA = github.context.payload.pull_request?.head?.sha;
-  if (!headSHA) {
-    throw new Error("Failed to get the current SHA from event payload");
-  }
-  if (!latestHeadSHA) {
-    throw new Error("Failed to get the pull request HEAD SHA");
-  }
-
-  if (headSHA !== latestHeadSHA) {
-    throw new Error(
-      `The head sha (${headSHA}) isn't latest (${latestHeadSHA}).`,
-    );
-  }
+const checkLatestCommit = (latestHeadSHA: string): void => {
+  checkLatestCommitFn(github.context.payload.pull_request, latestHeadSHA);
 };
 
 // Add label to PR
@@ -50,6 +42,9 @@ const addLabelToPR = async (
 ): Promise<void> => {
   if (prNumber <= 0) {
     throw new Error("Failed to get a pull request number");
+  }
+  if (!target) {
+    return;
   }
   try {
     await octokit.rest.issues.addLabels({
@@ -107,7 +102,40 @@ export const main = async () => {
     if (isPR) {
       core.info("Checking if commit is latest...");
 
-      await checkLatestCommit(ci.pr?.data.head.sha ?? "");
+      checkLatestCommit(ci.pr?.data.head.sha ?? "");
+
+      const prNumber = github.context.payload.pull_request?.number ?? 0;
+
+      let csmServerRepoOwner = github.context.repo.owner;
+      let csmServerRepoName = config.securefix_action?.server_repository ?? "";
+      if (csmServerRepoName.includes("/")) {
+        csmServerRepoOwner = csmServerRepoName.split("/")[0];
+        csmServerRepoName = csmServerRepoName.split("/")[1];
+      }
+
+      const updateResult = await updatePRBranch({
+        files: new Set([targetConfig.working_directory + "/**"]),
+        repoOwner: github.context.repo.owner,
+        repoName: github.context.repo.repo,
+        prNumber: prNumber,
+        maxBehindBy: -1,
+        githubToken: githubToken,
+        defaultGitHubToken: "",
+        appID: "",
+        appPrivateKey: "",
+        csmServerRepoOwner: csmServerRepoOwner,
+        csmServerRepoName: csmServerRepoName,
+        csmAppID: input.securefixActionAppId,
+        csmAppPrivateKey: input.securefixActionAppPrivateKey,
+        baseBranch: github.context.payload.pull_request?.base?.ref ?? "",
+        headBranch: github.context.payload.pull_request?.head?.ref ?? "",
+        contextPRNumber: prNumber,
+        updateIf300Files: true,
+      });
+      if (updateResult.updated) {
+        throw new Error("PR branch is updated");
+      }
+
       // Add label to PR (only for PRs)
       await addLabelToPR(
         octokit,
@@ -135,8 +163,36 @@ export const main = async () => {
 
   // Set outputs from target config
   for (const [key, value] of Object.entries(targetConfig)) {
-    if (key !== "env" && key !== "target" && value !== undefined) {
+    if (
+      key !== "env" &&
+      key !== "target" &&
+      key !== "secretsConfig" &&
+      value !== undefined
+    ) {
       core.setOutput(key, value);
+    }
+  }
+
+  // Process secrets
+  if (input.secrets) {
+    const inputSecrets: Record<string, string> = JSON.parse(input.secrets);
+    core.info(
+      `The list of secret names passed to the action: ${Object.keys(inputSecrets).join(", ")}`,
+    );
+    if (targetConfig.secretsConfig) {
+      const secretsOutput: Record<string, string> = {};
+      for (const [envName, secretName] of Object.entries(
+        targetConfig.secretsConfig,
+      )) {
+        if (!(secretName in inputSecrets)) {
+          throw new Error(`secret is not found: ${secretName}`);
+        }
+        core.info(
+          `map the secret ${secretName} to the environment variable ${envName}`,
+        );
+        secretsOutput[envName] = inputSecrets[secretName];
+      }
+      core.setOutput("secrets", JSON.stringify(secretsOutput));
     }
   }
 

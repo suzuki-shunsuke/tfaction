@@ -3,19 +3,22 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import * as lib from "../../../lib";
-import * as drift from "../../../lib/drift";
-import * as env from "../../../lib/env";
-import * as input from "../../../lib/input";
-import * as aqua from "../../../aqua";
-import * as getTargetConfig from "../../get-target-config";
+import * as lib from "../../lib";
+import * as drift from "../../lib/drift";
+import * as env from "../../lib/env";
+import * as input from "../../lib/input";
+import * as aqua from "../../aqua";
+import * as getTargetConfig from "../get-target-config";
 import {
   listRelatedPullRequests,
   updateBranchBySecurefix,
   updateBranchByCommit,
-} from "../terraform-apply";
+} from "./terraform";
 
-export const main = async (): Promise<void> => {
+export const main = async (
+  secrets?: Record<string, string>,
+  githubTokenForGitHubProvider?: string,
+): Promise<void> => {
   const githubToken = input.githubToken;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   const cfg = await lib.getConfig();
@@ -52,7 +55,6 @@ export const main = async (): Promise<void> => {
     cwd: workingDir,
   });
 
-  core.startGroup("tfmigrate apply");
   // Run tfmigrate apply with github-comment
   let exitCode = 0;
   try {
@@ -60,9 +62,16 @@ export const main = async (): Promise<void> => {
       .exec("tfmigrate", ["apply"], {
         cwd: workingDir,
         ignoreReturnCode: true,
-        env: env.all.TFMIGRATE_EXEC_PATH
-          ? { TFMIGRATE_EXEC_PATH: env.all.TFMIGRATE_EXEC_PATH }
-          : undefined,
+        secretEnvs: secrets,
+        group: "tfmigrate apply",
+        env: {
+          ...(env.all.TFMIGRATE_EXEC_PATH
+            ? { TFMIGRATE_EXEC_PATH: env.all.TFMIGRATE_EXEC_PATH }
+            : {}),
+          ...(githubTokenForGitHubProvider
+            ? { GITHUB_TOKEN: githubTokenForGitHubProvider }
+            : {}),
+        },
         listeners: {
           stdout: (data: Buffer) => {
             process.stdout.write(data);
@@ -87,8 +96,6 @@ export const main = async (): Promise<void> => {
   } finally {
     outputStream.end();
   }
-
-  core.endGroup();
 
   // If this is a drift issue, post the result to the drift issue
   if (driftIssueNumber) {

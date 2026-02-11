@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
+import * as github from "@actions/github";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
@@ -11,6 +12,7 @@ import * as conftest from "../../conftest";
 
 type Inputs = {
   githubToken: string;
+  githubTokenForGitHubProvider?: string;
   workingDirectory: string;
   renovateLogin: string;
   destroy: boolean;
@@ -21,15 +23,19 @@ type Inputs = {
   ciInfoTempDir?: string;
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
+  acceptChangeByRenovate: boolean;
   executor: aqua.Executor;
+  secrets?: Record<string, string>;
 };
 
 export type RunInputs = {
   githubToken: string;
+  githubTokenForGitHubProvider?: string;
   jobType: string;
   driftIssueNumber?: string;
   prAuthor?: string;
   ciInfoTempDir?: string;
+  secrets?: Record<string, string>;
 };
 
 type TerraformPlanOutputs = {
@@ -45,27 +51,45 @@ type TfmigratePlanOutputs = {
   planJson?: string;
 };
 
-const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
+export const disableAutoMergeForRenovateChange = async (
+  inputs: Inputs,
+): Promise<void> => {
   // Skip if not a renovate PR
   if (inputs.prAuthor !== inputs.renovateLogin) {
     return;
   }
 
-  // Check if renovate-change label exists
-  const labelsFile = path.join(inputs.ciInfoTempDir || "", "labels.txt");
-  if (!fs.existsSync(labelsFile)) {
-    core.warning(`Labels file not found: ${labelsFile}`);
+  // Skip if changes are expected for this target
+  if (inputs.acceptChangeByRenovate) {
     return;
   }
 
-  const labels = fs.readFileSync(labelsFile, "utf8").split("\n");
-  const hasRenovateChangeLabel = labels.some(
-    (label) => label.trim() === "renovate-change",
+  // Read pr.json from ciInfoTempDir
+  const prJsonFile = path.join(inputs.ciInfoTempDir || "", "pr.json");
+  if (!fs.existsSync(prJsonFile)) {
+    core.warning(`PR JSON file not found: ${prJsonFile}`);
+    return;
+  }
+
+  const prData = JSON.parse(fs.readFileSync(prJsonFile, "utf8"));
+
+  // If auto_merge is not enabled, nothing to do
+  if (!prData.auto_merge) {
+    return;
+  }
+
+  // Disable auto-merge via GraphQL
+  const octokit = github.getOctokit(inputs.githubToken);
+  await octokit.graphql(
+    `mutation ($nodeId: ID!) {
+      disablePullRequestAutoMerge(input: {pullRequestId: $nodeId}) {
+        clientMutationId
+      }
+    }`,
+    {
+      nodeId: prData.node_id,
+    },
   );
-
-  if (hasRenovateChangeLabel) {
-    return;
-  }
 
   const executor = inputs.executor;
 
@@ -84,10 +108,6 @@ const validateRenovateChange = async (inputs: Inputs): Promise<void> => {
         GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
       },
     },
-  );
-
-  throw new Error(
-    "Renovate PR must have 'No change' or 'renovate-change' label",
   );
 };
 
@@ -179,7 +199,13 @@ export const runTfmigratePlan = async (
 
   await executor.exec("tfmigrate", ["plan", "--out", tempPlanBinary], {
     cwd: inputs.workingDirectory,
-    env: tfmigrateEnv,
+    env: {
+      ...tfmigrateEnv,
+      ...(inputs.githubTokenForGitHubProvider
+        ? { GITHUB_TOKEN: inputs.githubTokenForGitHubProvider }
+        : {}),
+    },
+    secretEnvs: inputs.secrets,
     group: "tfmigrate plan",
     comment: {
       token: inputs.githubToken,
@@ -191,21 +217,19 @@ export const runTfmigratePlan = async (
   });
 
   // Run terraform show to convert plan to JSON
-  core.startGroup(`${inputs.tfCommand} show`);
-
   const showResult = await executor.getExecOutput(
     inputs.tfCommand,
     ["show", "-json", tempPlanBinary],
     {
       cwd: inputs.workingDirectory,
       silent: true,
+      group: `${inputs.tfCommand} show`,
       comment: {
         token: inputs.githubToken,
       },
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
-  core.endGroup();
 
   core.setOutput("plan_json", tempPlanJson);
   core.setOutput("plan_binary", tempPlanBinary);
@@ -220,9 +244,6 @@ export const runTerraformPlan = async (
   inputs: Inputs,
 ): Promise<TerraformPlanOutputs> => {
   const installDir = path.join(lib.GitHubActionPath, "install");
-
-  // Run terraform plan with tfcmt
-  core.startGroup(`${inputs.tfCommand} plan`);
 
   // Create temp directory and copy plan binary
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
@@ -257,18 +278,20 @@ export const runTerraformPlan = async (
 
   const executor = inputs.executor;
 
+  // Run terraform plan with tfcmt
   const planResult = await executor.getExecOutput("tfcmt", planArgs, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
+    secretEnvs: inputs.secrets,
+    group: `${inputs.tfCommand} plan`,
     env: {
-      GITHUB_TOKEN: inputs.githubToken,
-      AQUA_GLOBAL_CONFIG: lib.aquaGlobalConfig,
+      GITHUB_TOKEN: inputs.githubTokenForGitHubProvider || inputs.githubToken,
+      TFCMT_GITHUB_TOKEN: inputs.githubToken,
       TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
     },
   });
 
   const detailedExitcode = planResult.exitCode;
-  core.endGroup();
 
   // Set detailed_exitcode output immediately
   core.setOutput("detailed_exitcode", detailedExitcode);
@@ -321,7 +344,7 @@ export const runTerraformPlan = async (
 
   // If not drift detection mode, validate renovate changes
   if (!inputs.driftIssueNumber) {
-    await validateRenovateChange(inputs);
+    await disableAutoMergeForRenovateChange(inputs);
   }
 
   // If drift detection mode and there are changes, fail
@@ -353,6 +376,7 @@ export const main = async (
 
   const inputs: Inputs = {
     githubToken: runInputs.githubToken,
+    githubTokenForGitHubProvider: runInputs.githubTokenForGitHubProvider,
     workingDirectory: workingDir,
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.destroy || false,
@@ -364,7 +388,9 @@ export const main = async (
     s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
+    acceptChangeByRenovate: targetConfig.accept_change_by_renovate || false,
     executor,
+    secrets: runInputs.secrets,
   };
 
   const jobType = runInputs.jobType;

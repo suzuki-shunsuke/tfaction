@@ -3,12 +3,12 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import * as lib from "../../../lib";
-import * as drift from "../../../lib/drift";
-import * as env from "../../../lib/env";
-import * as input from "../../../lib/input";
-import * as aqua from "../../../aqua";
-import * as getTargetConfig from "../../get-target-config";
+import * as lib from "../../lib";
+import * as drift from "../../lib/drift";
+import * as env from "../../lib/env";
+import * as input from "../../lib/input";
+import * as aqua from "../../aqua";
+import * as getTargetConfig from "../get-target-config";
 import * as updateBranchAction from "@csm-actions/update-branch-action";
 import * as githubAppToken from "@suzuki-shunsuke/github-app-token";
 import {
@@ -16,6 +16,7 @@ import {
   FindOptions,
   DownloadArtifactOptions,
 } from "@actions/artifact";
+import * as run from "./run";
 
 type WorkflowRun = {
   headSha: string;
@@ -29,32 +30,18 @@ export const listRelatedPullRequests = async (
   const octokit = github.getOctokit(githubToken);
   const { owner, repo } = github.context.repo;
 
-  // Search pull requests using GraphQL
-  const query = `repo:${owner}/${repo} is:pr is:open label:"${target}" -label:tfaction:disable-auto-update`;
-
-  const result: {
-    search: {
-      nodes: Array<{ number: number }>;
-    };
-  } = await octokit.graphql(
-    `
-    query($q: String!) {
-      search(query: $q, type: ISSUE, first: 100) {
-        nodes {
-          ... on PullRequest {
-            number
-          }
-        }
-      }
-    }
-  `,
-    { q: query },
-  );
-
-  return result.search.nodes.map((pr) => pr.number);
+  return run.listRelatedPullRequests({
+    octokit,
+    owner,
+    repo,
+    target,
+  });
 };
 
-export const main = async (): Promise<void> => {
+export const main = async (
+  secrets?: Record<string, string>,
+  githubTokenForGitHubProvider?: string,
+): Promise<void> => {
   const githubToken = input.githubToken;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
   const cfg = await lib.getConfig();
@@ -95,8 +82,6 @@ export const main = async (): Promise<void> => {
   const applyOutput = path.join(tempDir, "apply_output.txt");
   const outputStream = fs.createWriteStream(applyOutput);
 
-  core.startGroup(`${tfCommand} apply`);
-
   // Run terraform apply with tfcmt
   let exitCode = 0;
   try {
@@ -118,8 +103,11 @@ export const main = async (): Promise<void> => {
         {
           cwd: workingDir,
           ignoreReturnCode: true,
+          secretEnvs: secrets,
+          group: `${tfCommand} apply`,
           env: {
-            GITHUB_TOKEN: githubToken,
+            GITHUB_TOKEN: githubTokenForGitHubProvider || githubToken,
+            TFCMT_GITHUB_TOKEN: githubToken,
             TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
           },
           listeners: {
@@ -140,8 +128,6 @@ export const main = async (): Promise<void> => {
   } finally {
     outputStream.end();
   }
-
-  core.endGroup();
 
   // If this is a drift issue, post the result to the drift issue
   if (driftIssueNumber) {
@@ -178,7 +164,8 @@ export const main = async (): Promise<void> => {
           cwd: workingDir,
           ignoreReturnCode: true,
           env: {
-            GITHUB_TOKEN: githubToken,
+            GITHUB_TOKEN: githubTokenForGitHubProvider || githubToken,
+            TFCMT_GITHUB_TOKEN: githubToken,
           },
         },
       );
@@ -246,23 +233,19 @@ export const updateBranchBySecurefix = async (
   });
   try {
     const octokit = github.getOctokit(token.token);
-    for (const prNumber of prNumbers) {
-      try {
-        core.info(
-          `Updating a branch ${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/pull/${prNumber}`,
-        );
-        await updateBranchAction.update({
-          octokit,
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
-          pullRequestNumber: prNumber,
-          serverRepositoryOwner: serverRepoOwner,
-          serverRepositoryName: serverRepoName,
-        });
-      } catch (error) {
-        core.warning(`Failed to update branch for PR #${prNumber}: ${error}`);
-      }
-    }
+    const { owner, repo } = github.context.repo;
+
+    await run.updateBranchBySecurefix({
+      octokit,
+      serverRepoOwner,
+      serverRepoName,
+      owner,
+      repo,
+      serverUrl: github.context.serverUrl,
+      prNumbers,
+      updateBranchFn: updateBranchAction.update,
+      logger: core,
+    });
   } finally {
     await revoke(token);
   }
@@ -273,18 +256,15 @@ export const updateBranchByCommit = async (
   prNumbers: number[],
 ): Promise<void> => {
   const octokit = github.getOctokit(githubToken);
-  for (const prNumber of prNumbers) {
-    try {
-      const { data } = await octokit.rest.pulls.updateBranch({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        pull_number: prNumber,
-      });
-      core.notice(`Updated a branch ${data.url}`);
-    } catch (error) {
-      core.warning(`Failed to update branch for PR #${prNumber}: ${error}`);
-    }
-  }
+  const { owner, repo } = github.context.repo;
+
+  return run.updateBranchByCommit({
+    octokit,
+    owner,
+    repo,
+    prNumbers,
+    logger: core,
+  });
 };
 
 const downloadArtifact = async (
@@ -321,7 +301,7 @@ const downloadArtifact = async (
 
 const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   const cfg = await lib.getConfig();
-  const githubToken = core.getInput("github_token");
+  const githubToken = input.githubToken;
   const target = env.all.TFACTION_TARGET;
   const planWorkflowName = cfg.plan_workflow_name;
   const ciInfoTempDir = env.all.CI_INFO_TEMP_DIR;

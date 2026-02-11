@@ -23,5 +23,20 @@ export default defineConfig([
     },
   },
   tseslint.configs.recommended,
+  {
+    files: ["**/*.{ts,mts,cts}"],
+    ignores: ["eslint.config.ts"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": "error",
+      "@typescript-eslint/require-await": "error",
+    },
+  },
   globalIgnores(["docusaurus.config.js", "website/*", "build/*", "dist/*"]),
 ]);

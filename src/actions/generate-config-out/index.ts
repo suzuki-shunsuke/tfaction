@@ -8,6 +8,7 @@ import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../get-target-config";
 import * as commit from "../../commit";
+import * as run from "./run";
 
 export const main = async () => {
   const githubToken = input.githubToken;
@@ -56,11 +57,8 @@ export const main = async () => {
 
   // Generate temp file name
   const runId = env.all.GITHUB_RUN_ID;
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/[-:T]/g, "")
-    .replace(/\..+/, "");
-  const tempFile = `generated_${runId}_${timestamp}.tf`;
+  const timestamp = run.formatTimestamp(new Date());
+  const tempFile = run.generateTempFileName(runId, timestamp);
   const tempFilePath = path.join(workingDir, tempFile);
   const targetFilePath = path.join(workingDir, file);
 
@@ -90,21 +88,15 @@ export const main = async () => {
   }
 
   const generatedContent = fs.readFileSync(tempFilePath, "utf8");
-  const filteredLines =
-    generatedContent
-      .split("\n")
-      .filter((line) => {
-        const trimmed = line.trim();
-        // Skip comments (lines starting with #) and empty lines
-        return trimmed.length > 0 && !trimmed.startsWith("#");
-      })
-      .join("\n") + "\n";
+  const filteredContent = run.filterGeneratedContent(generatedContent);
 
-  // Append to target file
-  if (fs.existsSync(targetFilePath)) {
-    fs.appendFileSync(targetFilePath, "\n" + filteredLines);
+  // Append to target file or create new file
+  const writeMode = run.getWriteMode(fs.existsSync(targetFilePath));
+  const contentToWrite = run.prepareContentForWrite(filteredContent, writeMode);
+  if (writeMode === "append") {
+    fs.appendFileSync(targetFilePath, contentToWrite);
   } else {
-    fs.writeFileSync(targetFilePath, filteredLines);
+    fs.writeFileSync(targetFilePath, contentToWrite);
   }
 
   // Remove temp file

@@ -18,7 +18,7 @@ export type Inputs = {
  * @param workingDir a relative path from github.workspace
  * @param cfg
  */
-const runAquaUpdateChecksum = async (
+export const runAquaUpdateChecksum = async (
   executor: aqua.Executor,
   workingDir: string,
   prune: boolean,
@@ -38,7 +38,7 @@ const runAquaUpdateChecksum = async (
  * @param workingDir a relative path from github.workspace
  * @returns a relative path from workingDir
  */
-const findChecksumFile = (workingDir: string): string => {
+export const findChecksumFile = (workingDir: string): string => {
   const candidates = [
     "aqua-checksums.json",
     ".aqua-checksums.json",
@@ -63,7 +63,7 @@ const findChecksumFile = (workingDir: string): string => {
  * @param workingDir a relative path from github.workspace
  * @returns
  */
-const checkIfChanged = async (
+export const checkIfChanged = async (
   checksumFile: string,
   workingDir: string,
 ): Promise<boolean> => {

@@ -15,7 +15,7 @@ describe("createWDTargetMap", () => {
     const wds = ["aws/foo/dev", "aws/bar/prod"];
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
       },
     ];
     const result = createWDTargetMap(wds, targetGroups, undefined);
@@ -27,7 +27,7 @@ describe("createWDTargetMap", () => {
     const wds = ["aws/services/foo/dev"];
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
       },
     ];
     const replaceTarget: Replace = {
@@ -46,7 +46,7 @@ describe("createWDTargetMap", () => {
     const wds = ["aws/services/foo/dev"];
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
       },
     ];
     const replaceTarget: Replace = {
@@ -69,7 +69,7 @@ describe("createWDTargetMap", () => {
     const wds = ["aws/foo/bar/foo/dev"];
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
       },
     ];
     const replaceTarget: Replace = {
@@ -89,7 +89,7 @@ describe("createWDTargetMap", () => {
     const wds = ["gcp/foo/dev"];
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
       },
     ];
     const replaceTarget: Replace = {
@@ -109,10 +109,10 @@ describe("createWDTargetMap", () => {
     const wds = ["aws/foo/dev", "gcp/bar/prod"];
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
       },
       {
-        working_directory: "gcp",
+        working_directory: "gcp/**",
       },
     ];
     const replaceTarget: Replace = {
@@ -133,7 +133,7 @@ describe("getTargetFromTargetGroupsByWorkingDir", () => {
   it("returns matching target group", () => {
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
         aws_region: "us-east-1",
       },
     ];
@@ -142,7 +142,7 @@ describe("getTargetFromTargetGroupsByWorkingDir", () => {
       "aws/foo/dev",
     );
     expect(result).toEqual({
-      working_directory: "aws",
+      working_directory: "aws/**",
       aws_region: "us-east-1",
     });
   });
@@ -150,7 +150,7 @@ describe("getTargetFromTargetGroupsByWorkingDir", () => {
   it("returns undefined when no match", () => {
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
       },
     ];
     const result = getTargetFromTargetGroupsByWorkingDir(
@@ -163,15 +163,15 @@ describe("getTargetFromTargetGroupsByWorkingDir", () => {
   it("returns first matching target group when multiple match", () => {
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
         aws_region: "us-east-1",
       },
       {
-        working_directory: "aws/services",
+        working_directory: "aws/services/**",
         aws_region: "us-west-2",
       },
     ];
-    // "aws/services/foo" matches "aws" first
+    // "aws/services/foo" matches "aws/**" first
     const result = getTargetFromTargetGroupsByWorkingDir(
       targetGroups,
       "aws/services/foo",
@@ -182,27 +182,27 @@ describe("getTargetFromTargetGroupsByWorkingDir", () => {
   it("handles nested paths correctly", () => {
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws/prod",
+        working_directory: "aws/prod/**",
       },
       {
-        working_directory: "aws",
+        working_directory: "aws/**",
       },
     ];
-    // "aws/prod/foo" should match "aws/prod" first
+    // "aws/prod/foo" should match "aws/prod/**" first
     const result = getTargetFromTargetGroupsByWorkingDir(
       targetGroups,
       "aws/prod/foo",
     );
-    expect(result?.working_directory).toBe("aws/prod");
+    expect(result?.working_directory).toBe("aws/prod/**");
   });
 
   it("does not match parent directories", () => {
     const targetGroups: TargetGroup[] = [
       {
-        working_directory: "aws/foo/dev",
+        working_directory: "aws/foo/dev/**",
       },
     ];
-    // "aws/foo" should not match "aws/foo/dev"
+    // "aws/foo" should not match "aws/foo/dev/**"
     const result = getTargetFromTargetGroupsByWorkingDir(
       targetGroups,
       "aws/foo",
@@ -222,10 +222,56 @@ describe("getTargetFromTargetGroupsByWorkingDir", () => {
     );
     expect(result?.working_directory).toBe("aws/foo");
   });
+
+  it("matches single-level wildcard pattern", () => {
+    const targetGroups: TargetGroup[] = [
+      {
+        working_directory: "aws/*/dev",
+      },
+    ];
+    expect(
+      getTargetFromTargetGroupsByWorkingDir(targetGroups, "aws/foo/dev"),
+    ).toBeDefined();
+    expect(
+      getTargetFromTargetGroupsByWorkingDir(targetGroups, "aws/foo/bar/dev"),
+    ).toBeUndefined();
+  });
+
+  it("matches globstar pattern", () => {
+    const targetGroups: TargetGroup[] = [
+      {
+        working_directory: "**/prod",
+      },
+    ];
+    expect(
+      getTargetFromTargetGroupsByWorkingDir(targetGroups, "aws/prod"),
+    ).toBeDefined();
+    expect(
+      getTargetFromTargetGroupsByWorkingDir(targetGroups, "gcp/services/prod"),
+    ).toBeDefined();
+  });
+
+  it("matches brace expansion pattern", () => {
+    const targetGroups: TargetGroup[] = [
+      {
+        working_directory: "aws/{foo,bar}/**",
+      },
+    ];
+    expect(
+      getTargetFromTargetGroupsByWorkingDir(targetGroups, "aws/foo/dev"),
+    ).toBeDefined();
+    expect(
+      getTargetFromTargetGroupsByWorkingDir(targetGroups, "aws/bar/dev"),
+    ).toBeDefined();
+    expect(
+      getTargetFromTargetGroupsByWorkingDir(targetGroups, "aws/baz/dev"),
+    ).toBeUndefined();
+  });
 });
 
 describe("getJobConfig", () => {
   const config: TargetConfig = {
+    accept_change_by_renovate: false,
     terraform_plan_config: {
       aws_assume_role_arn: "arn:aws:iam::123456789012:role/terraform-plan",
     },
@@ -284,6 +330,7 @@ describe("getJobConfig", () => {
 
   it("returns undefined when specific config is not set", () => {
     const partialConfig: TargetConfig = {
+      accept_change_by_renovate: false,
       terraform_plan_config: {
         aws_assume_role_arn: "arn:aws:iam::123456789012:role/terraform-plan",
       },
@@ -434,6 +481,7 @@ describe("checkDriftDetectionEnabled", () => {
   const createTargetConfig = (driftDetection?: {
     enabled?: boolean;
   }): TargetConfig => ({
+    accept_change_by_renovate: false,
     drift_detection: driftDetection,
   });
 

@@ -1,7 +1,7 @@
 import { diffString } from "json-diff";
 import * as env from "../lib/env";
 
-export const main = async () => {
+export const main = () => {
   // Compare outputs
   const testdata = [
     {
@@ -23,43 +23,13 @@ export const main = async () => {
         aws_role_session_name: "",
         destroy: "false",
         enable_terraform_docs: "false",
+        accept_change_by_renovate: "false",
       },
       convert: (data: Record<string, string>): Record<string, string> => {
         data.aws_role_session_name = "";
         return data;
       },
       actual: env.all.TARGET_CONFIG,
-    },
-    {
-      name: "get-global-config",
-      expected: {
-        working_directory_file: "tfaction.yaml",
-        module_file: "tfaction_module.yaml",
-        renovate_login: "renovate[bot]",
-        draft_pr: "false",
-        skip_create_pr: "false",
-        plan_workflow_name: "test.yaml",
-        label_prefix_tfmigrate: "migrate:",
-        label_prefix_skip: "skip:",
-        disable_update_related_pull_requests: "false",
-        update_local_path_module_caller: "true",
-        aqua_update_checksum_enabled: "true",
-        aqua_update_checksum_prune: "true",
-        aqua_update_checksum_skip_push: "false",
-        enable_tflint: "true",
-        enable_trivy: "true",
-        tflint_fix: "true",
-        terraform_command: "terraform",
-        drift_issue_repo_owner: "suzuki-shunsuke",
-        drift_issue_repo_name: "test-tfaction",
-        follow_up_pr_group_label_prefix: "tfaction:follow-up-pr-group/",
-        follow_up_pr_group_label_enabled: "false",
-        max_changed_working_dirs: "0",
-        max_changed_modules: "0",
-        securefix_action_server_repository: "",
-        securefix_action_pull_request_base_branch: "",
-      },
-      actual: env.all.GLOBAL_CONFIG,
     },
   ];
   let failed = false;

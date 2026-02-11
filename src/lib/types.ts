@@ -21,20 +21,20 @@ const ReviewdogConfig = z.object({
   fail_level: z.enum(["none", "any", "info", "warning", "error"]).optional(),
 });
 
-const tflintDefaults = { enabled: true, fix: false } as const;
+const tflintDefaults = { enabled: true, fix: true } as const;
 const TflintConfig = z.object({
   enabled: z.boolean().default(tflintDefaults.enabled),
   fix: z.boolean().default(tflintDefaults.fix),
   reviewdog: ReviewdogConfig.optional(),
 });
-type TflintConfig = z.infer<typeof TflintConfig>;
+export type TflintConfig = z.infer<typeof TflintConfig>;
 
 const trivyDefaults = { enabled: true } as const;
 const TrivyConfig = z.object({
   enabled: z.boolean().default(trivyDefaults.enabled),
   reviewdog: ReviewdogConfig.optional(),
 });
-type TrivyConfig = z.infer<typeof TrivyConfig>;
+export type TrivyConfig = z.infer<typeof TrivyConfig>;
 
 const TerraformDocsConfig = z.object({
   enabled: z.boolean().optional(),
@@ -169,6 +169,7 @@ export const TargetConfig = z.object({
   terraform_command: z.string().optional(),
   terraform_docs: TerraformDocsConfig.optional(),
   conftest: ConftestConfig.optional(),
+  accept_change_by_renovate: z.boolean().default(false),
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 

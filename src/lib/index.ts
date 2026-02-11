@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import { load } from "js-yaml";
+import { minimatch } from "minimatch";
 import { z } from "zod";
 import * as env from "./env";
 import { fileURLToPath } from "node:url";
@@ -86,9 +87,7 @@ export const createWDTargetMap = (
   for (const wd of wds) {
     let target = wd;
     for (const tg of targetGroups) {
-      const rel = path.relative(tg.working_directory, wd);
-      // path.isAbsolute check handles Windows edge case where different drive letters result in absolute path
-      if (rel.startsWith("..") || path.isAbsolute(rel)) {
+      if (!minimatch(wd, tg.working_directory)) {
         continue;
       }
       for (const pattern of replaceTarget?.patterns ?? []) {
@@ -115,9 +114,7 @@ export const getTargetFromTargetGroupsByWorkingDir = (
   wd: string,
 ): TargetGroup | undefined => {
   for (const targetConfig of targetGroups) {
-    const rel = path.relative(targetConfig.working_directory, wd);
-    // path.isAbsolute check handles Windows edge case where different drive letters result in absolute path
-    if (!rel.startsWith("..") && !path.isAbsolute(rel)) {
+    if (minimatch(wd, targetConfig.working_directory)) {
       return targetConfig;
     }
   }
@@ -129,7 +126,15 @@ export const readTargetConfig = (p: string): TargetConfig => {
 };
 
 export const getJobConfig = (
-  config: TargetConfig | undefined,
+  config:
+    | Pick<
+        TargetConfig,
+        | "terraform_apply_config"
+        | "terraform_plan_config"
+        | "tfmigrate_apply_config"
+        | "tfmigrate_plan_config"
+      >
+    | undefined,
   isApply: boolean,
   jobType: JobType,
 ): JobConfig | undefined => {
@@ -201,7 +206,7 @@ export const setEnvs = (
 export type Target = {
   target: string;
   workingDir: string;
-  group?: TargetGroup;
+  group: TargetGroup;
 };
 
 /**
@@ -226,6 +231,13 @@ export const getTargetGroup = async (
       config.target_groups,
       workingDir,
     );
+    if (targetConfig === undefined) {
+      throw new Error(
+        `no target group matches the working directory "${workingDir}". ` +
+          `Check target_groups[].working_directory in your tfaction-root.yaml. ` +
+          `Available patterns: ${config.target_groups.map((tg) => tg.working_directory).join(", ")}`,
+      );
+    }
     if (target) {
       return {
         target: target,
@@ -275,6 +287,13 @@ export const getTargetGroup = async (
     config.target_groups,
     workingDir,
   );
+  if (targetConfig === undefined) {
+    throw new Error(
+      `no target group matches the working directory "${workingDir}". ` +
+        `Check target_groups[].working_directory in your tfaction-root.yaml. ` +
+        `Available patterns: ${config.target_groups.map((tg) => tg.working_directory).join(", ")}`,
+    );
+  }
   return {
     target: target,
     workingDir: workingDir,

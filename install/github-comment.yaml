@@ -92,12 +92,12 @@ post:
 
   renovate-plan-change:
     template: |
-      ## :x: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Renovate's PR must be `No change`
+      ## :warning: {{if .Vars.tfaction_target}}{{.Vars.tfaction_target}}: {{end}}Auto-merge was disabled because `terraform plan` has changes
 
       {{template "link" .}}
 
-      In the pull request created by Renovate, the result of `terraform plan` must be `No change` to enable automerge safely.
-      If you allow changes, please set the pull request label `renovate-change` and rerun CI.
+      In the pull request created by Renovate, `terraform plan` detected changes. Auto-merge has been disabled for safety.
+      Please review the plan and merge the pull request manually if the changes are expected.
 
 exec:
   default:

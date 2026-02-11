@@ -6,9 +6,7 @@ import * as scaffoldTfmigrate from "./actions/scaffold-tfmigrate";
 import * as scaffoldWorkingDir from "./actions/scaffold-working-dir";
 import * as setup from "./actions/setup";
 import * as exportAWSSecretsManager from "./actions/export-aws-secrets-manager";
-import * as exportSecrets from "./actions/export-secrets";
 import * as generateConfigOut from "./actions/generate-config-out";
-import * as getGlobalConfig from "./actions/get-global-config";
 import * as getTargetConfig from "./actions/get-target-config";
 import * as pickOutDriftIssues from "./actions/pick-out-drift-issues";
 import * as listTargets from "./actions/list-targets";
@@ -40,9 +38,7 @@ export const main = async (inputs: Inputs) => {
     ["create-scaffold-module-pr", createScaffoldModulePR],
     ["create-scaffold-pr", createScaffoldPR],
     ["export-aws-secrets-manager", exportAWSSecretsManager],
-    ["export-secrets", exportSecrets],
     ["generate-config-out", generateConfigOut],
-    ["get-global-config", getGlobalConfig],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
     ["get-target-config", getTargetConfig],
     ["list-targets", listTargets],
@@ -64,5 +60,5 @@ export const main = async (inputs: Inputs) => {
   if (action === undefined) {
     throw new Error(`Unknown action: ${inputs.action}`);
   }
-  action.main();
+  await action.main();
 };

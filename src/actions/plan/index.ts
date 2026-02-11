@@ -36,10 +36,13 @@ export const main = async () => {
   if (!skipTerraform) {
     await runPlan(targetConfig, {
       githubToken: input.githubToken,
+      githubTokenForGitHubProvider:
+        input.githubTokenForGitHubProvider || undefined,
       jobType: jobType,
       driftIssueNumber: driftIssueNumber || undefined,
       prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,
       ciInfoTempDir: env.all.CI_INFO_TEMP_DIR || undefined,
+      secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
     });
 
     // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)

@@ -2,34 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as tmp from "tmp";
 import * as semver from "semver";
-import * as core from "@actions/core";
-import * as input from "../../../../lib/input";
 import * as aqua from "../../../../aqua";
-import * as types from "../../../../lib/types";
-
-export const main = async (executor: aqua.Executor, cfg: types.Config) => {
-  const configFiles = fs
-    .readFileSync(input.getRequiredConfigFiles(), "utf8")
-    .trim()
-    .split("\n");
-  const moduleFiles = fs
-    .readFileSync(input.getRequiredModuleFiles(), "utf8")
-    .trim()
-    .split("\n");
-
-  const moduleCallers = await list(
-    cfg.git_root_dir,
-    configFiles,
-    moduleFiles,
-    executor,
-  );
-
-  const json = JSON.stringify(moduleCallers);
-  core.info(`file: ${json}`);
-  const tmpobj = tmp.fileSync();
-  fs.writeFileSync(tmpobj.name, json);
-  core.setOutput("file", tmpobj.name);
-};
 
 /**
  * List module callers in the git repository.
