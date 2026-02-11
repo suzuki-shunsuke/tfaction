@@ -151,12 +151,10 @@ const processChangedFiles = (
   changedWorkingDirs: Set<string>;
   changedModules: Set<string>;
   changedFilesPerWD: Map<string, string[]>;
-  changedWorkingDirsByModule: Set<string>;
 } => {
   const changedWorkingDirs = new Set<string>();
   const changedModules = new Set<string>();
   const changedFilesPerWD = new Map<string, string[]>();
-  const changedWorkingDirsByModule = new Set<string>();
 
   for (const changedFile of changedFiles) {
     if (changedFile == "") {
@@ -169,7 +167,9 @@ const processChangedFiles = (
         moduleData.moduleCallerMap.get(module)?.forEach((caller) => {
           if (wdTargetMap.has(caller)) {
             changedWorkingDirs.add(caller);
-            changedWorkingDirsByModule.add(caller);
+            const files = changedFilesPerWD.get(caller) ?? [];
+            files.push(rel);
+            changedFilesPerWD.set(caller, files);
           }
           if (moduleData.moduleSet.has(caller)) {
             changedModules.add(caller);
@@ -202,7 +202,6 @@ const processChangedFiles = (
     changedWorkingDirs,
     changedModules,
     changedFilesPerWD,
-    changedWorkingDirsByModule,
   };
 };
 
@@ -216,7 +215,6 @@ const addTargetsFromChangedWorkingDirs = (
   terraformTargetObjs: TargetConfig[],
   skipTerraformFiles: string[],
   changedFilesPerWD: Map<string, string[]>,
-  changedWorkingDirsByModule: Set<string>,
   skips: Set<string>,
 ): void => {
   for (const changedWorkingDir of changedWorkingDirs) {
@@ -233,7 +231,7 @@ const addTargetsFromChangedWorkingDirs = (
     let skipTerraform = false;
     if (skips.has(target)) {
       skipTerraform = true;
-    } else if (!changedWorkingDirsByModule.has(changedWorkingDir)) {
+    } else {
       skipTerraform = shouldSkipByFiles(
         skipTerraformFiles,
         changedFilesPerWD.get(changedWorkingDir) ?? [],
@@ -350,17 +348,13 @@ export const run = async (input: Input): Promise<Result> => {
   );
 
   const moduleData = prepareModuleData(input.moduleCallers, input.moduleFiles);
-  const {
-    changedWorkingDirs,
-    changedModules,
-    changedFilesPerWD,
-    changedWorkingDirsByModule,
-  } = processChangedFiles(
-    input.changedFiles,
-    moduleData,
-    workingDirs,
-    wdTargetMap,
-  );
+  const { changedWorkingDirs, changedModules, changedFilesPerWD } =
+    processChangedFiles(
+      input.changedFiles,
+      moduleData,
+      workingDirs,
+      wdTargetMap,
+    );
 
   addTargetsFromChangedWorkingDirs(
     changedWorkingDirs,
@@ -372,7 +366,6 @@ export const run = async (input: Input): Promise<Result> => {
     terraformTargetObjs,
     config.skip_terraform_files ?? [],
     changedFilesPerWD,
-    changedWorkingDirsByModule,
     skips,
   );
 

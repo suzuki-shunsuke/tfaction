@@ -1456,7 +1456,7 @@ test("skip_terraform_files: not configured", async () => {
   });
 });
 
-test("skip_terraform_files: WD changed via module dependency is not skipped", async () => {
+test("skip_terraform_files: module files don't match patterns", async () => {
   expect(
     await run({
       config: {
@@ -1495,6 +1495,52 @@ test("skip_terraform_files: WD changed via module dependency is not skipped", as
         runs_on: "ubuntu-latest",
         secrets: undefined,
         skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: module files all match patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/.terraform.lock.hcl"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {
+        "modules/vpc": ["foo/dev"],
+      },
+      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc"],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: true,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
