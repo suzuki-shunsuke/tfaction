@@ -4,9 +4,6 @@ plan_workflow_name: test.yaml
 
 label_prefixes:
   tfmigrate: "migrate:"
-# skip_terraform_by_renovate: true
-renovate_terraform_labels:
-  - terraform
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_arm64
 
 terraform_command: terragrunt

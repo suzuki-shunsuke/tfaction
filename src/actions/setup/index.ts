@@ -11,7 +11,6 @@ import * as aqua from "../../aqua";
 import * as ciinfo from "../../ci-info";
 import { getTargetConfig } from "../get-target-config";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
-import * as checkTerraformSkip from "../../check-terraform-skip";
 import {
   isPullRequestEvent as isPullRequestEventFn,
   shouldSkipCIInfo as shouldSkipCIInfoFn,
@@ -142,13 +141,6 @@ export const main = async () => {
         targetConfig.target,
         github.context.payload.pull_request?.number ?? 0,
       );
-
-      await checkTerraformSkip.main(config, {
-        skipLabelPrefix: config.label_prefixes.skip,
-        labels: ci.pr?.data.labels?.map((label) => label.name) ?? [],
-        prAuthor: ci.pr?.data.user.login ?? "",
-        target: targetConfig.target,
-      });
     }
   }
 
