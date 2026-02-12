@@ -1,5 +1,5 @@
-import { run, shouldSkipByFiles } from "./index";
-import { expect, test, describe } from "vitest";
+import { run } from "./index";
+import { expect, test } from "vitest";
 import * as aqua from "../../../aqua";
 
 test("normal", async () => {
@@ -1593,36 +1593,5 @@ test("skip_terraform_files: multiple patterns", async () => {
         working_directory: "foo/dev",
       },
     ],
-  });
-});
-
-// shouldSkipByFiles unit tests
-
-describe("shouldSkipByFiles", () => {
-  test("returns false when patterns is empty", () => {
-    expect(shouldSkipByFiles([], ["main.tf"])).toBe(false);
-  });
-
-  test("returns false when changedFiles is empty", () => {
-    expect(shouldSkipByFiles(["*.lock.hcl"], [])).toBe(false);
-  });
-
-  test("returns true when all files match a pattern", () => {
-    expect(
-      shouldSkipByFiles(
-        ["*.lock.hcl", "*.md"],
-        [".terraform.lock.hcl", "README.md"],
-      ),
-    ).toBe(true);
-  });
-
-  test("returns false when some files don't match", () => {
-    expect(
-      shouldSkipByFiles(["*.lock.hcl"], [".terraform.lock.hcl", "main.tf"]),
-    ).toBe(false);
-  });
-
-  test("returns true with glob pattern", () => {
-    expect(shouldSkipByFiles(["*.lock.*"], [".terraform.lock.hcl"])).toBe(true);
   });
 });

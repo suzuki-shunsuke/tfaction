@@ -131,14 +131,8 @@ const prepareModuleData = (
   return { moduleCallerMap, modules, moduleDirs, moduleSet };
 };
 
-export const shouldSkipByFiles = (
-  patterns: string[],
-  changedFiles: string[],
-): boolean => {
-  if (patterns.length === 0 || changedFiles.length === 0) return false;
-  return changedFiles.every((file) =>
-    patterns.some((pattern) => minimatch(file, pattern, { dot: true })),
-  );
+const matchesSkipPatterns = (file: string, patterns: string[]): boolean => {
+  return patterns.some((p) => minimatch(file, p, { dot: true }));
 };
 
 const processChangedFiles = (
@@ -147,6 +141,7 @@ const processChangedFiles = (
   moduleData: ModuleData,
   workingDirs: string[],
   wdTargetMap: Map<string, string>,
+  skipTerraformFiles: string[],
 ): {
   changedWorkingDirs: Set<string>;
   changedModules: Set<string>;
@@ -167,9 +162,11 @@ const processChangedFiles = (
         moduleData.moduleCallerMap.get(module)?.forEach((caller) => {
           if (wdTargetMap.has(caller)) {
             changedWorkingDirs.add(caller);
-            const files = changedFilesPerWD.get(caller) ?? [];
-            files.push(rel);
-            changedFilesPerWD.set(caller, files);
+            if (!matchesSkipPatterns(rel, skipTerraformFiles)) {
+              const files = changedFilesPerWD.get(caller) ?? [];
+              files.push(rel);
+              changedFilesPerWD.set(caller, files);
+            }
           }
           if (moduleData.moduleSet.has(caller)) {
             changedModules.add(caller);
@@ -183,9 +180,11 @@ const processChangedFiles = (
       const rel = path.relative(workingDir, changedFile);
       if (!rel.startsWith(".." + path.sep)) {
         changedWorkingDirs.add(workingDir);
-        const files = changedFilesPerWD.get(workingDir) ?? [];
-        files.push(rel);
-        changedFilesPerWD.set(workingDir, files);
+        if (!matchesSkipPatterns(rel, skipTerraformFiles)) {
+          const files = changedFilesPerWD.get(workingDir) ?? [];
+          files.push(rel);
+          changedFilesPerWD.set(workingDir, files);
+        }
         break;
       }
     }
@@ -213,7 +212,6 @@ const addTargetsFromChangedWorkingDirs = (
   targetGroups: types.TargetGroup[],
   isApply: boolean,
   terraformTargetObjs: TargetConfig[],
-  skipTerraformFiles: string[],
   changedFilesPerWD: Map<string, string[]>,
   skips: Set<string>,
 ): void => {
@@ -232,10 +230,8 @@ const addTargetsFromChangedWorkingDirs = (
     if (skips.has(target)) {
       skipTerraform = true;
     } else {
-      skipTerraform = shouldSkipByFiles(
-        skipTerraformFiles,
-        changedFilesPerWD.get(changedWorkingDir) ?? [],
-      );
+      // If WD had changed files but none remain after filtering, all matched skip patterns
+      skipTerraform = !changedFilesPerWD.has(changedWorkingDir);
     }
     const obj = getTargetConfigByTarget(
       targetGroups,
@@ -354,6 +350,7 @@ export const run = async (input: Input): Promise<Result> => {
       moduleData,
       workingDirs,
       wdTargetMap,
+      config.skip_terraform_files ?? [],
     );
 
   addTargetsFromChangedWorkingDirs(
@@ -364,7 +361,6 @@ export const run = async (input: Input): Promise<Result> => {
     config.target_groups,
     isApply,
     terraformTargetObjs,
-    config.skip_terraform_files ?? [],
     changedFilesPerWD,
     skips,
   );
