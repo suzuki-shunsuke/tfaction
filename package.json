@@ -23,7 +23,7 @@
     "@suzuki-shunsuke/github-app-token": "npm:@jsr/suzuki-shunsuke__github-app-token@^0.0.3",
     "@suzuki-shunsuke/update-pr-branch": "npm:@jsr/suzuki-shunsuke__update-pr-branch@^0.0.3",
     "@types/json-diff": "^1.0.3",
-    "glob": "13.0.1",
+    "glob": "13.0.2",
     "handlebars": "^4.7.8",
     "js-yaml": "4.1.1",
     "json-diff": "^1.0.6",
