@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
-  generateTag,
+  generateTagName,
   run,
   type RunInput,
   type RunDependencies,
@@ -9,11 +9,11 @@ import {
 
 describe("generateTag", () => {
   it("generates correct tag from simple path", () => {
-    expect(generateTag("foo", "v1.0.0")).toBe("module_foo_v1.0.0");
+    expect(generateTagName("foo", "v1.0.0")).toBe("module_foo_v1.0.0");
   });
 
   it("replaces / with _ in path", () => {
-    expect(generateTag("aws/modules/vpc", "v1.0.0")).toBe(
+    expect(generateTagName("aws/modules/vpc", "v1.0.0")).toBe(
       "module_aws_modules_vpc_v1.0.0",
     );
   });
