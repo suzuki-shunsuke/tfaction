@@ -26,58 +26,48 @@ export const main = async () => {
   const jobType = env.all.TFACTION_JOB_TYPE;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
 
-  let skipTerraform = false;
-  if (jobType === "terraform" && !driftIssueNumber) {
-    skipTerraform = env.TFACTION_SKIP_TERRAFORM;
-  }
-  core.setOutput("skipped", skipTerraform);
+  await runPlan(targetConfig, {
+    githubToken: input.githubToken,
+    githubTokenForGitHubProvider:
+      input.githubTokenForGitHubProvider || undefined,
+    jobType: jobType,
+    driftIssueNumber: driftIssueNumber || undefined,
+    prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,
+    ciInfoTempDir: env.all.CI_INFO_TEMP_DIR || undefined,
+    secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
+  });
 
-  // Step 4: Run plan if not skipped
-  if (!skipTerraform) {
-    await runPlan(targetConfig, {
-      githubToken: input.githubToken,
-      githubTokenForGitHubProvider:
-        input.githubTokenForGitHubProvider || undefined,
-      jobType: jobType,
-      driftIssueNumber: driftIssueNumber || undefined,
-      prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,
-      ciInfoTempDir: env.all.CI_INFO_TEMP_DIR || undefined,
-      secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
-    });
+  // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)
+  if (jobType === "tfmigrate") {
+    const workingDir = targetConfig.working_directory;
+    if (workingDir) {
+      const tfmigrateHclPath = path.join(
+        config.git_root_dir,
+        workingDir,
+        ".tfmigrate.hcl",
+      );
+      const serverRepository = config.securefix_action?.server_repository ?? "";
 
-    // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)
-    if (jobType === "tfmigrate") {
-      const workingDir = targetConfig.working_directory;
-      if (workingDir) {
-        const tfmigrateHclPath = path.join(
-          config.git_root_dir,
-          workingDir,
-          ".tfmigrate.hcl",
-        );
-        const serverRepository =
-          config.securefix_action?.server_repository ?? "";
-
-        if (fs.existsSync(tfmigrateHclPath)) {
-          // If the file is new or modified, commit it
-          if (
-            await git.hasFileChangedPorcelain(
-              tfmigrateHclPath,
-              config.git_root_dir,
-            )
-          ) {
-            core.info("Committing .tfmigrate.hcl");
-            await createCommit({
-              commitMessage: "chore(tfmigrate): add .tfmigrate.hcl",
-              githubToken: input.githubToken,
-              rootDir: config.git_root_dir,
-              files: new Set([
-                path.relative(config.git_root_dir, tfmigrateHclPath),
-              ]),
-              serverRepository,
-              appId: input.securefixActionAppId,
-              appPrivateKey: input.securefixActionAppPrivateKey,
-            });
-          }
+      if (fs.existsSync(tfmigrateHclPath)) {
+        // If the file is new or modified, commit it
+        if (
+          await git.hasFileChangedPorcelain(
+            tfmigrateHclPath,
+            config.git_root_dir,
+          )
+        ) {
+          core.info("Committing .tfmigrate.hcl");
+          await createCommit({
+            commitMessage: "chore(tfmigrate): add .tfmigrate.hcl",
+            githubToken: input.githubToken,
+            rootDir: config.git_root_dir,
+            files: new Set([
+              path.relative(config.git_root_dir, tfmigrateHclPath),
+            ]),
+            serverRepository,
+            appId: input.securefixActionAppId,
+            appPrivateKey: input.securefixActionAppPrivateKey,
+          });
         }
       }
     }
