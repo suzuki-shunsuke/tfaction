@@ -37,6 +37,7 @@ test("normal", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -92,6 +93,7 @@ test("job config", async () => {
             secret_name: "GH_TOKEN",
           },
         ],
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -145,6 +147,7 @@ const prCommentExpected = {
           secret_name: "GH_TOKEN",
         },
       ],
+      skip_terraform: false,
       target: "foo/dev",
       working_directory: "foo/dev",
     },
@@ -243,6 +246,7 @@ test("module callers", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/bar",
         working_directory: "foo/bar",
       },
@@ -251,6 +255,7 @@ test("module callers", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/baz",
         working_directory: "foo/baz",
       },
@@ -259,6 +264,7 @@ test("module callers", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -301,6 +307,7 @@ test("nest", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -343,6 +350,7 @@ test("tfmigrate label", async () => {
         job_type: "tfmigrate",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -385,6 +393,7 @@ test("tfmigrate label with changed files", async () => {
         job_type: "tfmigrate",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -462,6 +471,7 @@ test("module callers triggered", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -512,6 +522,7 @@ test("replace_target", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "app/dev",
         working_directory: "services/app/dev",
       },
@@ -558,6 +569,7 @@ test("custom label prefixes for tfmigrate", async () => {
         job_type: "tfmigrate",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -565,8 +577,7 @@ test("custom label prefixes for tfmigrate", async () => {
   });
 });
 
-test("skip label parses correctly", async () => {
-  // Note: skip labels are parsed but don't filter targets in current implementation
+test("skip label sets skip_terraform", async () => {
   expect(
     await run({
       config: {
@@ -578,7 +589,7 @@ test("skip label parses correctly", async () => {
       },
       isApply: false,
       labels: ["skip:foo/dev", "other-label"],
-      changedFiles: ["foo/bar/main.tf"],
+      changedFiles: ["foo/dev/main.tf", "foo/bar/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml"],
       prBody: "",
       payload: {
@@ -601,6 +612,16 @@ test("skip label parses correctly", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
         target: "foo/bar",
         working_directory: "foo/bar",
       },
@@ -624,7 +645,7 @@ test("custom skip label prefix", async () => {
       },
       isApply: false,
       labels: ["ignore:foo/dev"],
-      changedFiles: ["foo/bar/main.tf"],
+      changedFiles: ["foo/dev/main.tf", "foo/bar/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml"],
       prBody: "",
       payload: {
@@ -647,6 +668,16 @@ test("custom skip label prefix", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
         target: "foo/bar",
         working_directory: "foo/bar",
       },
@@ -754,6 +785,7 @@ test("duplicate tfmigrate labels", async () => {
         job_type: "tfmigrate",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -796,6 +828,7 @@ test("isApply mode", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -854,6 +887,7 @@ test("tfmigrate with job config", async () => {
             secret_name: "TFMIGRATE_SECRET",
           },
         ],
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -901,6 +935,7 @@ test("tfmigrate apply with job config", async () => {
         job_type: "tfmigrate",
         runs_on: "self-hosted",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -948,6 +983,7 @@ test("module caller is also a module", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "terraform/dev",
         working_directory: "terraform/dev",
       },
@@ -995,6 +1031,7 @@ test("multiple target groups", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "aws/dev",
         working_directory: "aws/dev",
       },
@@ -1003,6 +1040,7 @@ test("multiple target groups", async () => {
         job_type: "terraform",
         runs_on: "macos-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "gcp/prod",
         working_directory: "gcp/prod",
       },
@@ -1061,6 +1099,7 @@ test("terraform plan job config", async () => {
             secret_name: "PLAN_SECRET",
           },
         ],
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -1108,6 +1147,7 @@ test("terraform apply job config", async () => {
         job_type: "terraform",
         runs_on: "production-runner",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -1187,6 +1227,7 @@ test("template_dir config files are excluded", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "aws/dev",
         working_directory: "aws/dev",
       },
@@ -1230,6 +1271,7 @@ test("template_dir with trailing slash", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "aws/dev",
         working_directory: "aws/dev",
       },
@@ -1273,6 +1315,280 @@ test("runs_on as array", async () => {
         job_type: "terraform",
         runs_on: ["self-hosted", "linux", "x64"],
         secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+// skip_terraform_files tests
+
+test("skip_terraform_files: all files match patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl", "*.md"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/.terraform.lock.hcl", "foo/dev/README.md"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: some files don't match", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/.terraform.lock.hcl", "foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: not configured", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/.terraform.lock.hcl"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: module files don't match patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {
+        "modules/vpc": ["foo/dev"],
+      },
+      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc"],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: module files all match patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/.terraform.lock.hcl"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {
+        "modules/vpc": ["foo/dev"],
+      },
+      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc"],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: multiple patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl", "*.md", "*.txt"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [
+        "foo/dev/.terraform.lock.hcl",
+        "foo/dev/README.md",
+        "foo/dev/notes.txt",
+      ],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: true,
         target: "foo/dev",
         working_directory: "foo/dev",
       },

@@ -13,12 +13,7 @@ export const main = async () => {
     input.githubTokenForGitHubProvider || undefined;
 
   if (jobType === "terraform") {
-    // Check if terraform should be skipped
-    const skipTerraform = env.TFACTION_SKIP_TERRAFORM;
-
-    if (!skipTerraform) {
-      await terraformApply.main(secrets, githubTokenForGitHubProvider);
-    }
+    await terraformApply.main(secrets, githubTokenForGitHubProvider);
   } else if (jobType === "tfmigrate") {
     await tfmigrateApply.main(secrets, githubTokenForGitHubProvider);
   }

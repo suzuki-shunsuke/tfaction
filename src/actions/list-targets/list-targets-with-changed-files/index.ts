@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 
 import * as path from "path";
+import { minimatch } from "minimatch";
 import * as lib from "../../../lib";
 import * as types from "../../../lib/types";
 import * as env from "../../../lib/env";
@@ -22,6 +23,7 @@ type TargetConfig = {
   job_type: string;
   environment?: types.GitHubEnvironment;
   secrets?: types.GitHubSecrets;
+  skip_terraform: boolean;
 };
 
 const getTargetConfigByTarget = (
@@ -30,6 +32,7 @@ const getTargetConfigByTarget = (
   target: string,
   isApply: boolean,
   jobType: types.JobType,
+  skipTerraform: boolean,
 ): TargetConfig | undefined => {
   const tg = lib.getTargetFromTargetGroupsByWorkingDir(targets, wd);
   if (tg === undefined) {
@@ -45,6 +48,7 @@ const getTargetConfigByTarget = (
       environment: tg?.environment,
       secrets: tg.secrets,
       job_type: jobType,
+      skip_terraform: skipTerraform,
     };
   }
   return {
@@ -54,6 +58,7 @@ const getTargetConfigByTarget = (
     environment: jobConfig.environment ?? tg.environment,
     secrets: jobConfig.secrets ?? tg.secrets,
     job_type: jobType,
+    skip_terraform: skipTerraform,
   };
 };
 
@@ -126,15 +131,25 @@ const prepareModuleData = (
   return { moduleCallerMap, modules, moduleDirs, moduleSet };
 };
 
+const matchesSkipPatterns = (file: string, patterns: string[]): boolean => {
+  return patterns.some((p) => minimatch(file, p, { dot: true }));
+};
+
 const processChangedFiles = (
   /** Absolute paths to changed files */
   changedFiles: string[],
   moduleData: ModuleData,
   workingDirs: string[],
   wdTargetMap: Map<string, string>,
-): { changedWorkingDirs: Set<string>; changedModules: Set<string> } => {
+  skipTerraformFiles: string[],
+): {
+  changedWorkingDirs: Set<string>;
+  changedModules: Set<string>;
+  changedFilesPerWD: Map<string, string[]>;
+} => {
   const changedWorkingDirs = new Set<string>();
   const changedModules = new Set<string>();
+  const changedFilesPerWD = new Map<string, string[]>();
 
   for (const changedFile of changedFiles) {
     if (changedFile == "") {
@@ -147,6 +162,11 @@ const processChangedFiles = (
         moduleData.moduleCallerMap.get(module)?.forEach((caller) => {
           if (wdTargetMap.has(caller)) {
             changedWorkingDirs.add(caller);
+            if (!matchesSkipPatterns(rel, skipTerraformFiles)) {
+              const files = changedFilesPerWD.get(caller) ?? [];
+              files.push(rel);
+              changedFilesPerWD.set(caller, files);
+            }
           }
           if (moduleData.moduleSet.has(caller)) {
             changedModules.add(caller);
@@ -160,6 +180,11 @@ const processChangedFiles = (
       const rel = path.relative(workingDir, changedFile);
       if (!rel.startsWith(".." + path.sep)) {
         changedWorkingDirs.add(workingDir);
+        if (!matchesSkipPatterns(rel, skipTerraformFiles)) {
+          const files = changedFilesPerWD.get(workingDir) ?? [];
+          files.push(rel);
+          changedFilesPerWD.set(workingDir, files);
+        }
         break;
       }
     }
@@ -172,7 +197,11 @@ const processChangedFiles = (
     }
   }
 
-  return { changedWorkingDirs, changedModules };
+  return {
+    changedWorkingDirs,
+    changedModules,
+    changedFilesPerWD,
+  };
 };
 
 const addTargetsFromChangedWorkingDirs = (
@@ -183,6 +212,8 @@ const addTargetsFromChangedWorkingDirs = (
   targetGroups: types.TargetGroup[],
   isApply: boolean,
   terraformTargetObjs: TargetConfig[],
+  changedFilesPerWD: Map<string, string[]>,
+  skips: Set<string>,
 ): void => {
   for (const changedWorkingDir of changedWorkingDirs) {
     const target = wdTargetMap.get(changedWorkingDir);
@@ -195,12 +226,20 @@ const addTargetsFromChangedWorkingDirs = (
     if (terraformTargets.has(target) || tfmigrates.has(target)) {
       continue;
     }
+    let skipTerraform = false;
+    if (skips.has(target)) {
+      skipTerraform = true;
+    } else {
+      // If WD had changed files but none remain after filtering, all matched skip patterns
+      skipTerraform = !changedFilesPerWD.has(changedWorkingDir);
+    }
     const obj = getTargetConfigByTarget(
       targetGroups,
       changedWorkingDir,
       target,
       isApply,
       "terraform",
+      skipTerraform,
     );
     if (obj !== undefined) {
       terraformTargets.add(target);
@@ -294,7 +333,7 @@ export const run = async (input: Input): Promise<Result> => {
   const terraformTargetObjs = new Array<TargetConfig>();
   const tfmigrateObjs = new Array<TargetConfig>();
 
-  handleLabels(
+  const skips = handleLabels(
     input.labels,
     isApply,
     targetWDMap,
@@ -305,12 +344,14 @@ export const run = async (input: Input): Promise<Result> => {
   );
 
   const moduleData = prepareModuleData(input.moduleCallers, input.moduleFiles);
-  const { changedWorkingDirs, changedModules } = processChangedFiles(
-    input.changedFiles,
-    moduleData,
-    workingDirs,
-    wdTargetMap,
-  );
+  const { changedWorkingDirs, changedModules, changedFilesPerWD } =
+    processChangedFiles(
+      input.changedFiles,
+      moduleData,
+      workingDirs,
+      wdTargetMap,
+      config.skip_terraform_files ?? [],
+    );
 
   addTargetsFromChangedWorkingDirs(
     changedWorkingDirs,
@@ -320,6 +361,8 @@ export const run = async (input: Input): Promise<Result> => {
     config.target_groups,
     isApply,
     terraformTargetObjs,
+    changedFilesPerWD,
+    skips,
   );
 
   const result = {
@@ -344,6 +387,7 @@ type Input = {
     target_groups: types.TargetGroup[];
     replace_target?: types.Replace;
     label_prefixes?: types.LabelPrefixes;
+    skip_terraform_files?: string[];
   };
   isApply: boolean;
   labels: string[];
@@ -389,7 +433,7 @@ const handleLabels = (
   targetGroups: types.TargetGroup[],
   tfmigrateObjs: Array<TargetConfig>,
   tfmigrates: Set<string>,
-) => {
+): Set<string> => {
   const skips = new Set<string>();
   const skipPrefix = labelPrefixes?.skip || "skip:";
   const tfmigratePrefix = labelPrefixes?.tfmigrate || "tfmigrate:";
@@ -420,12 +464,14 @@ const handleLabels = (
       target,
       isApply,
       "tfmigrate",
+      false,
     );
     if (obj === undefined) {
       throw new Error(`No target config is found for the target ${target}`);
     }
     tfmigrateObjs.push(obj);
   }
+  return skips;
 };
 
 export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {

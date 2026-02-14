@@ -222,7 +222,7 @@ export const RawConfig = z.object({
   module_file: z.string().default("tfaction_module.yaml"),
   plan_workflow_name: z.string(),
   renovate_login: z.string().default("renovate[bot]"),
-  renovate_terraform_labels: z.string().array().optional(),
+  skip_terraform_files: z.string().array().optional(),
   scaffold_working_directory: z
     .object({
       pull_request: z
@@ -274,7 +274,6 @@ export const RawConfig = z.object({
     })
     .nullish(),
   skip_create_pr: z.boolean().default(false),
-  skip_terraform_by_renovate: z.boolean().optional(),
   target_groups: TargetGroup.array(),
   tflint: TflintConfig.default(tflintDefaults),
   trivy: TrivyConfig.default(trivyDefaults),
