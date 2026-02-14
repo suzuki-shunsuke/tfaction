@@ -30,7 +30,10 @@ export type RunDependencies = {
   isDirectory: (path: string) => boolean;
 };
 
-export const generateTag = (modulePath: string, version: string): string => {
+export const generateTagName = (
+  modulePath: string,
+  version: string,
+): string => {
   const moduleName = modulePath.replace(/\//g, "_");
   return `module_${moduleName}_${version}`;
 };
@@ -64,7 +67,7 @@ export const run = async (
   }
 
   // Generate tag name
-  const tag = generateTag(modulePath, version);
+  const tag = generateTagName(modulePath, version);
   logger.info(`Tag: ${tag}`);
 
   // Create tag
