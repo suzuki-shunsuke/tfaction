@@ -218,11 +218,5 @@ export const main = async () => {
     await setupSSHKey(input.sshKey);
   }
 
-  core.setOutput("working_directory", targetConfig.working_directory);
-  core.setOutput(
-    "s3_bucket_name_tfmigrate_history",
-    targetConfig.s3_bucket_name_tfmigrate_history ?? "",
-  );
-
   core.info("Setup completed successfully");
 };
