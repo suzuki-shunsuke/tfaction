@@ -7,10 +7,7 @@ import * as aqua from "../../aqua";
 import * as getTargetConfig from "../get-target-config";
 import * as commit from "../../commit";
 
-export const generateBranchName = (
-  target: string,
-  isModule?: boolean,
-): string => {
+export const generateBranchName = (target: string): string => {
   const now = new Date();
   const timestamp =
     now.getFullYear().toString() +
@@ -20,8 +17,10 @@ export const generateBranchName = (
     now.getHours().toString().padStart(2, "0") +
     now.getMinutes().toString().padStart(2, "0") +
     now.getSeconds().toString().padStart(2, "0");
-  const prefix = isModule ? "scaffold-module" : "scaffold-working-directory";
-  return `${prefix}-${target}-${timestamp}`.replaceAll("/", "__");
+  return `scaffold-working-directory-${target}-${timestamp}`.replaceAll(
+    "/",
+    "__",
+  );
 };
 
 export const writeSkipCreatePrSummary = (
@@ -111,7 +110,7 @@ export const run = async (input: RunInput): Promise<void> => {
   });
 
   // Generate branch name
-  const branch = generateBranchName(target, isModule);
+  const branch = generateBranchName(target);
   core.info(`Generated branch name: ${branch}`);
 
   // Get modified files

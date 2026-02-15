@@ -56,11 +56,6 @@ describe("generateBranchName", () => {
     expect(branch).toContain("a__b__c");
     expect(branch).not.toContain("/");
   });
-
-  it("generates branch with scaffold-module- prefix when isModule=true", () => {
-    const branch = generateBranchName("my/module", true);
-    expect(branch).toMatch(/^scaffold-module-my__module-\d{8}T\d{6}$/);
-  });
 });
 
 describe("writeSkipCreatePrSummary", () => {
@@ -308,12 +303,14 @@ describe("run", () => {
       >);
     });
 
-    it("uses scaffold-module- branch prefix", async () => {
+    it("uses scaffold-working-directory- branch prefix", async () => {
       await run(defaultRunInput);
 
       expect(commit.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          branch: expect.stringContaining("scaffold-module-modules__vpc-"),
+          branch: expect.stringContaining(
+            "scaffold-working-directory-modules__vpc-",
+          ),
         }),
       );
     });
