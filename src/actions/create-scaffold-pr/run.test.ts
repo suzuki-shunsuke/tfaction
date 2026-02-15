@@ -56,6 +56,11 @@ describe("generateBranchName", () => {
     expect(branch).toContain("a__b__c");
     expect(branch).not.toContain("/");
   });
+
+  it("generates branch with scaffold-module- prefix when isModule=true", () => {
+    const branch = generateBranchName("my/module", true);
+    expect(branch).toMatch(/^scaffold-module-my__module-\d{8}T\d{6}$/);
+  });
 });
 
 describe("writeSkipCreatePrSummary", () => {
@@ -116,6 +121,20 @@ describe("writeSkipCreatePrSummary", () => {
 
     const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
     expect(summaryArg).toContain(runURL);
+  });
+
+  it("uses module title when isModule=true", () => {
+    writeSkipCreatePrSummary(
+      "owner/repo",
+      "branch",
+      "modules/vpc",
+      false,
+      "https://github.com/owner/repo/actions/runs/123",
+      true,
+    );
+
+    const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
+    expect(summaryArg).toContain("Scaffold a Terraform Module (modules/vpc)");
   });
 });
 
@@ -276,5 +295,90 @@ describe("run", () => {
         }),
       }),
     );
+  });
+
+  describe("type=module", () => {
+    beforeEach(() => {
+      vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
+        working_directory: "modules/vpc",
+        target: "modules/vpc",
+        type: "module",
+      } as unknown as Awaited<
+        ReturnType<typeof getTargetConfig.getTargetConfig>
+      >);
+    });
+
+    it("uses scaffold-module- branch prefix", async () => {
+      await run(defaultRunInput);
+
+      expect(commit.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          branch: expect.stringContaining("scaffold-module-modules__vpc-"),
+        }),
+      );
+    });
+
+    it("uses module commit message", async () => {
+      await run(defaultRunInput);
+
+      expect(commit.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          commitMessage: "chore(modules/vpc): scaffold a Terraform Module",
+        }),
+      );
+    });
+
+    it("uses default module PR title/body", async () => {
+      await run(defaultRunInput);
+
+      expect(commit.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pr: expect.objectContaining({
+            title: "Scaffold a Terraform Module (modules/vpc)",
+            body: expect.stringContaining("GitHub Actions"),
+          }),
+        }),
+      );
+    });
+
+    it("uses scaffold_module config templates", async () => {
+      vi.mocked(lib.getConfig).mockResolvedValue({
+        skip_create_pr: false,
+        draft_pr: false,
+        securefix_action: {},
+        scaffold_module: {
+          pull_request: {
+            title: "Module {{module_path}}",
+            body: "Module PR by {{actor}}",
+            comment: "Comment {{run_url}}",
+          },
+        },
+      } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
+
+      await run(defaultRunInput);
+
+      expect(commit.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pr: expect.objectContaining({
+            title: "Module modules/vpc",
+            body: "Module PR by user1",
+            comment: expect.stringContaining(defaultRunInput.runURL),
+          }),
+        }),
+      );
+    });
+
+    it("uses module summary when skip_create_pr=true", async () => {
+      vi.mocked(lib.getConfig).mockResolvedValue({
+        skip_create_pr: true,
+        draft_pr: false,
+        securefix_action: {},
+      } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
+
+      await run(defaultRunInput);
+
+      const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
+      expect(summaryArg).toContain("Scaffold a Terraform Module");
+    });
   });
 });
