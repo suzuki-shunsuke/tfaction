@@ -12,6 +12,7 @@ export const isPullRequestEvent = (eventName: string): boolean => {
 
 export type RunInput = {
   isPullRequest: boolean;
+  isModule?: boolean;
   /** absolute path to the working directory */
   workingDir: string;
   tfCommand: string;
@@ -42,6 +43,11 @@ export const run = async (input: RunInput): Promise<void> => {
     /** absolute path to the lock file */
     const lockFile = path.join(input.workingDir, ".terraform.lock.hcl");
     const existedBefore = fs.existsSync(lockFile);
+    // For modules, save the original content to restore later
+    const contentBefore =
+      input.isModule && existedBefore
+        ? fs.readFileSync(lockFile, "utf8")
+        : undefined;
 
     // terraform init (try without upgrade first, then with upgrade on failure)
     const initResult = await input.executor.exec(
@@ -69,43 +75,68 @@ export const run = async (input: RunInput): Promise<void> => {
       );
     }
 
-    const lockArgs = input.providersLockOpts
-      .split(/\s+/)
-      .filter((s) => s.length > 0);
-    await input.executor.exec(
-      input.tfCommand,
-      (input.terragruntRunAvailable ? ["run", "--"] : []).concat(
-        ["providers", "lock"],
-        lockArgs,
-      ),
-      {
-        cwd: input.workingDir,
-        group: input.terragruntRunAvailable
-          ? `${input.tfCommand} run -- providers lock`
-          : `${input.tfCommand} providers lock`,
-        comment: {
-          token: input.githubToken,
+    if (input.isModule) {
+      // Module: restore/delete lock file, skip providers lock
+      if (!existedBefore) {
+        // Lock file didn't exist before init - delete if created
+        if (fs.existsSync(lockFile)) {
+          fs.unlinkSync(lockFile);
+        }
+      } else if (contentBefore !== undefined) {
+        // Lock file existed before - revert if modified
+        if (fs.existsSync(lockFile)) {
+          const currentContent = fs.readFileSync(lockFile, "utf8");
+          if (currentContent !== contentBefore) {
+            fs.writeFileSync(lockFile, contentBefore);
+          }
+        } else {
+          // Lock file was deleted - restore it
+          fs.writeFileSync(lockFile, contentBefore);
+        }
+      }
+    } else {
+      // Non-module: providers lock + commit if changed
+      const lockArgs = input.providersLockOpts
+        .split(/\s+/)
+        .filter((s) => s.length > 0);
+      await input.executor.exec(
+        input.tfCommand,
+        (input.terragruntRunAvailable ? ["run", "--"] : []).concat(
+          ["providers", "lock"],
+          lockArgs,
+        ),
+        {
+          cwd: input.workingDir,
+          group: input.terragruntRunAvailable
+            ? `${input.tfCommand} run -- providers lock`
+            : `${input.tfCommand} providers lock`,
+          comment: {
+            token: input.githubToken,
+          },
         },
-      },
-    );
+      );
 
-    // Check if lock file changed
-    if (
-      !existedBefore ||
-      (await git.hasFileChanged(".terraform.lock.hcl", input.workingDir))
-    ) {
-      // Commit the change
-      const lockFileFromGitRootDir = path.relative(input.gitRootDir, lockFile);
-      await commit.create({
-        commitMessage: "chore: update .terraform.lock.hcl",
-        githubToken: input.githubToken,
-        rootDir: input.gitRootDir,
-        files: new Set([lockFileFromGitRootDir]),
-        serverRepository: input.serverRepository,
-        appId: input.appId,
-        appPrivateKey: input.appPrivateKey,
-      });
-      throw new Error(".terraform.lock.hcl is updated");
+      // Check if lock file changed
+      if (
+        !existedBefore ||
+        (await git.hasFileChanged(".terraform.lock.hcl", input.workingDir))
+      ) {
+        // Commit the change
+        const lockFileFromGitRootDir = path.relative(
+          input.gitRootDir,
+          lockFile,
+        );
+        await commit.create({
+          commitMessage: "chore: update .terraform.lock.hcl",
+          githubToken: input.githubToken,
+          rootDir: input.gitRootDir,
+          files: new Set([lockFileFromGitRootDir]),
+          serverRepository: input.serverRepository,
+          appId: input.appId,
+          appPrivateKey: input.appPrivateKey,
+        });
+        throw new Error(".terraform.lock.hcl is updated");
+      }
     }
   }
 
