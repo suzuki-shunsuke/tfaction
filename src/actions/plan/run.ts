@@ -363,6 +363,13 @@ export const main = async (
   targetConfig: getTargetConfig.TargetConfig,
   runInputs: RunInputs,
 ): Promise<void> => {
+  if (targetConfig.type === "module") {
+    core.info(
+      `Skipping plan for module target: ${targetConfig.target ?? targetConfig.working_directory}`,
+    );
+    return;
+  }
+
   const config = await lib.getConfig();
   const workingDir = path.join(
     config.git_root_dir,

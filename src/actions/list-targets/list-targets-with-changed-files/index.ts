@@ -388,8 +388,12 @@ export const run = async (input: Input): Promise<Result> => {
     moduleWorkingDirs,
   );
 
+  // Filter out modules from targetConfigs when in apply mode
+  const allTargetConfigs = terraformTargetObjs.concat(tfmigrateObjs);
   const result = {
-    targetConfigs: terraformTargetObjs.concat(tfmigrateObjs),
+    targetConfigs: isApply
+      ? allTargetConfigs.filter((tc) => tc.type !== "module")
+      : allTargetConfigs,
     modules: Array.from(changedModules),
   };
 
