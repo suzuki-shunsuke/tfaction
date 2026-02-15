@@ -170,6 +170,7 @@ export const TargetConfig = z.object({
   terraform_docs: TerraformDocsConfig.optional(),
   conftest: ConftestConfig.optional(),
   accept_change_by_renovate: z.boolean().default(false),
+  type: z.literal("module").optional(),
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
