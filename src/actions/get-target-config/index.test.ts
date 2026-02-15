@@ -1040,3 +1040,79 @@ test("aws_role_session_name falls back to prefix with runID when target is very 
   // When both full and target-only names exceed 64 chars, should fall back to prefix-runID
   expect(roleName).toBe(`${prefix}-${runID}`);
 });
+
+test("type module is propagated from tfaction.yaml", async () => {
+  const runID = env.all.GITHUB_RUN_ID;
+  const result: Result = {
+    envs: new Map<string, string | boolean>([
+      ["TFACTION_WORKING_DIR", "tests/aws/modules/vpc"],
+      ["TFACTION_TARGET", "tests/aws/modules/vpc"],
+    ]),
+    outputs: new Map<string, string | boolean>([
+      ["working_directory", "tests/aws/modules/vpc"],
+      [
+        "providers_lock_opts",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+      ],
+      ["template_dir", "tests/templates/github"],
+      ["enable_tflint", true],
+      ["enable_trivy", true],
+      ["enable_terraform_docs", false],
+      ["destroy", false],
+      ["accept_change_by_renovate", false],
+      ["tflint_fix", true],
+      ["terraform_command", "terraform"],
+      ["aws_role_session_name", "tfaction-plan-tests_aws_modules_vpc-" + runID],
+      ["type", "module"],
+    ]),
+  };
+  expect(
+    await run(
+      {
+        target: "tests/aws/modules/vpc",
+        workingDir: "tests/aws/modules/vpc",
+        isApply: false,
+        jobType: "terraform",
+      },
+      await lib.applyConfigDefaults(
+        {
+          plan_workflow_name: "plan.yaml",
+          target_groups: [
+            {
+              working_directory: "tests/aws/**",
+              template_dir: "tests/templates/github",
+            },
+          ],
+        },
+        "tests/tfaction-root.yaml",
+        "",
+      ),
+    ),
+  ).toStrictEqual(result);
+});
+
+test("type is omitted from outputs when not set (default root module)", async () => {
+  const result = await run(
+    {
+      target: "tests/aws/foo/dev",
+      workingDir: "tests/aws/foo/dev",
+      isApply: false,
+      jobType: "terraform",
+    },
+    await lib.applyConfigDefaults(
+      {
+        plan_workflow_name: "plan.yaml",
+        target_groups: [
+          {
+            working_directory: "tests/aws/**",
+            template_dir: "tests/templates/github",
+          },
+        ],
+      },
+      "tests/tfaction-root.yaml",
+      "",
+    ),
+  );
+  // type should not be in outputs when not set
+  expect(result.outputs.has("type")).toBe(false);
+});

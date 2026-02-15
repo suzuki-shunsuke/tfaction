@@ -39,6 +39,7 @@ export const main = async () => {
 
   await run({
     isPullRequest: isPullRequestEvent(github.context.eventName),
+    isModule: targetConfig.type === "module",
     workingDir,
     tfCommand,
     providersLockOpts: targetConfig.providers_lock_opts,

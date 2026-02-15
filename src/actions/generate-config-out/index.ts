@@ -71,7 +71,7 @@ export const main = async () => {
       `target:${targetConfig.target}`,
       "plan",
       "--",
-      "terraform",
+      "terraform", // TODO Support OpenTofu
       "plan",
       "-generate-config-out",
       tempFile,
