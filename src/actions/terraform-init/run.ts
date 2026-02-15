@@ -84,13 +84,8 @@ export const run = async (input: RunInput): Promise<void> => {
         }
       } else if (contentBefore !== undefined) {
         // Lock file existed before - revert if modified
-        if (fs.existsSync(lockFile)) {
-          const currentContent = fs.readFileSync(lockFile, "utf8");
-          if (currentContent !== contentBefore) {
-            fs.writeFileSync(lockFile, contentBefore);
-          }
-        } else {
-          // Lock file was deleted - restore it
+        const currentContent = fs.readFileSync(lockFile, "utf8");
+        if (currentContent !== contentBefore) {
           fs.writeFileSync(lockFile, contentBefore);
         }
       }
