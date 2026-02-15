@@ -2,10 +2,10 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
 import { z } from "zod";
-import * as aqua from "../../../aqua";
-import * as types from "../../../lib/types";
-import { checkGitDiff as defaultCheckGitDiff } from "../../../lib/git";
-import { create as defaultCreateCommit } from "../../../commit";
+import * as aqua from "../../aqua";
+import * as types from "../../lib/types";
+import { checkGitDiff as defaultCheckGitDiff } from "../../lib/git";
+import { create as defaultCreateCommit } from "../../commit";
 
 export type Logger = {
   info: (message: string) => void;
@@ -61,7 +61,8 @@ const TflintOutput = z.object({
                 }),
               }),
             })
-            .array(),
+            .array()
+            .optional(),
         })
         .array(),
     })
@@ -115,6 +116,9 @@ export const run = async (input: RunInput): Promise<void> => {
     const files = new Set<string>();
     for (const run of outJSON.runs) {
       for (const result of run.results) {
+        if (!result.locations) {
+          continue;
+        }
         for (const location of result.locations) {
           files.add(
             path.relative(

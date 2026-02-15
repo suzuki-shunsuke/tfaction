@@ -6,8 +6,8 @@ import {
   type RunInput,
   type Diagnostic,
   type Logger,
-} from "./index";
-import type { Config } from "../lib/types";
+} from "./trivy";
+import type { Config } from "../../lib/types";
 
 describe("getSeverity", () => {
   it("returns ERROR for HIGH severity", () => {

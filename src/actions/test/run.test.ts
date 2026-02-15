@@ -8,11 +8,11 @@ vi.mock("../../conftest", () => ({
   run: vi.fn(),
 }));
 
-vi.mock("../../trivy", () => ({
+vi.mock("./trivy", () => ({
   run: vi.fn(),
 }));
 
-vi.mock("../../tflint", () => ({
+vi.mock("./tflint", () => ({
   run: vi.fn(),
 }));
 
@@ -93,8 +93,8 @@ const createRunInput = (
 // Helper to get mocked modules
 const getMocks = async () => {
   const conftestMod = await import("../../conftest");
-  const trivyMod = await import("../../trivy");
-  const tflintMod = await import("../../tflint");
+  const trivyMod = await import("./trivy");
+  const tflintMod = await import("./tflint");
   const terraformDocsMod = await import("../../terraform-docs");
   const commitMod = await import("../../commit");
   const fmtMod = await import("./fmt");

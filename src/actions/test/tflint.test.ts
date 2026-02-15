@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { run, type RunInput, type Logger } from "./index";
+import { run, type RunInput, type Logger } from "./tflint";
 
 describe("run", () => {
   const createMockExecutor = () => ({
