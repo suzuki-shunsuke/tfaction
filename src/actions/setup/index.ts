@@ -199,7 +199,7 @@ export const main = async () => {
       core.info("updating checksum");
       await aquaUpdateChecksum.main(
         executor,
-        targetConfig.working_directory,
+        path.relative(config.workspace, workingDir),
         config,
         {
           githubToken: githubToken,
