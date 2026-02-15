@@ -9,4 +9,6 @@ schema
 terragrunt.rendered.json
 .terragrunt-cache
 
+.claude/plans
+
 ja

@@ -91,6 +91,7 @@ export const main = async () => {
     },
     config,
   );
+  /** absolute path to working directory */
   const workingDir = path.join(
     config.git_root_dir,
     targetConfig.working_directory,
@@ -196,11 +197,16 @@ export const main = async () => {
   if (isPR && config.aqua?.update_checksum?.enabled) {
     try {
       core.info("updating checksum");
-      await aquaUpdateChecksum.main(executor, workingDir, config, {
-        githubToken: githubToken,
-        securefixActionAppId: input.securefixActionAppId,
-        securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
-      });
+      await aquaUpdateChecksum.main(
+        executor,
+        targetConfig.working_directory,
+        config,
+        {
+          githubToken: githubToken,
+          securefixActionAppId: input.securefixActionAppId,
+          securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
+        },
+      );
     } catch (error) {
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {
