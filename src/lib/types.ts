@@ -220,7 +220,6 @@ export const RawConfig = z.object({
     .optional(),
   env: z.record(z.string(), z.string()).optional(),
   label_prefixes: LabelPrefixes.default(labelPrefixesDefaults),
-  module_file: z.string().default("tfaction_module.yaml"),
   plan_workflow_name: z.string(),
   renovate_login: z.string().default("renovate[bot]"),
   skip_terraform_files: z.string().array().optional(),
@@ -304,7 +303,6 @@ export const RawConfig = z.object({
   limit_changed_dirs: z
     .object({
       working_dirs: z.number().optional(),
-      modules: z.number().optional(),
     })
     .optional(),
 });

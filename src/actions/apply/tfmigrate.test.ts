@@ -119,7 +119,6 @@ const createMockConfig = (overrides: Record<string, unknown> = {}) => ({
   workspace: "/git/root",
   draft_pr: false,
   label_prefixes: { skip: "skip:", tfmigrate: "tfmigrate:" },
-  module_file: "tfaction_module.yaml",
   renovate_login: "renovate[bot]",
   skip_create_pr: false,
   ...overrides,

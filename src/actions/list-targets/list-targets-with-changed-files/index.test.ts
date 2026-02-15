@@ -23,14 +23,13 @@ test("normal", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -74,14 +73,13 @@ test("job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "dev",
@@ -135,7 +133,6 @@ const prCommentConfig = {
 };
 
 const prCommentExpected = {
-  modules: [],
   targetConfigs: [
     {
       environment: "dev",
@@ -169,10 +166,10 @@ test("pr comment", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual(prCommentExpected);
@@ -195,10 +192,10 @@ test("pr comment with updated body", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual(prCommentExpected);
@@ -232,14 +229,13 @@ test("module callers", async () => {
         // dev calls bar and baz
         "foo/dev": ["foo/bar", "foo/baz"],
       },
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -293,14 +289,13 @@ test("nest", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -336,14 +331,13 @@ test("tfmigrate label", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -379,14 +373,13 @@ test("tfmigrate label with changed files", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -401,7 +394,7 @@ test("tfmigrate label with changed files", async () => {
   });
 });
 
-test("module change detection", async () => {
+test("module change detection without callers produces no targets", async () => {
   expect(
     await run({
       config: {
@@ -422,14 +415,11 @@ test("module change detection", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [],
   });
 });
@@ -457,14 +447,11 @@ test("module callers triggered", async () => {
       moduleCallers: {
         "modules/vpc": ["foo/dev"],
       },
-      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [
       {
         environment: undefined,
@@ -508,14 +495,13 @@ test("replace_target", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -555,14 +541,13 @@ test("custom label prefixes for tfmigrate", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -598,14 +583,13 @@ test("skip label sets skip_terraform", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -654,14 +638,13 @@ test("custom skip label prefix", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -706,10 +689,10 @@ test("tfmigrate label with unknown target throws error", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).rejects.toThrow(
@@ -738,14 +721,13 @@ test("empty labels and changed files", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [],
   });
 });
@@ -771,14 +753,13 @@ test("duplicate tfmigrate labels", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -814,14 +795,13 @@ test("isApply mode", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -868,14 +848,13 @@ test("tfmigrate with job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "tfmigrate-env",
@@ -921,14 +900,13 @@ test("tfmigrate apply with job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "production",
@@ -966,17 +944,11 @@ test("module caller is also a module", async () => {
       moduleCallers: {
         "modules/base": ["modules/vpc", "terraform/dev"],
       },
-      moduleFiles: [
-        "modules/base/tfaction_module.yaml",
-        "modules/vpc/tfaction_module.yaml",
-      ],
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc", "modules/base"],
     targetConfigs: [
       {
         environment: undefined,
@@ -1017,14 +989,13 @@ test("multiple target groups", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -1080,14 +1051,13 @@ test("terraform plan job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "plan-env",
@@ -1133,14 +1103,13 @@ test("terraform apply job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "production",
@@ -1155,7 +1124,7 @@ test("terraform apply job config", async () => {
   });
 });
 
-test("multiple modules changed", async () => {
+test("multiple modules changed without callers produces no targets", async () => {
   expect(
     await run({
       config: {
@@ -1176,17 +1145,11 @@ test("multiple modules changed", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [
-        "modules/vpc/tfaction_module.yaml",
-        "modules/iam/tfaction_module.yaml",
-      ],
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc", "modules/iam"],
     targetConfigs: [],
   });
 });
@@ -1213,14 +1176,13 @@ test("template_dir config files are excluded", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -1257,14 +1219,13 @@ test("template_dir with trailing slash", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -1301,14 +1262,13 @@ test("runs_on as array", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -1347,14 +1307,13 @@ test("skip_terraform_files: all files match patterns", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -1391,14 +1350,13 @@ test("skip_terraform_files: some files don't match", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -1434,14 +1392,13 @@ test("skip_terraform_files: not configured", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -1480,14 +1437,11 @@ test("skip_terraform_files: module files don't match patterns", async () => {
       moduleCallers: {
         "modules/vpc": ["foo/dev"],
       },
-      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [
       {
         environment: undefined,
@@ -1526,14 +1480,11 @@ test("skip_terraform_files: module files all match patterns", async () => {
       moduleCallers: {
         "modules/vpc": ["foo/dev"],
       },
-      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [
       {
         environment: undefined,
@@ -1574,14 +1525,13 @@ test("skip_terraform_files: multiple patterns", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
@@ -1617,15 +1567,14 @@ test("module detected via moduleWorkingDirs gets type: module", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       moduleWorkingDirs: new Set(["modules/vpc"]),
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [
       {
         environment: undefined,
@@ -1665,15 +1614,14 @@ test("mixed modules and regular working dirs", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       moduleWorkingDirs: new Set(["modules/vpc"]),
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [
       {
         environment: undefined,
@@ -1722,15 +1670,14 @@ test("isApply filters out module type from targetConfigs", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       moduleWorkingDirs: new Set(["modules/vpc"]),
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [
       {
         environment: undefined,
@@ -1766,15 +1713,14 @@ test("module working dir with no changes produces no output", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
+
       moduleWorkingDirs: new Set(["modules/vpc"]),
       githubToken: "xxx",
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
+
       executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [],
   });
 });

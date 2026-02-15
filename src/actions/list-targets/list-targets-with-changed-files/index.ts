@@ -80,8 +80,6 @@ type PullRequestPayload = {
 
 type Result = {
   targetConfigs: TargetConfig[];
-  /** Relative file paths from git_root_dir */
-  modules: string[];
 };
 
 type ModuleData = {
@@ -93,10 +91,6 @@ type ModuleData = {
   moduleCallerMap: Map<string, string[]>;
   /** Relative paths from git_root_dir to modules */
   modules: string[];
-  /** Relative paths from git_root_dir to modules */
-  moduleDirs: string[];
-  /** Relative paths from git_root_dir to modules */
-  moduleSet: Set<string>;
 };
 
 const createTargetMaps = (
@@ -118,7 +112,6 @@ const createTargetMaps = (
 
 const prepareModuleData = (
   moduleCallers: ModuleToCallers | null,
-  moduleFiles: string[],
 ): ModuleData => {
   const moduleCallerMap: Map<string, string[]> = new Map(
     Object.entries(moduleCallers ?? {}),
@@ -128,15 +121,7 @@ const prepareModuleData = (
   modules.sort();
   modules.reverse();
 
-  /** Relative paths from git_root_dir to modules */
-  const moduleDirs = moduleFiles.map((moduleFile) => {
-    return path.dirname(moduleFile);
-  });
-  moduleDirs.sort();
-  moduleDirs.reverse();
-  const moduleSet = new Set(moduleDirs);
-
-  return { moduleCallerMap, modules, moduleDirs, moduleSet };
+  return { moduleCallerMap, modules };
 };
 
 const matchesSkipPatterns = (file: string, patterns: string[]): boolean => {
@@ -152,11 +137,9 @@ const processChangedFiles = (
   skipTerraformFiles: string[],
 ): {
   changedWorkingDirs: Set<string>;
-  changedModules: Set<string>;
   changedFilesPerWD: Map<string, string[]>;
 } => {
   const changedWorkingDirs = new Set<string>();
-  const changedModules = new Set<string>();
   const changedFilesPerWD = new Map<string, string[]>();
 
   for (const changedFile of changedFiles) {
@@ -176,9 +159,6 @@ const processChangedFiles = (
               changedFilesPerWD.set(caller, files);
             }
           }
-          if (moduleData.moduleSet.has(caller)) {
-            changedModules.add(caller);
-          }
         });
         break;
       }
@@ -196,18 +176,10 @@ const processChangedFiles = (
         break;
       }
     }
-    for (const module of moduleData.moduleDirs) {
-      const rel = path.relative(module, changedFile);
-      if (!rel.startsWith(".." + path.sep)) {
-        changedModules.add(module);
-        break;
-      }
-    }
   }
 
   return {
     changedWorkingDirs,
-    changedModules,
     changedFilesPerWD,
   };
 };
@@ -263,9 +235,7 @@ const addTargetsFromChangedWorkingDirs = (
 
 const validateChangeLimits = async (
   targetConfigs: TargetConfig[],
-  modules: string[],
   maxChangedWorkingDirectories: number,
-  maxChangedModules: number,
   githubToken: string,
   executor: aqua.Executor,
 ): Promise<void> => {
@@ -291,27 +261,6 @@ const validateChangeLimits = async (
     );
     throw new Error(
       `Too many working directories are changed (${targetConfigs.length}). Max is ${maxChangedWorkingDirectories}.`,
-    );
-  }
-  if (maxChangedModules > 0 && modules.length > maxChangedModules) {
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-k",
-        "too-many-changed-modules",
-        "-var",
-        `max_changed_modules:${maxChangedModules}`,
-      ],
-      {
-        env: {
-          GITHUB_TOKEN: githubToken,
-          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        },
-      },
-    );
-    throw new Error(
-      `Too many modules are changed (${modules.length}). Max is ${maxChangedModules}.`,
     );
   }
 };
@@ -356,24 +305,16 @@ export const run = async (input: Input): Promise<Result> => {
     tfmigrates,
   );
 
-  const moduleData = prepareModuleData(input.moduleCallers, input.moduleFiles);
-  const { changedWorkingDirs, changedModules, changedFilesPerWD } =
-    processChangedFiles(
-      input.changedFiles,
-      moduleData,
-      workingDirs,
-      wdTargetMap,
-      config.skip_terraform_files ?? [],
-    );
+  const moduleData = prepareModuleData(input.moduleCallers);
+  const { changedWorkingDirs, changedFilesPerWD } = processChangedFiles(
+    input.changedFiles,
+    moduleData,
+    workingDirs,
+    wdTargetMap,
+    config.skip_terraform_files ?? [],
+  );
 
   const moduleWorkingDirs = input.moduleWorkingDirs ?? new Set<string>();
-
-  // Add changed working dirs that are modules to changedModules for backward compat
-  for (const wd of changedWorkingDirs) {
-    if (moduleWorkingDirs.has(wd)) {
-      changedModules.add(wd);
-    }
-  }
 
   addTargetsFromChangedWorkingDirs(
     changedWorkingDirs,
@@ -394,14 +335,11 @@ export const run = async (input: Input): Promise<Result> => {
     targetConfigs: isApply
       ? allTargetConfigs.filter((tc) => tc.type !== "module")
       : allTargetConfigs,
-    modules: Array.from(changedModules),
   };
 
   await validateChangeLimits(
     result.targetConfigs,
-    result.modules,
     input.maxChangedWorkingDirectories,
-    input.maxChangedModules,
     input.githubToken,
     input.executor,
   );
@@ -422,8 +360,6 @@ type Input = {
   changedFiles: string[];
   /** Relative paths from git_root_dir */
   configFiles: string[];
-  /** Relative paths from git_root_dir */
-  moduleFiles: string[];
   prBody: string;
   payload: Payload;
   /** Relative path from git_root_dir to module => Relative paths from git_root_dir to module callers */
@@ -431,7 +367,6 @@ type Input = {
   /** Working directories that have type: module in their tfaction.yaml */
   moduleWorkingDirs?: Set<string>;
   maxChangedWorkingDirectories: number;
-  maxChangedModules: number;
   githubToken: string;
   executor: aqua.Executor;
 };
@@ -510,10 +445,6 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     cfg.git_root_dir,
     cfg.working_directory_file,
   );
-  const modules = await git.listWorkingDirFiles(
-    cfg.git_root_dir,
-    cfg.module_file,
-  );
 
   // Identify module working dirs from configFiles with type: module
   const moduleWorkingDirs = new Set<string>();
@@ -536,7 +467,6 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     moduleCallers = await listModuleCallers(
       cfg.git_root_dir,
       configFiles,
-      modules,
       executor,
     );
   }
@@ -548,24 +478,15 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     changedFiles:
       pr.pr?.files.map((file) => path.join(cfg.git_root_dir, file)) ?? [],
     configFiles,
-    moduleFiles: modules,
     moduleWorkingDirs,
     maxChangedWorkingDirectories: cfg.limit_changed_dirs?.working_dirs ?? 0,
-    maxChangedModules: cfg.limit_changed_dirs?.modules ?? 0,
     prBody: pr.pr?.data.body ?? "",
     payload: github.context.payload,
     githubToken: input.getRequiredGitHubToken(),
-    /*
-    {
-      // caller is a directory where uses the module
-      module1: [caller1, caller2],
-    }
-    */
     moduleCallers,
     executor,
   });
 
   core.info(`result: ${JSON.stringify(result)}`);
   core.setOutput("targets", result.targetConfigs);
-  core.setOutput("modules", result.modules);
 };
