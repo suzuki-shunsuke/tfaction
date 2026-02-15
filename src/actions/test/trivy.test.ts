@@ -1,171 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  getSeverity,
-  generateTable,
-  run,
-  type RunInput,
-  type Diagnostic,
-  type Logger,
-} from "./trivy";
+import { run, type RunInput } from "./trivy";
 import type { Config } from "../../lib/types";
-
-describe("getSeverity", () => {
-  it("returns ERROR for HIGH severity", () => {
-    expect(getSeverity("HIGH")).toBe("ERROR");
-  });
-
-  it("returns ERROR for CRITICAL severity", () => {
-    expect(getSeverity("CRITICAL")).toBe("ERROR");
-  });
-
-  it("returns WARNING for MEDIUM severity", () => {
-    expect(getSeverity("MEDIUM")).toBe("WARNING");
-  });
-
-  it("returns INFO for LOW severity", () => {
-    expect(getSeverity("LOW")).toBe("INFO");
-  });
-
-  it("returns empty string for unknown severity", () => {
-    expect(getSeverity("UNKNOWN")).toBe("");
-    expect(getSeverity("")).toBe("");
-  });
-
-  it("handles severity with additional text", () => {
-    expect(getSeverity("HIGH (score: 9.0)")).toBe("ERROR");
-    expect(getSeverity("CRITICAL-security")).toBe("ERROR");
-    expect(getSeverity("MEDIUM-risk")).toBe("WARNING");
-    expect(getSeverity("LOW-priority")).toBe("INFO");
-  });
-});
-
-describe("generateTable", () => {
-  it("returns header only for empty diagnostics", () => {
-    const result = generateTable([], "/base/path");
-    expect(result).toBe(
-      "rule | severity | filepath | range | message\n--- | --- | --- | --- | ---",
-    );
-  });
-
-  it("generates markdown link when URL is present", () => {
-    const diagnostics: Diagnostic[] = [
-      {
-        message: "Test message",
-        code: {
-          value: "AVD-AWS-0001",
-          url: "https://avd.aquasec.com/misconfig/avd-aws-0001",
-        },
-        location: {
-          path: "main.tf",
-          range: {
-            start: { line: 10 },
-            end: { line: 15 },
-          },
-        },
-        severity: "ERROR",
-      },
-    ];
-    const result = generateTable(diagnostics, "/base/path");
-    expect(result).toContain(
-      "[AVD-AWS-0001](https://avd.aquasec.com/misconfig/avd-aws-0001)",
-    );
-  });
-
-  it("generates plain text when URL is not present", () => {
-    const diagnostics: Diagnostic[] = [
-      {
-        message: "Test message",
-        code: {
-          value: "CUSTOM-001",
-          url: "",
-        },
-        location: {
-          path: "main.tf",
-          range: {
-            start: { line: 5 },
-            end: { line: 8 },
-          },
-        },
-        severity: "WARNING",
-      },
-    ];
-    const result = generateTable(diagnostics, "/base/path");
-    expect(result).toContain("CUSTOM-001 |");
-    expect(result).not.toContain("[CUSTOM-001]");
-  });
-
-  it("converts absolute path to relative path", () => {
-    const diagnostics: Diagnostic[] = [
-      {
-        message: "Test message",
-        code: { value: "TEST-001", url: "" },
-        location: {
-          path: "/base/path/subdir/main.tf",
-          range: {
-            start: { line: 1 },
-            end: { line: 2 },
-          },
-        },
-        severity: "ERROR",
-      },
-    ];
-    const result = generateTable(diagnostics, "/base/path");
-    expect(result).toContain("subdir/main.tf");
-  });
-
-  it("keeps relative path as-is", () => {
-    const diagnostics: Diagnostic[] = [
-      {
-        message: "Test message",
-        code: { value: "TEST-001", url: "" },
-        location: {
-          path: "modules/main.tf",
-          range: {
-            start: { line: 1 },
-            end: { line: 2 },
-          },
-        },
-        severity: "ERROR",
-      },
-    ];
-    const result = generateTable(diagnostics, "/base/path");
-    expect(result).toContain("modules/main.tf");
-  });
-
-  it("includes all diagnostic fields in table row", () => {
-    const diagnostics: Diagnostic[] = [
-      {
-        message: "S3 bucket has versioning disabled",
-        code: { value: "AVD-AWS-0088", url: "https://example.com" },
-        location: {
-          path: "storage.tf",
-          range: {
-            start: { line: 20 },
-            end: { line: 25 },
-          },
-        },
-        severity: "WARNING",
-      },
-    ];
-    const result = generateTable(diagnostics, "/base/path");
-    const lines = result.split("\n");
-    expect(lines).toHaveLength(3);
-    expect(lines[2]).toContain("AVD-AWS-0088");
-    expect(lines[2]).toContain("WARNING");
-    expect(lines[2]).toContain("storage.tf");
-    expect(lines[2]).toContain("20 ... 25");
-    expect(lines[2]).toContain("S3 bucket has versioning disabled");
-  });
-});
 
 describe("run", () => {
   const createMockExecutor = () => ({
     getExecOutput: vi.fn(),
     exec: vi.fn(),
-  });
-
-  const createMockLogger = (): Logger => ({
-    info: vi.fn(),
   });
 
   const createMockConfig = (overrides?: Partial<Config>): Config => ({
@@ -190,59 +30,12 @@ describe("run", () => {
     vi.clearAllMocks();
   });
 
-  it("returns early when trivy Results is null", async () => {
+  it("calls reviewdog even when trivy output has null Results", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
-    executor.getExecOutput.mockResolvedValueOnce({
-      stdout: JSON.stringify({ Results: null }),
-      stderr: "",
-      exitCode: 0,
-    });
-
-    const input: RunInput = {
-      executor: executor as unknown as RunInput["executor"],
-      workingDirectory: "/work",
-      githubToken: "token",
-      configPath: "",
-      trivy: createMockConfig().trivy,
-      eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
-    };
-
-    await run(input);
-
-    expect(logger.info).toHaveBeenCalledWith("trivy config is null");
-    expect(executor.exec).not.toHaveBeenCalled();
-  });
-
-  it("parses trivy Results and creates diagnostics", async () => {
-    const executor = createMockExecutor();
-    const logger = createMockLogger();
-
-    const trivyOutput = {
-      Results: [
-        {
-          Target: "main.tf",
-          Misconfigurations: [
-            {
-              ID: "AVD-AWS-0001",
-              Message: "Test error",
-              PrimaryURL: "https://example.com",
-              Severity: "HIGH",
-              CauseMetadata: {
-                StartLine: 10,
-                EndLine: 15,
-              },
-            },
-          ],
-        },
-      ],
-    };
-
+    const trivyStdout = JSON.stringify({ Results: null });
     executor.getExecOutput
       .mockResolvedValueOnce({
-        stdout: JSON.stringify(trivyOutput),
+        stdout: trivyStdout,
         stderr: "",
         exitCode: 0,
       })
@@ -260,77 +53,38 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
 
-    // Should call github-comment for nofilter mode
-    expect(executor.exec).toHaveBeenCalledWith(
-      "github-comment",
-      ["post", "-stdin-template"],
-      expect.objectContaining({
-        env: expect.objectContaining({
-          GITHUB_TOKEN: "token",
-        }),
-      }),
-    );
-
-    // Should call reviewdog
     expect(executor.exec).toHaveBeenCalledWith(
       "reviewdog",
-      expect.arrayContaining([
-        "-f",
-        "rdjson",
-        "-name",
-        "trivy",
-        "-reporter",
-        "github-pr-review",
-      ]),
-      expect.any(Object),
+      expect.arrayContaining(["-f", "sarif"]),
+      expect.objectContaining({
+        input: Buffer.from(trivyStdout),
+      }),
     );
   });
 
-  it("passes --config flag when configPath is provided", async () => {
+  it("passes trivy SARIF output to reviewdog", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
-    executor.getExecOutput.mockResolvedValueOnce({
-      stdout: JSON.stringify({ Results: null }),
-      stderr: "",
-      exitCode: 0,
+    const sarifOutput = JSON.stringify({
+      runs: [{ results: [] }],
     });
 
-    const input: RunInput = {
-      executor: executor as unknown as RunInput["executor"],
-      workingDirectory: "/work",
-      githubToken: "token",
-      configPath: "/path/to/trivy.yaml",
-      trivy: createMockConfig().trivy,
-      eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
-    };
-
-    await run(input);
-
-    expect(executor.getExecOutput).toHaveBeenCalledWith(
-      "trivy",
-      ["config", "--format", "json", "--config", "/path/to/trivy.yaml", "."],
-      expect.any(Object),
-    );
-  });
-
-  it("does not pass --config flag when configPath is empty", async () => {
-    const executor = createMockExecutor();
-    const logger = createMockLogger();
-
-    executor.getExecOutput.mockResolvedValueOnce({
-      stdout: JSON.stringify({ Results: null }),
-      stderr: "",
-      exitCode: 0,
-    });
+    executor.getExecOutput
+      .mockResolvedValueOnce({
+        stdout: sarifOutput,
+        stderr: "",
+        exitCode: 0,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec.mockResolvedValue(0);
 
     const input: RunInput = {
       executor: executor as unknown as RunInput["executor"],
@@ -339,22 +93,100 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
+    };
+
+    await run(input);
+
+    // Should call reviewdog with SARIF format
+    expect(executor.exec).toHaveBeenCalledWith(
+      "reviewdog",
+      expect.arrayContaining([
+        "-f",
+        "sarif",
+        "-name",
+        "trivy",
+        "-reporter",
+        "github-pr-review",
+      ]),
+      expect.objectContaining({
+        input: Buffer.from(sarifOutput),
+        env: {
+          REVIEWDOG_GITHUB_API_TOKEN: "token",
+        },
+      }),
+    );
+  });
+
+  it("passes --config flag when configPath is provided", async () => {
+    const executor = createMockExecutor();
+
+    executor.getExecOutput
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify({ runs: [{ results: [] }] }),
+        stderr: "",
+        exitCode: 0,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec.mockResolvedValue(0);
+
+    const input: RunInput = {
+      executor: executor as unknown as RunInput["executor"],
+      workingDirectory: "/work",
+      githubToken: "token",
+      configPath: "/path/to/trivy.yaml",
+      trivy: createMockConfig().trivy,
+      eventName: "pull_request",
     };
 
     await run(input);
 
     expect(executor.getExecOutput).toHaveBeenCalledWith(
       "trivy",
-      ["config", "--format", "json", "."],
+      ["config", "--format", "sarif", "--config", "/path/to/trivy.yaml", "."],
+      expect.any(Object),
+    );
+  });
+
+  it("does not pass --config flag when configPath is empty", async () => {
+    const executor = createMockExecutor();
+
+    executor.getExecOutput
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify({ runs: [{ results: [] }] }),
+        stderr: "",
+        exitCode: 0,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec.mockResolvedValue(0);
+
+    const input: RunInput = {
+      executor: executor as unknown as RunInput["executor"],
+      workingDirectory: "/work",
+      githubToken: "token",
+      configPath: "",
+      trivy: createMockConfig().trivy,
+      eventName: "pull_request",
+    };
+
+    await run(input);
+
+    expect(executor.getExecOutput).toHaveBeenCalledWith(
+      "trivy",
+      ["config", "--format", "sarif", "."],
       expect.any(Object),
     );
   });
 
   it("does not call github-comment when filterMode is not nofilter", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     const trivyOutput = {
       Results: [
@@ -399,8 +231,6 @@ describe("run", () => {
         reviewdog: { filter_mode: "added" },
       },
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
@@ -422,7 +252,6 @@ describe("run", () => {
 
   it("does not call github-comment when diagnostics is empty", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     const trivyOutput = {
       Results: [
@@ -453,8 +282,6 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
@@ -469,7 +296,6 @@ describe("run", () => {
 
   it("uses github-pr-review reporter for pull_request event", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     executor.getExecOutput
       .mockResolvedValueOnce({
@@ -491,8 +317,6 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
@@ -506,7 +330,6 @@ describe("run", () => {
 
   it("uses github-check reporter for push event", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     executor.getExecOutput
       .mockResolvedValueOnce({
@@ -528,8 +351,6 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "push",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
@@ -543,7 +364,6 @@ describe("run", () => {
 
   it("uses -fail-level when reviewdog supports it", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     executor.getExecOutput
       .mockResolvedValueOnce({
@@ -568,8 +388,6 @@ describe("run", () => {
         reviewdog: { fail_level: "error" },
       },
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
@@ -583,7 +401,6 @@ describe("run", () => {
 
   it("uses -fail-level when reviewdog help shows it in stderr", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     executor.getExecOutput
       .mockResolvedValueOnce({
@@ -605,8 +422,6 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
@@ -620,7 +435,6 @@ describe("run", () => {
 
   it("uses -fail-on-error when reviewdog does not support -fail-level", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     executor.getExecOutput
       .mockResolvedValueOnce({
@@ -642,8 +456,6 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
@@ -657,7 +469,6 @@ describe("run", () => {
 
   it("throws error when trivy exitCode is not 0", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     executor.getExecOutput
       .mockResolvedValueOnce({
@@ -679,8 +490,6 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await expect(run(input)).rejects.toThrow("trivy failed");
@@ -688,7 +497,6 @@ describe("run", () => {
 
   it("skips Results with null Misconfigurations", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     const trivyOutput = {
       Results: [
@@ -723,8 +531,6 @@ describe("run", () => {
       configPath: "",
       trivy: createMockConfig().trivy,
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);
@@ -739,7 +545,6 @@ describe("run", () => {
 
   it("uses default fail_level 'any' when not configured", async () => {
     const executor = createMockExecutor();
-    const logger = createMockLogger();
 
     executor.getExecOutput
       .mockResolvedValueOnce({
@@ -761,8 +566,6 @@ describe("run", () => {
       configPath: "",
       trivy: { enabled: true },
       eventName: "pull_request",
-      logger,
-      githubCommentConfig: "/path/to/config.yaml",
     };
 
     await run(input);

@@ -1,11 +1,11 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
-import { z } from "zod";
 import * as aqua from "../../aqua";
 import * as types from "../../lib/types";
 import { checkGitDiff as defaultCheckGitDiff } from "../../lib/git";
 import { create as defaultCreateCommit } from "../../commit";
+import { listFiles } from "./sarif";
 
 export type Logger = {
   info: (message: string) => void;
@@ -46,29 +46,6 @@ export type RunInput = {
   createCommit?: CommitCreator;
   checkGitDiff?: GitDiffChecker;
 };
-
-// .runs[].results[].locations[].physicalLocation.artifactLocation.uri
-const TflintOutput = z.object({
-  runs: z
-    .object({
-      results: z
-        .object({
-          locations: z
-            .object({
-              physicalLocation: z.object({
-                artifactLocation: z.object({
-                  uri: z.string(),
-                }),
-              }),
-            })
-            .array()
-            .optional(),
-        })
-        .array(),
-    })
-    .array(),
-});
-type TflintOutput = z.infer<typeof TflintOutput>;
 
 export const run = async (input: RunInput): Promise<void> => {
   if (!input.githubToken) {
@@ -111,27 +88,11 @@ export const run = async (input: RunInput): Promise<void> => {
     group: "tflint",
     ignoreReturnCode: true,
   });
-  const outJSON = TflintOutput.parse(JSON.parse(out.stdout));
   if (input.fix) {
-    const files = new Set<string>();
-    for (const run of outJSON.runs) {
-      for (const result of run.results) {
-        if (!result.locations) {
-          continue;
-        }
-        for (const location of result.locations) {
-          files.add(
-            path.relative(
-              input.gitRootDir,
-              path.join(
-                input.workingDirectory,
-                location.physicalLocation.artifactLocation.uri,
-              ),
-            ),
-          );
-        }
-      }
-    }
+    const files = listFiles(
+      out.stdout,
+      path.relative(input.gitRootDir, input.workingDirectory),
+    );
     if (files.size == 0) {
       return;
     }
