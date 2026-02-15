@@ -1,32 +1,72 @@
 # list-targets
 
-## Overview
+Generates a list of root modules changed in a PR.
+Used to run CI only on changed root modules in a monorepo.
 
-`list-targets` is an action to output changed working directories and modules.
-It outputs the following outputs.
+No inputs other than the `action` input are required.
 
-- targets: JSON string.
-- modules: JSON String. A list of paths to modules
+## Outputs
 
-targets:
+The outputs are intended to be used as `env`, `runs-on`, and `environment` in subsequent matrix jobs.
 
-```yaml
-- target: github/foo
-  working_directory: github/services/foo # A relative path from tfaction-root.yaml
-  runs_on: ubuntu-latest # Or list
-  job_type: terraform # tfmigrate
-  environment:
-    env_name: main
-    url: https://example.com
-  secrets:
-    - env_name:
-      secret_name:
+- `targets`: JSON list of changed root modules
+- `modules`: JSON list of changed modules
+
+### targets
+
+```json
+[
+  {
+    "target": "github/foo",
+    "working_directory": "github/service/foo",
+    "runs_on": "ubuntu-latest",
+    "job_type": "terraform",
+    "environment": "production"
+  }
+]
 ```
 
-modules:
+- `target`: Alias for `working_directory`. Defaults to the same value as `working_directory`
+- `runs_on`: Job execution environment. Defaults to `ubuntu-latest`
+- `environment`: GitHub Environments
+
+Example workflow usage:
 
 ```yaml
-- modules/foo # A relative path from tfaction-root.yaml to module
+plan:
+  name: "plan (${{matrix.target.target}})"
+  timeout-minutes: 60
+  runs-on: ${{matrix.target.runs_on}}
+  environment: ${{matrix.target.environment}}
+  needs: [list]
+  env:
+    TFACTION_TARGET: ${{matrix.target.target}}
+    TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
+    TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
+  if: "join(fromJSON(needs.list.outputs.targets), '') != ''"
+  strategy:
+    fail-fast: false
+    matrix:
+      target: ${{fromJSON(needs.list.outputs.targets)}}
+```
+
+Settings can be changed in `tfaction-root.yaml`:
+
+```yaml
+replace_target:
+  patterns:
+    - regexp: /services/
+      replace: /
+target_groups:
+  - working_directory: github/services/**
+    runs_on: ubuntu-slim
+    environment: production
+```
+
+### modules
+
+```json
+["modules/foo"]
 ```
 
 ## Usage
