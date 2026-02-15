@@ -229,6 +229,7 @@ ${prData.body}
 };
 
 export const createFailedPrsFile = (
+  /** Absolute path or relative path from github.workspace */
   workingDir: string,
   prNumber: string,
   githubServerUrl: string,
@@ -343,6 +344,7 @@ export interface RunInput {
   actor: string;
   prAuthor: string;
   target: string;
+  /** A relative path from git root directory to working directory */
   workingDir: string;
   isApply: boolean;
   prNumber: string;
@@ -396,6 +398,7 @@ export const run = async (input: RunInput): Promise<void> => {
     config,
   );
 
+  /** Absolute path to working directory */
   const workingDir = path.join(
     config.git_root_dir,
     targetConfig.working_directory,
@@ -433,10 +436,7 @@ export const run = async (input: RunInput): Promise<void> => {
   // Create failed-prs file
   const failedPrsFile = path.relative(
     config.git_root_dir,
-    path.join(
-      config.workspace,
-      createFailedPrsFile(workingDir, prNumber, githubServerUrl, repository),
-    ),
+    createFailedPrsFile(workingDir, prNumber, githubServerUrl, repository),
   );
 
   const labels: string[] = [];
