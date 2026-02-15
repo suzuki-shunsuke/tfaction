@@ -66,10 +66,20 @@ const createBaseTargetConfig = (
   ...overrides,
 });
 
+const createMockFs = () => ({
+  existsSync: vi.fn().mockReturnValue(false),
+  readFileSync: vi.fn().mockReturnValue(""),
+  writeFileSync: vi.fn(),
+  unlinkSync: vi.fn(),
+});
+
+type MockFs = ReturnType<typeof createMockFs>;
+
 const createRunInput = (
   executor: MockExecutor,
   configOverrides?: Partial<types.Config>,
   targetConfigOverrides?: Partial<TargetConfig>,
+  fsOverride?: MockFs,
 ): RunInput => ({
   config: { ...createBaseConfig(), ...configOverrides } as types.Config,
   targetConfig: createBaseTargetConfig(targetConfigOverrides),
@@ -77,6 +87,7 @@ const createRunInput = (
   securefixAppId: "app-id",
   securefixAppPrivateKey: "app-key",
   executor: executor as unknown as aqua.Executor,
+  ...(fsOverride ? { fs: fsOverride } : {}),
 });
 
 // Helper to get mocked modules
@@ -478,5 +489,202 @@ describe("run", () => {
         cwd: "/my/repo/infra/prod",
       }),
     );
+  });
+
+  describe("type=module", () => {
+    it("runs terraform init", async () => {
+      const mockFs = createMockFs();
+      const input = createRunInput(
+        mockExecutor,
+        undefined,
+        { type: "module" },
+        mockFs,
+      );
+      await run(input);
+
+      expect(mockExecutor.exec).toHaveBeenCalledWith(
+        "terraform",
+        ["init"],
+        expect.objectContaining({
+          cwd: "/git/root/aws/test",
+          group: "terraform init",
+        }),
+      );
+    });
+
+    it("skips conftest and validate", async () => {
+      const { conftestMod } = await getMocks();
+      const mockFs = createMockFs();
+      const input = createRunInput(
+        mockExecutor,
+        undefined,
+        { type: "module" },
+        mockFs,
+      );
+      await run(input);
+
+      expect(conftestMod.run).not.toHaveBeenCalled();
+      // validate is not called - only init is called via executor.exec
+      expect(mockExecutor.exec).not.toHaveBeenCalledWith(
+        "terraform",
+        ["validate"],
+        expect.anything(),
+      );
+    });
+
+    it("deletes lock file created by terraform init", async () => {
+      const mockFs = createMockFs();
+      // Lock file does not exist before init
+      mockFs.existsSync.mockImplementation((p: string) => {
+        if (p === "/git/root/aws/test/.terraform.lock.hcl") {
+          // First call (before init): false, second call (after tools): true
+          return (
+            mockFs.existsSync.mock.calls.filter((c: string[]) => c[0] === p)
+              .length > 1
+          );
+        }
+        return false;
+      });
+
+      const input = createRunInput(
+        mockExecutor,
+        undefined,
+        { type: "module" },
+        mockFs,
+      );
+      await run(input);
+
+      expect(mockFs.unlinkSync).toHaveBeenCalledWith(
+        "/git/root/aws/test/.terraform.lock.hcl",
+      );
+    });
+
+    it("reverts lock file modified by terraform init", async () => {
+      const mockFs = createMockFs();
+      const originalContent = "original lock content";
+      const modifiedContent = "modified lock content";
+
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockImplementation(() => {
+        // First call: save original, second call: read current (modified)
+        return mockFs.readFileSync.mock.calls.length <= 1
+          ? originalContent
+          : modifiedContent;
+      });
+
+      const input = createRunInput(
+        mockExecutor,
+        undefined,
+        { type: "module" },
+        mockFs,
+      );
+      await run(input);
+
+      expect(mockFs.writeFileSync).toHaveBeenCalledWith(
+        "/git/root/aws/test/.terraform.lock.hcl",
+        originalContent,
+      );
+    });
+
+    it("does nothing when lock file is unchanged", async () => {
+      const mockFs = createMockFs();
+      const content = "unchanged lock content";
+
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue(content);
+
+      const input = createRunInput(
+        mockExecutor,
+        undefined,
+        { type: "module" },
+        mockFs,
+      );
+      await run(input);
+
+      expect(mockFs.writeFileSync).not.toHaveBeenCalled();
+      expect(mockFs.unlinkSync).not.toHaveBeenCalled();
+    });
+
+    it("fmt commits without throwing", async () => {
+      const { fmtMod, commitMod } = await getMocks();
+      vi.mocked(fmtMod.fmt).mockResolvedValue({
+        exitCode: 0,
+        stdout: "main.tf\n",
+        stderr: "",
+      });
+
+      const mockFs = createMockFs();
+      const input = createRunInput(
+        mockExecutor,
+        undefined,
+        { type: "module" },
+        mockFs,
+      );
+
+      // Should not throw for modules
+      await expect(run(input)).resolves.toBeUndefined();
+      expect(commitMod.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          commitMessage: "style: terraform fmt -recursive",
+        }),
+      );
+    });
+
+    it("runs all module tools in correct order", async () => {
+      const { trivyMod, tflintMod, terraformDocsMod, fmtMod, conftestMod } =
+        await getMocks();
+
+      const callOrder: string[] = [];
+      mockExecutor.exec.mockImplementation((cmd: string, args: string[]) => {
+        if (args[0] === "init") {
+          callOrder.push("init");
+        }
+        return Promise.resolve(0);
+      });
+      vi.mocked(conftestMod.run).mockImplementation(() => {
+        callOrder.push("conftest");
+        return Promise.resolve();
+      });
+      vi.mocked(trivyMod.run).mockImplementation(() => {
+        callOrder.push("trivy");
+        return Promise.resolve();
+      });
+      vi.mocked(tflintMod.run).mockImplementation(() => {
+        callOrder.push("tflint");
+        return Promise.resolve();
+      });
+      vi.mocked(fmtMod.fmt).mockImplementation(() => {
+        callOrder.push("fmt");
+        return Promise.resolve({ exitCode: 0, stdout: "", stderr: "" });
+      });
+      vi.mocked(terraformDocsMod.run).mockImplementation(() => {
+        callOrder.push("terraform-docs");
+        return Promise.resolve();
+      });
+
+      const mockFs = createMockFs();
+      const input = createRunInput(
+        mockExecutor,
+        undefined,
+        {
+          type: "module",
+          enable_trivy: true,
+          enable_tflint: true,
+          enable_terraform_docs: true,
+        },
+        mockFs,
+      );
+      await run(input);
+
+      expect(callOrder).toEqual([
+        "init",
+        "trivy",
+        "tflint",
+        "fmt",
+        "terraform-docs",
+      ]);
+      // conftest should not be called for modules
+      expect(conftestMod.run).not.toHaveBeenCalled();
+    });
   });
 });
