@@ -58,7 +58,7 @@ export const main = async (
     cfg.git_root_dir,
     targetConfig.working_directory,
   );
-  const tfCommand = targetConfig.terraform_command || "terraform";
+  const tfCommand = targetConfig.terraform_command;
   const driftIssueRepo = drift.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;

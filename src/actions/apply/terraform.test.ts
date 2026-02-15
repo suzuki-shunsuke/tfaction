@@ -467,20 +467,6 @@ describe("main", () => {
     );
   });
 
-  it('defaults to "terraform" when terraform_command is empty', async () => {
-    const { mockExecutor } = await setupMainMocks({
-      targetConfig: { terraform_command: "" },
-    });
-
-    await main();
-
-    expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "tfcmt",
-      expect.arrayContaining(["terraform", "apply"]),
-      expect.any(Object),
-    );
-  });
-
   it('throws "No workflow run is found" when listWorkflowRuns returns empty array', async () => {
     const { mockExecutor } = await setupMainMocks({
       workflowRuns: [],

@@ -387,7 +387,7 @@ export const main = async (
     workingDirectory: workingDir,
     renovateLogin: config.renovate_login || "",
     destroy: targetConfig.destroy || false,
-    tfCommand: targetConfig.terraform_command || "terraform",
+    tfCommand: targetConfig.terraform_command,
     target: targetConfig.target,
     driftIssueNumber: runInputs.driftIssueNumber,
     prAuthor: runInputs.prAuthor,
