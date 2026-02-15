@@ -1595,3 +1595,139 @@ test("skip_terraform_files: multiple patterns", async () => {
     ],
   });
 });
+
+test("module detected via moduleWorkingDirs gets type: module", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "modules/**",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/main.tf"],
+      configFiles: ["modules/vpc/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      moduleWorkingDirs: new Set(["modules/vpc"]),
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc"],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "modules/vpc",
+        working_directory: "modules/vpc",
+        type: "module",
+      },
+    ],
+  });
+});
+
+test("mixed modules and regular working dirs", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+          {
+            working_directory: "modules/**",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf", "modules/vpc/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml", "modules/vpc/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      moduleWorkingDirs: new Set(["modules/vpc"]),
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: ["modules/vpc"],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "modules/vpc",
+        working_directory: "modules/vpc",
+        type: "module",
+      },
+    ],
+  });
+});
+
+test("module working dir with no changes produces no output", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "modules/**",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["modules/vpc/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      moduleFiles: [],
+      moduleWorkingDirs: new Set(["modules/vpc"]),
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      maxChangedModules: 0,
+      executor: await aqua.NewExecutor({}),
+    }),
+  ).toStrictEqual({
+    modules: [],
+    targetConfigs: [],
+  });
+});

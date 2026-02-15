@@ -24,6 +24,7 @@ type TargetConfig = {
   environment?: types.GitHubEnvironment;
   secrets?: types.GitHubSecrets;
   skip_terraform: boolean;
+  type?: "module";
 };
 
 const getTargetConfigByTarget = (
@@ -33,6 +34,7 @@ const getTargetConfigByTarget = (
   isApply: boolean,
   jobType: types.JobType,
   skipTerraform: boolean,
+  type?: "module",
 ): TargetConfig | undefined => {
   const tg = lib.getTargetFromTargetGroupsByWorkingDir(targets, wd);
   if (tg === undefined) {
@@ -40,8 +42,9 @@ const getTargetConfigByTarget = (
     return undefined;
   }
   const jobConfig = lib.getJobConfig(tg, isApply, jobType);
+  let result: TargetConfig;
   if (jobConfig === undefined) {
-    return {
+    result = {
       target: target,
       working_directory: wd,
       runs_on: tg.runs_on ?? "ubuntu-latest",
@@ -50,16 +53,21 @@ const getTargetConfigByTarget = (
       job_type: jobType,
       skip_terraform: skipTerraform,
     };
+  } else {
+    result = {
+      target: target,
+      working_directory: wd,
+      runs_on: jobConfig.runs_on ?? tg.runs_on ?? "ubuntu-latest",
+      environment: jobConfig.environment ?? tg.environment,
+      secrets: jobConfig.secrets ?? tg.secrets,
+      job_type: jobType,
+      skip_terraform: skipTerraform,
+    };
   }
-  return {
-    target: target,
-    working_directory: wd,
-    runs_on: jobConfig.runs_on ?? tg.runs_on ?? "ubuntu-latest",
-    environment: jobConfig.environment ?? tg.environment,
-    secrets: jobConfig.secrets ?? tg.secrets,
-    job_type: jobType,
-    skip_terraform: skipTerraform,
-  };
+  if (type) {
+    result.type = type;
+  }
+  return result;
 };
 
 type Payload = {
@@ -214,6 +222,7 @@ const addTargetsFromChangedWorkingDirs = (
   terraformTargetObjs: TargetConfig[],
   changedFilesPerWD: Map<string, string[]>,
   skips: Set<string>,
+  moduleWorkingDirs: Set<string>,
 ): void => {
   for (const changedWorkingDir of changedWorkingDirs) {
     const target = wdTargetMap.get(changedWorkingDir);
@@ -233,6 +242,9 @@ const addTargetsFromChangedWorkingDirs = (
       // If WD had changed files but none remain after filtering, all matched skip patterns
       skipTerraform = !changedFilesPerWD.has(changedWorkingDir);
     }
+    const type = moduleWorkingDirs.has(changedWorkingDir)
+      ? ("module" as const)
+      : undefined;
     const obj = getTargetConfigByTarget(
       targetGroups,
       changedWorkingDir,
@@ -240,6 +252,7 @@ const addTargetsFromChangedWorkingDirs = (
       isApply,
       "terraform",
       skipTerraform,
+      type,
     );
     if (obj !== undefined) {
       terraformTargets.add(target);
@@ -353,6 +366,15 @@ export const run = async (input: Input): Promise<Result> => {
       config.skip_terraform_files ?? [],
     );
 
+  const moduleWorkingDirs = input.moduleWorkingDirs ?? new Set<string>();
+
+  // Add changed working dirs that are modules to changedModules for backward compat
+  for (const wd of changedWorkingDirs) {
+    if (moduleWorkingDirs.has(wd)) {
+      changedModules.add(wd);
+    }
+  }
+
   addTargetsFromChangedWorkingDirs(
     changedWorkingDirs,
     wdTargetMap,
@@ -363,6 +385,7 @@ export const run = async (input: Input): Promise<Result> => {
     terraformTargetObjs,
     changedFilesPerWD,
     skips,
+    moduleWorkingDirs,
   );
 
   const result = {
@@ -401,6 +424,8 @@ type Input = {
   payload: Payload;
   /** Relative path from git_root_dir to module => Relative paths from git_root_dir to module callers */
   moduleCallers: ModuleToCallers | null;
+  /** Working directories that have type: module in their tfaction.yaml */
+  moduleWorkingDirs?: Set<string>;
   maxChangedWorkingDirectories: number;
   maxChangedModules: number;
   githubToken: string;
@@ -486,6 +511,22 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     cfg.module_file,
   );
 
+  // Identify module working dirs from configFiles with type: module
+  const moduleWorkingDirs = new Set<string>();
+  for (const configFile of configFiles) {
+    if (configFile === "") continue;
+    try {
+      const wdConfig = lib.readTargetConfig(
+        path.join(cfg.git_root_dir, configFile),
+      );
+      if (wdConfig.type === "module") {
+        moduleWorkingDirs.add(path.dirname(configFile));
+      }
+    } catch {
+      // Skip files that can't be parsed
+    }
+  }
+
   let moduleCallers: ModuleToCallers | null = null;
   if (cfg.update_local_path_module_caller?.enabled) {
     moduleCallers = await listModuleCallers(
@@ -504,6 +545,7 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
       pr.pr?.files.map((file) => path.join(cfg.git_root_dir, file)) ?? [],
     configFiles,
     moduleFiles: modules,
+    moduleWorkingDirs,
     maxChangedWorkingDirectories: cfg.limit_changed_dirs?.working_dirs ?? 0,
     maxChangedModules: cfg.limit_changed_dirs?.modules ?? 0,
     prBody: pr.pr?.data.body ?? "",
