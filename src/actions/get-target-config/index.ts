@@ -18,6 +18,7 @@ export type Result = {
 
 export interface TargetConfig {
   // Always set
+  /** Relative path from git root dir to working directory */
   working_directory: string;
   target: string;
   providers_lock_opts: string;
@@ -43,6 +44,9 @@ export interface TargetConfig {
   destroy?: boolean;
   enable_terraform_docs?: boolean;
   accept_change_by_renovate?: boolean;
+
+  // Module type (omitted for root modules, "module" for modules)
+  type?: "module";
 
   // Additional envs from config (dynamic)
   env?: Record<string, string>;
@@ -211,6 +215,7 @@ export const getTargetConfig = async (
 
     result.destroy = wdConfig.destroy ? true : false;
     result.accept_change_by_renovate = wdConfig.accept_change_by_renovate;
+    result.type = wdConfig.type;
     result.enable_terraform_docs =
       wdConfig?.terraform_docs?.enabled ??
       config?.terraform_docs?.enabled ??

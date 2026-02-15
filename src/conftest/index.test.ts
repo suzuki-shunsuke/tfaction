@@ -404,7 +404,6 @@ describe("buildPolicies", () => {
   ): types.Config => ({
     draft_pr: false,
     label_prefixes: { skip: "skip:", tfmigrate: "tfmigrate:" },
-    module_file: "tfaction_module.yaml",
     plan_workflow_name: "plan",
     renovate_login: "renovate[bot]",
     skip_create_pr: false,

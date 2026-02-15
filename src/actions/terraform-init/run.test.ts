@@ -13,6 +13,9 @@ vi.mock("fs", async () => {
   return {
     ...actual,
     existsSync: vi.fn(),
+    readFileSync: vi.fn(),
+    writeFileSync: vi.fn(),
+    unlinkSync: vi.fn(),
   };
 });
 
@@ -379,5 +382,148 @@ describe("run", () => {
         group: "terragrunt run -- providers",
       }),
     );
+  });
+
+  describe("isModule", () => {
+    it("PR + module: skips providers lock, runs init + providers", async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      const commitMod = await import("../../commit");
+
+      const input = {
+        ...createBaseInput(mockExecutor),
+        isPullRequest: true,
+        isModule: true,
+      };
+
+      await run(input);
+
+      // init + providers = 2 exec calls (no providers lock)
+      expect(mockExecutor.exec).toHaveBeenCalledTimes(2);
+      expect(mockExecutor.exec).toHaveBeenNthCalledWith(
+        1,
+        "terraform",
+        ["init", "-input=false"],
+        expect.objectContaining({ ignoreReturnCode: true }),
+      );
+      expect(mockExecutor.exec).toHaveBeenNthCalledWith(
+        2,
+        "terraform",
+        ["providers"],
+        expect.any(Object),
+      );
+      expect(commitMod.create).not.toHaveBeenCalled();
+    });
+
+    it("PR + module: deletes lock file created by init", async () => {
+      // Before init: doesn't exist. After init: exists.
+      vi.mocked(fs.existsSync).mockImplementation((p) => {
+        if (p === "/test/working/dir/.terraform.lock.hcl") {
+          const calls = vi
+            .mocked(fs.existsSync)
+            .mock.calls.filter((c) => c[0] === p);
+          // First call (before init): false, second call (after init): true
+          return calls.length > 1;
+        }
+        return false;
+      });
+
+      const input = {
+        ...createBaseInput(mockExecutor),
+        isPullRequest: true,
+        isModule: true,
+      };
+
+      await run(input);
+
+      expect(fs.unlinkSync).toHaveBeenCalledWith(
+        "/test/working/dir/.terraform.lock.hcl",
+      );
+    });
+
+    it("PR + module: reverts lock file modified by init", async () => {
+      const originalContent = "original lock content";
+      const modifiedContent = "modified lock content";
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockImplementation(() => {
+        return vi.mocked(fs.readFileSync).mock.calls.length <= 1
+          ? originalContent
+          : modifiedContent;
+      });
+
+      const input = {
+        ...createBaseInput(mockExecutor),
+        isPullRequest: true,
+        isModule: true,
+      };
+
+      await run(input);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        "/test/working/dir/.terraform.lock.hcl",
+        originalContent,
+      );
+    });
+
+    it("PR + module: does nothing when lock file is unchanged", async () => {
+      const content = "unchanged lock content";
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(content);
+
+      const input = {
+        ...createBaseInput(mockExecutor),
+        isPullRequest: true,
+        isModule: true,
+      };
+
+      await run(input);
+
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+      expect(fs.unlinkSync).not.toHaveBeenCalled();
+    });
+
+    it("PR + module: does not commit or throw", async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue("content");
+      const commitMod = await import("../../commit");
+
+      const input = {
+        ...createBaseInput(mockExecutor),
+        isPullRequest: true,
+        isModule: true,
+      };
+
+      await expect(run(input)).resolves.toBeUndefined();
+      expect(commitMod.create).not.toHaveBeenCalled();
+    });
+
+    it("PR + module, init fails: retries with -upgrade", async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+
+      mockExecutor.exec
+        .mockResolvedValueOnce(1) // init fails
+        .mockResolvedValueOnce(0) // init -upgrade succeeds
+        .mockResolvedValueOnce(0); // providers
+
+      const input = {
+        ...createBaseInput(mockExecutor),
+        isPullRequest: true,
+        isModule: true,
+      };
+
+      await run(input);
+
+      // init + init -upgrade + providers = 3 exec calls
+      expect(mockExecutor.exec).toHaveBeenCalledTimes(3);
+      expect(mockExecutor.exec).toHaveBeenNthCalledWith(
+        2,
+        "terraform",
+        ["init", "-input=false", "-upgrade"],
+        expect.objectContaining({
+          comment: { token: "test-token" },
+        }),
+      );
+    });
   });
 });

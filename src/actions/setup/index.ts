@@ -91,6 +91,7 @@ export const main = async () => {
     },
     config,
   );
+  /** absolute path to working directory */
   const workingDir = path.join(
     config.git_root_dir,
     targetConfig.working_directory,
@@ -196,11 +197,16 @@ export const main = async () => {
   if (isPR && config.aqua?.update_checksum?.enabled) {
     try {
       core.info("updating checksum");
-      await aquaUpdateChecksum.main(executor, workingDir, config, {
-        githubToken: githubToken,
-        securefixActionAppId: input.securefixActionAppId,
-        securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
-      });
+      await aquaUpdateChecksum.main(
+        executor,
+        path.relative(config.workspace, workingDir),
+        config,
+        {
+          githubToken: githubToken,
+          securefixActionAppId: input.securefixActionAppId,
+          securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
+        },
+      );
     } catch (error) {
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {
@@ -217,12 +223,6 @@ export const main = async () => {
     core.info("Setting up SSH key...");
     await setupSSHKey(input.sshKey);
   }
-
-  core.setOutput("working_directory", targetConfig.working_directory);
-  core.setOutput(
-    "s3_bucket_name_tfmigrate_history",
-    targetConfig.s3_bucket_name_tfmigrate_history ?? "",
-  );
 
   core.info("Setup completed successfully");
 };

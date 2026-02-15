@@ -23,17 +23,27 @@ export const generateBranchName = (target: string): string => {
   );
 };
 
+export const escapeForShellDoubleQuote = (s: string): string =>
+  s
+    .replaceAll("\\", "\\\\")
+    .replaceAll('"', '\\"')
+    .replaceAll("$", "\\$")
+    .replaceAll("`", "\\`");
+
 export const writeSkipCreatePrSummary = (
   repository: string,
   branch: string,
-  target: string,
   draftPr: boolean,
-  runURL: string,
+  prTitle: string,
+  prBody: string,
 ): void => {
   let draftOpt = "";
   if (draftPr) {
     draftOpt = "-d ";
   }
+
+  const escapedTitle = escapeForShellDoubleQuote(prTitle);
+  const escapedBody = escapeForShellDoubleQuote(prBody);
 
   const summary = `
 ## Create a scaffold pull request
@@ -43,8 +53,8 @@ Please run the following command in your terminal.
 \`\`\`
 gh pr create -R "${repository}" ${draftOpt}\\
   -H "${branch}" \\
-  -t "Scaffold a working directory (${target})" \\
-  -b "This pull request was created by [GitHub Actions](${runURL})"
+  -t "${escapedTitle}" \\
+  -b "${escapedBody}"
 \`\`\`
 
 [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
@@ -95,6 +105,7 @@ export const run = async (input: RunInput): Promise<void> => {
     config,
   );
 
+  const isModule = targetConfigResult.type === "module";
   const workingDir = targetConfigResult.working_directory || input.workingDir;
   const target = targetConfigResult.target || input.target;
 
@@ -115,33 +126,60 @@ export const run = async (input: RunInput): Promise<void> => {
     return;
   }
 
-  const vars = {
-    target: target,
-    working_dir: workingDir,
-    actor,
-    run_url: runURL,
-  };
-  const commitMessage = `scaffold a working directory (${target})`;
+  let commitMessage: string;
+  let prTitle: string;
+  let prBody: string;
+  let prComment: string;
 
-  const prTitle = config?.scaffold_working_directory?.pull_request?.title
-    ? Handlebars.compile(
-        config?.scaffold_working_directory?.pull_request?.title,
-      )(vars)
-    : `Scaffold a working directory (${target})`;
+  if (isModule) {
+    const vars = {
+      module_path: workingDir,
+      actor,
+      run_url: runURL,
+    };
+    commitMessage = `chore(${target}): scaffold a Terraform Module`;
 
-  const prBody = config?.scaffold_working_directory?.pull_request?.body
-    ? Handlebars.compile(
-        config?.scaffold_working_directory?.pull_request?.body,
-      )(vars)
-    : `This pull request scaffolds a working directory \`${workingDir}\`.
+    prTitle = config?.scaffold_module?.pull_request?.title
+      ? Handlebars.compile(config?.scaffold_module?.pull_request?.title)(vars)
+      : `Scaffold a Terraform Module (${target})`;
+
+    prBody = config?.scaffold_module?.pull_request?.body
+      ? Handlebars.compile(config?.scaffold_module?.pull_request?.body)(vars)
+      : `This pull request was created by [GitHub Actions](${runURL})`;
+
+    prComment = config?.scaffold_module?.pull_request?.comment
+      ? Handlebars.compile(config?.scaffold_module?.pull_request?.comment)(vars)
+      : `@${actor} This pull request was created by [GitHub Actions](${runURL}) you ran.
+    Please handle this pull request.`;
+  } else {
+    const vars = {
+      target: target,
+      working_dir: workingDir,
+      actor,
+      run_url: runURL,
+    };
+    commitMessage = `scaffold a working directory (${target})`;
+
+    prTitle = config?.scaffold_working_directory?.pull_request?.title
+      ? Handlebars.compile(
+          config?.scaffold_working_directory?.pull_request?.title,
+        )(vars)
+      : `Scaffold a working directory (${target})`;
+
+    prBody = config?.scaffold_working_directory?.pull_request?.body
+      ? Handlebars.compile(
+          config?.scaffold_working_directory?.pull_request?.body,
+        )(vars)
+      : `This pull request scaffolds a working directory \`${workingDir}\`.
     [@${actor} created this pull request by GitHub Actions](${runURL}).`;
 
-  const prComment = config?.scaffold_working_directory?.pull_request?.comment
-    ? Handlebars.compile(
-        config?.scaffold_working_directory?.pull_request?.comment,
-      )(vars)
-    : `@${actor} This pull request was created by [GitHub Actions](${runURL}) you ran.
+    prComment = config?.scaffold_working_directory?.pull_request?.comment
+      ? Handlebars.compile(
+          config?.scaffold_working_directory?.pull_request?.comment,
+        )(vars)
+      : `@${actor} This pull request was created by [GitHub Actions](${runURL}) you ran.
     Please handle this pull request.`;
+  }
 
   await commit.create({
     commitMessage,
@@ -165,6 +203,6 @@ export const run = async (input: RunInput): Promise<void> => {
 
   // Write step summary if skip_create_pr is true
   if (skipCreatePr) {
-    writeSkipCreatePrSummary(repository, branch, target, draftPr, runURL);
+    writeSkipCreatePrSummary(repository, branch, draftPr, prTitle, prBody);
   }
 };

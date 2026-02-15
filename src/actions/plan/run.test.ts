@@ -640,6 +640,31 @@ describe("main", () => {
     vi.restoreAllMocks();
   });
 
+  it("skips plan for module type and returns early", async () => {
+    const targetConfig: getTargetConfig.TargetConfig = {
+      working_directory: "modules/vpc",
+      target: "modules/vpc",
+      providers_lock_opts: "",
+      enable_tflint: false,
+      enable_trivy: false,
+      tflint_fix: false,
+      terraform_command: "terraform",
+      type: "module",
+    };
+    const runInputs: RunInputs = {
+      githubToken: "test-token",
+      jobType: "terraform",
+    };
+
+    await main(targetConfig, runInputs);
+
+    expect(core.info).toHaveBeenCalledWith(
+      "Skipping plan for module target: modules/vpc",
+    );
+    // getConfig should not be called since we return early
+    expect(mockGetConfig).not.toHaveBeenCalled();
+  });
+
   it("throws error when jobType is undefined", async () => {
     const targetConfig: getTargetConfig.TargetConfig = {
       working_directory: "aws/test",
