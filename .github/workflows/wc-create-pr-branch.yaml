@@ -239,10 +239,10 @@ jobs:
           permission-pull-requests: write
           permission-contents: write
 
-      - name: Test test-module
+      - name: Test test (module)
         uses: ./
         with:
-          action: test-module
+          action: test
           github_token: ${{steps.token.outputs.token}}
         if: |
           ! github.event.pull_request.head.repo.fork
@@ -256,15 +256,6 @@ jobs:
           action: scaffold-working-dir
         env:
           TFACTION_WORKING_DIR: tests/zoo
-
-      - name: Test scaffold-module
-        uses: ./
-        with:
-          action: scaffold-module
-        env:
-          TFACTION_WORKING_DIR: ""
-          TFACTION_MODULE_PATH: tests/modules/yoo
-          TFACTION_MODULE_TEMPLATE_DIR: tests/templates/module-github
 
       - name: Test get-target-config
         uses: ./
