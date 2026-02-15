@@ -2,10 +2,10 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
 import { z } from "zod";
-import * as aqua from "../aqua";
-import * as types from "../lib/types";
-import { checkGitDiff as defaultCheckGitDiff } from "../lib/git";
-import { create as defaultCreateCommit } from "../commit";
+import * as aqua from "../../../aqua";
+import * as types from "../../../lib/types";
+import { checkGitDiff as defaultCheckGitDiff } from "../../../lib/git";
+import { create as defaultCreateCommit } from "../../../commit";
 
 export type Logger = {
   info: (message: string) => void;
