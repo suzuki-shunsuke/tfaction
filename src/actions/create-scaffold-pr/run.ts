@@ -23,22 +23,27 @@ export const generateBranchName = (target: string): string => {
   );
 };
 
+export const escapeForShellDoubleQuote = (s: string): string =>
+  s
+    .replaceAll("\\", "\\\\")
+    .replaceAll('"', '\\"')
+    .replaceAll("$", "\\$")
+    .replaceAll("`", "\\`");
+
 export const writeSkipCreatePrSummary = (
   repository: string,
   branch: string,
-  target: string,
   draftPr: boolean,
-  runURL: string,
-  isModule?: boolean,
+  prTitle: string,
+  prBody: string,
 ): void => {
   let draftOpt = "";
   if (draftPr) {
     draftOpt = "-d ";
   }
 
-  const kind = isModule
-    ? `Scaffold a Terraform Module (${target})`
-    : `Scaffold a working directory (${target})`;
+  const escapedTitle = escapeForShellDoubleQuote(prTitle);
+  const escapedBody = escapeForShellDoubleQuote(prBody);
 
   const summary = `
 ## Create a scaffold pull request
@@ -48,8 +53,8 @@ Please run the following command in your terminal.
 \`\`\`
 gh pr create -R "${repository}" ${draftOpt}\\
   -H "${branch}" \\
-  -t "${kind}" \\
-  -b "This pull request was created by [GitHub Actions](${runURL})"
+  -t "${escapedTitle}" \\
+  -b "${escapedBody}"
 \`\`\`
 
 [Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
@@ -198,13 +203,6 @@ export const run = async (input: RunInput): Promise<void> => {
 
   // Write step summary if skip_create_pr is true
   if (skipCreatePr) {
-    writeSkipCreatePrSummary(
-      repository,
-      branch,
-      target,
-      draftPr,
-      runURL,
-      isModule,
-    );
+    writeSkipCreatePrSummary(repository, branch, draftPr, prTitle, prBody);
   }
 };
