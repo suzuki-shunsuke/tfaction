@@ -1,37 +1,11 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
+import { z } from "zod";
 import * as aqua from "../aqua";
 import * as types from "../lib/types";
-import { GitHubCommentConfig } from "../lib";
 import { checkGitDiff as defaultCheckGitDiff } from "../lib/git";
 import { create as defaultCreateCommit } from "../commit";
-
-export type DiagnosticCode = {
-  value: string;
-  url: string;
-};
-
-export type DiagnosticLocationRangePoint = {
-  line: number;
-};
-
-export type DiagnosticLocationRange = {
-  start: DiagnosticLocationRangePoint;
-  end: DiagnosticLocationRangePoint;
-};
-
-export type DiagnosticLocation = {
-  path: string;
-  range: DiagnosticLocationRange;
-};
-
-export type Diagnostic = {
-  message: string;
-  code: DiagnosticCode;
-  location: DiagnosticLocation;
-  severity: string;
-};
 
 export type Logger = {
   info: (message: string) => void;
@@ -73,76 +47,27 @@ export type RunInput = {
   checkGitDiff?: GitDiffChecker;
 };
 
-export const getSeverity = (s: string): string => {
-  if (s == "error") {
-    return "ERROR";
-  }
-  if (s == "warning") {
-    return "WARNING";
-  }
-  if (s == "info") {
-    return "INFO";
-  }
-  return "";
-};
-
-export const generateTable = (diagnostics: Array<Diagnostic>): string => {
-  const lines: Array<string> = [
-    "rule | severity | filepath | range | message",
-    "--- | --- | --- | --- | ---",
-  ];
-  for (let i = 0; i < diagnostics.length; i++) {
-    const diagnostic = diagnostics[i];
-
-    let rule = diagnostic.code.value;
-    if (diagnostic.code.url) {
-      rule = `[${diagnostic.code.value}](${diagnostic.code.url})`;
-    }
-
-    let range = "";
-    if (
-      diagnostic.location &&
-      diagnostic.location.range &&
-      diagnostic.location.range.start
-    ) {
-      range = `${diagnostic.location.range.start.line} ... ${diagnostic.location.range.end.line}`;
-    }
-
-    lines.push(
-      `${rule} | ${diagnostic.severity} | ${diagnostic.location.path} | ${range} | ${diagnostic.message}`,
-    );
-  }
-  return lines.join("\n");
-};
-
-type TflintIssue = {
-  message: string;
-  rule: {
-    name: string;
-    link: string;
-    severity: string;
-  };
-  range: {
-    filename: string;
-    start: { line: number };
-    end: { line: number };
-  };
-};
-
-type TflintError = {
-  message: string;
-  severity: string;
-  range: {
-    filename: string;
-    start: { line: number };
-    end: { line: number };
-  };
-};
-
-type TflintOutput = {
-  issues?: TflintIssue[];
-  errors?: TflintError[];
-};
+// .runs[].results[].locations[].physicalLocation.artifactLocation.uri
+const TflintOutput = z.object({
+  runs: z
+    .object({
+      results: z
+        .object({
+          locations: z
+            .object({
+              physicalLocation: z.object({
+                artifactLocation: z.object({
+                  uri: z.string(),
+                }),
+              }),
+            })
+            .array(),
+        })
+        .array(),
+    })
+    .array(),
+});
+type TflintOutput = z.infer<typeof TflintOutput>;
 
 export const run = async (input: RunInput): Promise<void> => {
   if (!input.githubToken) {
@@ -154,7 +79,6 @@ export const run = async (input: RunInput): Promise<void> => {
   const executor = input.executor;
   const eventName = input.eventName ?? github.context.eventName;
   const logger = input.logger ?? { info: core.info, setOutput: core.setOutput };
-  const githubCommentConfig = input.githubCommentConfig ?? GitHubCommentConfig;
   const createCommit = input.createCommit ?? defaultCreateCommit;
   const checkGitDiff = input.checkGitDiff ?? defaultCheckGitDiff;
 
@@ -166,7 +90,7 @@ export const run = async (input: RunInput): Promise<void> => {
     },
   });
 
-  const args = ["--format", "json"];
+  const args = ["--format", "sarif"];
 
   const help = await executor.getExecOutput("tflint", ["--help"], {
     cwd: input.workingDirectory,
@@ -186,65 +110,24 @@ export const run = async (input: RunInput): Promise<void> => {
     group: "tflint",
     ignoreReturnCode: true,
   });
-  const outJSON: TflintOutput = JSON.parse(out.stdout);
-  const diagnostics = new Array<Diagnostic>();
-  if (outJSON.issues) {
-    for (let i = 0; i < outJSON.issues.length; i++) {
-      const issue = outJSON.issues[i];
-      diagnostics.push({
-        message: issue.message,
-        code: {
-          value: issue.rule.name,
-          url: issue.rule.link,
-        },
-        location: {
-          path: issue.range.filename,
-          range: {
-            start: {
-              line: issue.range.start.line,
-            },
-            end: {
-              line: issue.range.end.line,
-            },
-          },
-        },
-        severity: getSeverity(issue.rule.severity),
-      });
-    }
-  }
-  if (outJSON.errors) {
-    for (let i = 0; i < outJSON.errors.length; i++) {
-      const err = outJSON.errors[i];
-      diagnostics.push({
-        message: err.message,
-        code: {
-          value: "",
-          url: "",
-        },
-        location: {
-          path: err.range.filename,
-          range: {
-            start: {
-              line: err.range.start.line,
-            },
-            end: {
-              line: err.range.end.line,
-            },
-          },
-        },
-        severity: getSeverity(err.severity),
-      });
-    }
-  }
+  const outJSON = TflintOutput.parse(JSON.parse(out.stdout));
   if (input.fix) {
-    const files = new Set(
-      diagnostics.map((d) =>
-        path.relative(
-          input.gitRootDir,
-          path.join(input.workingDirectory, d.location.path),
-        ),
-      ),
-    );
+    const files = new Set<string>();
+    for (const run of outJSON.runs) {
+      for (const result of run.results) {
+        for (const location of result.locations) {
+          files.add(
+            path.relative(
+              input.gitRootDir,
+              path.join(
+                input.workingDirectory,
+                location.physicalLocation.artifactLocation.uri,
+              ),
+            ),
+          );
+        }
+      }
+    }
     if (files.size == 0) {
       return;
     }
@@ -265,39 +148,13 @@ export const run = async (input: RunInput): Promise<void> => {
 
   const filterMode = input.tflint?.reviewdog?.filter_mode ?? "nofilter";
 
-  if (filterMode === "nofilter" && diagnostics.length > 0) {
-    const table = generateTable(diagnostics);
-    const githubCommentTemplate = `## :x: tflint error
-
-{{template "link" .}} | [tflint](https://github.com/terraform-linters/tflint) | [tflint Annotations to disable rules](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/annotations.md) | [tflint Config](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/config.md)
-
-Working Directory: \`${input.workingDirectory}\`
-
-${table}`;
-    await executor.exec("github-comment", ["post", "-stdin-template"], {
-      input: Buffer.from(githubCommentTemplate),
-      env: {
-        GITHUB_TOKEN: input.githubToken,
-        GH_COMMENT_CONFIG: githubCommentConfig,
-      },
-    });
-  }
-
-  const reviewDogInput = JSON.stringify({
-    source: {
-      name: "tflint",
-      url: "https://github.com/terraform-linters/tflint",
-    },
-    diagnostics: diagnostics,
-  });
   const reporter =
     eventName == "pull_request" ? "github-pr-review" : "github-check";
-  logger.info(`Reviewdog input: ${reviewDogInput}`);
-  logger.info("Running reviewdog");
+  logger.info(`Reviewdog input: ${out.stdout}`);
 
   const reviewdogArgs = [
     "-f",
-    "rdjson",
+    "sarif",
     "-name",
     "tflint",
     "-filter-mode",
@@ -323,7 +180,7 @@ ${table}`;
   }
 
   await executor.exec("reviewdog", reviewdogArgs, {
-    input: Buffer.from(reviewDogInput),
+    input: Buffer.from(out.stdout),
     cwd: input.workingDirectory,
     group: "reviewdog",
     env: {
