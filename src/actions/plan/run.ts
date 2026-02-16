@@ -394,8 +394,15 @@ export const runTerraformPlan = async (
   }
 
   // Dismiss existing approval reviews so reviewers must review the new plan
+  // Skip for Renovate PRs with no changes (detailedExitcode === 0)
   if (inputs.dismissApprovalBeforePlan && inputs.prNumber) {
-    await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
+    if (detailedExitcode === 0 && inputs.prAuthor === inputs.renovateLogin) {
+      core.info(
+        "Skipping dismiss approval reviews: Renovate PR with no changes",
+      );
+    } else {
+      await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
+    }
   }
 
   // Run terraform show to convert plan to JSON

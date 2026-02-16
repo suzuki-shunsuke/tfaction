@@ -524,6 +524,38 @@ describe("runTerraformPlan", () => {
 
     expect(mockOctokit.graphql).not.toHaveBeenCalled();
   });
+
+  it("skips dismissApprovalReviews for Renovate PR with no changes", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    mockExecutor.getExecOutput
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "",
+        stderr: "",
+      })
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "{}",
+        stderr: "",
+      });
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: true,
+      prNumber: 42,
+      prAuthor: "renovate[bot]",
+    };
+    await runTerraformPlan(inputs);
+
+    expect(mockOctokit.graphql).not.toHaveBeenCalled();
+    expect(core.info).toHaveBeenCalledWith(
+      "Skipping dismiss approval reviews: Renovate PR with no changes",
+    );
+  });
 });
 
 describe("disableAutoMergeForRenovateChange", () => {
