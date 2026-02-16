@@ -34,6 +34,9 @@ export const main = async () => {
     driftIssueNumber: driftIssueNumber || undefined,
     prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,
     ciInfoTempDir: env.all.CI_INFO_TEMP_DIR || undefined,
+    prNumber: env.all.CI_INFO_PR_NUMBER
+      ? parseInt(env.all.CI_INFO_PR_NUMBER, 10)
+      : undefined,
     secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
   });
 

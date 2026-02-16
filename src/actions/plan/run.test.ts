@@ -7,6 +7,7 @@ import {
   runTerraformPlan,
   runTfmigratePlan,
   disableAutoMergeForRenovateChange,
+  dismissApprovalReviews,
   main,
   type RunInputs,
 } from "./run";
@@ -24,6 +25,12 @@ vi.mock("@actions/core", () => ({
 
 vi.mock("@actions/github", () => ({
   getOctokit: vi.fn(),
+  context: {
+    repo: {
+      owner: "test-owner",
+      repo: "test-repo",
+    },
+  },
 }));
 
 vi.mock("@actions/artifact", () => ({
@@ -87,7 +94,12 @@ type MockExecutor = ReturnType<typeof createMockExecutor>;
 // Helper to create a mock octokit with graphql
 const createMockOctokit = () => ({
   graphql: vi.fn().mockResolvedValue({}),
-  rest: {},
+  rest: {
+    pulls: {
+      listReviews: vi.fn().mockResolvedValue({ data: [] }),
+      dismissReview: vi.fn().mockResolvedValue({}),
+    },
+  },
 });
 
 // Base inputs for tests
@@ -99,6 +111,8 @@ const createBaseInputs = (executor: MockExecutor) => ({
   tfCommand: "terraform",
   target: "aws/test/dev",
   acceptChangeByRenovate: false,
+  dismissApprovalBeforePlan: false,
+  prNumber: undefined as number | undefined,
   executor: executor as unknown as aqua.Executor,
 });
 
@@ -410,6 +424,93 @@ describe("runTerraformPlan", () => {
       "terraform_plan_json_aws__test__dev",
     );
   });
+
+  it("calls dismissApprovalReviews when enabled with PR number", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.rest.pulls.listReviews.mockResolvedValue({
+      data: [{ id: 1, state: "APPROVED" }],
+    });
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    mockExecutor.getExecOutput
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "",
+        stderr: "",
+      })
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "{}",
+        stderr: "",
+      });
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: true,
+      prNumber: 42,
+    };
+    await runTerraformPlan(inputs);
+
+    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips dismissApprovalReviews when disabled", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    mockExecutor.getExecOutput
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "",
+        stderr: "",
+      })
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "{}",
+        stderr: "",
+      });
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: false,
+      prNumber: 42,
+    };
+    await runTerraformPlan(inputs);
+
+    expect(mockOctokit.rest.pulls.listReviews).not.toHaveBeenCalled();
+  });
+
+  it("skips dismissApprovalReviews when no PR number", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    mockExecutor.getExecOutput
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "",
+        stderr: "",
+      })
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "{}",
+        stderr: "",
+      });
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: true,
+      prNumber: undefined,
+    };
+    await runTerraformPlan(inputs);
+
+    expect(mockOctokit.rest.pulls.listReviews).not.toHaveBeenCalled();
+  });
 });
 
 describe("disableAutoMergeForRenovateChange", () => {
@@ -450,6 +551,116 @@ describe("disableAutoMergeForRenovateChange", () => {
 
     await disableAutoMergeForRenovateChange(inputs);
     expect(mockExecutor.exec).not.toHaveBeenCalled();
+  });
+});
+
+describe("dismissApprovalReviews", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("dismisses approved reviews", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.rest.pulls.listReviews.mockResolvedValue({
+      data: [
+        { id: 1, state: "APPROVED" },
+        { id: 2, state: "APPROVED" },
+      ],
+    });
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledTimes(2);
+    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledWith({
+      owner: "test-owner",
+      repo: "test-repo",
+      pull_number: 42,
+      review_id: 1,
+      message: expect.stringContaining("terraform plan has been re-run"),
+    });
+    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledWith({
+      owner: "test-owner",
+      repo: "test-repo",
+      pull_number: 42,
+      review_id: 2,
+      message: expect.stringContaining("terraform plan has been re-run"),
+    });
+  });
+
+  it("skips non-approved reviews", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.rest.pulls.listReviews.mockResolvedValue({
+      data: [
+        { id: 1, state: "COMMENTED" },
+        { id: 2, state: "CHANGES_REQUESTED" },
+        { id: 3, state: "DISMISSED" },
+      ],
+    });
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(mockOctokit.rest.pulls.dismissReview).not.toHaveBeenCalled();
+  });
+
+  it("handles listReviews failure gracefully", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.rest.pulls.listReviews.mockRejectedValue(
+      new Error("API error"),
+    );
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(core.warning).toHaveBeenCalledWith(
+      "Failed to list reviews: API error",
+    );
+  });
+
+  it("handles individual dismissReview failure gracefully", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.rest.pulls.listReviews.mockResolvedValue({
+      data: [
+        { id: 1, state: "APPROVED" },
+        { id: 2, state: "APPROVED" },
+      ],
+    });
+    mockOctokit.rest.pulls.dismissReview
+      .mockRejectedValueOnce(new Error("Dismiss failed"))
+      .mockResolvedValueOnce({});
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(core.warning).toHaveBeenCalledWith(
+      "Failed to dismiss review 1: Dismiss failed",
+    );
+    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledTimes(2);
+  });
+
+  it("does nothing when no reviews exist", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.rest.pulls.listReviews.mockResolvedValue({ data: [] });
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(mockOctokit.rest.pulls.dismissReview).not.toHaveBeenCalled();
   });
 });
 

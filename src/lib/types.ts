@@ -278,6 +278,11 @@ export const RawConfig = z.object({
   tflint: TflintConfig.default(tflintDefaults),
   trivy: TrivyConfig.default(trivyDefaults),
   terraform_docs: TerraformDocsConfig.optional(),
+  dismiss_approval_before_plan: z
+    .object({
+      enabled: z.boolean().optional(),
+    })
+    .optional(),
   update_local_path_module_caller: z
     .object({
       enabled: z.boolean().optional(),

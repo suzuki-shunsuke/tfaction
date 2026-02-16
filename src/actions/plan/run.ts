@@ -24,6 +24,8 @@ type Inputs = {
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
   acceptChangeByRenovate: boolean;
+  dismissApprovalBeforePlan: boolean;
+  prNumber?: number;
   executor: aqua.Executor;
   secrets?: Record<string, string>;
 };
@@ -35,6 +37,7 @@ export type RunInputs = {
   driftIssueNumber?: string;
   prAuthor?: string;
   ciInfoTempDir?: string;
+  prNumber?: number;
   secrets?: Record<string, string>;
 };
 
@@ -109,6 +112,44 @@ export const disableAutoMergeForRenovateChange = async (
       },
     },
   );
+};
+
+export const dismissApprovalReviews = async (
+  githubToken: string,
+  prNumber: number,
+): Promise<void> => {
+  try {
+    const octokit = github.getOctokit(githubToken);
+    const { owner, repo } = github.context.repo;
+    const { data: reviews } = await octokit.rest.pulls.listReviews({
+      owner,
+      repo,
+      pull_number: prNumber,
+    });
+    for (const review of reviews) {
+      if (review.state !== "APPROVED") {
+        continue;
+      }
+      try {
+        await octokit.rest.pulls.dismissReview({
+          owner,
+          repo,
+          pull_number: prNumber,
+          review_id: review.id,
+          message:
+            "Dismissing approval because terraform plan has been re-run. Please review the new plan output before approving again.",
+        });
+      } catch (e) {
+        core.warning(
+          `Failed to dismiss review ${review.id}: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
+    }
+  } catch (e) {
+    core.warning(
+      `Failed to list reviews: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
 };
 
 const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
@@ -304,6 +345,11 @@ export const runTerraformPlan = async (
     throw new Error("terraform plan failed");
   }
 
+  // Dismiss existing approval reviews so reviewers must review the new plan
+  if (inputs.dismissApprovalBeforePlan && inputs.prNumber) {
+    await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
+  }
+
   // Run terraform show to convert plan to JSON
   const showResult = await executor.getExecOutput(
     inputs.tfCommand,
@@ -396,6 +442,9 @@ export const main = async (
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
     acceptChangeByRenovate: targetConfig.accept_change_by_renovate || false,
+    dismissApprovalBeforePlan:
+      config.dismiss_approval_before_plan?.enabled !== false,
+    prNumber: runInputs.prNumber,
     executor,
     secrets: runInputs.secrets,
   };
