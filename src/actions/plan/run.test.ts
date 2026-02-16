@@ -7,6 +7,7 @@ import {
   runTerraformPlan,
   runTfmigratePlan,
   disableAutoMergeForRenovateChange,
+  dismissApprovalReviews,
   main,
   type RunInputs,
 } from "./run";
@@ -24,6 +25,12 @@ vi.mock("@actions/core", () => ({
 
 vi.mock("@actions/github", () => ({
   getOctokit: vi.fn(),
+  context: {
+    repo: {
+      owner: "test-owner",
+      repo: "test-repo",
+    },
+  },
 }));
 
 vi.mock("@actions/artifact", () => ({
@@ -87,7 +94,22 @@ type MockExecutor = ReturnType<typeof createMockExecutor>;
 // Helper to create a mock octokit with graphql
 const createMockOctokit = () => ({
   graphql: vi.fn().mockResolvedValue({}),
-  rest: {},
+});
+
+// Helper to build a GraphQL reviews response
+const graphqlReviewsResponse = (
+  nodes: Array<{ id: string }>,
+  hasNextPage: boolean,
+  endCursor: string | null,
+) => ({
+  repository: {
+    pullRequest: {
+      reviews: {
+        nodes,
+        pageInfo: { hasNextPage, endCursor },
+      },
+    },
+  },
 });
 
 // Base inputs for tests
@@ -99,6 +121,8 @@ const createBaseInputs = (executor: MockExecutor) => ({
   tfCommand: "terraform",
   target: "aws/test/dev",
   acceptChangeByRenovate: false,
+  dismissApprovalBeforePlan: false,
+  prNumber: undefined as number | undefined,
   executor: executor as unknown as aqua.Executor,
 });
 
@@ -410,6 +434,128 @@ describe("runTerraformPlan", () => {
       "terraform_plan_json_aws__test__dev",
     );
   });
+
+  it("calls dismissApprovalReviews when enabled with PR number", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse([{ id: "PRR_1" }], false, null),
+      )
+      .mockResolvedValueOnce({}); // dismiss mutation
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    mockExecutor.getExecOutput
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "",
+        stderr: "",
+      })
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "{}",
+        stderr: "",
+      });
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: true,
+      prNumber: 42,
+    };
+    await runTerraformPlan(inputs);
+
+    // 1 list query + 1 dismiss mutation
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+  });
+
+  it("skips dismissApprovalReviews when disabled", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    mockExecutor.getExecOutput
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "",
+        stderr: "",
+      })
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "{}",
+        stderr: "",
+      });
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: false,
+      prNumber: 42,
+    };
+    await runTerraformPlan(inputs);
+
+    expect(mockOctokit.graphql).not.toHaveBeenCalled();
+  });
+
+  it("skips dismissApprovalReviews when no PR number", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    mockExecutor.getExecOutput
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "",
+        stderr: "",
+      })
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "{}",
+        stderr: "",
+      });
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: true,
+      prNumber: undefined,
+    };
+    await runTerraformPlan(inputs);
+
+    expect(mockOctokit.graphql).not.toHaveBeenCalled();
+  });
+
+  it("skips dismissApprovalReviews for Renovate PR with no changes", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    mockExecutor.getExecOutput
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "",
+        stderr: "",
+      })
+      .mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: "{}",
+        stderr: "",
+      });
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: true,
+      prNumber: 42,
+      prAuthor: "renovate[bot]",
+    };
+    await runTerraformPlan(inputs);
+
+    expect(mockOctokit.graphql).not.toHaveBeenCalled();
+    expect(core.info).toHaveBeenCalledWith(
+      "Skipping dismiss approval reviews: Renovate PR with no changes",
+    );
+  });
 });
 
 describe("disableAutoMergeForRenovateChange", () => {
@@ -450,6 +596,98 @@ describe("disableAutoMergeForRenovateChange", () => {
 
     await disableAutoMergeForRenovateChange(inputs);
     expect(mockExecutor.exec).not.toHaveBeenCalled();
+  });
+});
+
+describe("dismissApprovalReviews", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("dismisses approved reviews", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse([{ id: "PRR_1" }, { id: "PRR_2" }], false, null),
+      )
+      .mockResolvedValueOnce({}) // dismiss PRR_1
+      .mockResolvedValueOnce({}); // dismiss PRR_2
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    // 1 list query + 2 dismiss mutations
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(3);
+    expect(mockOctokit.graphql).toHaveBeenCalledWith(
+      expect.stringContaining("dismissPullRequestReview"),
+      expect.objectContaining({
+        reviewId: "PRR_1",
+        message: expect.stringContaining("terraform plan has been re-run"),
+      }),
+    );
+    expect(mockOctokit.graphql).toHaveBeenCalledWith(
+      expect.stringContaining("dismissPullRequestReview"),
+      expect.objectContaining({
+        reviewId: "PRR_2",
+        message: expect.stringContaining("terraform plan has been re-run"),
+      }),
+    );
+  });
+
+  it("handles GraphQL query failure gracefully", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.graphql.mockRejectedValue(new Error("API error"));
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(core.warning).toHaveBeenCalledWith(
+      "Failed to list reviews: API error",
+    );
+  });
+
+  it("handles individual dismiss mutation failure gracefully", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse([{ id: "PRR_1" }, { id: "PRR_2" }], false, null),
+      )
+      .mockRejectedValueOnce(new Error("Dismiss failed")) // dismiss PRR_1 fails
+      .mockResolvedValueOnce({}); // dismiss PRR_2 succeeds
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(core.warning).toHaveBeenCalledWith(
+      "Failed to dismiss review PRR_1: Dismiss failed",
+    );
+    // 1 list query + 2 dismiss mutations (both attempted)
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(3);
+  });
+
+  it("does nothing when no approved reviews exist", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.graphql.mockResolvedValueOnce(
+      graphqlReviewsResponse([], false, null),
+    );
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    // Only the list query, no dismiss mutations
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(1);
   });
 });
 
