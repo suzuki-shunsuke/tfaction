@@ -863,7 +863,10 @@ describe("main", () => {
     mockNewExecutor.mockResolvedValue(mockExecutor);
     mockGetConfig.mockResolvedValue({
       git_root_dir: "/git/root",
-      auto_apps: { logins: ["renovate[bot]", "dependabot[bot]"] },
+      auto_apps: {
+        logins: ["renovate[bot]", "dependabot[bot]"],
+        allow_auto_merge_change: false,
+      },
       target_groups: [],
       working_directory_file: ".tfaction.yaml",
       tflint: { enabled: false, fix: false },

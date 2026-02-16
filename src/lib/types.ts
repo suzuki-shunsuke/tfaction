@@ -225,7 +225,10 @@ export const RawConfig = z.object({
       logins: z.string().array().default(["renovate[bot]", "dependabot[bot]"]),
       allow_auto_merge_change: z.boolean().default(false),
     })
-    .default({ logins: ["renovate[bot]", "dependabot[bot]"] }),
+    .default({
+      logins: ["renovate[bot]", "dependabot[bot]"],
+      allow_auto_merge_change: false,
+    }),
   skip_terraform_files: z.string().array().optional(),
   scaffold_working_directory: z
     .object({

@@ -12,7 +12,10 @@ describe("run", () => {
     draft_pr: false,
     label_prefixes: { skip: "skip:", tfmigrate: "tfmigrate:" },
     plan_workflow_name: "plan",
-    auto_apps: { logins: ["renovate[bot]", "dependabot[bot]"] },
+    auto_apps: {
+      logins: ["renovate[bot]", "dependabot[bot]"],
+      allow_auto_merge_change: false,
+    },
     skip_create_pr: false,
     target_groups: [],
     tflint: { enabled: true, fix: false },

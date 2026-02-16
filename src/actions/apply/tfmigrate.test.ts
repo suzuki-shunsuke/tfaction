@@ -119,7 +119,10 @@ const createMockConfig = (overrides: Record<string, unknown> = {}) => ({
   workspace: "/git/root",
   draft_pr: false,
   label_prefixes: { skip: "skip:", tfmigrate: "tfmigrate:" },
-  auto_apps: { logins: ["renovate[bot]", "dependabot[bot]"] },
+  auto_apps: {
+    logins: ["renovate[bot]", "dependabot[bot]"],
+    allow_auto_merge_change: false,
+  },
   skip_create_pr: false,
   ...overrides,
 });
