@@ -115,8 +115,6 @@ outputs:
   # get-global-config
   working_directory_file:
     description: file name which locates on working directories
-  renovate_login:
-    description: Renovate login
   label_prefix_target:
     description: label prefix for target
   label_prefix_tfmigrate:

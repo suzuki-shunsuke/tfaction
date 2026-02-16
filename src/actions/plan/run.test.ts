@@ -116,7 +116,7 @@ const graphqlReviewsResponse = (
 const createBaseInputs = (executor: MockExecutor) => ({
   githubToken: "test-token",
   workingDirectory: "/test/working/dir",
-  renovateLogin: "renovate[bot]",
+  autoAppsLogins: ["renovate[bot]", "dependabot[bot]"],
   destroy: false,
   tfCommand: "terraform",
   target: "aws/test/dev",
@@ -863,7 +863,7 @@ describe("main", () => {
     mockNewExecutor.mockResolvedValue(mockExecutor);
     mockGetConfig.mockResolvedValue({
       git_root_dir: "/git/root",
-      renovate_login: "renovate[bot]",
+      auto_apps: { logins: ["renovate[bot]", "dependabot[bot]"] },
       target_groups: [],
       working_directory_file: ".tfaction.yaml",
       tflint: { enabled: false, fix: false },
