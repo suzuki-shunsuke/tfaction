@@ -121,27 +121,75 @@ export const dismissApprovalReviews = async (
   try {
     const octokit = github.getOctokit(githubToken);
     const { owner, repo } = github.context.repo;
-    const { data: reviews } = await octokit.rest.pulls.listReviews({
-      owner,
-      repo,
-      pull_number: prNumber,
-    });
-    for (const review of reviews) {
-      if (review.state !== "APPROVED") {
-        continue;
+
+    const query = `query($owner: String!, $repo: String!, $pr: Int!, $cursor: String) {
+      repository(owner: $owner, name: $repo) {
+        pullRequest(number: $pr) {
+          reviews(first: 100, states: [APPROVED], after: $cursor) {
+            nodes {
+              id
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
       }
+    }`;
+
+    const reviewIds: string[] = [];
+    let cursor: string | null = null;
+
+    while (true) {
+      const result: {
+        repository: {
+          pullRequest: {
+            reviews: {
+              nodes: Array<{ id: string }>;
+              pageInfo: {
+                hasNextPage: boolean;
+                endCursor: string;
+              };
+            };
+          };
+        };
+      } = await octokit.graphql(query, {
+        owner,
+        repo,
+        pr: prNumber,
+        cursor,
+      });
+
+      for (const node of result.repository.pullRequest.reviews.nodes) {
+        reviewIds.push(node.id);
+      }
+
+      if (!result.repository.pullRequest.reviews.pageInfo.hasNextPage) {
+        break;
+      }
+      cursor = result.repository.pullRequest.reviews.pageInfo.endCursor;
+    }
+
+    for (const reviewId of reviewIds) {
       try {
-        await octokit.rest.pulls.dismissReview({
-          owner,
-          repo,
-          pull_number: prNumber,
-          review_id: review.id,
-          message:
-            "Dismissing approval because terraform plan has been re-run. Please review the new plan output before approving again.",
-        });
+        await octokit.graphql(
+          `mutation($reviewId: ID!, $message: String!) {
+            dismissPullRequestReview(input: {pullRequestReviewId: $reviewId, message: $message}) {
+              pullRequestReview {
+                id
+              }
+            }
+          }`,
+          {
+            reviewId,
+            message:
+              "Dismissing approval because terraform plan has been re-run. Please review the new plan output before approving again.",
+          },
+        );
       } catch (e) {
         core.warning(
-          `Failed to dismiss review ${review.id}: ${e instanceof Error ? e.message : String(e)}`,
+          `Failed to dismiss review ${reviewId}: ${e instanceof Error ? e.message : String(e)}`,
         );
       }
     }

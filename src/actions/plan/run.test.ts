@@ -94,10 +94,20 @@ type MockExecutor = ReturnType<typeof createMockExecutor>;
 // Helper to create a mock octokit with graphql
 const createMockOctokit = () => ({
   graphql: vi.fn().mockResolvedValue({}),
-  rest: {
-    pulls: {
-      listReviews: vi.fn().mockResolvedValue({ data: [] }),
-      dismissReview: vi.fn().mockResolvedValue({}),
+});
+
+// Helper to build a GraphQL reviews response
+const graphqlReviewsResponse = (
+  nodes: Array<{ id: string }>,
+  hasNextPage: boolean,
+  endCursor: string | null,
+) => ({
+  repository: {
+    pullRequest: {
+      reviews: {
+        nodes,
+        pageInfo: { hasNextPage, endCursor },
+      },
     },
   },
 });
@@ -427,9 +437,11 @@ describe("runTerraformPlan", () => {
 
   it("calls dismissApprovalReviews when enabled with PR number", async () => {
     const mockOctokit = createMockOctokit();
-    mockOctokit.rest.pulls.listReviews.mockResolvedValue({
-      data: [{ id: 1, state: "APPROVED" }],
-    });
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse([{ id: "PRR_1" }], false, null),
+      )
+      .mockResolvedValueOnce({}); // dismiss mutation
     vi.mocked(github.getOctokit).mockReturnValue(
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
@@ -453,7 +465,8 @@ describe("runTerraformPlan", () => {
     };
     await runTerraformPlan(inputs);
 
-    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledTimes(1);
+    // 1 list query + 1 dismiss mutation
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
   });
 
   it("skips dismissApprovalReviews when disabled", async () => {
@@ -481,7 +494,7 @@ describe("runTerraformPlan", () => {
     };
     await runTerraformPlan(inputs);
 
-    expect(mockOctokit.rest.pulls.listReviews).not.toHaveBeenCalled();
+    expect(mockOctokit.graphql).not.toHaveBeenCalled();
   });
 
   it("skips dismissApprovalReviews when no PR number", async () => {
@@ -509,7 +522,7 @@ describe("runTerraformPlan", () => {
     };
     await runTerraformPlan(inputs);
 
-    expect(mockOctokit.rest.pulls.listReviews).not.toHaveBeenCalled();
+    expect(mockOctokit.graphql).not.toHaveBeenCalled();
   });
 });
 
@@ -565,58 +578,39 @@ describe("dismissApprovalReviews", () => {
 
   it("dismisses approved reviews", async () => {
     const mockOctokit = createMockOctokit();
-    mockOctokit.rest.pulls.listReviews.mockResolvedValue({
-      data: [
-        { id: 1, state: "APPROVED" },
-        { id: 2, state: "APPROVED" },
-      ],
-    });
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse([{ id: "PRR_1" }, { id: "PRR_2" }], false, null),
+      )
+      .mockResolvedValueOnce({}) // dismiss PRR_1
+      .mockResolvedValueOnce({}); // dismiss PRR_2
     vi.mocked(github.getOctokit).mockReturnValue(
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
     await dismissApprovalReviews("test-token", 42);
 
-    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledTimes(2);
-    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledWith({
-      owner: "test-owner",
-      repo: "test-repo",
-      pull_number: 42,
-      review_id: 1,
-      message: expect.stringContaining("terraform plan has been re-run"),
-    });
-    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledWith({
-      owner: "test-owner",
-      repo: "test-repo",
-      pull_number: 42,
-      review_id: 2,
-      message: expect.stringContaining("terraform plan has been re-run"),
-    });
+    // 1 list query + 2 dismiss mutations
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(3);
+    expect(mockOctokit.graphql).toHaveBeenCalledWith(
+      expect.stringContaining("dismissPullRequestReview"),
+      expect.objectContaining({
+        reviewId: "PRR_1",
+        message: expect.stringContaining("terraform plan has been re-run"),
+      }),
+    );
+    expect(mockOctokit.graphql).toHaveBeenCalledWith(
+      expect.stringContaining("dismissPullRequestReview"),
+      expect.objectContaining({
+        reviewId: "PRR_2",
+        message: expect.stringContaining("terraform plan has been re-run"),
+      }),
+    );
   });
 
-  it("skips non-approved reviews", async () => {
+  it("handles GraphQL query failure gracefully", async () => {
     const mockOctokit = createMockOctokit();
-    mockOctokit.rest.pulls.listReviews.mockResolvedValue({
-      data: [
-        { id: 1, state: "COMMENTED" },
-        { id: 2, state: "CHANGES_REQUESTED" },
-        { id: 3, state: "DISMISSED" },
-      ],
-    });
-    vi.mocked(github.getOctokit).mockReturnValue(
-      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
-    );
-
-    await dismissApprovalReviews("test-token", 42);
-
-    expect(mockOctokit.rest.pulls.dismissReview).not.toHaveBeenCalled();
-  });
-
-  it("handles listReviews failure gracefully", async () => {
-    const mockOctokit = createMockOctokit();
-    mockOctokit.rest.pulls.listReviews.mockRejectedValue(
-      new Error("API error"),
-    );
+    mockOctokit.graphql.mockRejectedValue(new Error("API error"));
     vi.mocked(github.getOctokit).mockReturnValue(
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
@@ -628,17 +622,14 @@ describe("dismissApprovalReviews", () => {
     );
   });
 
-  it("handles individual dismissReview failure gracefully", async () => {
+  it("handles individual dismiss mutation failure gracefully", async () => {
     const mockOctokit = createMockOctokit();
-    mockOctokit.rest.pulls.listReviews.mockResolvedValue({
-      data: [
-        { id: 1, state: "APPROVED" },
-        { id: 2, state: "APPROVED" },
-      ],
-    });
-    mockOctokit.rest.pulls.dismissReview
-      .mockRejectedValueOnce(new Error("Dismiss failed"))
-      .mockResolvedValueOnce({});
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse([{ id: "PRR_1" }, { id: "PRR_2" }], false, null),
+      )
+      .mockRejectedValueOnce(new Error("Dismiss failed")) // dismiss PRR_1 fails
+      .mockResolvedValueOnce({}); // dismiss PRR_2 succeeds
     vi.mocked(github.getOctokit).mockReturnValue(
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
@@ -646,21 +637,25 @@ describe("dismissApprovalReviews", () => {
     await dismissApprovalReviews("test-token", 42);
 
     expect(core.warning).toHaveBeenCalledWith(
-      "Failed to dismiss review 1: Dismiss failed",
+      "Failed to dismiss review PRR_1: Dismiss failed",
     );
-    expect(mockOctokit.rest.pulls.dismissReview).toHaveBeenCalledTimes(2);
+    // 1 list query + 2 dismiss mutations (both attempted)
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(3);
   });
 
-  it("does nothing when no reviews exist", async () => {
+  it("does nothing when no approved reviews exist", async () => {
     const mockOctokit = createMockOctokit();
-    mockOctokit.rest.pulls.listReviews.mockResolvedValue({ data: [] });
+    mockOctokit.graphql.mockResolvedValueOnce(
+      graphqlReviewsResponse([], false, null),
+    );
     vi.mocked(github.getOctokit).mockReturnValue(
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
     await dismissApprovalReviews("test-token", 42);
 
-    expect(mockOctokit.rest.pulls.dismissReview).not.toHaveBeenCalled();
+    // Only the list query, no dismiss mutations
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(1);
   });
 });
 
