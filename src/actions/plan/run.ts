@@ -23,7 +23,7 @@ type Inputs = {
   ciInfoTempDir?: string;
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
-  acceptChangeByRenovate: boolean;
+  allowAutoMergeChange: boolean;
   dismissApprovalBeforePlan: boolean;
   prNumber?: number;
   executor: aqua.Executor;
@@ -63,7 +63,7 @@ export const disableAutoMergeForRenovateChange = async (
   }
 
   // Skip if changes are expected for this target
-  if (inputs.acceptChangeByRenovate) {
+  if (inputs.allowAutoMergeChange) {
     return;
   }
 
@@ -500,7 +500,7 @@ export const main = async (
     s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
-    acceptChangeByRenovate: targetConfig.accept_change_by_renovate || false,
+    allowAutoMergeChange: config.auto_apps.allow_auto_merge_change,
     dismissApprovalBeforePlan:
       config.dismiss_approval_before_plan?.enabled !== false,
     prNumber: runInputs.prNumber,

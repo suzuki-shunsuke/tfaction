@@ -271,7 +271,6 @@ describe("getTargetFromTargetGroupsByWorkingDir", () => {
 
 describe("getJobConfig", () => {
   const config: TargetConfig = {
-    accept_change_by_renovate: false,
     terraform_plan_config: {
       aws_assume_role_arn: "arn:aws:iam::123456789012:role/terraform-plan",
     },
@@ -330,7 +329,6 @@ describe("getJobConfig", () => {
 
   it("returns undefined when specific config is not set", () => {
     const partialConfig: TargetConfig = {
-      accept_change_by_renovate: false,
       terraform_plan_config: {
         aws_assume_role_arn: "arn:aws:iam::123456789012:role/terraform-plan",
       },
@@ -481,7 +479,6 @@ describe("checkDriftDetectionEnabled", () => {
   const createTargetConfig = (driftDetection?: {
     enabled?: boolean;
   }): TargetConfig => ({
-    accept_change_by_renovate: false,
     drift_detection: driftDetection,
   });
 

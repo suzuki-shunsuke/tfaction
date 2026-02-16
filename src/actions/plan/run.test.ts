@@ -120,7 +120,7 @@ const createBaseInputs = (executor: MockExecutor) => ({
   destroy: false,
   tfCommand: "terraform",
   target: "aws/test/dev",
-  acceptChangeByRenovate: false,
+  allowAutoMergeChange: false,
   dismissApprovalBeforePlan: false,
   prNumber: undefined as number | undefined,
   executor: executor as unknown as aqua.Executor,
@@ -586,12 +586,12 @@ describe("disableAutoMergeForRenovateChange", () => {
     expect(mockExecutor.exec).not.toHaveBeenCalled();
   });
 
-  it("skips when acceptChangeByRenovate is true", async () => {
+  it("skips when allowAutoMergeChange is true", async () => {
     const inputs = {
       ...createBaseInputs(mockExecutor),
       prAuthor: "renovate[bot]",
       ciInfoTempDir: "/tmp/ci-info",
-      acceptChangeByRenovate: true,
+      allowAutoMergeChange: true,
     };
 
     await disableAutoMergeForRenovateChange(inputs);
