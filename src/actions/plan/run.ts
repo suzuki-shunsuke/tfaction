@@ -24,6 +24,8 @@ type Inputs = {
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
   acceptChangeByRenovate: boolean;
+  dismissApprovalBeforePlan: boolean;
+  prNumber?: number;
   executor: aqua.Executor;
   secrets?: Record<string, string>;
 };
@@ -35,6 +37,7 @@ export type RunInputs = {
   driftIssueNumber?: string;
   prAuthor?: string;
   ciInfoTempDir?: string;
+  prNumber?: number;
   secrets?: Record<string, string>;
 };
 
@@ -109,6 +112,92 @@ export const disableAutoMergeForRenovateChange = async (
       },
     },
   );
+};
+
+export const dismissApprovalReviews = async (
+  githubToken: string,
+  prNumber: number,
+): Promise<void> => {
+  try {
+    const octokit = github.getOctokit(githubToken);
+    const { owner, repo } = github.context.repo;
+
+    const query = `query($owner: String!, $repo: String!, $pr: Int!, $cursor: String) {
+      repository(owner: $owner, name: $repo) {
+        pullRequest(number: $pr) {
+          reviews(first: 100, states: [APPROVED], after: $cursor) {
+            nodes {
+              id
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      }
+    }`;
+
+    const reviewIds: string[] = [];
+    let cursor: string | null = null;
+
+    while (true) {
+      const result: {
+        repository: {
+          pullRequest: {
+            reviews: {
+              nodes: Array<{ id: string }>;
+              pageInfo: {
+                hasNextPage: boolean;
+                endCursor: string;
+              };
+            };
+          };
+        };
+      } = await octokit.graphql(query, {
+        owner,
+        repo,
+        pr: prNumber,
+        cursor,
+      });
+
+      for (const node of result.repository.pullRequest.reviews.nodes) {
+        reviewIds.push(node.id);
+      }
+
+      if (!result.repository.pullRequest.reviews.pageInfo.hasNextPage) {
+        break;
+      }
+      cursor = result.repository.pullRequest.reviews.pageInfo.endCursor;
+    }
+
+    for (const reviewId of reviewIds) {
+      try {
+        await octokit.graphql(
+          `mutation($reviewId: ID!, $message: String!) {
+            dismissPullRequestReview(input: {pullRequestReviewId: $reviewId, message: $message}) {
+              pullRequestReview {
+                id
+              }
+            }
+          }`,
+          {
+            reviewId,
+            message:
+              "Dismissing approval because terraform plan has been re-run. Please review the new plan output before approving again.",
+          },
+        );
+      } catch (e) {
+        core.warning(
+          `Failed to dismiss review ${reviewId}: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
+    }
+  } catch (e) {
+    core.warning(
+      `Failed to list reviews: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
 };
 
 const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
@@ -304,6 +393,18 @@ export const runTerraformPlan = async (
     throw new Error("terraform plan failed");
   }
 
+  // Dismiss existing approval reviews so reviewers must review the new plan
+  // Skip for Renovate PRs with no changes (detailedExitcode === 0)
+  if (inputs.dismissApprovalBeforePlan && inputs.prNumber) {
+    if (detailedExitcode === 0 && inputs.prAuthor === inputs.renovateLogin) {
+      core.info(
+        "Skipping dismiss approval reviews: Renovate PR with no changes",
+      );
+    } else {
+      await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
+    }
+  }
+
   // Run terraform show to convert plan to JSON
   const showResult = await executor.getExecOutput(
     inputs.tfCommand,
@@ -396,6 +497,9 @@ export const main = async (
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
     acceptChangeByRenovate: targetConfig.accept_change_by_renovate || false,
+    dismissApprovalBeforePlan:
+      config.dismiss_approval_before_plan?.enabled !== false,
+    prNumber: runInputs.prNumber,
     executor,
     secrets: runInputs.secrets,
   };

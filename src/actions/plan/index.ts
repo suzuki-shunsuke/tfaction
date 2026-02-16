@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -28,12 +29,12 @@ export const main = async () => {
 
   await runPlan(targetConfig, {
     githubToken: input.githubToken,
-    githubTokenForGitHubProvider:
-      input.githubTokenForGitHubProvider || undefined,
+    githubTokenForGitHubProvider: input.githubTokenForGitHubProvider,
     jobType: jobType,
-    driftIssueNumber: driftIssueNumber || undefined,
-    prAuthor: env.all.CI_INFO_PR_AUTHOR || undefined,
-    ciInfoTempDir: env.all.CI_INFO_TEMP_DIR || undefined,
+    driftIssueNumber: driftIssueNumber,
+    prAuthor: env.all.CI_INFO_PR_AUTHOR,
+    ciInfoTempDir: env.all.CI_INFO_TEMP_DIR,
+    prNumber: github.context.issue.number,
     secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
   });
 
