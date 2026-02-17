@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as fs from "fs";
 import * as lib from "../../lib";
 import * as types from "../../lib/types";
 import * as env from "../../lib/env";
@@ -118,8 +119,19 @@ export const getTargetConfig = async (
       inputs.jobType,
     );
 
+    const moduleFilePath = path.join(
+      config.git_root_dir,
+      workingDir,
+      config.module_file,
+    );
+    const rootFilePath = path.join(
+      config.git_root_dir,
+      workingDir,
+      workingDirectoryFile,
+    );
+    const isModule = fs.existsSync(moduleFilePath);
     const wdConfig = lib.readTargetConfig(
-      path.join(config.git_root_dir, workingDir, workingDirectoryFile),
+      isModule ? moduleFilePath : rootFilePath,
     );
     const jobConfig = lib.getJobConfig(
       wdConfig,
@@ -213,7 +225,7 @@ export const getTargetConfig = async (
     }
 
     result.destroy = wdConfig.destroy ? true : false;
-    result.type = wdConfig.type;
+    result.type = isModule ? "module" : undefined;
     result.enable_terraform_docs =
       wdConfig?.terraform_docs?.enabled ??
       config?.terraform_docs?.enabled ??

@@ -92,12 +92,13 @@ export const run = async (input: RunInput): Promise<void> => {
     core.info(`Created working directory: ${workingDir}`);
   }
 
-  // Create working directory file (e.g., tfaction.yaml)
-  const wdFilePath = path.join(workingDir, workingDirectoryFile);
+  // Create working directory file
   if (isModule) {
-    fs.writeFileSync(wdFilePath, "type: module\n");
-    core.info(`Created ${workingDirectoryFile} with type: module`);
+    const moduleFilePath = path.join(workingDir, config.module_file);
+    fs.writeFileSync(moduleFilePath, "{}\n");
+    core.info(`Created ${config.module_file}`);
   } else {
+    const wdFilePath = path.join(workingDir, workingDirectoryFile);
     fs.writeFileSync(wdFilePath, "{}\n");
     core.info(`Created ${workingDirectoryFile}`);
   }

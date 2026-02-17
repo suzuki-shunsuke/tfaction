@@ -193,6 +193,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       git_root_dir: "/repo",
       working_directory_file: "tfaction.yaml",
+      module_file: "tfaction_module.yaml",
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
 
     vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
@@ -363,16 +364,14 @@ describe("run", () => {
       >);
     });
 
-    it("creates tfaction.yaml with type: module", async () => {
+    it("creates tfaction_module.yaml", async () => {
       await run(moduleInput);
 
       expect(fs.writeFileSync).toHaveBeenCalledWith(
-        "/repo/modules/vpc/tfaction.yaml",
-        "type: module\n",
+        "/repo/modules/vpc/tfaction_module.yaml",
+        "{}\n",
       );
-      expect(core.info).toHaveBeenCalledWith(
-        "Created tfaction.yaml with type: module",
-      );
+      expect(core.info).toHaveBeenCalledWith("Created tfaction_module.yaml");
     });
 
     it("skips tfmigrate.hcl even when S3 bucket is configured", async () => {
