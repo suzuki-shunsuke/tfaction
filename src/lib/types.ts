@@ -169,7 +169,6 @@ export const TargetConfig = z.object({
   terraform_command: z.string().optional(),
   terraform_docs: TerraformDocsConfig.optional(),
   conftest: ConftestConfig.optional(),
-  accept_change_by_renovate: z.boolean().default(false),
   type: z.literal("module").optional(),
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
@@ -221,7 +220,15 @@ export const RawConfig = z.object({
   env: z.record(z.string(), z.string()).optional(),
   label_prefixes: LabelPrefixes.default(labelPrefixesDefaults),
   plan_workflow_name: z.string(),
-  renovate_login: z.string().default("renovate[bot]"),
+  auto_apps: z
+    .object({
+      logins: z.string().array().default(["renovate[bot]", "dependabot[bot]"]),
+      allow_auto_merge_change: z.boolean().default(false),
+    })
+    .default({
+      logins: ["renovate[bot]", "dependabot[bot]"],
+      allow_auto_merge_change: false,
+    }),
   skip_terraform_files: z.string().array().optional(),
   scaffold_working_directory: z
     .object({

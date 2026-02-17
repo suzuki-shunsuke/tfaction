@@ -405,7 +405,10 @@ describe("buildPolicies", () => {
     draft_pr: false,
     label_prefixes: { skip: "skip:", tfmigrate: "tfmigrate:" },
     plan_workflow_name: "plan",
-    renovate_login: "renovate[bot]",
+    auto_apps: {
+      logins: ["renovate[bot]", "dependabot[bot]"],
+      allow_auto_merge_change: false,
+    },
     skip_create_pr: false,
     target_groups: [],
     tflint: { enabled: true, fix: false },
@@ -423,9 +426,7 @@ describe("buildPolicies", () => {
     working_directory: "test-working-dir",
   });
 
-  const createEmptyWdConfig = (): types.TargetConfig => ({
-    accept_change_by_renovate: false,
-  });
+  const createEmptyWdConfig = (): types.TargetConfig => ({});
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -570,7 +571,6 @@ describe("buildPolicies", () => {
       },
     });
     const wdConfig: types.TargetConfig = {
-      accept_change_by_renovate: false,
       conftest: {
         disable_all: true,
       },
@@ -622,7 +622,6 @@ describe("buildPolicies", () => {
       },
     });
     const wdConfig: types.TargetConfig = {
-      accept_change_by_renovate: false,
       conftest: {
         policies: [{ id: "policy1", trace: true, policy: "policy/a" }],
       },
@@ -669,7 +668,6 @@ describe("buildPolicies", () => {
       },
     });
     const wdConfig: types.TargetConfig = {
-      accept_change_by_renovate: false,
       conftest: {
         policies: [{ tf: true, policy: "policy/new" }],
       },
@@ -726,7 +724,6 @@ describe("buildPolicies", () => {
       },
     };
     const wdConfig: types.TargetConfig = {
-      accept_change_by_renovate: false,
       conftest: {
         policies: [{ id: "policy1", quiet: false, policy: "policy/a" }],
       },

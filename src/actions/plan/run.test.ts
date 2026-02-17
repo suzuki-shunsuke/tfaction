@@ -116,11 +116,11 @@ const graphqlReviewsResponse = (
 const createBaseInputs = (executor: MockExecutor) => ({
   githubToken: "test-token",
   workingDirectory: "/test/working/dir",
-  renovateLogin: "renovate[bot]",
+  autoAppsLogins: ["renovate[bot]", "dependabot[bot]"],
   destroy: false,
   tfCommand: "terraform",
   target: "aws/test/dev",
-  acceptChangeByRenovate: false,
+  allowAutoMergeChange: false,
   dismissApprovalBeforePlan: false,
   prNumber: undefined as number | undefined,
   executor: executor as unknown as aqua.Executor,
@@ -586,12 +586,12 @@ describe("disableAutoMergeForRenovateChange", () => {
     expect(mockExecutor.exec).not.toHaveBeenCalled();
   });
 
-  it("skips when acceptChangeByRenovate is true", async () => {
+  it("skips when allowAutoMergeChange is true", async () => {
     const inputs = {
       ...createBaseInputs(mockExecutor),
       prAuthor: "renovate[bot]",
       ciInfoTempDir: "/tmp/ci-info",
-      acceptChangeByRenovate: true,
+      allowAutoMergeChange: true,
     };
 
     await disableAutoMergeForRenovateChange(inputs);
@@ -863,7 +863,10 @@ describe("main", () => {
     mockNewExecutor.mockResolvedValue(mockExecutor);
     mockGetConfig.mockResolvedValue({
       git_root_dir: "/git/root",
-      renovate_login: "renovate[bot]",
+      auto_apps: {
+        logins: ["renovate[bot]", "dependabot[bot]"],
+        allow_auto_merge_change: false,
+      },
       target_groups: [],
       working_directory_file: ".tfaction.yaml",
       tflint: { enabled: false, fix: false },

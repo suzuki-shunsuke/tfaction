@@ -43,7 +43,6 @@ export interface TargetConfig {
   // Only for non-scaffold_working_dir job types
   destroy?: boolean;
   enable_terraform_docs?: boolean;
-  accept_change_by_renovate?: boolean;
 
   // Module type (omitted for root modules, "module" for modules)
   type?: "module";
@@ -214,7 +213,6 @@ export const getTargetConfig = async (
     }
 
     result.destroy = wdConfig.destroy ? true : false;
-    result.accept_change_by_renovate = wdConfig.accept_change_by_renovate;
     result.type = wdConfig.type;
     result.enable_terraform_docs =
       wdConfig?.terraform_docs?.enabled ??

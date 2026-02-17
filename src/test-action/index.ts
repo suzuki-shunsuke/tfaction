@@ -23,7 +23,6 @@ export const main = () => {
         aws_role_session_name: "",
         destroy: "false",
         enable_terraform_docs: "false",
-        accept_change_by_renovate: "false",
       },
       convert: (data: Record<string, string>): Record<string, string> => {
         data.aws_role_session_name = "";

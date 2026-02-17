@@ -14,7 +14,7 @@ type Inputs = {
   githubToken: string;
   githubTokenForGitHubProvider?: string;
   workingDirectory: string;
-  renovateLogin: string;
+  autoAppsLogins: string[];
   destroy: boolean;
   tfCommand: string;
   target: string;
@@ -23,7 +23,7 @@ type Inputs = {
   ciInfoTempDir?: string;
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
-  acceptChangeByRenovate: boolean;
+  allowAutoMergeChange: boolean;
   dismissApprovalBeforePlan: boolean;
   prNumber?: number;
   executor: aqua.Executor;
@@ -58,12 +58,12 @@ export const disableAutoMergeForRenovateChange = async (
   inputs: Inputs,
 ): Promise<void> => {
   // Skip if not a renovate PR
-  if (inputs.prAuthor !== inputs.renovateLogin) {
+  if (!inputs.prAuthor || !inputs.autoAppsLogins.includes(inputs.prAuthor)) {
     return;
   }
 
   // Skip if changes are expected for this target
-  if (inputs.acceptChangeByRenovate) {
+  if (inputs.allowAutoMergeChange) {
     return;
   }
 
@@ -396,7 +396,11 @@ export const runTerraformPlan = async (
   // Dismiss existing approval reviews so reviewers must review the new plan
   // Skip for Renovate PRs with no changes (detailedExitcode === 0)
   if (inputs.dismissApprovalBeforePlan && inputs.prNumber) {
-    if (detailedExitcode === 0 && inputs.prAuthor === inputs.renovateLogin) {
+    if (
+      detailedExitcode === 0 &&
+      inputs.prAuthor !== undefined &&
+      inputs.autoAppsLogins.includes(inputs.prAuthor)
+    ) {
       core.info(
         "Skipping dismiss approval reviews: Renovate PR with no changes",
       );
@@ -486,7 +490,7 @@ export const main = async (
     githubToken: runInputs.githubToken,
     githubTokenForGitHubProvider: runInputs.githubTokenForGitHubProvider,
     workingDirectory: workingDir,
-    renovateLogin: config.renovate_login || "",
+    autoAppsLogins: config.auto_apps.logins,
     destroy: targetConfig.destroy || false,
     tfCommand: targetConfig.terraform_command,
     target: targetConfig.target,
@@ -496,7 +500,7 @@ export const main = async (
     s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
-    acceptChangeByRenovate: targetConfig.accept_change_by_renovate || false,
+    allowAutoMergeChange: config.auto_apps.allow_auto_merge_change,
     dismissApprovalBeforePlan:
       config.dismiss_approval_before_plan?.enabled !== false,
     prNumber: runInputs.prNumber,
