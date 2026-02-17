@@ -317,6 +317,12 @@ export const RawConfig = z.object({
       working_dirs: z.number().optional(),
     })
     .optional(),
+  test_plan_workflow: z
+    .object({
+      working_directories: z.string().array(),
+      changed_files: z.string().array(),
+    })
+    .optional(),
 });
 export type RawConfig = z.infer<typeof RawConfig>;
 

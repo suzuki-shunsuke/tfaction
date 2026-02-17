@@ -25,6 +25,7 @@ type TargetConfig = {
   secrets?: types.GitHubSecrets;
   skip_terraform: boolean;
   type?: "module";
+  test_dir?: boolean;
 };
 
 const getTargetConfigByTarget = (
@@ -331,9 +332,43 @@ export const run = async (input: Input): Promise<Result> => {
 
   // Filter out modules from targetConfigs when in apply mode
   const allTargetConfigs = terraformTargetObjs.concat(tfmigrateObjs);
+
+  // If no targets found, check test_plan_workflow for fallback test targets
+  const testPlanWorkflow = input.config.test_plan_workflow;
+  if (
+    allTargetConfigs.length === 0 &&
+    testPlanWorkflow &&
+    input.relativeChangedFiles
+  ) {
+    const changedFilesMatch = input.relativeChangedFiles.some((file) =>
+      testPlanWorkflow.changed_files.some((pattern) =>
+        minimatch(file, pattern, { dot: true }),
+      ),
+    );
+    if (changedFilesMatch) {
+      for (const wd of testPlanWorkflow.working_directories) {
+        const target = wdTargetMap.get(wd) ?? wd;
+        const obj = getTargetConfigByTarget(
+          config.target_groups,
+          wd,
+          target,
+          isApply,
+          "terraform",
+          false,
+        );
+        if (obj !== undefined) {
+          obj.test_dir = true;
+          allTargetConfigs.push(obj);
+        }
+      }
+    }
+  }
+
   const result = {
     targetConfigs: isApply
-      ? allTargetConfigs.filter((tc) => tc.type !== "module")
+      ? allTargetConfigs.filter(
+          (tc) => tc.type !== "module" && tc.test_dir !== true,
+        )
       : allTargetConfigs,
   };
 
@@ -353,6 +388,10 @@ type Input = {
     replace_target?: types.Replace;
     label_prefixes?: types.LabelPrefixes;
     skip_terraform_files?: string[];
+    test_plan_workflow?: {
+      working_directories: string[];
+      changed_files: string[];
+    };
   };
   isApply: boolean;
   labels: string[];
@@ -369,6 +408,8 @@ type Input = {
   maxChangedWorkingDirectories: number;
   githubToken: string;
   executor: aqua.Executor;
+  /** Relative paths from git_root_dir of changed files, for test_plan_workflow matching */
+  relativeChangedFiles?: string[];
 };
 
 /**
@@ -481,6 +522,7 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     githubToken: input.getRequiredGitHubToken(),
     moduleCallers,
     executor,
+    relativeChangedFiles: pr.pr?.files ?? [],
   });
 
   core.info(`result: ${JSON.stringify(result)}`);

@@ -28,6 +28,7 @@ type Inputs = {
   prNumber?: number;
   executor: aqua.Executor;
   secrets?: Record<string, string>;
+  testDir: boolean;
 };
 
 export type RunInputs = {
@@ -39,6 +40,7 @@ export type RunInputs = {
   ciInfoTempDir?: string;
   prNumber?: number;
   secrets?: Record<string, string>;
+  testDir?: boolean;
 };
 
 type TerraformPlanOutputs = {
@@ -448,7 +450,7 @@ export const runTerraformPlan = async (
   }
 
   // If not drift detection mode, validate renovate changes
-  if (!inputs.driftIssueNumber) {
+  if (!inputs.driftIssueNumber && !inputs.testDir) {
     await disableAutoMergeForRenovateChange(inputs);
   }
 
@@ -486,6 +488,8 @@ export const main = async (
     cwd: workingDir,
   });
 
+  const testDir = runInputs.testDir ?? false;
+
   const inputs: Inputs = {
     githubToken: runInputs.githubToken,
     githubTokenForGitHubProvider: runInputs.githubTokenForGitHubProvider,
@@ -501,11 +505,13 @@ export const main = async (
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
     allowAutoMergeChange: config.auto_apps.allow_auto_merge_change,
-    dismissApprovalBeforePlan:
-      config.dismiss_approval_before_plan?.enabled !== false,
+    dismissApprovalBeforePlan: testDir
+      ? false
+      : config.dismiss_approval_before_plan?.enabled !== false,
     prNumber: runInputs.prNumber,
     executor,
     secrets: runInputs.secrets,
+    testDir,
   };
 
   const jobType = runInputs.jobType;
