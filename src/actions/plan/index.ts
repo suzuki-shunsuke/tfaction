@@ -36,7 +36,6 @@ export const main = async () => {
     ciInfoTempDir: env.all.CI_INFO_TEMP_DIR,
     prNumber: github.context.issue.number,
     secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
-    testDir: env.all.TFACTION_TEST_DIR === "true",
   });
 
   // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)

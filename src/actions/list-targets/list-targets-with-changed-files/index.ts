@@ -25,7 +25,6 @@ type TargetConfig = {
   secrets?: types.GitHubSecrets;
   skip_terraform: boolean;
   type?: "module";
-  test_dir?: boolean;
 };
 
 const getTargetConfigByTarget = (
@@ -333,20 +332,20 @@ export const run = async (input: Input): Promise<Result> => {
   // Filter out modules from targetConfigs when in apply mode
   const allTargetConfigs = terraformTargetObjs.concat(tfmigrateObjs);
 
-  // If no targets found, check test_plan_workflow for fallback test targets
-  const testPlanWorkflow = input.config.test_plan_workflow;
+  // If no targets found, check test_workflow for fallback test targets
+  const testWorkflow = input.config.test_workflow;
   if (
     allTargetConfigs.length === 0 &&
-    testPlanWorkflow &&
+    testWorkflow &&
     input.relativeChangedFiles
   ) {
     const changedFilesMatch = input.relativeChangedFiles.some((file) =>
-      testPlanWorkflow.changed_files.some((pattern) =>
+      testWorkflow.changed_files.some((pattern) =>
         minimatch(file, pattern, { dot: true }),
       ),
     );
     if (changedFilesMatch) {
-      for (const wd of testPlanWorkflow.working_directories) {
+      for (const wd of testWorkflow.working_directories) {
         const target = wdTargetMap.get(wd) ?? wd;
         const obj = getTargetConfigByTarget(
           config.target_groups,
@@ -357,7 +356,6 @@ export const run = async (input: Input): Promise<Result> => {
           false,
         );
         if (obj !== undefined) {
-          obj.test_dir = true;
           allTargetConfigs.push(obj);
         }
       }
@@ -366,9 +364,7 @@ export const run = async (input: Input): Promise<Result> => {
 
   const result = {
     targetConfigs: isApply
-      ? allTargetConfigs.filter(
-          (tc) => tc.type !== "module" && tc.test_dir !== true,
-        )
+      ? allTargetConfigs.filter((tc) => tc.type !== "module")
       : allTargetConfigs,
   };
 
@@ -388,7 +384,7 @@ type Input = {
     replace_target?: types.Replace;
     label_prefixes?: types.LabelPrefixes;
     skip_terraform_files?: string[];
-    test_plan_workflow?: {
+    test_workflow?: {
       working_directories: string[];
       changed_files: string[];
     };
@@ -408,7 +404,7 @@ type Input = {
   maxChangedWorkingDirectories: number;
   githubToken: string;
   executor: aqua.Executor;
-  /** Relative paths from git_root_dir of changed files, for test_plan_workflow matching */
+  /** Relative paths from git_root_dir of changed files, for test_workflow matching */
   relativeChangedFiles?: string[];
 };
 

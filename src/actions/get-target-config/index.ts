@@ -261,9 +261,6 @@ export const main = async () => {
     },
     await lib.getConfig(),
   );
-  if (env.all.TFACTION_TEST_DIR === "true") {
-    result.outputs.set("test_dir", true);
-  }
   for (const [key, value] of result.envs) {
     core.exportVariable(key, value);
   }

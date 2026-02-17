@@ -1725,9 +1725,9 @@ test("module working dir with no changes produces no output", async () => {
   });
 });
 
-// test_plan_workflow tests
+// test_workflow tests
 
-test("test_plan_workflow: changed_files match and no working dirs changed adds test_dir targets", async () => {
+test("test_workflow: changed_files match and no working dirs changed adds test targets", async () => {
   expect(
     await run({
       config: {
@@ -1736,7 +1736,7 @@ test("test_plan_workflow: changed_files match and no working dirs changed adds t
             working_directory: "foo/**",
           },
         ],
-        test_plan_workflow: {
+        test_workflow: {
           working_directories: ["foo/dev"],
           changed_files: [".github/workflows/*.yaml"],
         },
@@ -1767,13 +1767,12 @@ test("test_plan_workflow: changed_files match and no working dirs changed adds t
         skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
-        test_dir: true,
       },
     ],
   });
 });
 
-test("test_plan_workflow: changed_files match but working dirs also changed returns normal targets", async () => {
+test("test_workflow: changed_files match but working dirs also changed returns normal targets", async () => {
   expect(
     await run({
       config: {
@@ -1782,7 +1781,7 @@ test("test_plan_workflow: changed_files match but working dirs also changed retu
             working_directory: "foo/**",
           },
         ],
-        test_plan_workflow: {
+        test_workflow: {
           working_directories: ["foo/dev"],
           changed_files: [".github/workflows/*.yaml"],
         },
@@ -1818,7 +1817,7 @@ test("test_plan_workflow: changed_files match but working dirs also changed retu
   });
 });
 
-test("test_plan_workflow: changed_files don't match and no working dirs changed returns no targets", async () => {
+test("test_workflow: changed_files don't match and no working dirs changed returns no targets", async () => {
   expect(
     await run({
       config: {
@@ -1827,7 +1826,7 @@ test("test_plan_workflow: changed_files don't match and no working dirs changed 
             working_directory: "foo/**",
           },
         ],
-        test_plan_workflow: {
+        test_workflow: {
           working_directories: ["foo/dev"],
           changed_files: [".github/workflows/*.yaml"],
         },
@@ -1853,7 +1852,7 @@ test("test_plan_workflow: changed_files don't match and no working dirs changed 
   });
 });
 
-test("test_plan_workflow: test_dir targets filtered out in apply mode", async () => {
+test("test_workflow: apply mode includes test targets", async () => {
   expect(
     await run({
       config: {
@@ -1862,7 +1861,7 @@ test("test_plan_workflow: test_dir targets filtered out in apply mode", async ()
             working_directory: "foo/**",
           },
         ],
-        test_plan_workflow: {
+        test_workflow: {
           working_directories: ["foo/dev"],
           changed_files: [".github/workflows/*.yaml"],
         },
@@ -1884,6 +1883,16 @@ test("test_plan_workflow: test_dir targets filtered out in apply mode", async ()
       relativeChangedFiles: [".github/workflows/plan.yaml"],
     }),
   ).toStrictEqual({
-    targetConfigs: [],
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
   });
 });
