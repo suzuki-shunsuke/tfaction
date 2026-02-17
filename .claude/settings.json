@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "npm run fmt && npm run lint"
+            "command": "npm run fmt && npm run build && npm run lint && npm t"
           }
         ]
       }
