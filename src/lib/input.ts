@@ -47,6 +47,9 @@ export const prNumber = core.getInput("pr_number");
 // setup
 export const sshKey = core.getInput("ssh_key");
 
+// output-github-secrets
+export const githubSecrets = core.getInput("github_secrets");
+
 // update-drift-issue
 export const getRequiredIssue = (): string => {
   return core.getInput("issue", { required: true });

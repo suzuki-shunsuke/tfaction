@@ -8,6 +8,7 @@ import * as generateConfigOut from "./actions/generate-config-out";
 import * as getTargetConfig from "./actions/get-target-config";
 import * as pickOutDriftIssues from "./actions/pick-out-drift-issues";
 import * as listTargets from "./actions/list-targets";
+import * as outputGithubSecrets from "./actions/output-github-secrets";
 import * as createDriftIssues from "./actions/create-drift-issues";
 import * as getOrCreateDriftIssue from "./actions/get-or-create-drift-issue";
 import * as updateDriftIssue from "./actions/update-drift-issue";
@@ -38,6 +39,7 @@ export const main = async (inputs: Inputs) => {
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
     ["get-target-config", getTargetConfig],
     ["list-targets", listTargets],
+    ["output-github-secrets", outputGithubSecrets],
     ["pick-out-drift-issues", pickOutDriftIssues],
     ["plan", plan],
     ["release-module", releaseModule],
