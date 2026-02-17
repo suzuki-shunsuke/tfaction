@@ -24,6 +24,11 @@ inputs:
     description: A JSON representing a map whose keys are secret names and values are secret values. Used by setup to compute the secrets output, and by terraform-init, plan, and apply to pass secrets as environment variables during command execution.
     required: false
 
+  # output-github-secrets
+  github_secrets:
+    description: GitHub Secrets as JSON. Used by output-github-secrets to map secrets to environment variable names.
+    required: false
+
   # setup
   ssh_key:
     description: SSH private key to checkout private modules
@@ -106,11 +111,11 @@ outputs:
   terraform_command:
     description: Terraform command. By default, the value is "terraform". If you use OpenTofu, the value is "tofu"
 
-  # setup
+  # output-github-secrets
   secrets:
     description: >-
       A JSON representing a map whose keys are environment variable names
-      and values are secret values. Output by setup action.
+      and values are secret values. Output by output-github-secrets action.
 
   # get-global-config
   working_directory_file:
