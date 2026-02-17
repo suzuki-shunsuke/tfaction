@@ -331,6 +331,37 @@ export const run = async (input: Input): Promise<Result> => {
 
   // Filter out modules from targetConfigs when in apply mode
   const allTargetConfigs = terraformTargetObjs.concat(tfmigrateObjs);
+
+  // If no targets found, check test_workflow for fallback test targets
+  const testWorkflow = input.config.test_workflow;
+  if (
+    allTargetConfigs.length === 0 &&
+    testWorkflow &&
+    input.relativeChangedFiles
+  ) {
+    const changedFilesMatch = input.relativeChangedFiles.some((file) =>
+      testWorkflow.changed_files.some((pattern) =>
+        minimatch(file, pattern, { dot: true }),
+      ),
+    );
+    if (changedFilesMatch) {
+      for (const wd of testWorkflow.working_directories) {
+        const target = wdTargetMap.get(wd) ?? wd;
+        const obj = getTargetConfigByTarget(
+          config.target_groups,
+          wd,
+          target,
+          isApply,
+          "terraform",
+          false,
+        );
+        if (obj !== undefined) {
+          allTargetConfigs.push(obj);
+        }
+      }
+    }
+  }
+
   const result = {
     targetConfigs: isApply
       ? allTargetConfigs.filter((tc) => tc.type !== "module")
@@ -353,6 +384,10 @@ type Input = {
     replace_target?: types.Replace;
     label_prefixes?: types.LabelPrefixes;
     skip_terraform_files?: string[];
+    test_workflow?: {
+      working_directories: string[];
+      changed_files: string[];
+    };
   };
   isApply: boolean;
   labels: string[];
@@ -369,6 +404,8 @@ type Input = {
   maxChangedWorkingDirectories: number;
   githubToken: string;
   executor: aqua.Executor;
+  /** Relative paths from git_root_dir of changed files, for test_workflow matching */
+  relativeChangedFiles?: string[];
 };
 
 /**
@@ -481,6 +518,7 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     githubToken: input.getRequiredGitHubToken(),
     moduleCallers,
     executor,
+    relativeChangedFiles: pr.pr?.files ?? [],
   });
 
   core.info(`result: ${JSON.stringify(result)}`);

@@ -1724,3 +1724,175 @@ test("module working dir with no changes produces no output", async () => {
     targetConfigs: [],
   });
 });
+
+// test_workflow tests
+
+test("test_workflow: changed_files match and no working dirs changed adds test targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          working_directories: ["foo/dev"],
+          changed_files: [".github/workflows/*.yaml"],
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      executor: await aqua.NewExecutor({}),
+      relativeChangedFiles: [".github/workflows/plan.yaml"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("test_workflow: changed_files match but working dirs also changed returns normal targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          working_directories: ["foo/dev"],
+          changed_files: [".github/workflows/*.yaml"],
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      executor: await aqua.NewExecutor({}),
+      relativeChangedFiles: [".github/workflows/plan.yaml", "foo/dev/main.tf"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("test_workflow: changed_files don't match and no working dirs changed returns no targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          working_directories: ["foo/dev"],
+          changed_files: [".github/workflows/*.yaml"],
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      executor: await aqua.NewExecutor({}),
+      relativeChangedFiles: ["README.md"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [],
+  });
+});
+
+test("test_workflow: apply mode includes test targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          working_directories: ["foo/dev"],
+          changed_files: [".github/workflows/*.yaml"],
+        },
+      },
+      isApply: true,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      githubToken: "xxx",
+      maxChangedWorkingDirectories: 0,
+      executor: await aqua.NewExecutor({}),
+      relativeChangedFiles: [".github/workflows/plan.yaml"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
