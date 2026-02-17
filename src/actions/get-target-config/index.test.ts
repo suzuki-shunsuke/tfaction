@@ -1041,7 +1041,7 @@ test("aws_role_session_name falls back to prefix with runID when target is very 
   expect(roleName).toBe(`${prefix}-${runID}`);
 });
 
-test("type module is propagated from tfaction.yaml", async () => {
+test("type module is inferred from tfaction_module.yaml", async () => {
   const runID = env.all.GITHUB_RUN_ID;
   const result: Result = {
     envs: new Map<string, string | boolean>([

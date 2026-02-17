@@ -441,25 +441,21 @@ const handleLabels = (
 export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   const cfg = await lib.getConfig();
 
-  const configFiles = await git.listWorkingDirFiles(
+  const rootConfigFiles = await git.listWorkingDirFiles(
     cfg.git_root_dir,
     cfg.working_directory_file,
   );
+  const moduleConfigFiles = await git.listWorkingDirFiles(
+    cfg.git_root_dir,
+    cfg.module_file,
+  );
+  const configFiles = [...rootConfigFiles, ...moduleConfigFiles];
 
-  // Identify module working dirs from configFiles with type: module
+  // Identify module working dirs from moduleConfigFiles (no YAML parsing needed)
   const moduleWorkingDirs = new Set<string>();
-  for (const configFile of configFiles) {
+  for (const configFile of moduleConfigFiles) {
     if (configFile === "") continue;
-    try {
-      const wdConfig = lib.readTargetConfig(
-        path.join(cfg.git_root_dir, configFile),
-      );
-      if (wdConfig.type === "module") {
-        moduleWorkingDirs.add(path.dirname(configFile));
-      }
-    } catch {
-      // Skip files that can't be parsed
-    }
+    moduleWorkingDirs.add(path.dirname(configFile));
   }
 
   let moduleCallers: ModuleToCallers | null = null;

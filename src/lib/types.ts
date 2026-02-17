@@ -169,7 +169,6 @@ export const TargetConfig = z.object({
   terraform_command: z.string().optional(),
   terraform_docs: TerraformDocsConfig.optional(),
   conftest: ConftestConfig.optional(),
-  type: z.literal("module").optional(),
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
@@ -302,6 +301,7 @@ export const RawConfig = z.object({
     })
     .optional(),
   working_directory_file: z.string().default("tfaction.yaml"),
+  module_file: z.string().default("tfaction_module.yaml"),
   replace_target: Replace.optional(),
   providers_lock_opts: z.string().optional(),
   securefix_action: z

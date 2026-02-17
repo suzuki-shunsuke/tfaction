@@ -869,6 +869,7 @@ describe("main", () => {
       },
       target_groups: [],
       working_directory_file: ".tfaction.yaml",
+      module_file: "tfaction_module.yaml",
       tflint: { enabled: false, fix: false },
       trivy: { enabled: false },
       terraform_command: "terraform",

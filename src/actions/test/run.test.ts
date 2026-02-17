@@ -50,6 +50,7 @@ const createBaseConfig = (): types.Config =>
     trivy: { enabled: true },
     target_groups: [],
     working_directory_file: ".tfaction.yaml",
+    module_file: "tfaction_module.yaml",
     terraform_command: "terraform",
   }) as unknown as types.Config;
 

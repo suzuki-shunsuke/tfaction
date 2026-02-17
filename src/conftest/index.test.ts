@@ -415,6 +415,7 @@ describe("buildPolicies", () => {
     trivy: { enabled: true },
     terraform_command: "terraform",
     working_directory_file: "tfaction.yaml",
+    module_file: "tfaction_module.yaml",
     git_root_dir: "/repo",
     config_path: "/repo/tfaction-root.yaml",
     config_dir: "/repo",

@@ -220,6 +220,7 @@ export const getTargetGroup = async (
   config: {
     config_path: string;
     working_directory_file: string;
+    module_file: string;
     target_groups: TargetGroup[];
     replace_target?: Replace | undefined;
   },
@@ -266,10 +267,12 @@ export const getTargetGroup = async (
   const gitRootDir = await getGitRootDir(configDir);
 
   const wds: string[] = [];
-  const files = await listWorkingDirFiles(
+  const rootFiles = await listWorkingDirFiles(
     gitRootDir,
     config.working_directory_file,
   );
+  const moduleFiles = await listWorkingDirFiles(gitRootDir, config.module_file);
+  const files = [...rootFiles, ...moduleFiles];
   for (const file of files) {
     wds.push(path.dirname(file));
   }

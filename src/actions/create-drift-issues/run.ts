@@ -143,6 +143,7 @@ export type GetTargetGroupFn = (
   config: {
     config_path: string;
     working_directory_file: string;
+    module_file: string;
     target_groups: types.TargetGroup[];
     replace_target?: types.Replace | undefined;
   },
