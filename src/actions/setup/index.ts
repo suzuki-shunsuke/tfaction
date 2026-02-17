@@ -12,6 +12,10 @@ import * as ciinfo from "../../ci-info";
 import { getTargetConfig } from "../get-target-config";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
 import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from "@aws-sdk/client-secrets-manager";
+import {
   isPullRequestEvent as isPullRequestEventFn,
   shouldSkipCIInfo as shouldSkipCIInfoFn,
   checkLatestCommit as checkLatestCommitFn,
@@ -160,6 +164,7 @@ export const main = async () => {
       key !== "env" &&
       key !== "target" &&
       key !== "secretsConfig" &&
+      key !== "awsSecretsManagerConfig" &&
       value !== undefined
     ) {
       core.setOutput(key, value);
@@ -167,13 +172,15 @@ export const main = async () => {
   }
 
   // Process secrets
+  const secretsOutput: Record<string, string> = {};
+
+  // Process GitHub secrets
   if (input.secrets) {
     const inputSecrets: Record<string, string> = JSON.parse(input.secrets);
     core.info(
       `The list of secret names passed to the action: ${Object.keys(inputSecrets).join(", ")}`,
     );
     if (targetConfig.secretsConfig) {
-      const secretsOutput: Record<string, string> = {};
       for (const [envName, secretName] of Object.entries(
         targetConfig.secretsConfig,
       )) {
@@ -185,8 +192,64 @@ export const main = async () => {
         );
         secretsOutput[envName] = inputSecrets[secretName];
       }
-      core.setOutput("secrets", JSON.stringify(secretsOutput));
     }
+  }
+
+  // Process AWS Secrets Manager secrets
+  if (targetConfig.awsSecretsManagerConfig) {
+    const { awsRegion, secrets } = targetConfig.awsSecretsManagerConfig;
+    const awsClient = new SecretsManagerClient({ region: awsRegion });
+
+    // Collect unique secret IDs and fetch each once
+    const secretIds = new Set(secrets.map((s) => s.secretId));
+    const secretValues = new Map<string, string>();
+    for (const secretId of secretIds) {
+      const command = new GetSecretValueCommand({ SecretId: secretId });
+      const response = await awsClient.send(command);
+      if (!response.SecretString) {
+        throw new Error(`SecretString is empty: secret_id=${secretId}`);
+      }
+      secretValues.set(secretId, response.SecretString);
+    }
+
+    // Resolve each secret entry
+    const jsonCache = new Map<string, Record<string, string>>();
+    for (const secret of secrets) {
+      const rawValue = secretValues.get(secret.secretId)!;
+      let value: string;
+      if (secret.secretKey) {
+        let parsed = jsonCache.get(secret.secretId);
+        if (!parsed) {
+          parsed = JSON.parse(rawValue) as Record<string, string>;
+          jsonCache.set(secret.secretId, parsed);
+        }
+        if (!parsed[secret.secretKey]) {
+          throw new Error(
+            `secret key isn't found: secret_key=${secret.secretKey} secret_id=${secret.secretId}`,
+          );
+        }
+        value = parsed[secret.secretKey];
+        core.info(
+          `AWS secret: secret_id=${secret.secretId} env_name=${secret.envName} secret_key=${secret.secretKey}`,
+        );
+      } else {
+        value = rawValue;
+        core.info(
+          `AWS secret: secret_id=${secret.secretId} env_name=${secret.envName}`,
+        );
+      }
+      core.setSecret(value);
+      if (secret.envName in secretsOutput) {
+        core.warning(
+          `AWS secret overrides GitHub secret for env_name=${secret.envName}`,
+        );
+      }
+      secretsOutput[secret.envName] = value;
+    }
+  }
+
+  if (Object.keys(secretsOutput).length > 0) {
+    core.setOutput("secrets", JSON.stringify(secretsOutput));
   }
 
   const executor = await aqua.NewExecutor({
