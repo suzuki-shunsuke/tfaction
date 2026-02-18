@@ -119,18 +119,12 @@ outputs:
   terraform_command:
     description: Terraform command. By default, the value is "terraform". If you use OpenTofu, the value is "tofu"
 
-  # output-aws-secrets-manager
-  aws_secrets:
-    description: >-
-      A JSON representing a map whose keys are environment variable names
-      and values are secret values fetched from AWS Secrets Manager.
-      Output by output-aws-secrets-manager action.
-
-  # output-github-secrets
+  # output-github-secrets, output-aws-secrets-manager
   secrets:
     description: >-
       A JSON representing a map whose keys are environment variable names
-      and values are secret values. Output by output-github-secrets action.
+      and values are secret values.
+      Output by output-github-secrets and output-aws-secrets-manager actions.
 
   # get-global-config
   working_directory_file:

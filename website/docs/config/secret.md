@@ -72,7 +72,7 @@ Error: "secret is not found: FASTLY_API_KEY"
 ### AWS Secrets Manager
 
 You can output AWS Secrets Manager's Secrets with the `output-aws-secrets-manager` action.
-Secrets are output as a JSON map via the `aws_secrets` output, so they are only accessible to steps that explicitly reference the output.
+Secrets are output as a JSON map via the `secrets` output, so they are only accessible to steps that explicitly reference the output.
 
 Target Group Configuration
 
