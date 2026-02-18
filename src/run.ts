@@ -3,7 +3,6 @@ import * as createScaffoldPR from "./actions/create-scaffold-pr";
 import * as scaffoldTfmigrate from "./actions/scaffold-tfmigrate";
 import * as scaffoldWorkingDir from "./actions/scaffold-working-dir";
 import * as setup from "./actions/setup";
-import * as exportAWSSecretsManager from "./actions/export-aws-secrets-manager";
 import * as generateConfigOut from "./actions/generate-config-out";
 import * as outputAWSSecretsManager from "./actions/output-aws-secrets-manager";
 import * as getTargetConfig from "./actions/get-target-config";
@@ -35,7 +34,6 @@ export const main = async (inputs: Inputs) => {
     ["create-drift-issues", createDriftIssues],
     ["create-follow-up-pr", createFollowUpPR],
     ["create-scaffold-pr", createScaffoldPR],
-    ["export-aws-secrets-manager", exportAWSSecretsManager],
     ["generate-config-out", generateConfigOut],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
     ["get-target-config", getTargetConfig],

@@ -1,1 +1,0 @@
-# export-aws-secrets-manager
