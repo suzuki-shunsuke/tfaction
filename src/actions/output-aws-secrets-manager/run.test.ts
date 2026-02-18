@@ -215,18 +215,18 @@ describe("buildSecretsToExport", () => {
 });
 
 describe("run", () => {
-  it("returns empty array when no secrets configured", async () => {
+  it("returns empty secrets when no secrets configured", async () => {
     const input: RunInput = {
       getSecretValue: vi.fn(),
     };
 
     const result = await run(input);
 
-    expect(result).toEqual([]);
+    expect(result).toEqual({ secrets: {} });
     expect(input.getSecretValue).not.toHaveBeenCalled();
   });
 
-  it("returns empty array when both group and job config secrets are empty", async () => {
+  it("returns empty secrets when both group and job config secrets are empty", async () => {
     const input: RunInput = {
       groupSecrets: [],
       jobConfigSecrets: [],
@@ -235,7 +235,7 @@ describe("run", () => {
 
     const result = await run(input);
 
-    expect(result).toEqual([]);
+    expect(result).toEqual({ secrets: {} });
     expect(input.getSecretValue).not.toHaveBeenCalled();
   });
 
@@ -253,14 +253,9 @@ describe("run", () => {
 
     const result = await run(input);
 
-    expect(result).toEqual([
-      {
-        envName: "GROUP_SECRET",
-        secretId: "group-secret",
-        secretValue: "secret-value",
-        secretKey: "",
-      },
-    ]);
+    expect(result).toEqual({
+      secrets: { GROUP_SECRET: "secret-value" },
+    });
     expect(getSecretValue).toHaveBeenCalledWith("group-secret");
     expect(getSecretValue).toHaveBeenCalledTimes(1);
   });
@@ -279,14 +274,9 @@ describe("run", () => {
 
     const result = await run(input);
 
-    expect(result).toEqual([
-      {
-        envName: "JOB_SECRET",
-        secretId: "job-secret",
-        secretValue: "job-secret-value",
-        secretKey: "",
-      },
-    ]);
+    expect(result).toEqual({
+      secrets: { JOB_SECRET: "job-secret-value" },
+    });
     expect(getSecretValue).toHaveBeenCalledWith("job-secret");
   });
 
@@ -314,18 +304,11 @@ describe("run", () => {
 
     const result = await run(input);
 
-    expect(result).toHaveLength(2);
-    expect(result[0]).toEqual({
-      envName: "GROUP_SECRET",
-      secretId: "group-secret",
-      secretValue: "group-value",
-      secretKey: "",
-    });
-    expect(result[1]).toEqual({
-      envName: "JOB_SECRET",
-      secretId: "job-secret",
-      secretValue: "job-value",
-      secretKey: "",
+    expect(result).toEqual({
+      secrets: {
+        GROUP_SECRET: "group-value",
+        JOB_SECRET: "job-value",
+      },
     });
   });
 
@@ -388,25 +371,12 @@ describe("run", () => {
 
     const result = await run(input);
 
-    expect(result).toEqual([
-      {
-        envName: "DB_USER",
-        secretId: "db-creds",
-        secretValue: "admin",
-        secretKey: "user",
+    expect(result).toEqual({
+      secrets: {
+        DB_USER: "admin",
+        DB_PASS: "secret",
+        API_KEY: "raw-api-key",
       },
-      {
-        envName: "DB_PASS",
-        secretId: "db-creds",
-        secretValue: "secret",
-        secretKey: "pass",
-      },
-      {
-        envName: "API_KEY",
-        secretId: "api-key",
-        secretValue: "raw-api-key",
-        secretKey: "",
-      },
-    ]);
+    });
   });
 });

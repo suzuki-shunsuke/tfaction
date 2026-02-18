@@ -10,6 +10,7 @@ import * as git from "../../lib/git";
 import { getTargetConfig } from "../get-target-config";
 import { main as runPlan } from "./run";
 import { create as createCommit } from "../../commit";
+import { mergeSecrets } from "../../lib/secret";
 
 export const main = async () => {
   // Step 1: Get target config
@@ -35,7 +36,7 @@ export const main = async () => {
     prAuthor: env.all.CI_INFO_PR_AUTHOR,
     ciInfoTempDir: env.all.CI_INFO_TEMP_DIR,
     prNumber: github.context.issue.number,
-    secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
+    secrets: mergeSecrets(input.secrets, input.awsSecrets),
   });
 
   // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)

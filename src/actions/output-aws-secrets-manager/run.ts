@@ -13,6 +13,10 @@ export type RunInput = {
   getSecretValue: (secretId: string) => Promise<string>;
 };
 
+type Result = {
+  secrets: Record<string, string>;
+};
+
 /**
  * Build a list of secrets to export from the configuration and fetched secret values.
  *
@@ -79,17 +83,17 @@ export function buildSecretsToExport(
 }
 
 /**
- * Fetch secrets from AWS Secrets Manager and return a list of secrets to export.
+ * Fetch secrets from AWS Secrets Manager and return them as a key-value map.
  *
  * @param input - RunInput containing secrets configuration and fetch function
- * @returns Array of secrets to export
+ * @returns Object with secrets as a Record mapping env names to secret values
  */
-export async function run(input: RunInput): Promise<SecretToExport[]> {
+export async function run(input: RunInput): Promise<Result> {
   const { groupSecrets, jobConfigSecrets, getSecretValue } = input;
 
   const allSecrets = [...(groupSecrets ?? []), ...(jobConfigSecrets ?? [])];
   if (allSecrets.length === 0) {
-    return [];
+    return { secrets: {} };
   }
 
   // Collect unique secret IDs
@@ -117,5 +121,13 @@ export async function run(input: RunInput): Promise<SecretToExport[]> {
     ? buildSecretsToExport(jobConfigSecrets, secretValues)
     : [];
 
-  return [...groupSecretsToExport, ...jobConfigSecretsToExport];
+  const allSecretsToExport = [
+    ...groupSecretsToExport,
+    ...jobConfigSecretsToExport,
+  ];
+  const secrets: Record<string, string> = {};
+  for (const s of allSecretsToExport) {
+    secrets[s.envName] = s.secretValue;
+  }
+  return { secrets };
 }

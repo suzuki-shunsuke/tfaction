@@ -7,6 +7,7 @@ import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import { isPullRequestEvent, run } from "./run";
+import { mergeSecrets } from "../../lib/secret";
 
 export const main = async () => {
   const githubToken = input.getRequiredGitHubToken();
@@ -51,6 +52,6 @@ export const main = async () => {
     serverRepository: config.securefix_action?.server_repository ?? "",
     appId: input.securefixActionAppId,
     appPrivateKey: input.securefixActionAppPrivateKey,
-    secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
+    secrets: mergeSecrets(input.secrets, input.awsSecrets),
   });
 };

@@ -5,24 +5,7 @@ import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
-import { run, type SecretToExport } from "./run";
-
-/**
- * Mask the secret value and output it as an environment variable.
- */
-function exportSecret(secret: SecretToExport): void {
-  if (secret.secretKey) {
-    core.info(
-      `export the secret as the environment variable: secret_id=${secret.secretId} env_name=${secret.envName} secret_key=${secret.secretKey}`,
-    );
-  } else {
-    core.info(
-      `export the secret as the environment variable: secret_id=${secret.secretId} env_name=${secret.envName}`,
-    );
-  }
-  core.setSecret(secret.secretValue);
-  core.exportVariable(secret.envName, secret.secretValue);
-}
+import { run } from "./run";
 
 export const main = async (): Promise<void> => {
   const config = await lib.getConfig();
@@ -55,13 +38,15 @@ export const main = async (): Promise<void> => {
     return response.SecretString;
   };
 
-  const secrets = await run({
+  const result = await run({
     groupSecrets,
     jobConfigSecrets,
     getSecretValue,
   });
 
-  for (const secret of secrets) {
-    exportSecret(secret);
+  for (const [envName, secretValue] of Object.entries(result.secrets)) {
+    core.info(`output the secret: env_name=${envName}`);
+    core.setSecret(secretValue);
   }
+  core.setOutput("secrets", JSON.stringify(result.secrets));
 };
