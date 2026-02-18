@@ -22,9 +22,9 @@ export type RunInput = {
   workingDirectory: string;
   repoRoot: string;
   githubToken: string;
-  securefixActionAppId: string;
-  securefixActionAppPrivateKey: string;
-  securefixActionServerRepository: string;
+  csmAppId: string;
+  csmAppPrivateKey: string;
+  csmActionsServerRepository: string;
   executor: aqua.Executor;
   eventName?: string;
   target?: string;
@@ -164,9 +164,9 @@ export const run = async (input: RunInput): Promise<void> => {
       await commitCreate({
         githubToken: input.githubToken,
         commitMessage: "docs: generate document by terraform-docs",
-        appId: input.securefixActionAppId,
-        appPrivateKey: input.securefixActionAppPrivateKey,
-        serverRepository: input.securefixActionServerRepository,
+        appId: input.csmAppId,
+        appPrivateKey: input.csmAppPrivateKey,
+        serverRepository: input.csmActionsServerRepository,
         files: new Set([
           path.join(
             path.relative(input.repoRoot, input.workingDirectory),

@@ -107,7 +107,7 @@ export const main = async () => {
       const prNumber = github.context.payload.pull_request?.number ?? 0;
 
       let csmServerRepoOwner = github.context.repo.owner;
-      let csmServerRepoName = config.securefix_action?.server_repository ?? "";
+      let csmServerRepoName = config.csm_actions?.server_repository ?? "";
       if (csmServerRepoName.includes("/")) {
         csmServerRepoOwner = csmServerRepoName.split("/")[0];
         csmServerRepoName = csmServerRepoName.split("/")[1];
@@ -125,8 +125,8 @@ export const main = async () => {
         appPrivateKey: "",
         csmServerRepoOwner: csmServerRepoOwner,
         csmServerRepoName: csmServerRepoName,
-        csmAppID: input.securefixActionAppId,
-        csmAppPrivateKey: input.securefixActionAppPrivateKey,
+        csmAppID: input.csmAppId,
+        csmAppPrivateKey: input.csmAppPrivateKey,
         baseBranch: github.context.payload.pull_request?.base?.ref ?? "",
         headBranch: github.context.payload.pull_request?.head?.ref ?? "",
         contextPRNumber: prNumber,
@@ -180,8 +180,8 @@ export const main = async () => {
         config,
         {
           githubToken: githubToken,
-          securefixActionAppId: input.securefixActionAppId,
-          securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
+          csmAppId: input.csmAppId,
+          csmAppPrivateKey: input.csmAppPrivateKey,
         },
       );
     } catch (error) {

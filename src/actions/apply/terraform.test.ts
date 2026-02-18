@@ -89,8 +89,8 @@ vi.mock("../../lib/env", () => ({
 
 vi.mock("../../lib/input", () => ({
   githubToken: "mock-github-token",
-  securefixActionAppId: "mock-app-id",
-  securefixActionAppPrivateKey: "mock-private-key",
+  csmAppId: "mock-app-id",
+  csmAppPrivateKey: "mock-private-key",
 }));
 
 vi.mock("../../aqua", () => ({
@@ -584,7 +584,7 @@ describe("main", () => {
     expect(run.listRelatedPullRequests).not.toHaveBeenCalled();
   });
 
-  it("uses securefix when securefix_action.server_repository is configured", async () => {
+  it("uses securefix when csm_actions.server_repository is configured", async () => {
     const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
     const mockToken = { token: "sf-token", expiresAt: "2099-01-01T00:00:00Z" };
     vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
@@ -592,7 +592,7 @@ describe("main", () => {
 
     await setupMainMocks({
       config: {
-        securefix_action: {
+        csm_actions: {
           server_repository: "securefix-server",
           pull_request: { base_branch: "main" },
         },

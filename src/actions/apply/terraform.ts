@@ -66,8 +66,7 @@ export const main = async (
   const disableUpdateRelatedPullRequests = !(
     cfg.update_related_pull_requests?.enabled ?? true
   );
-  const securefixServerRepository =
-    cfg.securefix_action?.server_repository ?? "";
+  const csmActionsServerRepository = cfg.csm_actions?.server_repository ?? "";
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
     cwd: workingDir,
@@ -189,10 +188,10 @@ export const main = async (
       githubToken,
       targetConfig.target,
     );
-    if (securefixServerRepository) {
+    if (csmActionsServerRepository) {
       await updateBranchBySecurefix(
         github.context.repo.owner,
-        securefixServerRepository,
+        csmActionsServerRepository,
         prNumbers,
       );
     } else {
@@ -223,8 +222,8 @@ export const updateBranchBySecurefix = async (
   prNumbers: number[],
 ): Promise<void> => {
   const token = await githubAppToken.create({
-    appId: input.securefixActionAppId,
-    privateKey: input.securefixActionAppPrivateKey,
+    appId: input.csmAppId,
+    privateKey: input.csmAppPrivateKey,
     owner: serverRepoOwner,
     repositories: [serverRepoName],
     permissions: {

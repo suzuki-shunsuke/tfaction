@@ -530,8 +530,8 @@ describe("run", () => {
 
   const defaultRunInput: RunInput = {
     githubToken: "test-token",
-    securefixAppId: "",
-    securefixAppPrivateKey: "",
+    csmAppId: "",
+    csmAppPrivateKey: "",
     actor: "user1",
     prAuthor: "user2",
     target: "infra/env/prod",
@@ -564,7 +564,7 @@ describe("run", () => {
         skip: "skip:",
       },
       follow_up_pr: {},
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
     vi.mocked(lib.getJobType).mockReturnValue("terraform");
     vi.mocked(getTargetConfig).mockResolvedValue({
@@ -619,7 +619,7 @@ describe("run", () => {
         skip: "skip:",
       },
       follow_up_pr: {},
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
     vi.mocked(commit.create).mockResolvedValue("");
 

@@ -151,8 +151,8 @@ describe("writeSkipCreatePrSummary", () => {
 describe("run", () => {
   const defaultRunInput: RunInput = {
     githubToken: "test-token",
-    securefixAppId: "",
-    securefixAppPrivateKey: "",
+    csmAppId: "",
+    csmAppPrivateKey: "",
     target: "my/target",
     workingDir: "my/working-dir",
     actor: "user1",
@@ -166,7 +166,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       skip_create_pr: false,
       draft_pr: false,
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
     vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
       working_directory: "my/working-dir",
@@ -212,7 +212,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       skip_create_pr: true,
       draft_pr: false,
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
 
     await run(defaultRunInput);
@@ -228,7 +228,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       skip_create_pr: true,
       draft_pr: false,
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
 
     await run(defaultRunInput);
@@ -243,7 +243,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       skip_create_pr: false,
       draft_pr: false,
-      securefix_action: {},
+      csm_actions: {},
       scaffold_working_directory: {
         pull_request: {
           title: "Scaffold {{target}}",
@@ -357,7 +357,7 @@ describe("run", () => {
       vi.mocked(lib.getConfig).mockResolvedValue({
         skip_create_pr: false,
         draft_pr: false,
-        securefix_action: {},
+        csm_actions: {},
         scaffold_module: {
           pull_request: {
             title: "Module {{module_path}}",
@@ -384,7 +384,7 @@ describe("run", () => {
       vi.mocked(lib.getConfig).mockResolvedValue({
         skip_create_pr: true,
         draft_pr: false,
-        securefix_action: {},
+        csm_actions: {},
       } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
 
       await run(defaultRunInput);

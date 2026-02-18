@@ -339,8 +339,8 @@ export const postSkipCreateComment = async (
 
 export interface RunInput {
   githubToken: string;
-  securefixAppId: string;
-  securefixAppPrivateKey: string;
+  csmAppId: string;
+  csmAppPrivateKey: string;
   actor: string;
   prAuthor: string;
   target: string;
@@ -357,8 +357,8 @@ export interface RunInput {
 export const run = async (input: RunInput): Promise<void> => {
   const {
     githubToken,
-    securefixAppId,
-    securefixAppPrivateKey,
+    csmAppId,
+    csmAppPrivateKey,
     actor,
     prAuthor,
     target: envTarget,
@@ -380,10 +380,9 @@ export const run = async (input: RunInput): Promise<void> => {
   const groupLabelEnabled = config.follow_up_pr?.group_label?.enabled ?? false;
   const groupLabelPrefix =
     config.follow_up_pr?.group_label?.prefix ?? "tfaction:follow-up-pr-group/";
-  const securefixServerRepository =
-    config.securefix_action?.server_repository ?? "";
-  const securefixPRBaseBranch =
-    config.securefix_action?.pull_request?.base_branch ?? "";
+  const csmActionsServerRepository =
+    config.csm_actions?.server_repository ?? "";
+  const csmPRBaseBranch = config.csm_actions?.pull_request?.base_branch ?? "";
 
   const jobType = lib.getJobType();
 
@@ -453,16 +452,16 @@ export const run = async (input: RunInput): Promise<void> => {
     githubToken,
     rootDir: config.git_root_dir,
     files: new Set([failedPrsFile]),
-    serverRepository: securefixServerRepository,
-    appId: securefixAppId,
-    appPrivateKey: securefixAppPrivateKey,
+    serverRepository: csmActionsServerRepository,
+    appId: csmAppId,
+    appPrivateKey: csmAppPrivateKey,
     branch: prParams.branch,
     pr: skipCreatePr
       ? undefined
       : {
           title: prParams.prTitle,
           body: prParams.prBody,
-          base: securefixPRBaseBranch,
+          base: csmPRBaseBranch,
           labels: labels,
           assignees:
             prParams.assignees.length > 0 ? prParams.assignees : undefined,

@@ -184,8 +184,8 @@ export interface RunInput {
   githubToken: string;
   migrationName: string;
   prNumber: string;
-  securefixAppId: string;
-  securefixAppPrivateKey: string;
+  csmAppId: string;
+  csmAppPrivateKey: string;
   target: string;
   workingDir: string;
   actor: string;
@@ -199,8 +199,8 @@ export const run = async (input: RunInput): Promise<void> => {
     githubToken,
     migrationName,
     prNumber,
-    securefixAppId,
-    securefixAppPrivateKey,
+    csmAppId,
+    csmAppPrivateKey,
     actor,
     runURL,
     repository,
@@ -231,9 +231,8 @@ export const run = async (input: RunInput): Promise<void> => {
   const skipCreatePr = config.skip_create_pr;
   const draftPr = config.draft_pr;
   const labelPrefix = config.label_prefixes.tfmigrate;
-  const securefixServerRepository = config.securefix_action?.server_repository;
-  const securefixPRBaseBranch =
-    config.securefix_action?.pull_request?.base_branch ?? "";
+  const csmActionsServerRepository = config.csm_actions?.server_repository;
+  const csmPRBaseBranch = config.csm_actions?.pull_request?.base_branch ?? "";
 
   const label = `${labelPrefix}${target}`;
 
@@ -315,16 +314,16 @@ export const run = async (input: RunInput): Promise<void> => {
     rootDir: config.git_root_dir,
     githubToken,
     files: new Set(files),
-    serverRepository: securefixServerRepository ?? "",
-    appId: securefixAppId,
-    appPrivateKey: securefixAppPrivateKey,
+    serverRepository: csmActionsServerRepository ?? "",
+    appId: csmAppId,
+    appPrivateKey: csmAppPrivateKey,
     branch,
     pr: shouldSkipPr
       ? undefined
       : {
           title: prTitle,
           body: prBody,
-          base: securefixPRBaseBranch,
+          base: csmPRBaseBranch,
           labels: label ? [label] : undefined,
           assignees: actor ? [actor] : undefined,
           draft: draftPr,

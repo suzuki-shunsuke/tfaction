@@ -8,8 +8,8 @@ import * as commit from "../../../commit";
 
 export type Inputs = {
   githubToken: string;
-  securefixActionAppId: string;
-  securefixActionAppPrivateKey: string;
+  csmAppId: string;
+  csmAppPrivateKey: string;
 };
 
 /**
@@ -122,9 +122,9 @@ export const main = async (
     githubToken: inputs.githubToken,
     rootDir: cfg.git_root_dir,
     files: new Set([checksumFileFromRootDir]),
-    serverRepository: cfg?.securefix_action?.server_repository ?? "",
-    appId: inputs.securefixActionAppId,
-    appPrivateKey: inputs.securefixActionAppPrivateKey,
+    serverRepository: cfg?.csm_actions?.server_repository ?? "",
+    appId: inputs.csmAppId,
+    appPrivateKey: inputs.csmAppPrivateKey,
   });
   throw new Error(`${checksumFileOutput} is updated.`);
 };

@@ -16,8 +16,8 @@ export type RunInput = {
   config: types.Config;
   targetConfig: TargetConfig;
   githubToken: string;
-  securefixAppId: string;
-  securefixAppPrivateKey: string;
+  csmAppId: string;
+  csmAppPrivateKey: string;
   executor: aqua.Executor;
   fs?: {
     existsSync: typeof fs.existsSync;
@@ -45,7 +45,7 @@ export const run = async (input: RunInput): Promise<void> => {
   const destroy = targetConfig.destroy ?? false;
   const tfCommand = targetConfig.terraform_command;
   const target = targetConfig.target;
-  const serverRepository = config.securefix_action?.server_repository ?? "";
+  const serverRepository = config.csm_actions?.server_repository ?? "";
 
   // For modules: save lock file state and run terraform init
   let lockFileExisted = false;
@@ -115,8 +115,8 @@ export const run = async (input: RunInput): Promise<void> => {
       githubTokenForFix: "",
       fix: targetConfig.tflint_fix,
       serverRepository,
-      securefixActionAppId: input.securefixAppId,
-      securefixActionAppPrivateKey: input.securefixAppPrivateKey,
+      csmAppId: input.csmAppId,
+      csmAppPrivateKey: input.csmAppPrivateKey,
       executor,
       tflint: config.tflint,
     });
@@ -164,8 +164,8 @@ export const run = async (input: RunInput): Promise<void> => {
           githubToken,
           files: new Set(files),
           serverRepository,
-          appId: input.securefixAppId,
-          appPrivateKey: input.securefixAppPrivateKey,
+          appId: input.csmAppId,
+          appPrivateKey: input.csmAppPrivateKey,
         });
         if (!isModule) {
           throw new Error("code will be automatically formatted");
@@ -178,9 +178,9 @@ export const run = async (input: RunInput): Promise<void> => {
     await runTerraformDocs({
       workingDirectory: workingDir,
       githubToken,
-      securefixActionAppId: input.securefixAppId,
-      securefixActionAppPrivateKey: input.securefixAppPrivateKey,
-      securefixActionServerRepository: serverRepository,
+      csmAppId: input.csmAppId,
+      csmAppPrivateKey: input.csmAppPrivateKey,
+      csmActionsServerRepository: serverRepository,
       executor,
       repoRoot: config.git_root_dir,
     });

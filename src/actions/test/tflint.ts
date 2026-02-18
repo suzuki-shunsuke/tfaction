@@ -37,8 +37,8 @@ export type RunInput = {
   githubTokenForFix: string;
   fix: boolean;
   serverRepository: string;
-  securefixActionAppId: string;
-  securefixActionAppPrivateKey: string;
+  csmAppId: string;
+  csmAppPrivateKey: string;
   tflint?: types.TflintConfig;
   eventName?: string;
   logger?: Logger;
@@ -104,8 +104,8 @@ export const run = async (input: RunInput): Promise<void> => {
         githubToken: githubTokenForFix,
         files: new Set(changedFiles),
         serverRepository: input.serverRepository,
-        appId: input.securefixActionAppId,
-        appPrivateKey: input.securefixActionAppPrivateKey,
+        appId: input.csmAppId,
+        appPrivateKey: input.csmAppPrivateKey,
       });
       throw new Error("code is fixed by tflint --fix");
     }

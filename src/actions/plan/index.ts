@@ -48,7 +48,7 @@ export const main = async () => {
         workingDir,
         ".tfmigrate.hcl",
       );
-      const serverRepository = config.securefix_action?.server_repository ?? "";
+      const serverRepository = config.csm_actions?.server_repository ?? "";
 
       if (fs.existsSync(tfmigrateHclPath)) {
         // If the file is new or modified, commit it
@@ -67,8 +67,8 @@ export const main = async () => {
               path.relative(config.git_root_dir, tfmigrateHclPath),
             ]),
             serverRepository,
-            appId: input.securefixActionAppId,
-            appPrivateKey: input.securefixActionAppPrivateKey,
+            appId: input.csmAppId,
+            appPrivateKey: input.csmAppPrivateKey,
           });
         }
       }
