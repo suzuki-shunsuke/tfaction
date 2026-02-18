@@ -5,6 +5,7 @@ import * as scaffoldWorkingDir from "./actions/scaffold-working-dir";
 import * as setup from "./actions/setup";
 import * as exportAWSSecretsManager from "./actions/export-aws-secrets-manager";
 import * as generateConfigOut from "./actions/generate-config-out";
+import * as outputAWSSecretsManager from "./actions/output-aws-secrets-manager";
 import * as getTargetConfig from "./actions/get-target-config";
 import * as pickOutDriftIssues from "./actions/pick-out-drift-issues";
 import * as listTargets from "./actions/list-targets";
@@ -39,6 +40,7 @@ export const main = async (inputs: Inputs) => {
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
     ["get-target-config", getTargetConfig],
     ["list-targets", listTargets],
+    ["output-aws-secrets-manager", outputAWSSecretsManager],
     ["output-github-secrets", outputGithubSecrets],
     ["pick-out-drift-issues", pickOutDriftIssues],
     ["plan", plan],
