@@ -10,6 +10,7 @@ import * as input from "../../../lib/input";
 import * as git from "../../../lib/git";
 import * as aqua from "../../../aqua";
 import * as ciInfo from "../../../ci-info";
+import { post } from "../../../comment";
 import {
   list as listModuleCallers,
   ModuleToCallers,
@@ -236,29 +237,21 @@ const addTargetsFromChangedWorkingDirs = (
 const validateChangeLimits = async (
   targetConfigs: TargetConfig[],
   maxChangedWorkingDirectories: number,
-  githubToken: string,
-  executor: aqua.Executor,
+  octokit: ReturnType<typeof github.getOctokit>,
+  prNumber: number,
 ): Promise<void> => {
   if (
     maxChangedWorkingDirectories > 0 &&
     targetConfigs.length > maxChangedWorkingDirectories
   ) {
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-k",
-        "too-many-changed-dirs",
-        "-var",
-        `max_changed_dirs:${maxChangedWorkingDirectories}`,
-      ],
-      {
-        env: {
-          GITHUB_TOKEN: githubToken,
-          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        },
+    await post({
+      octokit,
+      prNumber,
+      templateKey: "too-many-changed-dirs",
+      vars: {
+        max_changed_dirs: `${maxChangedWorkingDirectories}`,
       },
-    );
+    });
     throw new Error(
       `Too many working directories are changed (${targetConfigs.length}). Max is ${maxChangedWorkingDirectories}.`,
     );
@@ -371,8 +364,8 @@ export const run = async (input: Input): Promise<Result> => {
   await validateChangeLimits(
     result.targetConfigs,
     input.maxChangedWorkingDirectories,
-    input.githubToken,
-    input.executor,
+    input.octokit,
+    input.prNumber,
   );
 
   return result;
@@ -402,8 +395,8 @@ type Input = {
   /** Working directories that have type: module in their tfaction.yaml */
   moduleWorkingDirs?: Set<string>;
   maxChangedWorkingDirectories: number;
-  githubToken: string;
-  executor: aqua.Executor;
+  octokit: ReturnType<typeof github.getOctokit>;
+  prNumber: number;
   /** Relative paths from git_root_dir of changed files, for test_workflow matching */
   relativeChangedFiles?: string[];
 };
@@ -504,6 +497,9 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     );
   }
 
+  const githubToken = input.getRequiredGitHubToken();
+  const octokit = github.getOctokit(githubToken);
+
   const result = await run({
     labels: pr.pr?.data.labels?.map((l) => l.name) ?? [],
     config: cfg,
@@ -515,9 +511,9 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     maxChangedWorkingDirectories: cfg.limit_changed_dirs?.working_dirs ?? 0,
     prBody: pr.pr?.data.body ?? "",
     payload: github.context.payload,
-    githubToken: input.getRequiredGitHubToken(),
+    octokit,
+    prNumber: github.context.payload.pull_request?.number ?? 0,
     moduleCallers,
-    executor,
     relativeChangedFiles: pr.pr?.files ?? [],
   });
 

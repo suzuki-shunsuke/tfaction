@@ -9,6 +9,7 @@ import * as lib from "../../lib";
 import * as env from "../../lib/env";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../../conftest";
+import { post } from "../../comment";
 
 type Inputs = {
   githubToken: string;
@@ -94,24 +95,14 @@ export const disableAutoMergeForRenovateChange = async (
     },
   );
 
-  const executor = inputs.executor;
-
-  await executor.exec(
-    "github-comment",
-    [
-      "post",
-      "-var",
-      `tfaction_target:${inputs.target}`,
-      "-k",
-      "renovate-plan-change",
-    ],
-    {
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-      },
+  await post({
+    octokit: octokit,
+    prNumber: inputs.prNumber ?? 0,
+    templateKey: "renovate-plan-change",
+    vars: {
+      tfaction_target: inputs.target,
     },
-  );
+  });
 };
 
 export const dismissApprovalReviews = async (
@@ -212,8 +203,6 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   let templatePath = "";
   let content = "";
 
-  const executor = inputs.executor;
-
   // Generate from S3 template
   if (inputs.s3BucketNameTfmigrateHistory) {
     templatePath = path.join(installDir, "tfmigrate.hcl");
@@ -235,22 +224,15 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
     );
   } else {
     // Error: neither S3 nor GCS bucket is configured
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-var",
-        `tfaction_target:${inputs.target}`,
-        "-k",
-        "tfmigrate-hcl-not-found",
-      ],
-      {
-        env: {
-          GITHUB_TOKEN: inputs.githubToken,
-          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        },
+    const octokit = github.getOctokit(inputs.githubToken);
+    await post({
+      octokit,
+      prNumber: inputs.prNumber ?? 0,
+      templateKey: "tfmigrate-hcl-not-found",
+      vars: {
+        tfaction_target: inputs.target,
       },
-    );
+    });
     throw new Error(
       ".tfmigrate.hcl is required but neither S3 nor GCS bucket is configured",
     );

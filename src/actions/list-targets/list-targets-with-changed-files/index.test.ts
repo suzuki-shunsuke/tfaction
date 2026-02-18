@@ -1,6 +1,5 @@
 import { run } from "./index";
 import { expect, test } from "vitest";
-import * as aqua from "../../../aqua";
 
 test("normal", async () => {
   expect(
@@ -24,10 +23,9 @@ test("normal", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -74,10 +72,9 @@ test("job config", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -167,10 +164,9 @@ test("pr comment", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual(prCommentExpected);
 });
@@ -193,10 +189,9 @@ test("pr comment with updated body", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual(prCommentExpected);
 });
@@ -230,10 +225,9 @@ test("module callers", async () => {
         "foo/dev": ["foo/bar", "foo/baz"],
       },
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -290,10 +284,9 @@ test("nest", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -332,10 +325,9 @@ test("tfmigrate label", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -374,10 +366,9 @@ test("tfmigrate label with changed files", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -415,9 +406,9 @@ test("module change detection without callers produces no targets", async () => 
         },
       },
       moduleCallers: {},
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [],
@@ -447,9 +438,9 @@ test("module callers triggered", async () => {
       moduleCallers: {
         "modules/vpc": ["foo/dev"],
       },
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -496,10 +487,9 @@ test("replace_target", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -542,10 +532,9 @@ test("custom label prefixes for tfmigrate", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -584,10 +573,9 @@ test("skip label sets skip_terraform", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -639,10 +627,9 @@ test("custom skip label prefix", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -690,10 +677,9 @@ test("tfmigrate label with unknown target throws error", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).rejects.toThrow(
     "No working directory is found for the target unknown/target",
@@ -722,10 +708,9 @@ test("empty labels and changed files", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [],
@@ -754,10 +739,9 @@ test("duplicate tfmigrate labels", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -796,10 +780,9 @@ test("isApply mode", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -849,10 +832,9 @@ test("tfmigrate with job config", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -901,10 +883,9 @@ test("tfmigrate apply with job config", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -944,9 +925,9 @@ test("module caller is also a module", async () => {
       moduleCallers: {
         "modules/base": ["modules/vpc", "terraform/dev"],
       },
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -990,10 +971,9 @@ test("multiple target groups", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1052,10 +1032,9 @@ test("terraform plan job config", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1104,10 +1083,9 @@ test("terraform apply job config", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1145,9 +1123,9 @@ test("multiple modules changed without callers produces no targets", async () =>
         },
       },
       moduleCallers: {},
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [],
@@ -1177,10 +1155,9 @@ test("template_dir config files are excluded", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1220,10 +1197,9 @@ test("template_dir with trailing slash", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1263,10 +1239,9 @@ test("runs_on as array", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1308,10 +1283,9 @@ test("skip_terraform_files: all files match patterns", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1351,10 +1325,9 @@ test("skip_terraform_files: some files don't match", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1393,10 +1366,9 @@ test("skip_terraform_files: not configured", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1437,9 +1409,9 @@ test("skip_terraform_files: module files don't match patterns", async () => {
       moduleCallers: {
         "modules/vpc": ["foo/dev"],
       },
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1480,9 +1452,9 @@ test("skip_terraform_files: module files all match patterns", async () => {
       moduleCallers: {
         "modules/vpc": ["foo/dev"],
       },
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1526,10 +1498,9 @@ test("skip_terraform_files: multiple patterns", async () => {
       },
       moduleCallers: {},
 
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1569,10 +1540,9 @@ test("module detected via moduleWorkingDirs gets type: module", async () => {
       moduleCallers: {},
 
       moduleWorkingDirs: new Set(["modules/vpc"]),
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1616,10 +1586,9 @@ test("mixed modules and regular working dirs", async () => {
       moduleCallers: {},
 
       moduleWorkingDirs: new Set(["modules/vpc"]),
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1672,10 +1641,9 @@ test("isApply filters out module type from targetConfigs", async () => {
       moduleCallers: {},
 
       moduleWorkingDirs: new Set(["modules/vpc"]),
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [
@@ -1715,10 +1683,9 @@ test("module working dir with no changes produces no output", async () => {
       moduleCallers: {},
 
       moduleWorkingDirs: new Set(["modules/vpc"]),
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
     targetConfigs: [],
@@ -1752,9 +1719,9 @@ test("test_workflow: changed_files match and no working dirs changed adds test t
         },
       },
       moduleCallers: {},
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
       relativeChangedFiles: [".github/workflows/plan.yaml"],
     }),
   ).toStrictEqual({
@@ -1797,9 +1764,9 @@ test("test_workflow: changed_files match but working dirs also changed returns n
         },
       },
       moduleCallers: {},
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
       relativeChangedFiles: [".github/workflows/plan.yaml", "foo/dev/main.tf"],
     }),
   ).toStrictEqual({
@@ -1842,9 +1809,9 @@ test("test_workflow: changed_files don't match and no working dirs changed retur
         },
       },
       moduleCallers: {},
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
       relativeChangedFiles: ["README.md"],
     }),
   ).toStrictEqual({
@@ -1877,9 +1844,9 @@ test("test_workflow: apply mode includes test targets", async () => {
         },
       },
       moduleCallers: {},
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      executor: await aqua.NewExecutor({}),
       relativeChangedFiles: [".github/workflows/plan.yaml"],
     }),
   ).toStrictEqual({

@@ -13,6 +13,7 @@ import {
 } from "./run";
 import type * as aqua from "../../aqua";
 import type * as getTargetConfig from "../get-target-config";
+import { post } from "../../comment";
 
 // Mock modules
 vi.mock("@actions/core", () => ({
@@ -73,6 +74,10 @@ vi.mock("../../aqua", () => ({
 
 vi.mock("../../conftest", () => ({
   run: vi.fn(),
+}));
+
+vi.mock("../../comment", () => ({
+  post: vi.fn(),
 }));
 
 // Helper to create a mock executor
@@ -323,10 +328,11 @@ describe("runTerraformPlan", () => {
       expect.stringContaining("disablePullRequestAutoMerge"),
       { nodeId: "PR_123" },
     );
-    expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "github-comment",
-      expect.arrayContaining(["post", "-k", "renovate-plan-change"]),
-      expect.any(Object),
+    expect(post).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateKey: "renovate-plan-change",
+        vars: { tfaction_target: "aws/test/dev" },
+      }),
     );
   });
 
@@ -359,7 +365,7 @@ describe("runTerraformPlan", () => {
 
     const result = await runTerraformPlan(inputs);
     expect(result.detailedExitcode).toBe(2);
-    expect(mockExecutor.exec).not.toHaveBeenCalled();
+    expect(post).not.toHaveBeenCalled();
   });
 
   it("skips renovate check when PR author is not renovate", async () => {
@@ -383,7 +389,7 @@ describe("runTerraformPlan", () => {
 
     const result = await runTerraformPlan(inputs);
     expect(result.detailedExitcode).toBe(2);
-    expect(mockExecutor.exec).not.toHaveBeenCalled();
+    expect(post).not.toHaveBeenCalled();
   });
 
   it("writes plan JSON from terraform show output", async () => {
@@ -583,7 +589,7 @@ describe("disableAutoMergeForRenovateChange", () => {
     expect(core.warning).toHaveBeenCalledWith(
       "PR JSON file not found: /tmp/ci-info/pr.json",
     );
-    expect(mockExecutor.exec).not.toHaveBeenCalled();
+    expect(post).not.toHaveBeenCalled();
   });
 
   it("skips when allowAutoMergeChange is true", async () => {
@@ -595,7 +601,7 @@ describe("disableAutoMergeForRenovateChange", () => {
     };
 
     await disableAutoMergeForRenovateChange(inputs);
-    expect(mockExecutor.exec).not.toHaveBeenCalled();
+    expect(post).not.toHaveBeenCalled();
   });
 });
 
@@ -756,10 +762,11 @@ describe("runTfmigratePlan", () => {
     await expect(runTfmigratePlan(inputs)).rejects.toThrow(
       ".tfmigrate.hcl is required but neither S3 nor GCS bucket is configured",
     );
-    expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "github-comment",
-      expect.arrayContaining(["post", "-k", "tfmigrate-hcl-not-found"]),
-      expect.any(Object),
+    expect(post).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateKey: "tfmigrate-hcl-not-found",
+        vars: { tfaction_target: "aws/test/dev" },
+      }),
     );
   });
 
