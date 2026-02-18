@@ -66,8 +66,8 @@ gh pr create -R "${repository}" ${draftOpt}\\
 
 export interface RunInput {
   githubToken: string;
-  securefixAppId: string;
-  securefixAppPrivateKey: string;
+  csmAppId: string;
+  csmAppPrivateKey: string;
   target: string;
   workingDir: string;
   actor: string;
@@ -76,23 +76,16 @@ export interface RunInput {
 }
 
 export const run = async (input: RunInput): Promise<void> => {
-  const {
-    githubToken,
-    securefixAppId,
-    securefixAppPrivateKey,
-    actor,
-    repository,
-    runURL,
-  } = input;
+  const { githubToken, csmAppId, csmAppPrivateKey, actor, repository, runURL } =
+    input;
 
   const config = await lib.getConfig();
 
   const skipCreatePr = config.skip_create_pr;
   const draftPr = config.draft_pr;
-  const securefixServerRepository =
-    config.securefix_action?.server_repository ?? "";
-  const securefixPRBaseBranch =
-    config.securefix_action?.pull_request?.base_branch ?? "";
+  const csmActionsServerRepository =
+    config.csm_actions?.server_repository ?? "";
+  const csmPRBaseBranch = config.csm_actions?.pull_request?.base_branch ?? "";
 
   // Get target config
   const targetConfigResult = await getTargetConfig.getTargetConfig(
@@ -185,16 +178,16 @@ export const run = async (input: RunInput): Promise<void> => {
     commitMessage,
     githubToken,
     files: new Set(files),
-    serverRepository: securefixServerRepository,
-    appId: securefixAppId,
-    appPrivateKey: securefixAppPrivateKey,
+    serverRepository: csmActionsServerRepository,
+    appId: csmAppId,
+    appPrivateKey: csmAppPrivateKey,
     branch,
     pr: skipCreatePr
       ? undefined
       : {
           title: prTitle,
           body: prBody,
-          base: securefixPRBaseBranch,
+          base: csmPRBaseBranch,
           assignees: actor ? [actor] : undefined,
           draft: draftPr,
           comment: prComment,

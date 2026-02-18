@@ -137,8 +137,8 @@ describe("checkIfChanged", () => {
 describe("main", () => {
   const defaultInputs = {
     githubToken: "token",
-    securefixActionAppId: "app-id",
-    securefixActionAppPrivateKey: "app-key",
+    csmAppId: "app-id",
+    csmAppPrivateKey: "app-key",
   };
 
   const defaultCfg = {
@@ -150,7 +150,7 @@ describe("main", () => {
         skip_push: false,
       },
     },
-    securefix_action: {
+    csm_actions: {
       server_repository: "owner/repo",
     },
   };

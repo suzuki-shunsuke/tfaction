@@ -46,8 +46,8 @@ describe("run", () => {
     githubTokenForFix: "",
     fix: false,
     serverRepository: "",
-    securefixActionAppId: "",
-    securefixActionAppPrivateKey: "",
+    csmAppId: "",
+    csmAppPrivateKey: "",
     tflint: { enabled: true, fix: false },
     eventName: "pull_request",
     logger: createMockLogger(),
@@ -456,8 +456,8 @@ describe("run", () => {
       logger,
       githubTokenForFix: "fix-token",
       serverRepository: "server-repo",
-      securefixActionAppId: "app-id",
-      securefixActionAppPrivateKey: "app-key",
+      csmAppId: "app-id",
+      csmAppPrivateKey: "app-key",
     });
 
     await expect(run(input)).rejects.toThrow("code is fixed by tflint --fix");

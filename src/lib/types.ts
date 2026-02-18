@@ -304,7 +304,7 @@ export const RawConfig = z.object({
   module_file: z.string().default("tfaction_module.yaml"),
   replace_target: Replace.optional(),
   providers_lock_opts: z.string().optional(),
-  securefix_action: z
+  csm_actions: z
     .object({
       server_repository: z.string(),
       pull_request: z.object({

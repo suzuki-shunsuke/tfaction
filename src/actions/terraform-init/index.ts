@@ -49,9 +49,9 @@ export const main = async () => {
     gitRootDir: config.git_root_dir,
     terragruntRunAvailable,
     executor,
-    serverRepository: config.securefix_action?.server_repository ?? "",
-    appId: input.securefixActionAppId,
-    appPrivateKey: input.securefixActionAppPrivateKey,
+    serverRepository: config.csm_actions?.server_repository ?? "",
+    appId: input.csmAppId,
+    appPrivateKey: input.csmAppPrivateKey,
     secrets: mergeSecrets(input.secrets, input.awsSecrets),
   });
 };

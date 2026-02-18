@@ -311,10 +311,10 @@ describe("main", () => {
     expect(terraform.listRelatedPullRequests).not.toHaveBeenCalled();
   });
 
-  it("uses securefix when securefix_action.server_repository is configured", async () => {
+  it("uses securefix when csm_actions.server_repository is configured", async () => {
     await setupMainMocks({
       config: {
-        securefix_action: {
+        csm_actions: {
           server_repository: "securefix-server",
         },
       },

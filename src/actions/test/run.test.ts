@@ -85,8 +85,8 @@ const createRunInput = (
   config: { ...createBaseConfig(), ...configOverrides } as types.Config,
   targetConfig: createBaseTargetConfig(targetConfigOverrides),
   githubToken: "test-token",
-  securefixAppId: "app-id",
-  securefixAppPrivateKey: "app-key",
+  csmAppId: "app-id",
+  csmAppPrivateKey: "app-key",
   executor: executor as unknown as aqua.Executor,
   ...(fsOverride ? { fs: fsOverride } : {}),
 });
@@ -237,7 +237,7 @@ describe("run", () => {
       mockExecutor,
       {
         tflint: tflintConfig,
-        securefix_action: {
+        csm_actions: {
           server_repository: "owner/repo",
           pull_request: { base_branch: "main" },
         },
@@ -255,8 +255,8 @@ describe("run", () => {
       githubTokenForFix: "",
       fix: true,
       serverRepository: "owner/repo",
-      securefixActionAppId: "app-id",
-      securefixActionAppPrivateKey: "app-key",
+      csmAppId: "app-id",
+      csmAppPrivateKey: "app-key",
       executor: input.executor,
       tflint: tflintConfig,
     });
@@ -373,7 +373,7 @@ describe("run", () => {
     const input = createRunInput(
       mockExecutor,
       {
-        securefix_action: {
+        csm_actions: {
           server_repository: "owner/server",
           pull_request: { base_branch: "main" },
         },
@@ -386,15 +386,15 @@ describe("run", () => {
     expect(terraformDocsMod.run).toHaveBeenCalledWith({
       workingDirectory: "/git/root/aws/test",
       githubToken: "test-token",
-      securefixActionAppId: "app-id",
-      securefixActionAppPrivateKey: "app-key",
-      securefixActionServerRepository: "owner/server",
+      csmAppId: "app-id",
+      csmAppPrivateKey: "app-key",
+      csmActionsServerRepository: "owner/server",
       executor: input.executor,
       repoRoot: "/git/root",
     });
   });
 
-  it("serverRepository defaults to empty when securefix_action is undefined", async () => {
+  it("serverRepository defaults to empty when csm_actions is undefined", async () => {
     const { fmtMod, commitMod } = await getMocks();
     vi.mocked(fmtMod.fmt).mockResolvedValue({
       exitCode: 0,
