@@ -27,6 +27,9 @@ export const action = core.getInput("action");
 // setup, terraform-init, plan, apply
 export const secrets = core.getInput("secrets");
 
+// terraform-init, plan, apply
+export const awsSecrets = core.getInput("aws_secrets");
+
 // generate-config-out
 export const branch = core.getInput("branch");
 export const file = core.getInput("file");
