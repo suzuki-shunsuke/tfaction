@@ -80,6 +80,7 @@ export const execAndComment = async (
 ): Promise<ExecResult> => {
   let stdout = "";
   let stderr = "";
+  let combinedOutput = "";
 
   const result = await exec.getExecOutput(command, args, {
     ...execOptions,
@@ -87,18 +88,21 @@ export const execAndComment = async (
     listeners: {
       ...execOptions?.listeners,
       stdout: (data: Buffer) => {
-        stdout += data.toString();
+        const str = data.toString();
+        stdout += str;
+        combinedOutput += str;
         execOptions?.listeners?.stdout?.(data);
       },
       stderr: (data: Buffer) => {
-        stderr += data.toString();
+        const str = data.toString();
+        stderr += str;
+        combinedOutput += str;
         execOptions?.listeners?.stderr?.(data);
       },
     },
   });
 
   const exitCode = result.exitCode;
-  const combinedOutput = stdout + stderr;
 
   const config = loadConfig();
   const key = comment.key ?? "default";
