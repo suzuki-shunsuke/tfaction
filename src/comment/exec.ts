@@ -109,7 +109,7 @@ export const execAndComment = async (
   const templates = config.exec[key] ?? config.exec["default"];
   if (!templates) {
     core.warning(`No exec comment templates found for key "${key}"`);
-    if (exitCode !== 0) {
+    if (exitCode !== 0 && !execOptions?.ignoreReturnCode) {
       throw new Error(
         `Command failed with exit code ${exitCode}: ${command} ${(args ?? []).join(" ")}`,
       );
@@ -146,7 +146,7 @@ export const execAndComment = async (
     await postComment(octokit, prNumber, body, comment.org, comment.repo);
   }
 
-  if (exitCode !== 0) {
+  if (exitCode !== 0 && !execOptions?.ignoreReturnCode) {
     throw new Error(
       `Command failed with exit code ${exitCode}: ${command} ${(args ?? []).join(" ")}`,
     );
