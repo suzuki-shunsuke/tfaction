@@ -100,7 +100,7 @@ export const run = async (input: RunInput): Promise<void> => {
     // Build terraform-docs arguments
     const opts = config ? ["-c", config] : ["markdown"];
 
-    // Execute terraform-docs via github-comment
+    // Execute terraform-docs with comment posting
     const result = await executor.getExecOutput(
       "terraform-docs",
       [...opts, "."],

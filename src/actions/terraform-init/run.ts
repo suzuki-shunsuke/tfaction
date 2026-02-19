@@ -30,7 +30,7 @@ export type RunInput = {
 
 export const run = async (input: RunInput): Promise<void> => {
   if (!input.isPullRequest) {
-    // Non-PR: just run init with github-comment
+    // Non-PR: just run init with comment posting on failure
     await input.executor.exec(input.tfCommand, ["init", "-input=false"], {
       cwd: input.workingDir,
       secretEnvs: input.secrets,
