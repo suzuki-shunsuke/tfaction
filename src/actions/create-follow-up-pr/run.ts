@@ -270,6 +270,7 @@ export interface SkipCreateCommentParams {
   groupLabel: string;
   target: string;
   mentions: string;
+  commentOverrides?: Array<{ id: string; body: string }>;
 }
 
 export const postSkipCreateComment = async (
@@ -319,6 +320,7 @@ export const postSkipCreateComment = async (
       mentions: mentions,
       opts: optsString,
     },
+    commentOverrides: params.commentOverrides,
   });
   core.info("Posted skip-create-follow-up-pr comment");
 };
@@ -462,6 +464,7 @@ export const run = async (input: RunInput): Promise<void> => {
         mentions: prParams.mentions,
         follow_up_pr_url: followUpPrUrl,
       },
+      commentOverrides: config.comments,
     });
     core.info("Posted comment to the original PR");
   }
@@ -480,6 +483,7 @@ export const run = async (input: RunInput): Promise<void> => {
       groupLabel,
       target,
       mentions: prParams.mentions,
+      commentOverrides: config.comments,
     });
   }
 };

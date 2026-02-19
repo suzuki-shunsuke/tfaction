@@ -12,6 +12,7 @@ export type Inputs = {
   prNumber: number;
   templateKey: string;
   vars: Record<string, string>;
+  commentOverrides?: Array<{ id: string; body: string }>;
 };
 
 type Metadata = {
@@ -70,15 +71,25 @@ ${block}
 };
 
 export const post = async (inputs: Inputs): Promise<void> => {
-  const config = loadConfig();
   registerHelpers();
 
-  const templateConfig = config.post[inputs.templateKey];
-  if (!templateConfig) {
-    throw new Error(`Template not found: ${inputs.templateKey}`);
+  // Check user overrides first
+  const override = inputs.commentOverrides?.find(
+    (c) => c.id === inputs.templateKey,
+  );
+  let templateStr: string;
+  if (override) {
+    templateStr = override.body;
+  } else {
+    const config = loadConfig();
+    const templateConfig = config.post[inputs.templateKey];
+    if (!templateConfig) {
+      throw new Error(`Template not found: ${inputs.templateKey}`);
+    }
+    templateStr = templateConfig.template;
   }
 
-  const template = Handlebars.compile(templateConfig.template);
+  const template = Handlebars.compile(templateStr);
   const message = template({ Vars: inputs.vars });
 
   const metadata: Metadata = {
