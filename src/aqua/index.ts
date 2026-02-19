@@ -8,6 +8,7 @@ import { arch, homedir, platform, tmpdir } from "os";
 import { mkdtempSync, existsSync, renameSync, mkdirSync } from "fs";
 import * as lib from "../lib";
 import * as env from "../lib/env";
+import { execAndComment } from "../comment/exec";
 import {
   type Comment,
   getOS as _getOS,
@@ -125,7 +126,6 @@ export class Executor {
         processEnv: process.env as Record<string, string | undefined>,
         path: env.all.PATH,
         aquaGlobalConfig: lib.aquaGlobalConfig,
-        gitHubCommentConfig: lib.GitHubCommentConfig,
       },
       this.installDir,
       this.githubToken,
@@ -133,8 +133,8 @@ export class Executor {
     ) as { [key: string]: string } | undefined;
   }
 
-  buildArgs(command: string, args?: string[], options?: ExecOptions) {
-    return _buildArgs(command, args, options);
+  buildArgs(command: string, args?: string[]) {
+    return _buildArgs(command, args);
   }
 
   async exec(
@@ -142,14 +142,24 @@ export class Executor {
     args?: string[],
     options?: ExecOptions,
   ): Promise<number> {
-    const bArgs = this.buildArgs(command, args, options);
+    const bArgs = this.buildArgs(command, args);
+    const envVars = this.env(options);
     try {
       if (options?.group) {
         core.startGroup(options.group);
       }
+      if (options?.comment) {
+        const result = await execAndComment(
+          bArgs.command,
+          bArgs.args,
+          options.comment,
+          { ...options, env: envVars },
+        );
+        return result.exitCode;
+      }
       return await exec.exec(bArgs.command, bArgs.args, {
         ...options,
-        env: this.env(options),
+        env: envVars,
       });
     } finally {
       if (options?.group) {
@@ -163,14 +173,24 @@ export class Executor {
     args?: string[],
     options?: ExecOptions,
   ): Promise<exec.ExecOutput> {
-    const bArgs = this.buildArgs(command, args, options);
+    const bArgs = this.buildArgs(command, args);
+    const envVars = this.env(options);
     try {
       if (options?.group) {
         core.startGroup(options.group);
       }
+      if (options?.comment) {
+        const result = await execAndComment(
+          bArgs.command,
+          bArgs.args,
+          options.comment,
+          { ...options, env: envVars },
+        );
+        return result;
+      }
       return await exec.getExecOutput(bArgs.command, bArgs.args, {
         ...options,
-        env: this.env(options),
+        env: envVars,
       });
     } finally {
       if (options?.group) {

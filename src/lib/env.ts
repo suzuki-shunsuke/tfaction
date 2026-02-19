@@ -15,9 +15,7 @@ type dynamicEnvKey =
   | "AQUA_GITHUB_TOKEN"
   | "AQUA_GLOBAL_CONFIG"
   | "PATH"
-  | "GH_COMMENT_CONFIG"
   | "TFCMT_GITHUB_TOKEN"
-  | "GITHUB_ACCESS_TOKEN"
   | "TFMIGRATE_EXEC_PATH"
   | "REVIEWDOG_GITHUB_API_TOKEN"
   | "TERRAGRUNT_LOG_DISABLE";
@@ -31,7 +29,7 @@ export type dynamicEnvs = Partial<Record<dynamicEnvKey, string>>;
  *   env.all.GITHUB_TOKEN; // Get an environment variable
  *   env.all; // Get all environment variables
  *   env: {
- *     ...env.record("GITHUB_TOKEN", "GH_COMMENT_CONFIG"), // Pass only specific envs to envs
+ *     ...env.record("GITHUB_TOKEN"), // Pass only specific envs to envs
  *   },
  */
 const keys = [
@@ -77,7 +75,6 @@ const keys = [
   "GLOBAL_CONFIG",
   "LIST_MODULE_CALLERS",
   // exec only
-  "GH_COMMENT_CONFIG",
   "REVIEWDOG_GITHUB_API_TOKEN",
   "TERRAGRUNT_LOG_DISABLE",
 ] as const;

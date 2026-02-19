@@ -23,12 +23,6 @@ export const GitHubActionPath = path.join(
   "..",
 );
 
-export const GitHubCommentConfig = path.join(
-  GitHubActionPath,
-  "install",
-  "github-comment.yaml",
-);
-
 export const aquaConfig = path.join(
   GitHubActionPath,
   "install",

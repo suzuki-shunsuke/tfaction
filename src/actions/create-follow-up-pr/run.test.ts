@@ -29,7 +29,6 @@ vi.mock("fs", async () => {
 vi.mock("../../lib", () => ({
   getConfig: vi.fn(),
   getJobType: vi.fn(),
-  GitHubCommentConfig: "/mock/config/github-comment.yaml",
 }));
 
 vi.mock("../../comment", () => ({

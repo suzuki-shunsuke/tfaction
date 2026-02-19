@@ -191,7 +191,6 @@ describe("run", () => {
       ["-c", ".terraform-docs.yml", "."],
       expect.objectContaining({
         cwd: "/repo/work",
-        ignoreReturnCode: true,
       }),
     );
   });
@@ -233,11 +232,9 @@ describe("run", () => {
     const executor = input.executor as unknown as ReturnType<
       typeof createMockExecutor
     >;
-    executor.getExecOutput.mockResolvedValue({
-      stdout: "",
-      stderr: "error",
-      exitCode: 1,
-    });
+    executor.getExecOutput.mockRejectedValue(
+      new Error("terraform-docs failed with exit code 1"),
+    );
 
     await expect(run(input)).rejects.toThrow(
       "terraform-docs failed with exit code 1",
@@ -544,11 +541,9 @@ describe("run", () => {
     const executor = input.executor as unknown as ReturnType<
       typeof createMockExecutor
     >;
-    executor.getExecOutput.mockResolvedValue({
-      stdout: "",
-      stderr: "",
-      exitCode: 1,
-    });
+    executor.getExecOutput.mockRejectedValue(
+      new Error("terraform-docs failed with exit code 1"),
+    );
 
     await expect(run(input)).rejects.toThrow();
 
@@ -593,6 +588,7 @@ describe("run", () => {
       expect.any(Array),
       expect.objectContaining({
         comment: expect.objectContaining({
+          key: "terraform-docs",
           vars: { tfaction_target: "my-target" },
         }),
       }),

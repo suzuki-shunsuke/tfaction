@@ -480,7 +480,7 @@ describe("main", () => {
       workflowRuns: [],
     });
 
-    // github-comment post should be called, then it throws
+    // comment is posted via native post(), then it throws
     mockExecutor.exec.mockResolvedValue(0);
 
     await expect(main()).rejects.toThrow("No workflow run is found");

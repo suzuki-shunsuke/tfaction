@@ -189,7 +189,7 @@ describe("run", () => {
     );
   });
 
-  it("does not call github-comment when filterMode is not nofilter", async () => {
+  it("uses custom filterMode for reviewdog", async () => {
     const executor = createMockExecutor();
 
     const trivyOutput = {
@@ -239,14 +239,7 @@ describe("run", () => {
 
     await run(input);
 
-    // Should NOT call github-comment
-    expect(executor.exec).not.toHaveBeenCalledWith(
-      "github-comment",
-      expect.any(Array),
-      expect.any(Object),
-    );
-
-    // Should still call reviewdog
+    // Should call reviewdog with custom filter mode
     expect(executor.exec).toHaveBeenCalledWith(
       "reviewdog",
       expect.arrayContaining(["-filter-mode", "added"]),
@@ -254,7 +247,7 @@ describe("run", () => {
     );
   });
 
-  it("does not call github-comment when diagnostics is empty", async () => {
+  it("calls reviewdog when diagnostics is empty", async () => {
     const executor = createMockExecutor();
 
     const trivyOutput = {
@@ -290,10 +283,9 @@ describe("run", () => {
 
     await run(input);
 
-    // Should NOT call github-comment
-    expect(executor.exec).not.toHaveBeenCalledWith(
-      "github-comment",
-      expect.any(Array),
+    expect(executor.exec).toHaveBeenCalledWith(
+      "reviewdog",
+      expect.arrayContaining(["-f", "sarif"]),
       expect.any(Object),
     );
   });
@@ -539,10 +531,9 @@ describe("run", () => {
 
     await run(input);
 
-    // Should not call github-comment since no diagnostics
-    expect(executor.exec).not.toHaveBeenCalledWith(
-      "github-comment",
-      expect.any(Array),
+    expect(executor.exec).toHaveBeenCalledWith(
+      "reviewdog",
+      expect.arrayContaining(["-f", "sarif"]),
       expect.any(Object),
     );
   });

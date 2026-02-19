@@ -21,11 +21,17 @@ type Metadata = {
   Vars: Record<string, string>;
 };
 
-type CommentConfig = {
-  post: Record<string, { template: string }>;
+export type ExecTemplateEntry = {
+  when: string;
+  template: string;
 };
 
-const loadConfig = (): CommentConfig => {
+export type CommentConfig = {
+  post: Record<string, { template: string }>;
+  exec: Record<string, ExecTemplateEntry[]>;
+};
+
+export const loadConfig = (): CommentConfig => {
   const configPath = path.join(lib.GitHubActionPath, "install", "comment.yaml");
   const content = fs.readFileSync(configPath, "utf8");
   return yaml.load(content) as CommentConfig;
@@ -33,7 +39,7 @@ const loadConfig = (): CommentConfig => {
 
 const block = "```";
 
-const registerHelpers = () => {
+export const registerHelpers = () => {
   Handlebars.registerHelper("link", () => {
     return `[Build link](${env.GITHUB_SERVER_URL}/${github.context.serverUrl}/actions/runs/${github.context.runId})`;
   });
@@ -69,6 +75,38 @@ ${block}
   });
 };
 
+export const buildCommentBody = (
+  message: string,
+  templateKey: string,
+  vars: Record<string, string>,
+): string => {
+  const metadata: Metadata = {
+    JobName: github.context.job,
+    SHA1: github.context.sha,
+    TemplateKey: templateKey,
+    Vars: vars,
+  };
+
+  return `${message}
+<!-- github-comment: ${JSON.stringify(metadata)} -->
+`;
+};
+
+export const postComment = async (
+  octokit: ReturnType<typeof github.getOctokit>,
+  prNumber: number,
+  body: string,
+  org?: string,
+  repo?: string,
+): Promise<void> => {
+  await octokit.rest.issues.createComment({
+    owner: org ?? github.context.repo.owner,
+    repo: repo ?? github.context.repo.repo,
+    issue_number: prNumber,
+    body,
+  });
+};
+
 export const post = async (inputs: Inputs): Promise<void> => {
   const config = loadConfig();
   registerHelpers();
@@ -81,21 +119,7 @@ export const post = async (inputs: Inputs): Promise<void> => {
   const template = Handlebars.compile(templateConfig.template);
   const message = template({ Vars: inputs.vars });
 
-  const metadata: Metadata = {
-    JobName: github.context.job,
-    SHA1: github.context.sha,
-    TemplateKey: inputs.templateKey,
-    Vars: inputs.vars,
-  };
+  const body = buildCommentBody(message, inputs.templateKey, inputs.vars);
 
-  const body = `${message}
-<!-- github-comment: ${JSON.stringify(metadata)} -->
-`;
-
-  await inputs.octokit.rest.issues.createComment({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    issue_number: inputs.prNumber,
-    body,
-  });
+  await postComment(inputs.octokit, inputs.prNumber, body);
 };

@@ -54,7 +54,7 @@ export const main = async (
     cwd: workingDir,
   });
 
-  // Run tfmigrate apply with github-comment
+  // Run tfmigrate apply with execAndComment (posts a comment on failure)
   let exitCode = 0;
   try {
     await executor

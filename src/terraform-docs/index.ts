@@ -100,15 +100,15 @@ export const run = async (input: RunInput): Promise<void> => {
     // Build terraform-docs arguments
     const opts = config ? ["-c", config] : ["markdown"];
 
-    // Execute terraform-docs via github-comment
+    // Execute terraform-docs with comment posting
     const result = await executor.getExecOutput(
       "terraform-docs",
       [...opts, "."],
       {
         cwd: input.workingDirectory,
-        ignoreReturnCode: true,
         comment: {
           token: input.githubToken,
+          key: "terraform-docs",
           vars: {
             tfaction_target: target,
           },
@@ -118,13 +118,6 @@ export const run = async (input: RunInput): Promise<void> => {
 
     // Write output to temp file
     fileSystem.writeFileSync(tempFile.name, result.stdout);
-
-    // Check if command failed
-    if (result.exitCode !== 0) {
-      throw new Error(
-        `terraform-docs failed with exit code ${result.exitCode}`,
-      );
-    }
 
     // Check for error: .terraform-docs.yml is required
     const output = fileSystem.readFileSync(tempFile.name, "utf8");
