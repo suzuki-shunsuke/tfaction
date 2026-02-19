@@ -57,7 +57,6 @@ vi.mock("../../lib", async () => {
     ...actual,
     getConfig: vi.fn(),
     GitHubActionPath: "/mock/action/path",
-    GitHubCommentConfig: "/mock/config/github-comment.yaml",
     aquaGlobalConfig: "/mock/config/aqua.yaml",
   };
 });

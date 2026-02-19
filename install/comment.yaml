@@ -111,7 +111,7 @@ exec:
         {{hidden_combined_output}}
 
   list-workflow-runs:
-    - when: ExitCode != 0 and Stderr contains "could not find any workflows named"
+    - when: ExitCode != 0 && Stderr.contains("could not find any workflows named")
       template: |
         ## :x: {{Vars.tfaction_target}}: Failed to list workflow runs `{{Vars.plan_workflow_name}}`
 

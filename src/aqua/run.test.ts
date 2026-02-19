@@ -71,86 +71,18 @@ describe("getInstallPath", () => {
 });
 
 describe("buildArgs", () => {
-  it("returns command/args unchanged when no comment", () => {
+  it("returns command/args unchanged", () => {
     const result = buildArgs("terraform", ["plan"]);
     expect(result).toEqual({
       command: "terraform",
       args: ["plan"],
     });
   });
-  it("returns command unchanged when options has no comment", () => {
-    const result = buildArgs("terraform", ["plan"], {});
+  it("handles empty/undefined args", () => {
+    const result = buildArgs("terraform", undefined);
     expect(result).toEqual({
       command: "terraform",
-      args: ["plan"],
-    });
-  });
-  it("wraps with github-comment exec when comment provided", () => {
-    const result = buildArgs("terraform", ["plan"], {
-      comment: { token: "tok" },
-    });
-    expect(result).toEqual({
-      command: "github-comment",
-      args: ["exec", "--", "terraform", "plan"],
-    });
-  });
-  it("includes -org, -repo, -pr flags when set", () => {
-    const result = buildArgs("terraform", ["plan"], {
-      comment: { token: "tok", org: "myorg", repo: "myrepo", pr: "42" },
-    });
-    expect(result).toEqual({
-      command: "github-comment",
-      args: [
-        "exec",
-        "-org",
-        "myorg",
-        "-repo",
-        "myrepo",
-        "-pr",
-        "42",
-        "--",
-        "terraform",
-        "plan",
-      ],
-    });
-  });
-  it("includes -var flags for set variables", () => {
-    const result = buildArgs("terraform", ["plan"], {
-      comment: {
-        token: "tok",
-        vars: { tfaction_target: "aws/dev", pr_url: "https://example.com/1" },
-      },
-    });
-    expect(result).toEqual({
-      command: "github-comment",
-      args: [
-        "exec",
-        "-var",
-        "tfaction_target:aws/dev",
-        "-var",
-        "pr_url:https://example.com/1",
-        "--",
-        "terraform",
-        "plan",
-      ],
-    });
-  });
-  it("includes -k flag when key set", () => {
-    const result = buildArgs("terraform", ["plan"], {
-      comment: { token: "tok", key: "conftest" },
-    });
-    expect(result).toEqual({
-      command: "github-comment",
-      args: ["exec", "-k", "conftest", "--", "terraform", "plan"],
-    });
-  });
-  it("handles empty/undefined args", () => {
-    const result = buildArgs("terraform", undefined, {
-      comment: { token: "tok" },
-    });
-    expect(result).toEqual({
-      command: "github-comment",
-      args: ["exec", "--", "terraform"],
+      args: undefined,
     });
   });
 });
@@ -160,7 +92,6 @@ describe("buildEnv", () => {
     processEnv: { EXISTING: "val" },
     path: "/usr/bin",
     aquaGlobalConfig: "/path/to/aqua.yaml",
-    gitHubCommentConfig: "/path/to/gh-comment.yaml",
   };
 
   it("sets AQUA_GLOBAL_CONFIG from deps", () => {
@@ -180,12 +111,12 @@ describe("buildEnv", () => {
     const result = buildEnv(baseDeps, "", "gh-token");
     expect(result.AQUA_GITHUB_TOKEN).toBe("gh-token");
   });
-  it("sets GITHUB_ACCESS_TOKEN and GH_COMMENT_CONFIG when comment present", () => {
+  it("does not set comment-related env vars when comment present", () => {
     const result = buildEnv(baseDeps, "", undefined, {
       comment: { token: "comment-token" },
     });
-    expect(result.GITHUB_ACCESS_TOKEN).toBe("comment-token");
-    expect(result.GH_COMMENT_CONFIG).toBe("/path/to/gh-comment.yaml");
+    expect(result.GITHUB_ACCESS_TOKEN).toBeUndefined();
+    expect(result.GH_COMMENT_CONFIG).toBeUndefined();
   });
   it("includes secretEnvs when provided", () => {
     const result = buildEnv(baseDeps, "", undefined, {
@@ -210,19 +141,19 @@ describe("buildEnv", () => {
   });
   it("merge precedence: dynamic env > options.env > processEnv", () => {
     const deps: EnvDeps = {
-      processEnv: { PATH: "/proc", GITHUB_TOKEN: "proc-tok", FOO: "from-proc" },
+      processEnv: {
+        PATH: "/proc",
+        GITHUB_TOKEN: "proc-tok",
+        FOO: "from-proc",
+      },
       path: "/proc",
       aquaGlobalConfig: "/aqua.yaml",
-      gitHubCommentConfig: "/gh.yaml",
     };
     const result = buildEnv(deps, "/install", "gh-tok", {
       env: { PATH: "/opt-path" },
-      comment: { token: "comment-tok" },
     });
     // dynamic env (PATH with installDir) wins over options.env and processEnv
     expect(result.PATH).toBe("/proc:/install");
-    // dynamic env (GITHUB_ACCESS_TOKEN from comment) is set
-    expect(result.GITHUB_ACCESS_TOKEN).toBe("comment-tok");
     // processEnv value preserved when not overridden
     expect(result.FOO).toBe("from-proc");
   });
