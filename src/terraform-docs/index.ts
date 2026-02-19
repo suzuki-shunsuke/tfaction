@@ -106,7 +106,6 @@ export const run = async (input: RunInput): Promise<void> => {
       [...opts, "."],
       {
         cwd: input.workingDirectory,
-        ignoreReturnCode: true,
         comment: {
           token: input.githubToken,
           key: "terraform-docs",
@@ -119,13 +118,6 @@ export const run = async (input: RunInput): Promise<void> => {
 
     // Write output to temp file
     fileSystem.writeFileSync(tempFile.name, result.stdout);
-
-    // Check if command failed
-    if (result.exitCode !== 0) {
-      throw new Error(
-        `terraform-docs failed with exit code ${result.exitCode}`,
-      );
-    }
 
     // Check for error: .terraform-docs.yml is required
     const output = fileSystem.readFileSync(tempFile.name, "utf8");
