@@ -109,6 +109,7 @@ export const run = async (input: RunInput): Promise<void> => {
         ignoreReturnCode: true,
         comment: {
           token: input.githubToken,
+          key: "terraform-docs",
           vars: {
             tfaction_target: target,
           },

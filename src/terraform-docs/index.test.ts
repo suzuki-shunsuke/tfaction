@@ -593,6 +593,7 @@ describe("run", () => {
       expect.any(Array),
       expect.objectContaining({
         comment: expect.objectContaining({
+          key: "terraform-docs",
           vars: { tfaction_target: "my-target" },
         }),
       }),

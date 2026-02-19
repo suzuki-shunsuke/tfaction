@@ -9,6 +9,7 @@ export type Comment = {
   key?:
     | "conftest"
     | "terraform-validate"
+    | "terraform-docs"
     | "tfmigrate-plan"
     | "tfmigrate-apply"
     | "drift-apply";

@@ -110,52 +110,6 @@ exec:
 
         {{hidden_combined_output}}
 
-  list-workflow-runs:
-    - when: ExitCode != 0 && Stderr.contains("could not find any workflows named")
-      template: |
-        ## :x: {{Vars.tfaction_target}}: Failed to list workflow runs `{{Vars.plan_workflow_name}}`
-
-        {{link}}
-
-        It failed to list workflow runs `{{Vars.plan_workflow_name}}`.
-        Probably the setting `plan_workflow_name` in `tfaction-root.yaml` is wrong.
-        `plan_workflow_name` must be the workflow name where terraform plan is run in CI of pull requests.
-
-        {{join_command}}
-
-        {{hidden_combined_output}}
-    - when: ExitCode != 0
-      template: |
-        ## :x: {{Vars.tfaction_target}}: Failed to list workflow runs `{{Vars.plan_workflow_name}}`
-
-        {{link}}
-
-        It failed to list workflow runs `{{Vars.plan_workflow_name}}`.
-
-        {{join_command}}
-
-        {{hidden_combined_output}}
-    - when: Stdout == ""
-      template: |
-        ## :x: {{Vars.tfaction_target}}: No workflow run is found `{{Vars.plan_workflow_name}}`
-
-        {{link}}
-
-        {{join_command}}
-
-        {{hidden_combined_output}}
-
-  download-plan-file:
-    - when: ExitCode != 0
-      template: |
-        ## :x: {{Vars.tfaction_target}}: Failed to download a plan file from GitHub Actions Artifact
-
-        {{link}}
-
-        {{join_command}}
-
-        {{hidden_combined_output}}
-
   terraform-docs:
     - when: ExitCode != 0
       template: |
