@@ -117,6 +117,10 @@ vi.mock("./run", () => ({
   updateBranchBySecurefix: vi.fn(),
 }));
 
+vi.mock("../../comment", () => ({
+  post: vi.fn(),
+}));
+
 // Helper to create a mock executor
 const createMockExecutor = () => ({
   exec: vi.fn().mockResolvedValue(0),

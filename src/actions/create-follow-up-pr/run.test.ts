@@ -32,8 +32,8 @@ vi.mock("../../lib", () => ({
   GitHubCommentConfig: "/mock/config/github-comment.yaml",
 }));
 
-vi.mock("../../aqua", () => ({
-  NewExecutor: vi.fn(),
+vi.mock("../../comment", () => ({
+  post: vi.fn(),
 }));
 
 vi.mock("../../commit", () => ({
@@ -49,9 +49,9 @@ import * as github from "@actions/github";
 import * as fs from "fs";
 
 import * as lib from "../../lib";
-import * as aqua from "../../aqua";
 import * as commit from "../../commit";
 import { getTargetConfig } from "../get-target-config";
+import { post } from "../../comment";
 
 import {
   escapeRegExp,
@@ -76,19 +76,6 @@ const createMockOctokit = () => ({
 });
 
 type MockOctokit = ReturnType<typeof createMockOctokit>;
-
-const createMockExecutor = () => ({
-  exec: vi.fn().mockResolvedValue(0),
-  getExecOutput: vi.fn().mockResolvedValue({
-    exitCode: 0,
-    stdout: "",
-    stderr: "",
-  }),
-  installDir: "/mock/install",
-  githubToken: "mock-token",
-  env: vi.fn(),
-  buildArgs: vi.fn(),
-});
 
 describe("escapeRegExp", () => {
   it("escapes all special regex characters", () => {
@@ -459,15 +446,16 @@ describe("createFailedPrsFile", () => {
 });
 
 describe("postSkipCreateComment", () => {
-  let mockExecutor: ReturnType<typeof createMockExecutor>;
+  let mockOctokitLocal: MockOctokit;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockExecutor = createMockExecutor();
+    mockOctokitLocal = createMockOctokit();
   });
 
   const defaultParams = (): SkipCreateCommentParams => ({
-    githubToken: "token",
+    octokit: mockOctokitLocal as unknown as SkipCreateCommentParams["octokit"],
+    prNumberInt: 42,
     repository: "owner/repo",
     branch: "follow-up-42",
     prTitle: "chore: follow up",
@@ -477,22 +465,19 @@ describe("postSkipCreateComment", () => {
     groupLabel: "",
     target: "infra/prod",
     mentions: "@user1",
-    executor: mockExecutor as unknown as SkipCreateCommentParams["executor"],
-    workingDir: "/workspace",
   });
 
-  it("calls github-comment with correct base args", async () => {
+  it("calls post with correct base args", async () => {
     await postSkipCreateComment(defaultParams());
 
-    expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "github-comment",
-      expect.arrayContaining(["post", "-k", "skip-create-follow-up-pr"]),
+    expect(post).toHaveBeenCalledWith(
       expect.objectContaining({
-        cwd: "/workspace",
-        env: {
-          GITHUB_TOKEN: "token",
-          GH_COMMENT_CONFIG: "/mock/config/github-comment.yaml",
-        },
+        prNumber: 42,
+        templateKey: "skip-create-follow-up-pr",
+        vars: expect.objectContaining({
+          tfaction_target: "infra/prod",
+          mentions: "@user1",
+        }),
       }),
     );
   });
@@ -503,10 +488,13 @@ describe("postSkipCreateComment", () => {
       draftPr: true,
     });
 
-    const callArgs = mockExecutor.exec.mock.calls[0];
-    const varsArg = callArgs[1] as string[];
-    const optsVar = varsArg.find((a: string) => a.startsWith("opts:"));
-    expect(optsVar).toContain("-d");
+    expect(post).toHaveBeenCalledWith(
+      expect.objectContaining({
+        vars: expect.objectContaining({
+          opts: expect.stringContaining("-d"),
+        }),
+      }),
+    );
   });
 
   it("includes -l flag when groupLabelEnabled and groupLabel set", async () => {
@@ -516,17 +504,25 @@ describe("postSkipCreateComment", () => {
       groupLabel: "tfaction:follow-up-pr-group/42",
     });
 
-    const callArgs = mockExecutor.exec.mock.calls[0];
-    const varsArg = callArgs[1] as string[];
-    const optsVar = varsArg.find((a: string) => a.startsWith("opts:"));
-    expect(optsVar).toContain("-l");
-    expect(optsVar).toContain("tfaction:follow-up-pr-group/42");
+    expect(post).toHaveBeenCalledWith(
+      expect.objectContaining({
+        vars: expect.objectContaining({
+          opts: expect.stringContaining("-l"),
+        }),
+      }),
+    );
+    expect(post).toHaveBeenCalledWith(
+      expect.objectContaining({
+        vars: expect.objectContaining({
+          opts: expect.stringContaining("tfaction:follow-up-pr-group/42"),
+        }),
+      }),
+    );
   });
 });
 
 describe("run", () => {
   let mockOctokit: MockOctokit;
-  let mockExecutor: ReturnType<typeof createMockExecutor>;
 
   const defaultRunInput: RunInput = {
     githubToken: "test-token",
@@ -548,7 +544,6 @@ describe("run", () => {
     vi.clearAllMocks();
 
     mockOctokit = createMockOctokit();
-    mockExecutor = createMockExecutor();
 
     vi.mocked(github.getOctokit).mockReturnValue(
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
@@ -571,9 +566,6 @@ describe("run", () => {
       working_directory: "infra/env/prod",
       target: "infra/env/prod",
     } as unknown as Awaited<ReturnType<typeof getTargetConfig>>);
-    vi.mocked(aqua.NewExecutor).mockResolvedValue(
-      mockExecutor as unknown as Awaited<ReturnType<typeof aqua.NewExecutor>>,
-    );
     vi.mocked(commit.create).mockResolvedValue(
       "https://github.com/owner/repo/pull/99",
     );
@@ -596,13 +588,14 @@ describe("run", () => {
   it("posts comment to original PR when followUpPrUrl is returned", async () => {
     await run(defaultRunInput);
 
-    expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "github-comment",
-      expect.arrayContaining(["post", "-k", "create-follow-up-pr"]),
+    expect(post).toHaveBeenCalledWith(
       expect.objectContaining({
-        env: {
-          GITHUB_TOKEN: "test-token",
-        },
+        prNumber: 42,
+        templateKey: "create-follow-up-pr",
+        vars: expect.objectContaining({
+          tfaction_target: "infra/env/prod",
+          follow_up_pr_url: "https://github.com/owner/repo/pull/99",
+        }),
       }),
     );
   });
@@ -632,10 +625,10 @@ describe("run", () => {
     );
 
     // Should post skip comment
-    expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "github-comment",
-      expect.arrayContaining(["post", "-k", "skip-create-follow-up-pr"]),
-      expect.any(Object),
+    expect(post).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateKey: "skip-create-follow-up-pr",
+      }),
     );
   });
 
