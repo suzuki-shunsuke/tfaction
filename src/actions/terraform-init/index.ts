@@ -7,6 +7,7 @@ import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import { isPullRequestEvent, run } from "./run";
+import { mergeSecrets } from "../../lib/secret";
 
 export const main = async () => {
   const githubToken = input.getRequiredGitHubToken();
@@ -39,6 +40,7 @@ export const main = async () => {
 
   await run({
     isPullRequest: isPullRequestEvent(github.context.eventName),
+    isModule: targetConfig.type === "module",
     workingDir,
     tfCommand,
     providersLockOpts: targetConfig.providers_lock_opts,
@@ -47,9 +49,9 @@ export const main = async () => {
     gitRootDir: config.git_root_dir,
     terragruntRunAvailable,
     executor,
-    serverRepository: config.securefix_action?.server_repository ?? "",
-    appId: input.securefixActionAppId,
-    appPrivateKey: input.securefixActionAppPrivateKey,
-    secrets: input.secrets ? JSON.parse(input.secrets) : undefined,
+    serverRepository: config.csm_actions?.server_repository ?? "",
+    appId: input.csmAppId,
+    appPrivateKey: input.csmAppPrivateKey,
+    secrets: mergeSecrets(input.secrets, input.awsSecrets),
   });
 };

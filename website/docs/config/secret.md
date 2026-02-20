@@ -71,8 +71,8 @@ Error: "secret is not found: FASTLY_API_KEY"
 
 ### AWS Secrets Manager
 
-You can export AWS Secrets Manager's Secrets as environment variables with [export-aws-secrets-manager](https://github.com/suzuki-shunsuke/tfaction/tree/main/export-aws-secrets-manager) Action.
-This action is used in [setup](https://github.com/suzuki-shunsuke/tfaction/tree/main/setup) Action, so you don't have to use this Action explicitly.
+You can output AWS Secrets Manager's Secrets with the `output-aws-secrets-manager` action.
+Secrets are output as a JSON map via the `secrets` output, so they are only accessible to steps that explicitly reference the output.
 
 Target Group Configuration
 

@@ -404,15 +404,18 @@ describe("buildPolicies", () => {
   ): types.Config => ({
     draft_pr: false,
     label_prefixes: { skip: "skip:", tfmigrate: "tfmigrate:" },
-    module_file: "tfaction_module.yaml",
     plan_workflow_name: "plan",
-    renovate_login: "renovate[bot]",
+    auto_apps: {
+      logins: ["renovate[bot]", "dependabot[bot]"],
+      allow_auto_merge_change: false,
+    },
     skip_create_pr: false,
     target_groups: [],
     tflint: { enabled: true, fix: false },
     trivy: { enabled: true },
     terraform_command: "terraform",
     working_directory_file: "tfaction.yaml",
+    module_file: "tfaction_module.yaml",
     git_root_dir: "/repo",
     config_path: "/repo/tfaction-root.yaml",
     config_dir: "/repo",
@@ -424,9 +427,7 @@ describe("buildPolicies", () => {
     working_directory: "test-working-dir",
   });
 
-  const createEmptyWdConfig = (): types.TargetConfig => ({
-    accept_change_by_renovate: false,
-  });
+  const createEmptyWdConfig = (): types.TargetConfig => ({});
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -571,7 +572,6 @@ describe("buildPolicies", () => {
       },
     });
     const wdConfig: types.TargetConfig = {
-      accept_change_by_renovate: false,
       conftest: {
         disable_all: true,
       },
@@ -623,7 +623,6 @@ describe("buildPolicies", () => {
       },
     });
     const wdConfig: types.TargetConfig = {
-      accept_change_by_renovate: false,
       conftest: {
         policies: [{ id: "policy1", trace: true, policy: "policy/a" }],
       },
@@ -670,7 +669,6 @@ describe("buildPolicies", () => {
       },
     });
     const wdConfig: types.TargetConfig = {
-      accept_change_by_renovate: false,
       conftest: {
         policies: [{ tf: true, policy: "policy/new" }],
       },
@@ -727,7 +725,6 @@ describe("buildPolicies", () => {
       },
     };
     const wdConfig: types.TargetConfig = {
-      accept_change_by_renovate: false,
       conftest: {
         policies: [{ id: "policy1", quiet: false, policy: "policy/a" }],
       },

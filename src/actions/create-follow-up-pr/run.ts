@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import * as lib from "../../lib";
 import * as types from "../../lib/types";
-import * as aqua from "../../aqua";
 import * as commit from "../../commit";
 import { getTargetConfig, TargetConfig } from "../get-target-config";
+import { post } from "../../comment";
 
 export const PRData = z.object({
   body: z.string().nullable(),
@@ -229,6 +229,7 @@ ${prData.body}
 };
 
 export const createFailedPrsFile = (
+  /** Absolute path or relative path from github.workspace */
   workingDir: string,
   prNumber: string,
   githubServerUrl: string,
@@ -258,7 +259,8 @@ export const createFailedPrsFile = (
 };
 
 export interface SkipCreateCommentParams {
-  githubToken: string;
+  octokit: Octokit;
+  prNumberInt: number;
   repository: string;
   branch: string;
   prTitle: string;
@@ -268,15 +270,14 @@ export interface SkipCreateCommentParams {
   groupLabel: string;
   target: string;
   mentions: string;
-  executor: aqua.Executor;
-  workingDir: string;
 }
 
 export const postSkipCreateComment = async (
   params: SkipCreateCommentParams,
 ): Promise<void> => {
   const {
-    githubToken,
+    octokit,
+    prNumberInt,
     repository,
     branch,
     prTitle,
@@ -286,7 +287,6 @@ export const postSkipCreateComment = async (
     groupLabel,
     target,
     mentions,
-    workingDir,
   } = params;
 
   const createOpts: string[] = [
@@ -310,39 +310,27 @@ export const postSkipCreateComment = async (
 
   const optsString = createOpts.join(" ");
 
-  const executor = params.executor;
-
-  await executor.exec(
-    "github-comment",
-    [
-      "post",
-      "-k",
-      "skip-create-follow-up-pr",
-      "-var",
-      `tfaction_target:${target}`,
-      "-var",
-      `mentions:${mentions}`,
-      "-var",
-      `opts:${optsString}`,
-    ],
-    {
-      cwd: workingDir,
-      env: {
-        GITHUB_TOKEN: githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-      },
+  await post({
+    octokit,
+    prNumber: prNumberInt,
+    templateKey: "skip-create-follow-up-pr",
+    vars: {
+      tfaction_target: target,
+      mentions: mentions,
+      opts: optsString,
     },
-  );
+  });
   core.info("Posted skip-create-follow-up-pr comment");
 };
 
 export interface RunInput {
   githubToken: string;
-  securefixAppId: string;
-  securefixAppPrivateKey: string;
+  csmAppId: string;
+  csmAppPrivateKey: string;
   actor: string;
   prAuthor: string;
   target: string;
+  /** A relative path from git root directory to working directory */
   workingDir: string;
   isApply: boolean;
   prNumber: string;
@@ -355,8 +343,8 @@ export interface RunInput {
 export const run = async (input: RunInput): Promise<void> => {
   const {
     githubToken,
-    securefixAppId,
-    securefixAppPrivateKey,
+    csmAppId,
+    csmAppPrivateKey,
     actor,
     prAuthor,
     target: envTarget,
@@ -378,10 +366,9 @@ export const run = async (input: RunInput): Promise<void> => {
   const groupLabelEnabled = config.follow_up_pr?.group_label?.enabled ?? false;
   const groupLabelPrefix =
     config.follow_up_pr?.group_label?.prefix ?? "tfaction:follow-up-pr-group/";
-  const securefixServerRepository =
-    config.securefix_action?.server_repository ?? "";
-  const securefixPRBaseBranch =
-    config.securefix_action?.pull_request?.base_branch ?? "";
+  const csmActionsServerRepository =
+    config.csm_actions?.server_repository ?? "";
+  const csmPRBaseBranch = config.csm_actions?.pull_request?.base_branch ?? "";
 
   const jobType = lib.getJobType();
 
@@ -396,16 +383,12 @@ export const run = async (input: RunInput): Promise<void> => {
     config,
   );
 
+  /** Absolute path to working directory */
   const workingDir = path.join(
     config.git_root_dir,
     targetConfig.working_directory,
   );
   const target = targetConfig.target;
-
-  const executor = await aqua.NewExecutor({
-    githubToken,
-    cwd: workingDir,
-  });
 
   const { owner, repo } = github.context.repo;
 
@@ -433,10 +416,7 @@ export const run = async (input: RunInput): Promise<void> => {
   // Create failed-prs file
   const failedPrsFile = path.relative(
     config.git_root_dir,
-    path.join(
-      config.workspace,
-      createFailedPrsFile(workingDir, prNumber, githubServerUrl, repository),
-    ),
+    createFailedPrsFile(workingDir, prNumber, githubServerUrl, repository),
   );
 
   const labels: string[] = [];
@@ -453,16 +433,16 @@ export const run = async (input: RunInput): Promise<void> => {
     githubToken,
     rootDir: config.git_root_dir,
     files: new Set([failedPrsFile]),
-    serverRepository: securefixServerRepository,
-    appId: securefixAppId,
-    appPrivateKey: securefixAppPrivateKey,
+    serverRepository: csmActionsServerRepository,
+    appId: csmAppId,
+    appPrivateKey: csmAppPrivateKey,
     branch: prParams.branch,
     pr: skipCreatePr
       ? undefined
       : {
           title: prParams.prTitle,
           body: prParams.prBody,
-          base: securefixPRBaseBranch,
+          base: csmPRBaseBranch,
           labels: labels,
           assignees:
             prParams.assignees.length > 0 ? prParams.assignees : undefined,
@@ -473,35 +453,24 @@ export const run = async (input: RunInput): Promise<void> => {
 
   // Post comment to original PR (GitHub API only)
   if (followUpPrUrl) {
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-config",
-        lib.GitHubCommentConfig,
-        "-var",
-        `tfaction_target:${target}`,
-        "-var",
-        `mentions:${prParams.mentions}`,
-        "-var",
-        `follow_up_pr_url:${followUpPrUrl}`,
-        "-k",
-        "create-follow-up-pr",
-      ],
-      {
-        cwd: workingDir,
-        env: {
-          GITHUB_TOKEN: githubToken,
-        },
+    await post({
+      octokit,
+      prNumber: parseInt(prNumber, 10),
+      templateKey: "create-follow-up-pr",
+      vars: {
+        tfaction_target: target,
+        mentions: prParams.mentions,
+        follow_up_pr_url: followUpPrUrl,
       },
-    );
+    });
     core.info("Posted comment to the original PR");
   }
 
   // Post skip-create comment if skip_create_pr is true
   if (skipCreatePr) {
     await postSkipCreateComment({
-      githubToken,
+      octokit,
+      prNumberInt: parseInt(prNumber, 10),
       repository,
       branch: prParams.branch,
       prTitle: prParams.prTitle,
@@ -511,8 +480,6 @@ export const run = async (input: RunInput): Promise<void> => {
       groupLabel,
       target,
       mentions: prParams.mentions,
-      executor,
-      workingDir,
     });
   }
 };

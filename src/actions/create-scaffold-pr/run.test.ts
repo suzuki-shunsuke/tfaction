@@ -37,11 +37,38 @@ import * as commit from "../../commit";
 import * as getTargetConfig from "../get-target-config";
 
 import {
+  escapeForShellDoubleQuote,
   generateBranchName,
   writeSkipCreatePrSummary,
   run,
   type RunInput,
 } from "./run";
+
+describe("escapeForShellDoubleQuote", () => {
+  it("leaves normal strings unchanged", () => {
+    expect(escapeForShellDoubleQuote("hello world")).toBe("hello world");
+  });
+
+  it("escapes backslashes", () => {
+    expect(escapeForShellDoubleQuote("a\\b")).toBe("a\\\\b");
+  });
+
+  it("escapes double quotes", () => {
+    expect(escapeForShellDoubleQuote('say "hi"')).toBe('say \\"hi\\"');
+  });
+
+  it("escapes dollar signs", () => {
+    expect(escapeForShellDoubleQuote("$HOME")).toBe("\\$HOME");
+  });
+
+  it("escapes backticks", () => {
+    expect(escapeForShellDoubleQuote("`cmd`")).toBe("\\`cmd\\`");
+  });
+
+  it("escapes all special characters together", () => {
+    expect(escapeForShellDoubleQuote('a\\b"c$d`e')).toBe('a\\\\b\\"c\\$d\\`e');
+  });
+});
 
 describe("generateBranchName", () => {
   it("generates branch with scaffold-working-directory- prefix and timestamp format YYYYMMDDTHHMMSS", () => {
@@ -67,9 +94,9 @@ describe("writeSkipCreatePrSummary", () => {
     writeSkipCreatePrSummary(
       "owner/repo",
       "scaffold-working-directory-target-20240101T120000",
-      "my/target",
       false,
-      "https://github.com/owner/repo/actions/runs/123",
+      "Scaffold a working directory (my/target)",
+      "This pull request was created by GitHub Actions",
     );
 
     expect(core.summary.addRaw).toHaveBeenCalledWith(
@@ -79,51 +106,53 @@ describe("writeSkipCreatePrSummary", () => {
   });
 
   it("includes -d flag when draftPr is true", () => {
-    writeSkipCreatePrSummary(
-      "owner/repo",
-      "branch",
-      "my/target",
-      true,
-      "https://github.com/owner/repo/actions/runs/123",
-    );
+    writeSkipCreatePrSummary("owner/repo", "branch", true, "title", "body");
 
     const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
     expect(summaryArg).toContain("-d ");
   });
 
   it("omits -d flag when draftPr is false", () => {
-    writeSkipCreatePrSummary(
-      "owner/repo",
-      "branch",
-      "my/target",
-      false,
-      "https://github.com/owner/repo/actions/runs/123",
-    );
+    writeSkipCreatePrSummary("owner/repo", "branch", false, "title", "body");
 
     const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
     expect(summaryArg).not.toContain("-d ");
   });
 
-  it("includes the runURL in the summary", () => {
-    const runURL = "https://github.com/owner/repo/actions/runs/456";
+  it("includes prTitle and prBody in the summary", () => {
     writeSkipCreatePrSummary(
       "owner/repo",
       "branch",
-      "my/target",
       false,
-      runURL,
+      "My PR Title",
+      "My PR Body",
     );
 
     const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
-    expect(summaryArg).toContain(runURL);
+    expect(summaryArg).toContain("My PR Title");
+    expect(summaryArg).toContain("My PR Body");
+  });
+
+  it("escapes special characters in prTitle and prBody", () => {
+    writeSkipCreatePrSummary(
+      "owner/repo",
+      "branch",
+      false,
+      'Title with "quotes" and $var',
+      "Body with `backticks` and \\backslash",
+    );
+
+    const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
+    expect(summaryArg).toContain('Title with \\"quotes\\" and \\$var');
+    expect(summaryArg).toContain("Body with \\`backticks\\` and \\\\backslash");
   });
 });
 
 describe("run", () => {
   const defaultRunInput: RunInput = {
     githubToken: "test-token",
-    securefixAppId: "",
-    securefixAppPrivateKey: "",
+    csmAppId: "",
+    csmAppPrivateKey: "",
     target: "my/target",
     workingDir: "my/working-dir",
     actor: "user1",
@@ -137,7 +166,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       skip_create_pr: false,
       draft_pr: false,
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
     vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
       working_directory: "my/working-dir",
@@ -183,7 +212,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       skip_create_pr: true,
       draft_pr: false,
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
 
     await run(defaultRunInput);
@@ -199,14 +228,14 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       skip_create_pr: true,
       draft_pr: false,
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
 
     await run(defaultRunInput);
 
-    expect(core.summary.addRaw).toHaveBeenCalledWith(
-      expect.stringContaining("gh pr create"),
-    );
+    const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
+    expect(summaryArg).toContain("gh pr create");
+    expect(summaryArg).toContain("Scaffold a working directory (my/target)");
     expect(core.summary.write).toHaveBeenCalled();
   });
 
@@ -214,7 +243,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       skip_create_pr: false,
       draft_pr: false,
-      securefix_action: {},
+      csm_actions: {},
       scaffold_working_directory: {
         pull_request: {
           title: "Scaffold {{target}}",
@@ -276,5 +305,92 @@ describe("run", () => {
         }),
       }),
     );
+  });
+
+  describe("type=module", () => {
+    beforeEach(() => {
+      vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
+        working_directory: "modules/vpc",
+        target: "modules/vpc",
+        type: "module",
+      } as unknown as Awaited<
+        ReturnType<typeof getTargetConfig.getTargetConfig>
+      >);
+    });
+
+    it("uses scaffold-working-directory- branch prefix", async () => {
+      await run(defaultRunInput);
+
+      expect(commit.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          branch: expect.stringContaining(
+            "scaffold-working-directory-modules__vpc-",
+          ),
+        }),
+      );
+    });
+
+    it("uses module commit message", async () => {
+      await run(defaultRunInput);
+
+      expect(commit.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          commitMessage: "chore(modules/vpc): scaffold a Terraform Module",
+        }),
+      );
+    });
+
+    it("uses default module PR title/body", async () => {
+      await run(defaultRunInput);
+
+      expect(commit.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pr: expect.objectContaining({
+            title: "Scaffold a Terraform Module (modules/vpc)",
+            body: expect.stringContaining("GitHub Actions"),
+          }),
+        }),
+      );
+    });
+
+    it("uses scaffold_module config templates", async () => {
+      vi.mocked(lib.getConfig).mockResolvedValue({
+        skip_create_pr: false,
+        draft_pr: false,
+        csm_actions: {},
+        scaffold_module: {
+          pull_request: {
+            title: "Module {{module_path}}",
+            body: "Module PR by {{actor}}",
+            comment: "Comment {{run_url}}",
+          },
+        },
+      } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
+
+      await run(defaultRunInput);
+
+      expect(commit.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pr: expect.objectContaining({
+            title: "Module modules/vpc",
+            body: "Module PR by user1",
+            comment: expect.stringContaining(defaultRunInput.runURL),
+          }),
+        }),
+      );
+    });
+
+    it("uses module summary when skip_create_pr=true", async () => {
+      vi.mocked(lib.getConfig).mockResolvedValue({
+        skip_create_pr: true,
+        draft_pr: false,
+        csm_actions: {},
+      } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
+
+      await run(defaultRunInput);
+
+      const summaryArg = vi.mocked(core.summary.addRaw).mock.calls[0][0];
+      expect(summaryArg).toContain("Scaffold a Terraform Module");
+    });
   });
 });

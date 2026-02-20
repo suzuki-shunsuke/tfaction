@@ -1,6 +1,5 @@
 import { run } from "./index";
 import { expect, test } from "vitest";
-import * as aqua from "../../../aqua";
 
 test("normal", async () => {
   expect(
@@ -23,20 +22,19 @@ test("normal", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -73,14 +71,12 @@ test("job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "dev",
@@ -92,6 +88,7 @@ test("job config", async () => {
             secret_name: "GH_TOKEN",
           },
         ],
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -133,7 +130,6 @@ const prCommentConfig = {
 };
 
 const prCommentExpected = {
-  modules: [],
   targetConfigs: [
     {
       environment: "dev",
@@ -145,6 +141,7 @@ const prCommentExpected = {
           secret_name: "GH_TOKEN",
         },
       ],
+      skip_terraform: false,
       target: "foo/dev",
       working_directory: "foo/dev",
     },
@@ -166,11 +163,10 @@ test("pr comment", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual(prCommentExpected);
 });
@@ -192,11 +188,10 @@ test("pr comment with updated body", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual(prCommentExpected);
 });
@@ -229,20 +224,19 @@ test("module callers", async () => {
         // dev calls bar and baz
         "foo/dev": ["foo/bar", "foo/baz"],
       },
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/bar",
         working_directory: "foo/bar",
       },
@@ -251,6 +245,7 @@ test("module callers", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/baz",
         working_directory: "foo/baz",
       },
@@ -259,6 +254,7 @@ test("module callers", async () => {
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -287,20 +283,19 @@ test("nest", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -329,20 +324,19 @@ test("tfmigrate label", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "tfmigrate",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -371,20 +365,19 @@ test("tfmigrate label with changed files", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "tfmigrate",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -392,7 +385,7 @@ test("tfmigrate label with changed files", async () => {
   });
 });
 
-test("module change detection", async () => {
+test("module change detection without callers produces no targets", async () => {
   expect(
     await run({
       config: {
@@ -413,14 +406,11 @@ test("module change detection", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [],
   });
 });
@@ -448,20 +438,18 @@ test("module callers triggered", async () => {
       moduleCallers: {
         "modules/vpc": ["foo/dev"],
       },
-      moduleFiles: ["modules/vpc/tfaction_module.yaml"],
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc"],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -498,20 +486,19 @@ test("replace_target", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "app/dev",
         working_directory: "services/app/dev",
       },
@@ -544,20 +531,19 @@ test("custom label prefixes for tfmigrate", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "tfmigrate",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -565,8 +551,7 @@ test("custom label prefixes for tfmigrate", async () => {
   });
 });
 
-test("skip label parses correctly", async () => {
-  // Note: skip labels are parsed but don't filter targets in current implementation
+test("skip label sets skip_terraform", async () => {
   expect(
     await run({
       config: {
@@ -578,7 +563,7 @@ test("skip label parses correctly", async () => {
       },
       isApply: false,
       labels: ["skip:foo/dev", "other-label"],
-      changedFiles: ["foo/bar/main.tf"],
+      changedFiles: ["foo/dev/main.tf", "foo/bar/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml"],
       prBody: "",
       payload: {
@@ -587,20 +572,28 @@ test("skip label parses correctly", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
         target: "foo/bar",
         working_directory: "foo/bar",
       },
@@ -624,7 +617,7 @@ test("custom skip label prefix", async () => {
       },
       isApply: false,
       labels: ["ignore:foo/dev"],
-      changedFiles: ["foo/bar/main.tf"],
+      changedFiles: ["foo/dev/main.tf", "foo/bar/main.tf"],
       configFiles: ["foo/dev/tfaction.yaml", "foo/bar/tfaction.yaml"],
       prBody: "",
       payload: {
@@ -633,20 +626,28 @@ test("custom skip label prefix", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
         target: "foo/bar",
         working_directory: "foo/bar",
       },
@@ -675,11 +676,10 @@ test("tfmigrate label with unknown target throws error", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).rejects.toThrow(
     "No working directory is found for the target unknown/target",
@@ -707,14 +707,12 @@ test("empty labels and changed files", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [],
   });
 });
@@ -740,20 +738,19 @@ test("duplicate tfmigrate labels", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "tfmigrate",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -782,20 +779,19 @@ test("isApply mode", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -835,14 +831,12 @@ test("tfmigrate with job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "tfmigrate-env",
@@ -854,6 +848,7 @@ test("tfmigrate with job config", async () => {
             secret_name: "TFMIGRATE_SECRET",
           },
         ],
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -887,20 +882,19 @@ test("tfmigrate apply with job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "production",
         job_type: "tfmigrate",
         runs_on: "self-hosted",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -931,23 +925,18 @@ test("module caller is also a module", async () => {
       moduleCallers: {
         "modules/base": ["modules/vpc", "terraform/dev"],
       },
-      moduleFiles: [
-        "modules/base/tfaction_module.yaml",
-        "modules/vpc/tfaction_module.yaml",
-      ],
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc", "modules/base"],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "terraform/dev",
         working_directory: "terraform/dev",
       },
@@ -981,20 +970,19 @@ test("multiple target groups", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "aws/dev",
         working_directory: "aws/dev",
       },
@@ -1003,6 +991,7 @@ test("multiple target groups", async () => {
         job_type: "terraform",
         runs_on: "macos-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "gcp/prod",
         working_directory: "gcp/prod",
       },
@@ -1042,14 +1031,12 @@ test("terraform plan job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "plan-env",
@@ -1061,6 +1048,7 @@ test("terraform plan job config", async () => {
             secret_name: "PLAN_SECRET",
           },
         ],
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -1094,20 +1082,19 @@ test("terraform apply job config", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: "production",
         job_type: "terraform",
         runs_on: "production-runner",
         secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },
@@ -1115,7 +1102,7 @@ test("terraform apply job config", async () => {
   });
 });
 
-test("multiple modules changed", async () => {
+test("multiple modules changed without callers produces no targets", async () => {
   expect(
     await run({
       config: {
@@ -1136,17 +1123,11 @@ test("multiple modules changed", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [
-        "modules/vpc/tfaction_module.yaml",
-        "modules/iam/tfaction_module.yaml",
-      ],
-      githubToken: "xxx",
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: ["modules/vpc", "modules/iam"],
     targetConfigs: [],
   });
 });
@@ -1173,20 +1154,19 @@ test("template_dir config files are excluded", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "aws/dev",
         working_directory: "aws/dev",
       },
@@ -1216,20 +1196,19 @@ test("template_dir with trailing slash", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: "ubuntu-latest",
         secrets: undefined,
+        skip_terraform: false,
         target: "aws/dev",
         working_directory: "aws/dev",
       },
@@ -1259,20 +1238,625 @@ test("runs_on as array", async () => {
         },
       },
       moduleCallers: {},
-      moduleFiles: [],
-      githubToken: "xxx",
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
       maxChangedWorkingDirectories: 0,
-      maxChangedModules: 0,
-      executor: await aqua.NewExecutor({}),
     }),
   ).toStrictEqual({
-    modules: [],
     targetConfigs: [
       {
         environment: undefined,
         job_type: "terraform",
         runs_on: ["self-hosted", "linux", "x64"],
         secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+// skip_terraform_files tests
+
+test("skip_terraform_files: all files match patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl", "*.md"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/.terraform.lock.hcl", "foo/dev/README.md"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: some files don't match", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/.terraform.lock.hcl", "foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: not configured", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/.terraform.lock.hcl"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: module files don't match patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {
+        "modules/vpc": ["foo/dev"],
+      },
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: module files all match patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/.terraform.lock.hcl"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {
+        "modules/vpc": ["foo/dev"],
+      },
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("skip_terraform_files: multiple patterns", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        skip_terraform_files: ["*.lock.hcl", "*.md", "*.txt"],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [
+        "foo/dev/.terraform.lock.hcl",
+        "foo/dev/README.md",
+        "foo/dev/notes.txt",
+      ],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: true,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("module detected via moduleWorkingDirs gets type: module", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "modules/**",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["modules/vpc/main.tf"],
+      configFiles: ["modules/vpc/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+
+      moduleWorkingDirs: new Set(["modules/vpc"]),
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "modules/vpc",
+        working_directory: "modules/vpc",
+        type: "module",
+      },
+    ],
+  });
+});
+
+test("mixed modules and regular working dirs", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+          {
+            working_directory: "modules/**",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf", "modules/vpc/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml", "modules/vpc/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+
+      moduleWorkingDirs: new Set(["modules/vpc"]),
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "modules/vpc",
+        working_directory: "modules/vpc",
+        type: "module",
+      },
+    ],
+  });
+});
+
+test("isApply filters out module type from targetConfigs", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+          {
+            working_directory: "modules/**",
+          },
+        ],
+      },
+      isApply: true,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf", "modules/vpc/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml", "modules/vpc/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+
+      moduleWorkingDirs: new Set(["modules/vpc"]),
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("module working dir with no changes produces no output", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "modules/**",
+          },
+        ],
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["modules/vpc/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+
+      moduleWorkingDirs: new Set(["modules/vpc"]),
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+    }),
+  ).toStrictEqual({
+    targetConfigs: [],
+  });
+});
+
+// test_workflow tests
+
+test("test_workflow: changed_files match and no working dirs changed adds test targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          working_directories: ["foo/dev"],
+          changed_files: [".github/workflows/*.yaml"],
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: [".github/workflows/plan.yaml"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("test_workflow: changed_files match but working dirs also changed returns normal targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          working_directories: ["foo/dev"],
+          changed_files: [".github/workflows/*.yaml"],
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: ["foo/dev/main.tf"],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: [".github/workflows/plan.yaml", "foo/dev/main.tf"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/dev",
+        working_directory: "foo/dev",
+      },
+    ],
+  });
+});
+
+test("test_workflow: changed_files don't match and no working dirs changed returns no targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          working_directories: ["foo/dev"],
+          changed_files: [".github/workflows/*.yaml"],
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: ["README.md"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [],
+  });
+});
+
+test("test_workflow: apply mode includes test targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          working_directories: ["foo/dev"],
+          changed_files: [".github/workflows/*.yaml"],
+        },
+      },
+      isApply: true,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: [".github/workflows/plan.yaml"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
         target: "foo/dev",
         working_directory: "foo/dev",
       },

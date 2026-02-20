@@ -86,8 +86,8 @@ const defaultRunInput: RunInput = {
   githubToken: "test-token",
   migrationName: "main",
   prNumber: "",
-  securefixAppId: "",
-  securefixAppPrivateKey: "",
+  csmAppId: "",
+  csmAppPrivateKey: "",
   target: "aws/dev",
   workingDir: "aws/dev",
   actor: "user1",
@@ -394,7 +394,7 @@ describe("run", () => {
       skip_create_pr: false,
       draft_pr: false,
       label_prefixes: { tfmigrate: "tfmigrate:" },
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
     vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
       working_directory: "aws/dev",
@@ -486,7 +486,7 @@ describe("run", () => {
       skip_create_pr: true,
       draft_pr: false,
       label_prefixes: { tfmigrate: "tfmigrate:" },
-      securefix_action: {},
+      csm_actions: {},
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
 
     await run(defaultRunInput);
@@ -511,7 +511,7 @@ describe("run", () => {
       skip_create_pr: false,
       draft_pr: false,
       label_prefixes: { tfmigrate: "tfmigrate:" },
-      securefix_action: {},
+      csm_actions: {},
       scaffold_tfmigrate: {
         pull_request: {
           title: "Scaffold {{target}}",

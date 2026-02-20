@@ -8,7 +8,6 @@ import * as aqua from "../../../../aqua";
  * List module callers in the git repository.
  * @param gitRootDir - Absolute path to the git root directory
  * @param configFiles - Relative file paths from git_root_dir to config files
- * @param moduleFiles - Relative file paths from git_root_dir to module files
  * @param executor
  * @returns Relative path to module from git_root_dir => Relative paths from git_root_dir to module callers
  */
@@ -16,14 +15,9 @@ export const list = async (
   gitRootDir: string,
   /** relative file paths from git_root_dir */
   configFiles: string[],
-  /** relative file paths from git_root_dir */
-  moduleFiles: string[],
   executor: aqua.Executor,
 ): Promise<ModuleToCallers> => {
   const rawModuleCalls: ModuleCalls = {};
-
-  /** Relative paths from git root dir to working directories and modules */
-  const allTerraformFiles = Array.from([...configFiles, ...moduleFiles]);
 
   for (const tfFile of configFiles) {
     /** A relative path from git_root_dir to module caller */
@@ -93,7 +87,7 @@ export const list = async (
     }
   }
 
-  for (const tfFile of allTerraformFiles) {
+  for (const tfFile of configFiles) {
     if (tfFile == "") {
       continue;
     }

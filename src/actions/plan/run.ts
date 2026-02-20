@@ -9,12 +9,13 @@ import * as lib from "../../lib";
 import * as env from "../../lib/env";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../../conftest";
+import { post } from "../../comment";
 
 type Inputs = {
   githubToken: string;
   githubTokenForGitHubProvider?: string;
   workingDirectory: string;
-  renovateLogin: string;
+  autoAppsLogins: string[];
   destroy: boolean;
   tfCommand: string;
   target: string;
@@ -23,7 +24,9 @@ type Inputs = {
   ciInfoTempDir?: string;
   s3BucketNameTfmigrateHistory?: string;
   gcsBucketNameTfmigrateHistory?: string;
-  acceptChangeByRenovate: boolean;
+  allowAutoMergeChange: boolean;
+  dismissApprovalBeforePlan: boolean;
+  prNumber?: number;
   executor: aqua.Executor;
   secrets?: Record<string, string>;
 };
@@ -35,6 +38,7 @@ export type RunInputs = {
   driftIssueNumber?: string;
   prAuthor?: string;
   ciInfoTempDir?: string;
+  prNumber?: number;
   secrets?: Record<string, string>;
 };
 
@@ -55,12 +59,12 @@ export const disableAutoMergeForRenovateChange = async (
   inputs: Inputs,
 ): Promise<void> => {
   // Skip if not a renovate PR
-  if (inputs.prAuthor !== inputs.renovateLogin) {
+  if (!inputs.prAuthor || !inputs.autoAppsLogins.includes(inputs.prAuthor)) {
     return;
   }
 
   // Skip if changes are expected for this target
-  if (inputs.acceptChangeByRenovate) {
+  if (inputs.allowAutoMergeChange) {
     return;
   }
 
@@ -91,24 +95,100 @@ export const disableAutoMergeForRenovateChange = async (
     },
   );
 
-  const executor = inputs.executor;
-
-  await executor.exec(
-    "github-comment",
-    [
-      "post",
-      "-var",
-      `tfaction_target:${inputs.target}`,
-      "-k",
-      "renovate-plan-change",
-    ],
-    {
-      env: {
-        GITHUB_TOKEN: inputs.githubToken,
-        GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-      },
+  await post({
+    octokit: octokit,
+    prNumber: inputs.prNumber ?? 0,
+    templateKey: "renovate-plan-change",
+    vars: {
+      tfaction_target: inputs.target,
     },
-  );
+  });
+};
+
+export const dismissApprovalReviews = async (
+  githubToken: string,
+  prNumber: number,
+): Promise<void> => {
+  try {
+    const octokit = github.getOctokit(githubToken);
+    const { owner, repo } = github.context.repo;
+
+    const query = `query($owner: String!, $repo: String!, $pr: Int!, $cursor: String) {
+      repository(owner: $owner, name: $repo) {
+        pullRequest(number: $pr) {
+          reviews(first: 100, states: [APPROVED], after: $cursor) {
+            nodes {
+              id
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      }
+    }`;
+
+    const reviewIds: string[] = [];
+    let cursor: string | null = null;
+
+    while (true) {
+      const result: {
+        repository: {
+          pullRequest: {
+            reviews: {
+              nodes: Array<{ id: string }>;
+              pageInfo: {
+                hasNextPage: boolean;
+                endCursor: string;
+              };
+            };
+          };
+        };
+      } = await octokit.graphql(query, {
+        owner,
+        repo,
+        pr: prNumber,
+        cursor,
+      });
+
+      for (const node of result.repository.pullRequest.reviews.nodes) {
+        reviewIds.push(node.id);
+      }
+
+      if (!result.repository.pullRequest.reviews.pageInfo.hasNextPage) {
+        break;
+      }
+      cursor = result.repository.pullRequest.reviews.pageInfo.endCursor;
+    }
+
+    for (const reviewId of reviewIds) {
+      try {
+        await octokit.graphql(
+          `mutation($reviewId: ID!, $message: String!) {
+            dismissPullRequestReview(input: {pullRequestReviewId: $reviewId, message: $message}) {
+              pullRequestReview {
+                id
+              }
+            }
+          }`,
+          {
+            reviewId,
+            message:
+              "Dismissing approval because terraform plan has been re-run. Please review the new plan output before approving again.",
+          },
+        );
+      } catch (e) {
+        core.warning(
+          `Failed to dismiss review ${reviewId}: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
+    }
+  } catch (e) {
+    core.warning(
+      `Failed to list reviews: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
 };
 
 const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
@@ -122,8 +202,6 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   const installDir = path.join(lib.GitHubActionPath, "install");
   let templatePath = "";
   let content = "";
-
-  const executor = inputs.executor;
 
   // Generate from S3 template
   if (inputs.s3BucketNameTfmigrateHistory) {
@@ -146,22 +224,15 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
     );
   } else {
     // Error: neither S3 nor GCS bucket is configured
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-var",
-        `tfaction_target:${inputs.target}`,
-        "-k",
-        "tfmigrate-hcl-not-found",
-      ],
-      {
-        env: {
-          GITHUB_TOKEN: inputs.githubToken,
-          GH_COMMENT_CONFIG: lib.GitHubCommentConfig,
-        },
+    const octokit = github.getOctokit(inputs.githubToken);
+    await post({
+      octokit,
+      prNumber: inputs.prNumber ?? 0,
+      templateKey: "tfmigrate-hcl-not-found",
+      vars: {
+        tfaction_target: inputs.target,
       },
-    );
+    });
     throw new Error(
       ".tfmigrate.hcl is required but neither S3 nor GCS bucket is configured",
     );
@@ -304,6 +375,22 @@ export const runTerraformPlan = async (
     throw new Error("terraform plan failed");
   }
 
+  // Dismiss existing approval reviews so reviewers must review the new plan
+  // Skip for Renovate PRs with no changes (detailedExitcode === 0)
+  if (inputs.dismissApprovalBeforePlan && inputs.prNumber) {
+    if (
+      detailedExitcode === 0 &&
+      inputs.prAuthor !== undefined &&
+      inputs.autoAppsLogins.includes(inputs.prAuthor)
+    ) {
+      core.info(
+        "Skipping dismiss approval reviews: Renovate PR with no changes",
+      );
+    } else {
+      await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
+    }
+  }
+
   // Run terraform show to convert plan to JSON
   const showResult = await executor.getExecOutput(
     inputs.tfCommand,
@@ -363,6 +450,13 @@ export const main = async (
   targetConfig: getTargetConfig.TargetConfig,
   runInputs: RunInputs,
 ): Promise<void> => {
+  if (targetConfig.type === "module") {
+    core.info(
+      `Skipping plan for module target: ${targetConfig.target ?? targetConfig.working_directory}`,
+    );
+    return;
+  }
+
   const config = await lib.getConfig();
   const workingDir = path.join(
     config.git_root_dir,
@@ -378,9 +472,9 @@ export const main = async (
     githubToken: runInputs.githubToken,
     githubTokenForGitHubProvider: runInputs.githubTokenForGitHubProvider,
     workingDirectory: workingDir,
-    renovateLogin: config.renovate_login || "",
+    autoAppsLogins: config.auto_apps.logins,
     destroy: targetConfig.destroy || false,
-    tfCommand: targetConfig.terraform_command || "terraform",
+    tfCommand: targetConfig.terraform_command,
     target: targetConfig.target,
     driftIssueNumber: runInputs.driftIssueNumber,
     prAuthor: runInputs.prAuthor,
@@ -388,7 +482,10 @@ export const main = async (
     s3BucketNameTfmigrateHistory: targetConfig.s3_bucket_name_tfmigrate_history,
     gcsBucketNameTfmigrateHistory:
       targetConfig.gcs_bucket_name_tfmigrate_history,
-    acceptChangeByRenovate: targetConfig.accept_change_by_renovate || false,
+    allowAutoMergeChange: config.auto_apps.allow_auto_merge_change,
+    dismissApprovalBeforePlan:
+      config.dismiss_approval_before_plan?.enabled !== false,
+    prNumber: runInputs.prNumber,
     executor,
     secrets: runInputs.secrets,
   };

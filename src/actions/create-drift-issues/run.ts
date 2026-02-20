@@ -143,6 +143,7 @@ export type GetTargetGroupFn = (
   config: {
     config_path: string;
     working_directory_file: string;
+    module_file: string;
     target_groups: types.TargetGroup[];
     replace_target?: types.Replace | undefined;
   },
@@ -172,7 +173,7 @@ export const run = async (
   input: RunInput,
   ghToken: string,
   deps: RunDependencies = defaultDependencies,
-): Promise<Result | undefined> => {
+): Promise<void> => {
   const { octokit, graphqlOctokit, repoOwner, repoName, config, logger } =
     input;
 
@@ -234,11 +235,9 @@ export const run = async (
     if (targetWDMap.has(target)) {
       continue;
     }
-    logger.info(`Archiving an issue for ${target}`);
+    logger.info(`Archiving an issue for ${target}: ${issue.url}`);
     await archiveIssue(octokit, repoOwner, repoName, issue.title, issue.number);
   }
-
-  return undefined;
 };
 
 export const createGraphQLOctokit = (ghToken: string): GraphQLPaginator => {

@@ -89,8 +89,8 @@ vi.mock("../../lib/env", () => ({
 
 vi.mock("../../lib/input", () => ({
   githubToken: "mock-github-token",
-  securefixActionAppId: "mock-app-id",
-  securefixActionAppPrivateKey: "mock-private-key",
+  csmAppId: "mock-app-id",
+  csmAppPrivateKey: "mock-private-key",
 }));
 
 vi.mock("../../aqua", () => ({
@@ -115,6 +115,10 @@ vi.mock("./run", () => ({
   listRelatedPullRequests: vi.fn(),
   updateBranchByCommit: vi.fn(),
   updateBranchBySecurefix: vi.fn(),
+}));
+
+vi.mock("../../comment", () => ({
+  post: vi.fn(),
 }));
 
 // Helper to create a mock executor
@@ -144,6 +148,7 @@ const createMockConfig = (overrides: Record<string, unknown> = {}) => ({
   update_related_pull_requests: { enabled: true },
   target_groups: [],
   working_directory_file: "tfaction.yaml",
+  module_file: "tfaction_module.yaml",
   tflint: { enabled: false, fix: false },
   trivy: { enabled: false },
   terraform_command: "terraform",
@@ -152,8 +157,10 @@ const createMockConfig = (overrides: Record<string, unknown> = {}) => ({
   workspace: "/git/root",
   draft_pr: false,
   label_prefixes: { skip: "skip:", tfmigrate: "tfmigrate:" },
-  module_file: "tfaction_module.yaml",
-  renovate_login: "renovate[bot]",
+  auto_apps: {
+    logins: ["renovate[bot]", "dependabot[bot]"],
+    allow_auto_merge_change: false,
+  },
   skip_create_pr: false,
   ...overrides,
 });
@@ -468,26 +475,12 @@ describe("main", () => {
     );
   });
 
-  it('defaults to "terraform" when terraform_command is empty', async () => {
-    const { mockExecutor } = await setupMainMocks({
-      targetConfig: { terraform_command: "" },
-    });
-
-    await main();
-
-    expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "tfcmt",
-      expect.arrayContaining(["terraform", "apply"]),
-      expect.any(Object),
-    );
-  });
-
   it('throws "No workflow run is found" when listWorkflowRuns returns empty array', async () => {
     const { mockExecutor } = await setupMainMocks({
       workflowRuns: [],
     });
 
-    // github-comment post should be called, then it throws
+    // comment is posted via native post(), then it throws
     mockExecutor.exec.mockResolvedValue(0);
 
     await expect(main()).rejects.toThrow("No workflow run is found");
@@ -595,7 +588,7 @@ describe("main", () => {
     expect(run.listRelatedPullRequests).not.toHaveBeenCalled();
   });
 
-  it("uses securefix when securefix_action.server_repository is configured", async () => {
+  it("uses securefix when csm_actions.server_repository is configured", async () => {
     const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
     const mockToken = { token: "sf-token", expiresAt: "2099-01-01T00:00:00Z" };
     vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
@@ -603,7 +596,7 @@ describe("main", () => {
 
     await setupMainMocks({
       config: {
-        securefix_action: {
+        csm_actions: {
           server_repository: "securefix-server",
           pull_request: { base_branch: "main" },
         },

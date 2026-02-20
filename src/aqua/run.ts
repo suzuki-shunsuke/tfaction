@@ -9,6 +9,7 @@ export type Comment = {
   key?:
     | "conftest"
     | "terraform-validate"
+    | "terraform-docs"
     | "tfmigrate-plan"
     | "tfmigrate-apply"
     | "drift-apply";
@@ -62,46 +63,10 @@ export const getInstallPath = (
   return join(base, "bin", "aqua");
 };
 
-export type ExecOptionsForArgs = {
-  comment?: Comment;
-};
-
-export const buildArgs = (
-  command: string,
-  args?: string[],
-  options?: ExecOptionsForArgs,
-): Args => {
-  if (!options?.comment) {
-    return {
-      command,
-      args,
-    };
-  }
-  const newArgs = ["exec"];
-  if (options.comment.org) {
-    newArgs.push("-org", options.comment.org);
-  }
-  if (options.comment.repo) {
-    newArgs.push("-repo", options.comment.repo);
-  }
-  if (options.comment.pr) {
-    newArgs.push("-pr", options.comment.pr);
-  }
-  if (options.comment.vars) {
-    for (const key of _varKeys) {
-      if (options.comment.vars[key]) {
-        newArgs.push("-var", `${key}:${options.comment.vars[key]}`);
-      }
-    }
-  }
-  if (options.comment.key) {
-    newArgs.push("-k", options.comment.key);
-  }
-  newArgs.push("--", command);
-  newArgs.push(...(args ?? []));
+export const buildArgs = (command: string, args?: string[]): Args => {
   return {
-    command: "github-comment",
-    args: newArgs,
+    command,
+    args,
   };
 };
 
@@ -109,7 +74,6 @@ export type EnvDeps = {
   processEnv: Record<string, string | undefined>;
   path: string;
   aquaGlobalConfig: string;
-  gitHubCommentConfig: string;
 };
 
 export type ExecOptionsForEnv = {
@@ -133,11 +97,6 @@ export const buildEnv = (
   if (githubToken) {
     dynamicEnv.AQUA_GITHUB_TOKEN = githubToken;
   }
-  if (options?.comment) {
-    dynamicEnv.GITHUB_ACCESS_TOKEN = options.comment.token;
-    dynamicEnv.GH_COMMENT_CONFIG = deps.gitHubCommentConfig;
-  }
-
   return {
     ...deps.processEnv,
     ...options?.secretEnvs,

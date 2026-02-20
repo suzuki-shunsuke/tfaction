@@ -27,7 +27,7 @@ export const main = async () => {
     throw new Error("repo_owner and repo_name are required");
   }
 
-  const result = await run(
+  await run(
     {
       octokit: github.getOctokit(ghToken),
       graphqlOctokit: createGraphQLOctokit(ghToken),
@@ -41,13 +41,4 @@ export const main = async () => {
     },
     ghToken,
   );
-
-  if (result === undefined) {
-    return;
-  }
-
-  core.exportVariable("TFACTION_DRIFT_ISSUE_NUMBER", result.number);
-  core.exportVariable("TFACTION_DRIFT_ISSUE_STATE", result.state);
-  core.info(result.url);
-  core.summary.addRaw(`Drift Issue: ${result.url}`, true);
 };

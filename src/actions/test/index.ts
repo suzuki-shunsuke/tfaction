@@ -10,8 +10,8 @@ import { run } from "./run";
 export const main = async () => {
   const config = await lib.getConfig();
   const githubToken = input.githubToken;
-  const securefixAppId = input.securefixActionAppId;
-  const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
+  const csmAppId = input.csmAppId;
+  const csmAppPrivateKey = input.csmAppPrivateKey;
 
   const targetConfig = await getTargetConfig(
     {
@@ -37,8 +37,8 @@ export const main = async () => {
     config,
     targetConfig,
     githubToken,
-    securefixAppId,
-    securefixAppPrivateKey,
+    csmAppId,
+    csmAppPrivateKey,
     executor,
   });
 };

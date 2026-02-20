@@ -42,8 +42,7 @@ export const main = async (
   const disableUpdateRelatedPullRequests = !(
     cfg.update_related_pull_requests?.enabled ?? true
   );
-  const securefixServerRepository =
-    cfg.securefix_action?.server_repository ?? "";
+  const csmActionsServerRepository = cfg.csm_actions?.server_repository ?? "";
 
   // Create a temporary file for apply output
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
@@ -55,7 +54,7 @@ export const main = async (
     cwd: workingDir,
   });
 
-  // Run tfmigrate apply with github-comment
+  // Run tfmigrate apply with execAndComment (posts a comment on failure)
   let exitCode = 0;
   try {
     await executor
@@ -140,10 +139,10 @@ export const main = async (
       githubToken,
       targetConfig.target,
     );
-    if (securefixServerRepository) {
+    if (csmActionsServerRepository) {
       await updateBranchBySecurefix(
         github.context.repo.owner,
-        securefixServerRepository,
+        csmActionsServerRepository,
         prNumbers,
       );
     } else {

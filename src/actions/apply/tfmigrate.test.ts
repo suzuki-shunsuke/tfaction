@@ -111,6 +111,7 @@ const createMockConfig = (overrides: Record<string, unknown> = {}) => ({
   update_related_pull_requests: { enabled: true },
   target_groups: [],
   working_directory_file: "tfaction.yaml",
+  module_file: "tfaction_module.yaml",
   tflint: { enabled: false, fix: false },
   trivy: { enabled: false },
   terraform_command: "terraform",
@@ -119,8 +120,10 @@ const createMockConfig = (overrides: Record<string, unknown> = {}) => ({
   workspace: "/git/root",
   draft_pr: false,
   label_prefixes: { skip: "skip:", tfmigrate: "tfmigrate:" },
-  module_file: "tfaction_module.yaml",
-  renovate_login: "renovate[bot]",
+  auto_apps: {
+    logins: ["renovate[bot]", "dependabot[bot]"],
+    allow_auto_merge_change: false,
+  },
   skip_create_pr: false,
   ...overrides,
 });
@@ -308,10 +311,10 @@ describe("main", () => {
     expect(terraform.listRelatedPullRequests).not.toHaveBeenCalled();
   });
 
-  it("uses securefix when securefix_action.server_repository is configured", async () => {
+  it("uses securefix when csm_actions.server_repository is configured", async () => {
     await setupMainMocks({
       config: {
-        securefix_action: {
+        csm_actions: {
           server_repository: "securefix-server",
         },
       },

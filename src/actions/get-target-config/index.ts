@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as fs from "fs";
 import * as lib from "../../lib";
 import * as types from "../../lib/types";
 import * as env from "../../lib/env";
@@ -18,6 +19,7 @@ export type Result = {
 
 export interface TargetConfig {
   // Always set
+  /** Relative path from git root dir to working directory */
   working_directory: string;
   target: string;
   providers_lock_opts: string;
@@ -42,7 +44,9 @@ export interface TargetConfig {
   // Only for non-scaffold_working_dir job types
   destroy?: boolean;
   enable_terraform_docs?: boolean;
-  accept_change_by_renovate?: boolean;
+
+  // Module type (omitted for root modules, "module" for modules)
+  type?: "module";
 
   // Additional envs from config (dynamic)
   env?: Record<string, string>;
@@ -115,8 +119,19 @@ export const getTargetConfig = async (
       inputs.jobType,
     );
 
+    const moduleFilePath = path.join(
+      config.git_root_dir,
+      workingDir,
+      config.module_file,
+    );
+    const rootFilePath = path.join(
+      config.git_root_dir,
+      workingDir,
+      workingDirectoryFile,
+    );
+    const isModule = fs.existsSync(moduleFilePath);
     const wdConfig = lib.readTargetConfig(
-      path.join(config.git_root_dir, workingDir, workingDirectoryFile),
+      isModule ? moduleFilePath : rootFilePath,
     );
     const jobConfig = lib.getJobConfig(
       wdConfig,
@@ -210,7 +225,7 @@ export const getTargetConfig = async (
     }
 
     result.destroy = wdConfig.destroy ? true : false;
-    result.accept_change_by_renovate = wdConfig.accept_change_by_renovate;
+    result.type = isModule ? "module" : undefined;
     result.enable_terraform_docs =
       wdConfig?.terraform_docs?.enabled ??
       config?.terraform_docs?.enabled ??

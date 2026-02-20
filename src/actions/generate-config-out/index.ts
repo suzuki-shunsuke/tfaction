@@ -14,8 +14,8 @@ export const main = async () => {
   const githubToken = input.githubToken;
   const branch = input.branch;
   const file = input.file;
-  const securefixAppId = input.securefixActionAppId;
-  const securefixAppPrivateKey = input.securefixActionAppPrivateKey;
+  const csmAppId = input.csmAppId;
+  const csmAppPrivateKey = input.csmAppPrivateKey;
 
   if (!branch) {
     throw new Error("branch input is required");
@@ -27,7 +27,7 @@ export const main = async () => {
   // Get global config
   const config = await lib.getConfig();
 
-  const securefixServerRepository = config?.securefix_action?.server_repository;
+  const csmActionsServerRepository = config?.csm_actions?.server_repository;
 
   // Get target config
   const targetConfig = await getTargetConfig.getTargetConfig(
@@ -71,7 +71,7 @@ export const main = async () => {
       `target:${targetConfig.target}`,
       "plan",
       "--",
-      "terraform",
+      targetConfig.terraform_command,
       "plan",
       "-generate-config-out",
       tempFile,
@@ -117,9 +117,9 @@ export const main = async () => {
         path.join(config.workspace, targetFilePath),
       ),
     ]),
-    serverRepository: securefixServerRepository ?? "",
-    appId: securefixAppId,
-    appPrivateKey: securefixAppPrivateKey,
+    serverRepository: csmActionsServerRepository ?? "",
+    appId: csmAppId,
+    appPrivateKey: csmAppPrivateKey,
     branch,
   });
 };

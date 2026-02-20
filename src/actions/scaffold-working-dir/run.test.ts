@@ -28,6 +28,10 @@ vi.mock("../../lib/git", () => ({
   getModifiedFiles: vi.fn(),
 }));
 
+vi.mock("../../aqua", () => ({
+  NewExecutor: vi.fn(),
+}));
+
 vi.mock("../get-target-config", () => ({
   getTargetConfig: vi.fn(),
 }));
@@ -36,6 +40,7 @@ import * as core from "@actions/core";
 import * as fs from "fs";
 
 import * as lib from "../../lib";
+import * as aqua from "../../aqua";
 import * as git from "../../lib/git";
 import * as getTargetConfig from "../get-target-config";
 
@@ -188,6 +193,7 @@ describe("run", () => {
     vi.mocked(lib.getConfig).mockResolvedValue({
       git_root_dir: "/repo",
       working_directory_file: "tfaction.yaml",
+      module_file: "tfaction_module.yaml",
     } as unknown as Awaited<ReturnType<typeof lib.getConfig>>);
 
     vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
@@ -334,5 +340,130 @@ describe("run", () => {
       "working_directory",
       "/repo/aws/dev",
     );
+  });
+
+  describe("type=module", () => {
+    const moduleInput: RunInput = {
+      target: "modules/vpc",
+      workingDir: "modules/vpc",
+      githubToken: "test-token",
+      repository: "owner/repo",
+    };
+
+    beforeEach(() => {
+      vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
+        working_directory: "modules/vpc",
+        target: "modules/vpc",
+        type: "module",
+        template_dir: undefined,
+        s3_bucket_name_tfmigrate_history: undefined,
+        gcs_bucket_name_tfmigrate_history: undefined,
+        enable_terraform_docs: false,
+      } as unknown as Awaited<
+        ReturnType<typeof getTargetConfig.getTargetConfig>
+      >);
+    });
+
+    it("creates tfaction_module.yaml", async () => {
+      await run(moduleInput);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        "/repo/modules/vpc/tfaction_module.yaml",
+        "{}\n",
+      );
+      expect(core.info).toHaveBeenCalledWith("Created tfaction_module.yaml");
+    });
+
+    it("skips tfmigrate.hcl even when S3 bucket is configured", async () => {
+      vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
+        working_directory: "modules/vpc",
+        target: "modules/vpc",
+        type: "module",
+        template_dir: undefined,
+        s3_bucket_name_tfmigrate_history: "my-bucket",
+        gcs_bucket_name_tfmigrate_history: undefined,
+        enable_terraform_docs: false,
+      } as unknown as Awaited<
+        ReturnType<typeof getTargetConfig.getTargetConfig>
+      >);
+
+      await run(moduleInput);
+
+      expect(fs.copyFileSync).not.toHaveBeenCalled();
+    });
+
+    it("uses module-specific template vars", async () => {
+      vi.mocked(git.getModifiedFiles).mockResolvedValue(["main.tf"]);
+      vi.mocked(fs.statSync).mockReturnValue({
+        isFile: () => true,
+      } as fs.Stats);
+      vi.mocked(fs.readFileSync).mockReturnValue(
+        "module {{module_name}} ref={{ref}}",
+      );
+
+      await run(moduleInput);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        "/repo/modules/vpc/main.tf",
+        "module vpc ref=module_modules_vpc_v0.1.0",
+      );
+    });
+
+    it("runs terraform-docs when enable_terraform_docs is true", async () => {
+      vi.mocked(getTargetConfig.getTargetConfig).mockResolvedValue({
+        working_directory: "modules/vpc",
+        target: "modules/vpc",
+        type: "module",
+        template_dir: undefined,
+        s3_bucket_name_tfmigrate_history: undefined,
+        gcs_bucket_name_tfmigrate_history: undefined,
+        enable_terraform_docs: true,
+      } as unknown as Awaited<
+        ReturnType<typeof getTargetConfig.getTargetConfig>
+      >);
+
+      const mockExecutor = {
+        exec: vi
+          .fn()
+          .mockImplementation(
+            (
+              _cmd: string,
+              _args: string[],
+              opts: { listeners?: { stdout?: (data: Buffer) => void } },
+            ) => {
+              if (opts?.listeners?.stdout) {
+                opts.listeners.stdout(Buffer.from("# VPC Module\n"));
+              }
+              return Promise.resolve(0);
+            },
+          ),
+      };
+      vi.mocked(aqua.NewExecutor).mockResolvedValue(
+        mockExecutor as unknown as Awaited<ReturnType<typeof aqua.NewExecutor>>,
+      );
+
+      await run(moduleInput);
+
+      expect(mockExecutor.exec).toHaveBeenCalledWith(
+        "terraform-docs",
+        ["."],
+        expect.objectContaining({
+          cwd: "/repo/modules/vpc",
+        }),
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        "/repo/modules/vpc/README.md",
+        "# VPC Module\n",
+      );
+      expect(core.info).toHaveBeenCalledWith("Running terraform-docs");
+      expect(core.info).toHaveBeenCalledWith("Generated README.md");
+    });
+
+    it("skips terraform-docs when enable_terraform_docs is false", async () => {
+      await run(moduleInput);
+
+      expect(aqua.NewExecutor).not.toHaveBeenCalled();
+      expect(core.info).not.toHaveBeenCalledWith("Running terraform-docs");
+    });
   });
 });

@@ -30,7 +30,7 @@ export const create = async (inputs: Inputs): Promise<string> => {
   if (inputs.serverRepository) {
     if (!inputs.appId || !inputs.appPrivateKey) {
       throw new Error(
-        "app_id and app_private_key are required when securefix_action_server_repository is set",
+        "app_id and app_private_key are required when csm_actions_server_repository is set",
       );
     }
 

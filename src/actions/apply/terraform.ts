@@ -17,6 +17,7 @@ import {
   DownloadArtifactOptions,
 } from "@actions/artifact";
 import * as run from "./run";
+import { post } from "../../comment";
 
 type WorkflowRun = {
   headSha: string;
@@ -58,7 +59,7 @@ export const main = async (
     cfg.git_root_dir,
     targetConfig.working_directory,
   );
-  const tfCommand = targetConfig.terraform_command || "terraform";
+  const tfCommand = targetConfig.terraform_command;
   const driftIssueRepo = drift.getDriftIssueRepo(cfg);
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;
@@ -66,13 +67,12 @@ export const main = async (
   const disableUpdateRelatedPullRequests = !(
     cfg.update_related_pull_requests?.enabled ?? true
   );
-  const securefixServerRepository =
-    cfg.securefix_action?.server_repository ?? "";
+  const csmActionsServerRepository = cfg.csm_actions?.server_repository ?? "";
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
     cwd: workingDir,
   });
-  const planFilePath = await downloadPlanFile(executor);
+  const planFilePath = await downloadPlanFile();
   if (!planFilePath) {
     throw new Error("PLAN_FILE_PATH is not set");
   }
@@ -189,10 +189,10 @@ export const main = async (
       githubToken,
       targetConfig.target,
     );
-    if (securefixServerRepository) {
+    if (csmActionsServerRepository) {
       await updateBranchBySecurefix(
         github.context.repo.owner,
-        securefixServerRepository,
+        csmActionsServerRepository,
         prNumbers,
       );
     } else {
@@ -223,8 +223,8 @@ export const updateBranchBySecurefix = async (
   prNumbers: number[],
 ): Promise<void> => {
   const token = await githubAppToken.create({
-    appId: input.securefixActionAppId,
-    privateKey: input.securefixActionAppPrivateKey,
+    appId: input.csmAppId,
+    privateKey: input.csmAppPrivateKey,
     owner: serverRepoOwner,
     repositories: [serverRepoName],
     permissions: {
@@ -299,7 +299,7 @@ const downloadArtifact = async (
   await artifact.downloadArtifact(targetArtifact.id, artifactOpts);
 };
 
-const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
+const downloadPlanFile = async (): Promise<string> => {
   const cfg = await lib.getConfig();
   const githubToken = input.githubToken;
   const target = env.all.TFACTION_TARGET;
@@ -326,25 +326,17 @@ const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
   });
 
   if (workflowRuns.workflow_runs.length === 0) {
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-var",
-        `tfaction_target:${target}`,
-        "-var",
-        `plan_workflow_name:${planWorkflowName}`,
-        "-var",
-        `branch:${branch}`,
-        "-k",
-        "no-workflow-run-found",
-      ],
-      {
-        env: {
-          GITHUB_TOKEN: githubToken,
-        },
+    const ciInfoPrNumber = env.all.CI_INFO_PR_NUMBER;
+    await post({
+      octokit,
+      prNumber: parseInt(ciInfoPrNumber, 10),
+      templateKey: "no-workflow-run-found",
+      vars: {
+        tfaction_target: target,
+        plan_workflow_name: planWorkflowName,
+        branch: branch,
       },
-    );
+    });
     throw new Error("No workflow run is found");
   }
 
@@ -358,25 +350,17 @@ const downloadPlanFile = async (executor: aqua.Executor): Promise<string> => {
 
   // Check if headSha matches
   if (headSha !== prHeadSha) {
-    await executor.exec(
-      "github-comment",
-      [
-        "post",
-        "-var",
-        `tfaction_target:${target}`,
-        "-var",
-        `wf_sha:${headSha}`,
-        "-var",
-        `pr_sha:${prHeadSha}`,
-        "-k",
-        "invalid-workflow-sha",
-      ],
-      {
-        env: {
-          GITHUB_TOKEN: githubToken,
-        },
+    const ciInfoPrNumber = env.all.CI_INFO_PR_NUMBER;
+    await post({
+      octokit,
+      prNumber: parseInt(ciInfoPrNumber, 10),
+      templateKey: "invalid-workflow-sha",
+      vars: {
+        tfaction_target: target,
+        wf_sha: headSha,
+        pr_sha: prHeadSha,
       },
-    );
+    });
     throw new Error(
       `workflow run's headSha (${headSha}) is different from the associated pull request's head sha (${prHeadSha})`,
     );

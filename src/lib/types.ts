@@ -169,7 +169,6 @@ export const TargetConfig = z.object({
   terraform_command: z.string().optional(),
   terraform_docs: TerraformDocsConfig.optional(),
   conftest: ConftestConfig.optional(),
-  accept_change_by_renovate: z.boolean().default(false),
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
@@ -219,10 +218,17 @@ export const RawConfig = z.object({
     .optional(),
   env: z.record(z.string(), z.string()).optional(),
   label_prefixes: LabelPrefixes.default(labelPrefixesDefaults),
-  module_file: z.string().default("tfaction_module.yaml"),
   plan_workflow_name: z.string(),
-  renovate_login: z.string().default("renovate[bot]"),
-  renovate_terraform_labels: z.string().array().optional(),
+  auto_apps: z
+    .object({
+      logins: z.string().array().default(["renovate[bot]", "dependabot[bot]"]),
+      allow_auto_merge_change: z.boolean().default(false),
+    })
+    .default({
+      logins: ["renovate[bot]", "dependabot[bot]"],
+      allow_auto_merge_change: false,
+    }),
+  skip_terraform_files: z.string().array().optional(),
   scaffold_working_directory: z
     .object({
       pull_request: z
@@ -274,11 +280,15 @@ export const RawConfig = z.object({
     })
     .nullish(),
   skip_create_pr: z.boolean().default(false),
-  skip_terraform_by_renovate: z.boolean().optional(),
   target_groups: TargetGroup.array(),
   tflint: TflintConfig.default(tflintDefaults),
   trivy: TrivyConfig.default(trivyDefaults),
   terraform_docs: TerraformDocsConfig.optional(),
+  dismiss_approval_before_plan: z
+    .object({
+      enabled: z.boolean().optional(),
+    })
+    .optional(),
   update_local_path_module_caller: z
     .object({
       enabled: z.boolean().optional(),
@@ -291,9 +301,10 @@ export const RawConfig = z.object({
     })
     .optional(),
   working_directory_file: z.string().default("tfaction.yaml"),
+  module_file: z.string().default("tfaction_module.yaml"),
   replace_target: Replace.optional(),
   providers_lock_opts: z.string().optional(),
-  securefix_action: z
+  csm_actions: z
     .object({
       server_repository: z.string(),
       pull_request: z.object({
@@ -304,7 +315,12 @@ export const RawConfig = z.object({
   limit_changed_dirs: z
     .object({
       working_dirs: z.number().optional(),
-      modules: z.number().optional(),
+    })
+    .optional(),
+  test_workflow: z
+    .object({
+      working_directories: z.string().array(),
+      changed_files: z.string().array(),
     })
     .optional(),
 });

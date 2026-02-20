@@ -24,16 +24,29 @@ inputs:
     description: A JSON representing a map whose keys are secret names and values are secret values. Used by setup to compute the secrets output, and by terraform-init, plan, and apply to pass secrets as environment variables during command execution.
     required: false
 
+  # terraform-init, plan, apply
+  aws_secrets:
+    description: >-
+      A JSON representing a map whose keys are environment variable names
+      and values are secret values fetched from AWS Secrets Manager.
+      Passed from the output of output-aws-secrets-manager action.
+    required: false
+
+  # output-github-secrets
+  github_secrets:
+    description: GitHub Secrets as JSON. Used by output-github-secrets to map secrets to environment variable names.
+    required: false
+
   # setup
   ssh_key:
     description: SSH private key to checkout private modules
     required: false
 
   # commit
-  securefix_action_app_id:
+  csm_app_id:
     description: GitHub App ID
     required: false
-  securefix_action_app_private_key:
+  csm_app_private_key:
     description: GitHub App Private Key
     required: false
 
@@ -106,19 +119,16 @@ outputs:
   terraform_command:
     description: Terraform command. By default, the value is "terraform". If you use OpenTofu, the value is "tofu"
 
-  # setup
+  # output-github-secrets, output-aws-secrets-manager
   secrets:
     description: >-
       A JSON representing a map whose keys are environment variable names
-      and values are secret values. Output by setup action.
+      and values are secret values.
+      Output by output-github-secrets and output-aws-secrets-manager actions.
 
   # get-global-config
   working_directory_file:
     description: file name which locates on working directories
-  module_file:
-    description: file name which locates on Modules
-  renovate_login:
-    description: Renovate login
   label_prefix_target:
     description: label prefix for target
   label_prefix_tfmigrate:
@@ -141,16 +151,12 @@ outputs:
     description: aqua update-checksum's `prune`
   plan_workflow_name:
     description: GitHub Actions Workflow name running tfaction/terraform-plan action
-  securefix_action_server_repository:
-    description: Securefix Action Server Repository
+  csm_actions_server_repository:
+    description: CSM Actions Server Repository
 
   # check-terraform-skip
   skip_terraform:
     description: whether terraform is skipped
-
-  # list-changed-modules
-  modules:
-    description: list of modules
 
   # list-module-caller
   file:

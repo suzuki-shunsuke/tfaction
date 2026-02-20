@@ -11,7 +11,6 @@ import * as aqua from "../../aqua";
 import * as ciinfo from "../../ci-info";
 import { getTargetConfig } from "../get-target-config";
 import * as aquaUpdateChecksum from "./aqua-update-checksum";
-import * as checkTerraformSkip from "../../check-terraform-skip";
 import {
   isPullRequestEvent as isPullRequestEventFn,
   shouldSkipCIInfo as shouldSkipCIInfoFn,
@@ -92,6 +91,7 @@ export const main = async () => {
     },
     config,
   );
+  /** absolute path to working directory */
   const workingDir = path.join(
     config.git_root_dir,
     targetConfig.working_directory,
@@ -107,7 +107,7 @@ export const main = async () => {
       const prNumber = github.context.payload.pull_request?.number ?? 0;
 
       let csmServerRepoOwner = github.context.repo.owner;
-      let csmServerRepoName = config.securefix_action?.server_repository ?? "";
+      let csmServerRepoName = config.csm_actions?.server_repository ?? "";
       if (csmServerRepoName.includes("/")) {
         csmServerRepoOwner = csmServerRepoName.split("/")[0];
         csmServerRepoName = csmServerRepoName.split("/")[1];
@@ -125,8 +125,8 @@ export const main = async () => {
         appPrivateKey: "",
         csmServerRepoOwner: csmServerRepoOwner,
         csmServerRepoName: csmServerRepoName,
-        csmAppID: input.securefixActionAppId,
-        csmAppPrivateKey: input.securefixActionAppPrivateKey,
+        csmAppID: input.csmAppId,
+        csmAppPrivateKey: input.csmAppPrivateKey,
         baseBranch: github.context.payload.pull_request?.base?.ref ?? "",
         headBranch: github.context.payload.pull_request?.head?.ref ?? "",
         contextPRNumber: prNumber,
@@ -142,13 +142,6 @@ export const main = async () => {
         targetConfig.target,
         github.context.payload.pull_request?.number ?? 0,
       );
-
-      await checkTerraformSkip.main(config, {
-        skipLabelPrefix: config.label_prefixes.skip,
-        labels: ci.pr?.data.labels?.map((label) => label.name) ?? [],
-        prAuthor: ci.pr?.data.user.login ?? "",
-        target: targetConfig.target,
-      });
     }
   }
 
@@ -173,29 +166,6 @@ export const main = async () => {
     }
   }
 
-  // Process secrets
-  if (input.secrets) {
-    const inputSecrets: Record<string, string> = JSON.parse(input.secrets);
-    core.info(
-      `The list of secret names passed to the action: ${Object.keys(inputSecrets).join(", ")}`,
-    );
-    if (targetConfig.secretsConfig) {
-      const secretsOutput: Record<string, string> = {};
-      for (const [envName, secretName] of Object.entries(
-        targetConfig.secretsConfig,
-      )) {
-        if (!(secretName in inputSecrets)) {
-          throw new Error(`secret is not found: ${secretName}`);
-        }
-        core.info(
-          `map the secret ${secretName} to the environment variable ${envName}`,
-        );
-        secretsOutput[envName] = inputSecrets[secretName];
-      }
-      core.setOutput("secrets", JSON.stringify(secretsOutput));
-    }
-  }
-
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
     cwd: workingDir,
@@ -204,11 +174,16 @@ export const main = async () => {
   if (isPR && config.aqua?.update_checksum?.enabled) {
     try {
       core.info("updating checksum");
-      await aquaUpdateChecksum.main(executor, workingDir, config, {
-        githubToken: githubToken,
-        securefixActionAppId: input.securefixActionAppId,
-        securefixActionAppPrivateKey: input.securefixActionAppPrivateKey,
-      });
+      await aquaUpdateChecksum.main(
+        executor,
+        path.relative(config.workspace, workingDir),
+        config,
+        {
+          githubToken: githubToken,
+          csmAppId: input.csmAppId,
+          csmAppPrivateKey: input.csmAppPrivateKey,
+        },
+      );
     } catch (error) {
       // aqua-update-checksum throws when file is updated, which is expected
       if (error instanceof Error && error.message.includes("is updated")) {
@@ -225,12 +200,6 @@ export const main = async () => {
     core.info("Setting up SSH key...");
     await setupSSHKey(input.sshKey);
   }
-
-  core.setOutput("working_directory", targetConfig.working_directory);
-  core.setOutput(
-    "s3_bucket_name_tfmigrate_history",
-    targetConfig.s3_bucket_name_tfmigrate_history ?? "",
-  );
 
   core.info("Setup completed successfully");
 };

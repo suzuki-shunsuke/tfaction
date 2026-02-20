@@ -22,7 +22,7 @@ test("default", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
     ]),
@@ -72,7 +72,7 @@ test("config", async () => {
       ["terraform_command", "tofu"],
       ["aws_role_session_name", "test"],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["enable_terraform_docs", false],
     ]),
   };
@@ -172,7 +172,7 @@ test("tfmigrate plan", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_assume_role_arn", "arn:aws:iam::123:role/tfmigrate-plan"],
@@ -225,7 +225,7 @@ test("tfmigrate apply", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_assume_role_arn", "arn:aws:iam::123:role/tfmigrate-apply"],
@@ -278,7 +278,7 @@ test("terraform apply", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_assume_role_arn", "arn:aws:iam::123:role/terraform-apply"],
@@ -330,7 +330,7 @@ test("explicit aws_role_session_name overrides auto-generation", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "custom-session-name"],
@@ -380,7 +380,7 @@ test("terraform_docs enabled in root config", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", true],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -434,7 +434,7 @@ test("environment variables from targetGroup", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -488,7 +488,7 @@ test("environment variables from root config", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -555,7 +555,7 @@ test("gcp configuration", async () => {
         "projects/456/locations/global/workloadIdentityPools/pool/providers/provider",
       ],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["enable_terraform_docs", false],
     ]),
   };
@@ -609,7 +609,7 @@ test("gcp_access_token_scopes", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -663,7 +663,7 @@ test("s3_bucket_name_tfmigrate_history", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -714,7 +714,7 @@ test("gcs_bucket_name_tfmigrate_history", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -762,7 +762,7 @@ test("providers_lock_opts override", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -862,7 +862,7 @@ test("only workingDir provided - target derived from workingDir", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -911,7 +911,7 @@ test("tflint_fix enabled in root config", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -966,7 +966,7 @@ test("target group env overrides root env", async () => {
       ["enable_trivy", true],
       ["enable_terraform_docs", false],
       ["destroy", false],
-      ["accept_change_by_renovate", false],
+
       ["tflint_fix", true],
       ["terraform_command", "terraform"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -1039,4 +1039,80 @@ test("aws_role_session_name falls back to prefix with runID when target is very 
   expect(roleName.length).toBeLessThanOrEqual(64);
   // When both full and target-only names exceed 64 chars, should fall back to prefix-runID
   expect(roleName).toBe(`${prefix}-${runID}`);
+});
+
+test("type module is inferred from tfaction_module.yaml", async () => {
+  const runID = env.all.GITHUB_RUN_ID;
+  const result: Result = {
+    envs: new Map<string, string | boolean>([
+      ["TFACTION_WORKING_DIR", "tests/aws/modules/vpc"],
+      ["TFACTION_TARGET", "tests/aws/modules/vpc"],
+    ]),
+    outputs: new Map<string, string | boolean>([
+      ["working_directory", "tests/aws/modules/vpc"],
+      [
+        "providers_lock_opts",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+      ],
+      ["template_dir", "tests/templates/github"],
+      ["enable_tflint", true],
+      ["enable_trivy", true],
+      ["enable_terraform_docs", false],
+      ["destroy", false],
+
+      ["tflint_fix", true],
+      ["terraform_command", "terraform"],
+      ["aws_role_session_name", "tfaction-plan-tests_aws_modules_vpc-" + runID],
+      ["type", "module"],
+    ]),
+  };
+  expect(
+    await run(
+      {
+        target: "tests/aws/modules/vpc",
+        workingDir: "tests/aws/modules/vpc",
+        isApply: false,
+        jobType: "terraform",
+      },
+      await lib.applyConfigDefaults(
+        {
+          plan_workflow_name: "plan.yaml",
+          target_groups: [
+            {
+              working_directory: "tests/aws/**",
+              template_dir: "tests/templates/github",
+            },
+          ],
+        },
+        "tests/tfaction-root.yaml",
+        "",
+      ),
+    ),
+  ).toStrictEqual(result);
+});
+
+test("type is omitted from outputs when not set (default root module)", async () => {
+  const result = await run(
+    {
+      target: "tests/aws/foo/dev",
+      workingDir: "tests/aws/foo/dev",
+      isApply: false,
+      jobType: "terraform",
+    },
+    await lib.applyConfigDefaults(
+      {
+        plan_workflow_name: "plan.yaml",
+        target_groups: [
+          {
+            working_directory: "tests/aws/**",
+            template_dir: "tests/templates/github",
+          },
+        ],
+      },
+      "tests/tfaction-root.yaml",
+      "",
+    ),
+  );
+  // type should not be in outputs when not set
+  expect(result.outputs.has("type")).toBe(false);
 });
