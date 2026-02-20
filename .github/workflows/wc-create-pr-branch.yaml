@@ -80,14 +80,6 @@ jobs:
           permission-pull-requests: write
           permission-contents: write
 
-      - name: Hide comment
-        uses: ./
-        if: |
-          github.event.pull_request &&
-          ! github.event.pull_request.head.repo.fork
-        with:
-          action: hide-comment
-
       - name: Test setup
         uses: ./
         with:
@@ -246,6 +238,14 @@ jobs:
           private-key: ${{secrets.gh_app_private_key}}
           permission-pull-requests: write
           permission-contents: write
+
+      - name: Hide comment
+        uses: ./
+        if: |
+          github.event.pull_request &&
+          ! github.event.pull_request.head.repo.fork
+        with:
+          action: hide-comment
 
       - name: Test test (module)
         uses: ./
