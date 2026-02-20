@@ -1,4 +1,5 @@
 import * as createFollowUpPR from "./actions/create-follow-up-pr";
+import * as hideComment from "./actions/hide-comment";
 import * as createScaffoldPR from "./actions/create-scaffold-pr";
 import * as scaffoldTfmigrate from "./actions/scaffold-tfmigrate";
 import * as scaffoldWorkingDir from "./actions/scaffold-working-dir";
@@ -36,6 +37,7 @@ export const main = async (inputs: Inputs) => {
     ["create-scaffold-pr", createScaffoldPR],
     ["generate-config-out", generateConfigOut],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
+    ["hide-comment", hideComment],
     ["get-target-config", getTargetConfig],
     ["list-targets", listTargets],
     ["output-aws-secrets-manager", outputAWSSecretsManager],

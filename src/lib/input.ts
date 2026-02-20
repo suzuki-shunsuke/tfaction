@@ -4,6 +4,7 @@
 // - input.ts MUST NOT depend on other internal modules
 
 import * as core from "@actions/core";
+import { DEFAULT_CONDITION } from "../actions/hide-comment/run";
 
 // Common inputs used across multiple actions
 export const githubToken = core.getInput("github_token");
@@ -50,6 +51,9 @@ export const sshKey = core.getInput("ssh_key");
 
 // output-github-secrets
 export const githubSecrets = core.getInput("github_secrets");
+
+// hide-comment
+export const getIf = (): string => core.getInput("if") || DEFAULT_CONDITION;
 
 // update-drift-issue
 export const getRequiredIssue = (): string => {
