@@ -4,12 +4,41 @@ import * as os from "os";
 import * as path from "path";
 import { DefaultArtifactClient } from "@actions/artifact";
 import * as github from "@actions/github";
+import { z } from "zod";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../../conftest";
 import { post } from "../../comment";
+
+const ResourceChange = z.object({
+  change: z.object({
+    actions: z.array(z.string()),
+  }),
+});
+
+const PlanJson = z.object({
+  resource_changes: z.array(ResourceChange).nullable().optional(),
+});
+
+export type ResultSummary = "no-op" | "update" | "delete";
+
+export const getResultSummary = (planJsonContent: string): ResultSummary => {
+  const plan = PlanJson.parse(JSON.parse(planJsonContent));
+  const resourceChanges = plan.resource_changes ?? [];
+  let hasUpdate = false;
+  for (const rc of resourceChanges) {
+    const actions = rc.change.actions;
+    if (actions.includes("delete")) {
+      return "delete";
+    }
+    if (actions.includes("create") || actions.includes("update")) {
+      hasUpdate = true;
+    }
+  }
+  return hasUpdate ? "update" : "no-op";
+};
 
 type Inputs = {
   githubToken: string;
@@ -301,6 +330,7 @@ export const runTfmigratePlan = async (
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
+  core.setOutput("result_summary", "no-op");
 
   core.setOutput("plan_json", tempPlanJson);
   core.setOutput("plan_binary", tempPlanBinary);
@@ -405,6 +435,7 @@ export const runTerraformPlan = async (
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
+  core.setOutput("result_summary", getResultSummary(showResult.stdout));
 
   core.setOutput("plan_json", tempPlanJson);
   core.setOutput("plan_json_artifact_path", tempPlanJson); // Keep for backward compatibility
