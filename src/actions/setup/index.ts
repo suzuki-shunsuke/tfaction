@@ -1,7 +1,5 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 
 import * as lib from "../../lib";
@@ -56,22 +54,6 @@ const addLabelToPR = async (
   } catch (error) {
     core.warning(`Failed to add label to PR: ${error}`);
   }
-};
-
-// Set up SSH key
-const setupSSHKey = async (sshKey: string): Promise<void> => {
-  if (!sshKey) {
-    return;
-  }
-
-  const sshDir = path.join(os.homedir(), ".ssh");
-  const keyPath = path.join(sshDir, "id_rsa");
-
-  await fs.promises.mkdir(sshDir, { recursive: true });
-  await fs.promises.writeFile(keyPath, sshKey);
-  await fs.promises.chmod(keyPath, 0o600);
-
-  core.info("SSH key configured for private modules");
 };
 
 export const main = async () => {
@@ -194,11 +176,6 @@ export const main = async () => {
       }
       throw error;
     }
-  }
-
-  if (input.sshKey) {
-    core.info("Setting up SSH key...");
-    await setupSSHKey(input.sshKey);
   }
 
   core.info("Setup completed successfully");
