@@ -8,6 +8,7 @@ import {
   runTfmigratePlan,
   disableAutoMergeForRenovateChange,
   dismissApprovalReviews,
+  getResultSummary,
   main,
   type RunInputs,
 } from "./run";
@@ -84,7 +85,7 @@ const createMockExecutor = () => ({
   exec: vi.fn().mockResolvedValue(0),
   getExecOutput: vi.fn().mockResolvedValue({
     exitCode: 0,
-    stdout: "{}",
+    stdout: '{"resource_changes": []}',
     stderr: "",
   }),
   installDir: "/mock/install",
@@ -154,7 +155,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: '{"plan": "empty"}',
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -169,6 +170,7 @@ describe("runTerraformPlan", () => {
       "plan_binary",
       path.join(tempDir, "tfplan.binary"),
     );
+    expect(core.setOutput).toHaveBeenCalledWith("result_summary", "no-op");
   });
 
   it("throws error when detailedExitcode=1 (failure)", async () => {
@@ -195,7 +197,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: '{"plan": "changes"}',
+        stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
         stderr: "",
       });
 
@@ -205,6 +207,7 @@ describe("runTerraformPlan", () => {
     expect(result.detailedExitcode).toBe(2);
     expect(result.planBinary).toBe(path.join(tempDir, "tfplan.binary"));
     expect(result.planJson).toBe(path.join(tempDir, "tfplan.json"));
+    expect(core.setOutput).toHaveBeenCalledWith("result_summary", "update");
   });
 
   it("adds -destroy flag when destroy=true", async () => {
@@ -216,7 +219,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -243,7 +246,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -275,7 +278,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -310,7 +313,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
         stderr: "",
       });
     mockExecutor.exec.mockResolvedValue(0);
@@ -352,7 +355,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
         stderr: "",
       });
 
@@ -376,7 +379,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
         stderr: "",
       });
 
@@ -392,7 +395,7 @@ describe("runTerraformPlan", () => {
   });
 
   it("writes plan JSON from terraform show output", async () => {
-    const planJsonContent = '{"format_version": "1.0", "changes": []}';
+    const planJsonContent = '{"format_version": "1.0", "resource_changes": []}';
     mockExecutor.getExecOutput
       .mockResolvedValueOnce({
         exitCode: 0,
@@ -423,7 +426,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -459,7 +462,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -488,7 +491,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -516,7 +519,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -544,7 +547,7 @@ describe("runTerraformPlan", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -774,7 +777,7 @@ describe("runTfmigratePlan", () => {
     mockExecutor.exec.mockResolvedValue(0);
     mockExecutor.getExecOutput.mockResolvedValue({
       exitCode: 0,
-      stdout: '{"plan": "result"}',
+      stdout: '{"resource_changes": []}',
       stderr: "",
     });
 
@@ -792,6 +795,7 @@ describe("runTfmigratePlan", () => {
         group: "tfmigrate plan",
       }),
     );
+    expect(core.setOutput).toHaveBeenCalledWith("result_summary", "no-op");
   });
 
   it("sets TFMIGRATE_EXEC_PATH when tfCommand is not terraform", async () => {
@@ -799,7 +803,7 @@ describe("runTfmigratePlan", () => {
     mockExecutor.exec.mockResolvedValue(0);
     mockExecutor.getExecOutput.mockResolvedValue({
       exitCode: 0,
-      stdout: "{}",
+      stdout: '{"resource_changes": []}',
       stderr: "",
     });
 
@@ -825,7 +829,7 @@ describe("runTfmigratePlan", () => {
     mockExecutor.exec.mockResolvedValue(0);
     mockExecutor.getExecOutput.mockResolvedValue({
       exitCode: 0,
-      stdout: '{"changes": []}',
+      stdout: '{"resource_changes": []}',
       stderr: "",
     });
 
@@ -842,8 +846,84 @@ describe("runTfmigratePlan", () => {
     );
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       path.join(tempDir, "tfplan.json"),
-      '{"changes": []}',
+      '{"resource_changes": []}',
     );
+  });
+});
+
+describe("getResultSummary", () => {
+  it("returns no-op when resource_changes is empty", () => {
+    expect(getResultSummary('{"resource_changes": []}')).toBe("no-op");
+  });
+
+  it("returns no-op when resource_changes is undefined", () => {
+    expect(getResultSummary("{}")).toBe("no-op");
+  });
+
+  it("returns no-op when resource_changes is null", () => {
+    expect(getResultSummary('{"resource_changes": null}')).toBe("no-op");
+  });
+
+  it("returns no-op when all actions are no-op", () => {
+    const plan = {
+      resource_changes: [
+        { change: { actions: ["no-op"] } },
+        { change: { actions: ["no-op"] } },
+      ],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("no-op");
+  });
+
+  it("returns no-op when all actions are read", () => {
+    const plan = {
+      resource_changes: [{ change: { actions: ["read"] } }],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("no-op");
+  });
+
+  it("returns update when actions include create", () => {
+    const plan = {
+      resource_changes: [{ change: { actions: ["create"] } }],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("update");
+  });
+
+  it("returns update when actions include update", () => {
+    const plan = {
+      resource_changes: [{ change: { actions: ["update"] } }],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("update");
+  });
+
+  it("returns delete when actions include delete", () => {
+    const plan = {
+      resource_changes: [{ change: { actions: ["delete"] } }],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("delete");
+  });
+
+  it("returns delete for delete-create recreate", () => {
+    const plan = {
+      resource_changes: [{ change: { actions: ["delete", "create"] } }],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("delete");
+  });
+
+  it("returns delete for create-delete recreate", () => {
+    const plan = {
+      resource_changes: [{ change: { actions: ["create", "delete"] } }],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("delete");
+  });
+
+  it("returns delete when mix of update and delete", () => {
+    const plan = {
+      resource_changes: [
+        { change: { actions: ["update"] } },
+        { change: { actions: ["delete"] } },
+      ],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("delete");
   });
 });
 
@@ -983,7 +1063,7 @@ describe("main", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -1016,7 +1096,7 @@ describe("main", () => {
     mockExecutor.exec.mockResolvedValue(0);
     mockExecutor.getExecOutput.mockResolvedValue({
       exitCode: 0,
-      stdout: "{}",
+      stdout: '{"resource_changes": []}',
       stderr: "",
     });
 
@@ -1080,7 +1160,7 @@ describe("main", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -1118,7 +1198,7 @@ describe("main", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
@@ -1159,7 +1239,7 @@ describe("main", () => {
       })
       .mockResolvedValueOnce({
         exitCode: 0,
-        stdout: "{}",
+        stdout: '{"resource_changes": []}',
         stderr: "",
       });
 
