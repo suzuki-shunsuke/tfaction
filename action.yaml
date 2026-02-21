@@ -37,11 +37,6 @@ inputs:
     description: GitHub Secrets as JSON. Used by output-github-secrets to map secrets to environment variable names.
     required: false
 
-  # setup
-  ssh_key:
-    description: SSH private key to checkout private modules
-    required: false
-
   # commit
   csm_app_id:
     description: GitHub App ID

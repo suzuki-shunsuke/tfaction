@@ -46,9 +46,6 @@ export const getRequiredVersion = (): string => {
 export const migrationName = core.getInput("migration_name") || "main";
 export const prNumber = core.getInput("pr_number");
 
-// setup
-export const sshKey = core.getInput("ssh_key");
-
 // output-github-secrets
 export const githubSecrets = core.getInput("github_secrets");
 
