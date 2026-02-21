@@ -4,13 +4,7 @@ import * as os from "os";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import {
-  listRelatedPullRequests,
-  updateBranchByCommit,
-  updateBranchBySecurefix,
-  main,
-} from "./terraform";
-import * as run from "./run";
+import { main } from "./terraform";
 import type * as aqua from "../../aqua";
 
 // Mock modules
@@ -99,22 +93,6 @@ vi.mock("../../aqua", () => ({
 
 vi.mock("../get-target-config", () => ({
   getTargetConfig: vi.fn(),
-}));
-
-vi.mock("@csm-actions/update-branch-action", () => ({
-  update: vi.fn(),
-}));
-
-vi.mock("@suzuki-shunsuke/github-app-token", () => ({
-  create: vi.fn(),
-  revoke: vi.fn(),
-  hasExpired: vi.fn(),
-}));
-
-vi.mock("./run", () => ({
-  listRelatedPullRequests: vi.fn(),
-  updateBranchByCommit: vi.fn(),
-  updateBranchBySecurefix: vi.fn(),
 }));
 
 vi.mock("../../comment", () => ({
@@ -248,173 +226,8 @@ const setupMainMocks = async (
     mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
   );
 
-  // Mock run.listRelatedPullRequests for the update phase
-  vi.mocked(run.listRelatedPullRequests).mockResolvedValue([]);
-
   return { config, targetConfig, mockExecutor, mockWriteStream, mockOctokit };
 };
-
-describe("listRelatedPullRequests", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it("calls github.getOctokit and delegates to run.listRelatedPullRequests", async () => {
-    const mockOctokit = { graphql: vi.fn() };
-    vi.mocked(github.getOctokit).mockReturnValue(
-      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
-    );
-    vi.mocked(run.listRelatedPullRequests).mockResolvedValue([10, 20]);
-
-    const result = await listRelatedPullRequests("my-token", "aws/dev/vpc");
-
-    expect(github.getOctokit).toHaveBeenCalledWith("my-token");
-    expect(run.listRelatedPullRequests).toHaveBeenCalledWith({
-      octokit: mockOctokit,
-      owner: "test-owner",
-      repo: "test-repo",
-      target: "aws/dev/vpc",
-    });
-    expect(result).toEqual([10, 20]);
-  });
-
-  it("returns empty array when run.listRelatedPullRequests returns []", async () => {
-    const mockOctokit = { graphql: vi.fn() };
-    vi.mocked(github.getOctokit).mockReturnValue(
-      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
-    );
-    vi.mocked(run.listRelatedPullRequests).mockResolvedValue([]);
-
-    const result = await listRelatedPullRequests("my-token", "aws/dev/vpc");
-
-    expect(result).toEqual([]);
-  });
-});
-
-describe("updateBranchByCommit", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it("creates octokit and delegates to run.updateBranchByCommit", async () => {
-    const mockOctokit = { rest: {} };
-    vi.mocked(github.getOctokit).mockReturnValue(
-      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
-    );
-
-    await updateBranchByCommit("my-token", [1, 2, 3]);
-
-    expect(github.getOctokit).toHaveBeenCalledWith("my-token");
-    expect(run.updateBranchByCommit).toHaveBeenCalledWith({
-      octokit: mockOctokit,
-      owner: "test-owner",
-      repo: "test-repo",
-      prNumbers: [1, 2, 3],
-      logger: core,
-    });
-  });
-});
-
-describe("updateBranchBySecurefix", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it("creates GitHub App token and delegates to run.updateBranchBySecurefix, then revokes token", async () => {
-    const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
-    const updateBranchMod = await import("@csm-actions/update-branch-action");
-    const mockOctokit = { rest: {} };
-    const mockToken = {
-      token: "app-token-123",
-      expiresAt: "2099-01-01T00:00:00Z",
-    };
-
-    vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
-    vi.mocked(githubAppTokenMod.hasExpired).mockReturnValue(false);
-    vi.mocked(github.getOctokit).mockReturnValue(
-      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
-    );
-
-    await updateBranchBySecurefix("server-owner", "server-repo", [5, 6]);
-
-    expect(githubAppTokenMod.create).toHaveBeenCalledWith({
-      appId: "mock-app-id",
-      privateKey: "mock-private-key",
-      owner: "server-owner",
-      repositories: ["server-repo"],
-      permissions: { issues: "write" },
-    });
-    expect(run.updateBranchBySecurefix).toHaveBeenCalledWith({
-      octokit: mockOctokit,
-      serverRepoOwner: "server-owner",
-      serverRepoName: "server-repo",
-      owner: "test-owner",
-      repo: "test-repo",
-      serverUrl: "https://github.com",
-      prNumbers: [5, 6],
-      updateBranchFn: updateBranchMod.update,
-      logger: core,
-    });
-    expect(githubAppTokenMod.revoke).toHaveBeenCalledWith("app-token-123");
-  });
-
-  it("revokes token even when run.updateBranchBySecurefix throws", async () => {
-    const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
-    const mockToken = {
-      token: "app-token-456",
-      expiresAt: "2099-01-01T00:00:00Z",
-    };
-
-    vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
-    vi.mocked(githubAppTokenMod.hasExpired).mockReturnValue(false);
-    vi.mocked(github.getOctokit).mockReturnValue(
-      {} as unknown as ReturnType<typeof github.getOctokit>,
-    );
-    vi.mocked(run.updateBranchBySecurefix).mockRejectedValue(
-      new Error("update failed"),
-    );
-
-    await expect(updateBranchBySecurefix("owner", "repo", [1])).rejects.toThrow(
-      "update failed",
-    );
-
-    expect(githubAppTokenMod.revoke).toHaveBeenCalledWith("app-token-456");
-  });
-
-  it("skips revocation if token has expired", async () => {
-    const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
-    const mockToken = {
-      token: "expired-token",
-      expiresAt: "2020-01-01T00:00:00Z",
-    };
-
-    vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
-    vi.mocked(githubAppTokenMod.hasExpired).mockReturnValue(true);
-    vi.mocked(github.getOctokit).mockReturnValue(
-      {} as unknown as ReturnType<typeof github.getOctokit>,
-    );
-    vi.mocked(run.updateBranchBySecurefix).mockResolvedValue(undefined);
-
-    await updateBranchBySecurefix("owner", "repo", [1]);
-
-    expect(githubAppTokenMod.revoke).not.toHaveBeenCalled();
-    expect(core.info).toHaveBeenCalledWith(
-      "GitHub App token has already expired",
-    );
-  });
-});
 
 describe("main", () => {
   beforeEach(async () => {
@@ -575,52 +388,6 @@ describe("main", () => {
     await main();
   });
 
-  it("skips updating when update_related_pull_requests.enabled is false", async () => {
-    await setupMainMocks({
-      config: { update_related_pull_requests: { enabled: false } },
-    });
-
-    await main();
-
-    expect(core.info).toHaveBeenCalledWith(
-      "Skip updating related pull requests",
-    );
-    expect(run.listRelatedPullRequests).not.toHaveBeenCalled();
-  });
-
-  it("uses securefix when csm_actions.server_repository is configured", async () => {
-    const githubAppTokenMod = await import("@suzuki-shunsuke/github-app-token");
-    const mockToken = { token: "sf-token", expiresAt: "2099-01-01T00:00:00Z" };
-    vi.mocked(githubAppTokenMod.create).mockResolvedValue(mockToken as never);
-    vi.mocked(githubAppTokenMod.hasExpired).mockReturnValue(false);
-
-    await setupMainMocks({
-      config: {
-        csm_actions: {
-          server_repository: "securefix-server",
-          pull_request: { base_branch: "main" },
-        },
-      },
-    });
-
-    vi.mocked(run.listRelatedPullRequests).mockResolvedValue([10]);
-
-    await main();
-
-    // updateBranchBySecurefix in ./run should have been called (via the wrapper)
-    expect(run.updateBranchBySecurefix).toHaveBeenCalled();
-  });
-
-  it("uses commit update when securefix is not configured", async () => {
-    await setupMainMocks();
-
-    vi.mocked(run.listRelatedPullRequests).mockResolvedValue([10, 20]);
-
-    await main();
-
-    expect(run.updateBranchByCommit).toHaveBeenCalled();
-  });
-
   it('throws "terraform apply failed" when exit code is non-zero', async () => {
     const { mockExecutor } = await setupMainMocks();
 
@@ -633,8 +400,5 @@ describe("main", () => {
     });
 
     await expect(main()).rejects.toThrow("terraform apply failed");
-
-    // PR updates should still have run before the throw
-    // (listRelatedPullRequests is called after the apply even on failure)
   });
 });
