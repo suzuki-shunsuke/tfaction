@@ -9,11 +9,6 @@ import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../get-target-config";
-import {
-  listRelatedPullRequests,
-  updateBranchBySecurefix,
-  updateBranchByCommit,
-} from "./terraform";
 
 export const main = async (
   secrets?: Record<string, string>,
@@ -39,10 +34,6 @@ export const main = async (
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;
   const ciInfoPrNumber = env.all.CI_INFO_PR_NUMBER;
-  const disableUpdateRelatedPullRequests = !(
-    cfg.update_related_pull_requests?.enabled ?? true
-  );
-  const csmActionsServerRepository = cfg.csm_actions?.server_repository ?? "";
 
   // Create a temporary file for apply output
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
@@ -130,24 +121,6 @@ export const main = async (
     fs.rmdirSync(tempDir);
   } catch {
     // Ignore the failure
-  }
-
-  if (disableUpdateRelatedPullRequests) {
-    core.info("Skip updating related pull requests");
-  } else {
-    const prNumbers = await listRelatedPullRequests(
-      githubToken,
-      targetConfig.target,
-    );
-    if (csmActionsServerRepository) {
-      await updateBranchBySecurefix(
-        github.context.repo.owner,
-        csmActionsServerRepository,
-        prNumbers,
-      );
-    } else {
-      await updateBranchByCommit(githubToken, prNumbers);
-    }
   }
 
   if (exitCode !== 0) {

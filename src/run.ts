@@ -20,6 +20,7 @@ import * as plan from "./actions/plan";
 import * as releaseModule from "./actions/release-module";
 import * as terraformInit from "./actions/terraform-init";
 import * as test from "./actions/test";
+import * as updatePrBranch from "./actions/update-pr-branch";
 
 type Inputs = {
   action: string;
@@ -51,6 +52,7 @@ export const main = async (inputs: Inputs) => {
     ["terraform-init", terraformInit],
     ["test", test],
     ["update-drift-issue", updateDriftIssue],
+    ["update-pr-branch", updatePrBranch],
     ["set-drift-env", setDriftEnv],
     ["sync-drift-issue-description", syncDriftIssueDescription],
   ]);

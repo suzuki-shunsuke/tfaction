@@ -9,34 +9,16 @@ import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../get-target-config";
-import * as updateBranchAction from "@csm-actions/update-branch-action";
-import * as githubAppToken from "@suzuki-shunsuke/github-app-token";
 import {
   DefaultArtifactClient,
   FindOptions,
   DownloadArtifactOptions,
 } from "@actions/artifact";
-import * as run from "./run";
 import { post } from "../../comment";
 
 type WorkflowRun = {
   headSha: string;
   databaseId: number;
-};
-
-export const listRelatedPullRequests = async (
-  githubToken: string,
-  target: string,
-): Promise<number[]> => {
-  const octokit = github.getOctokit(githubToken);
-  const { owner, repo } = github.context.repo;
-
-  return run.listRelatedPullRequests({
-    octokit,
-    owner,
-    repo,
-    target,
-  });
 };
 
 export const main = async (
@@ -64,10 +46,6 @@ export const main = async (
   const driftIssueRepoOwner = driftIssueRepo.owner;
   const driftIssueRepoName = driftIssueRepo.name;
   const ciInfoPrNumber = env.all.CI_INFO_PR_NUMBER;
-  const disableUpdateRelatedPullRequests = !(
-    cfg.update_related_pull_requests?.enabled ?? true
-  );
-  const csmActionsServerRepository = cfg.csm_actions?.server_repository ?? "";
   const executor = await aqua.NewExecutor({
     githubToken: githubToken,
     cwd: workingDir,
@@ -182,89 +160,9 @@ export const main = async (
     // Ignore the failure
   }
 
-  if (disableUpdateRelatedPullRequests) {
-    core.info("Skip updating related pull requests");
-  } else {
-    const prNumbers = await listRelatedPullRequests(
-      githubToken,
-      targetConfig.target,
-    );
-    if (csmActionsServerRepository) {
-      await updateBranchBySecurefix(
-        github.context.repo.owner,
-        csmActionsServerRepository,
-        prNumbers,
-      );
-    } else {
-      await updateBranchByCommit(githubToken, prNumbers);
-    }
-  }
-
   if (exitCode !== 0) {
     throw new Error("terraform apply failed");
   }
-};
-
-const revoke = async (token: githubAppToken.Token): Promise<void> => {
-  if (!token) {
-    return;
-  }
-  if (githubAppToken.hasExpired(token.expiresAt)) {
-    core.info("GitHub App token has already expired");
-    return;
-  }
-  core.info("Revoking GitHub App token");
-  await githubAppToken.revoke(token.token);
-};
-
-export const updateBranchBySecurefix = async (
-  serverRepoOwner: string,
-  serverRepoName: string,
-  prNumbers: number[],
-): Promise<void> => {
-  const token = await githubAppToken.create({
-    appId: input.csmAppId,
-    privateKey: input.csmAppPrivateKey,
-    owner: serverRepoOwner,
-    repositories: [serverRepoName],
-    permissions: {
-      issues: "write",
-    },
-  });
-  try {
-    const octokit = github.getOctokit(token.token);
-    const { owner, repo } = github.context.repo;
-
-    await run.updateBranchBySecurefix({
-      octokit,
-      serverRepoOwner,
-      serverRepoName,
-      owner,
-      repo,
-      serverUrl: github.context.serverUrl,
-      prNumbers,
-      updateBranchFn: updateBranchAction.update,
-      logger: core,
-    });
-  } finally {
-    await revoke(token);
-  }
-};
-
-export const updateBranchByCommit = async (
-  githubToken: string,
-  prNumbers: number[],
-): Promise<void> => {
-  const octokit = github.getOctokit(githubToken);
-  const { owner, repo } = github.context.repo;
-
-  return run.updateBranchByCommit({
-    octokit,
-    owner,
-    repo,
-    prNumbers,
-    logger: core,
-  });
 };
 
 const downloadArtifact = async (

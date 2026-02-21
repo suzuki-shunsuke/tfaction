@@ -5,7 +5,6 @@ import * as path from "path";
 import * as core from "@actions/core";
 
 import { main } from "./tfmigrate";
-import * as terraform from "./terraform";
 import type * as aqua from "../../aqua";
 
 // Mock modules
@@ -76,12 +75,6 @@ vi.mock("../../aqua", () => ({
 
 vi.mock("../get-target-config", () => ({
   getTargetConfig: vi.fn(),
-}));
-
-vi.mock("./terraform", () => ({
-  listRelatedPullRequests: vi.fn(),
-  updateBranchBySecurefix: vi.fn(),
-  updateBranchByCommit: vi.fn(),
 }));
 
 // Helper to create a mock executor
@@ -177,9 +170,6 @@ const setupMainMocks = async (
     mockWriteStream as unknown as fs.WriteStream,
   );
   vi.mocked(fs.rmdirSync).mockReturnValue(undefined);
-
-  // Mock listRelatedPullRequests for the update phase
-  vi.mocked(terraform.listRelatedPullRequests).mockResolvedValue([]);
 
   return { config, targetConfig, mockExecutor, mockWriteStream };
 };
@@ -296,52 +286,6 @@ describe("main", () => {
 
     // Should not throw
     await main();
-  });
-
-  it("skips updating when update_related_pull_requests.enabled is false", async () => {
-    await setupMainMocks({
-      config: { update_related_pull_requests: { enabled: false } },
-    });
-
-    await main();
-
-    expect(core.info).toHaveBeenCalledWith(
-      "Skip updating related pull requests",
-    );
-    expect(terraform.listRelatedPullRequests).not.toHaveBeenCalled();
-  });
-
-  it("uses securefix when csm_actions.server_repository is configured", async () => {
-    await setupMainMocks({
-      config: {
-        csm_actions: {
-          server_repository: "securefix-server",
-        },
-      },
-    });
-
-    vi.mocked(terraform.listRelatedPullRequests).mockResolvedValue([10]);
-
-    await main();
-
-    expect(terraform.updateBranchBySecurefix).toHaveBeenCalledWith(
-      "test-owner",
-      "securefix-server",
-      [10],
-    );
-  });
-
-  it("uses commit update when securefix is not configured", async () => {
-    await setupMainMocks();
-
-    vi.mocked(terraform.listRelatedPullRequests).mockResolvedValue([10, 20]);
-
-    await main();
-
-    expect(terraform.updateBranchByCommit).toHaveBeenCalledWith(
-      "mock-github-token",
-      [10, 20],
-    );
   });
 
   it('throws "tfmigrate apply failed" when exit code is non-zero', async () => {
