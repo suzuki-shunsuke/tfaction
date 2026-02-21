@@ -9,7 +9,7 @@ import {
   type ListRelatedPullRequestsInput,
   type UpdateBranchByCommitInput,
   type UpdateBranchBySecurefixInput,
-} from "./run";
+} from "./update-branch";
 
 describe("buildSearchQuery", () => {
   it("builds correct search query with owner, repo and target", () => {

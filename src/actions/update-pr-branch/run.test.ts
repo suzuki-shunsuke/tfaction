@@ -5,7 +5,7 @@ vi.mock("@actions/github", () => ({
   getOctokit: vi.fn(),
 }));
 
-vi.mock("../apply/run", () => ({
+vi.mock("./update-branch", () => ({
   listRelatedPullRequests: vi.fn(),
   updateBranchByCommit: vi.fn(),
   updateBranchBySecurefix: vi.fn(),
@@ -16,7 +16,7 @@ import {
   listRelatedPullRequests,
   updateBranchByCommit,
   updateBranchBySecurefix,
-} from "../apply/run";
+} from "./update-branch";
 import { run } from "./run";
 
 const createMockLogger = () => ({

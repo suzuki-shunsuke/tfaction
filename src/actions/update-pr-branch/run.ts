@@ -5,7 +5,7 @@ import {
   updateBranchBySecurefix,
   type UpdateBranchFn,
   type Logger,
-} from "../apply/run";
+} from "./update-branch";
 
 export type RunInput = {
   githubToken: string;
