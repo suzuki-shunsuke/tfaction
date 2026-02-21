@@ -239,6 +239,14 @@ jobs:
           permission-pull-requests: write
           permission-contents: write
 
+      - name: Hide comment
+        uses: ./
+        if: |
+          github.event.pull_request &&
+          ! github.event.pull_request.head.repo.fork
+        with:
+          action: hide-comment
+
       - name: Test test (module)
         uses: ./
         with:

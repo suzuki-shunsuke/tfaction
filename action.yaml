@@ -74,6 +74,13 @@ inputs:
     description: Pull request number. scaffold-tfmigrate uses this to update pull requests.
     required: false
 
+  # hide-comment
+  if:
+    description: >-
+      CEL expression to determine which comments to hide.
+      Available variables - Comment.HasMeta (bool), Comment.Meta (object with SHA1, Program, Command, JobName, PRNumber, Target, WorkflowName, Vars), Commit.SHA1 (string).
+    required: false
+
   # update-drift-issue
   issue:
     description: The issue number. update-drift-issue uses this to update drift issues

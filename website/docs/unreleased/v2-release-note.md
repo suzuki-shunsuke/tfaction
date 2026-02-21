@@ -25,6 +25,7 @@ Additionally, it includes feature enhancements such as the introduction of a tem
 - Automatic fixes via tflint --fix enabled by default
 - Addition of `github_token_for_github_provider` input for passing a GitHub Access Token for the GitHub Provider
 - Automatic PR branch update when changes are detected on the base branch by comparing root modules between base and feature branches
+- Support hiding old comments by hide-comment action
 
 ### Performance Improvements
 
