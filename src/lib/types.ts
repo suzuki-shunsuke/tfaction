@@ -295,11 +295,6 @@ export const RawConfig = z.object({
     })
     .optional(),
   terraform_command: z.string().default("terraform"),
-  update_related_pull_requests: z
-    .object({
-      enabled: z.boolean().optional(),
-    })
-    .optional(),
   working_directory_file: z.string().default("tfaction.yaml"),
   module_file: z.string().default("tfaction_module.yaml"),
   replace_target: Replace.optional(),

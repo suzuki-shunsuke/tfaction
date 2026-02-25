@@ -31,9 +31,6 @@ scaffold_working_directory:
 #     skip_push: false # default is false
 #     prune: true # default is false
 
-update_related_pull_requests:
-  enabled: true
-
 drift_detection:
   enabled: false
   issue_repo_owner: suzuki-shunsuke

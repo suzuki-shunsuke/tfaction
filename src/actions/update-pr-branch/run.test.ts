@@ -28,7 +28,6 @@ const createMockLogger = () => ({
 const createBaseInput = (overrides: Partial<RunInput> = {}): RunInput => ({
   githubToken: "gh-token",
   target: "aws/dev/vpc",
-  disableUpdateRelatedPullRequests: false,
   csmActionsServerRepository: "",
   csmAppId: "",
   csmAppPrivateKey: "",
@@ -46,21 +45,6 @@ const createBaseInput = (overrides: Partial<RunInput> = {}): RunInput => ({
 describe("run", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  it("skips when disableUpdateRelatedPullRequests is true", async () => {
-    const logger = createMockLogger();
-    const input = createBaseInput({
-      disableUpdateRelatedPullRequests: true,
-      logger,
-    });
-
-    await run(input);
-
-    expect(logger.info).toHaveBeenCalledWith(
-      "Skip updating related pull requests",
-    );
-    expect(listRelatedPullRequests).not.toHaveBeenCalled();
   });
 
   it("calls updateBranchByCommit when csmActionsServerRepository is empty", async () => {

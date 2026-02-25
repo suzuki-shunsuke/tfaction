@@ -24,9 +24,6 @@ export const main = async () => {
   await run({
     githubToken,
     target: targetConfig.target,
-    disableUpdateRelatedPullRequests: !(
-      cfg.update_related_pull_requests?.enabled ?? true
-    ),
     csmActionsServerRepository: cfg.csm_actions?.server_repository ?? "",
     csmAppId: input.csmAppId,
     csmAppPrivateKey: input.csmAppPrivateKey,

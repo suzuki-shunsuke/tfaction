@@ -14,16 +14,11 @@ tfaction automatically updates PR branches. There are two types of updates:
 When terraform apply is run for a root module, PRs that modify the same root module need to be updated and have terraform plan run again.
 Otherwise, reviews based on an outdated plan are unreliable, and the plan file in GitHub Artifacts becomes stale, causing apply to fail even if the PR is merged.
 
-tfaction updates these PRs automatically by default, so users do not need any special configuration. However, you can disable automatic updates through settings.
+tfaction updates these PRs automatically by default, so users do not need any special configuration.
+If you want to disable automatic updates, you can simply not run the `update-pr-branch` action in your workflow.
 That said, as mentioned above, updating before merging is necessary, so disabling this is not recommended.
 
 - Adding the `tfaction:disable-auto-update` label to a PR prevents that PR from being automatically updated
-- You can disable this in tfaction-root.yaml:
-
-```yaml
-update_related_pull_requests:
-  enabled: false
-```
 
 ## 2. Automatic Update During PR CI
 
