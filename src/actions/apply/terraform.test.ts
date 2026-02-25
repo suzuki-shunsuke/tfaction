@@ -123,7 +123,6 @@ const createMockWriteStream = () => ({
 const createMockConfig = (overrides: Record<string, unknown> = {}) => ({
   git_root_dir: "/git/root",
   plan_workflow_name: "plan.yaml",
-  update_related_pull_requests: { enabled: true },
   target_groups: [],
   working_directory_file: "tfaction.yaml",
   module_file: "tfaction_module.yaml",

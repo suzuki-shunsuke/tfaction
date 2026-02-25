@@ -10,7 +10,6 @@ import {
 export type RunInput = {
   githubToken: string;
   target: string;
-  disableUpdateRelatedPullRequests: boolean;
   csmActionsServerRepository: string;
   csmAppId: string;
   csmAppPrivateKey: string;
@@ -31,11 +30,6 @@ export type RunInput = {
 };
 
 export const run = async (input: RunInput): Promise<void> => {
-  if (input.disableUpdateRelatedPullRequests) {
-    input.logger.info("Skip updating related pull requests");
-    return;
-  }
-
   const octokit = github.getOctokit(input.githubToken);
   const prNumbers = await listRelatedPullRequests({
     octokit,
