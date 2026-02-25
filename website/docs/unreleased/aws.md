@@ -1,17 +1,17 @@
 ---
-sidebar_position: 1200
+sidebar_position: 1300
 ---
 
-# Configuration for AWS
+# AWS Configuration
 
-This page explains the configuration for using the AWS Provider and S3 Backend.
+This page explains the configuration for using the AWS Provider or S3 Backend.
 If you do not use these, you can skip this page.
 
-When using these, you need to authenticate before running terraform init.
+When using these, you need to authenticate before running `terraform init`.
 
 ## IAM Role Configuration
 
-Configure the IAM Role to assume in tfaction-root.yaml or tfaction.yaml.
+Configure the IAM Role to assume in `tfaction-root.yaml` or `tfaction.yaml`.
 
 ```yaml
 target_groups:
@@ -23,10 +23,10 @@ target_groups:
       aws_assume_role_arn: arn:aws:iam::000000000000:role/GitHubActions_Terraform_AWS_terraform_apply
 ```
 
-Because you can use separate IAM Roles for terraform plan and apply, you can use a read-only IAM Role for plan and an IAM Role with stronger permissions for apply.
+You can use different IAM Roles for `terraform plan` and `apply`. For example, use a read-only IAM Role for plan and a more privileged IAM Role for apply.
 
-In tfaction v1, the `setup` action executed [aws-actions/configure-aws-credentials](https://github.com/aws-actions/configure-aws-credentials).
-Starting from v2, it is no longer executed automatically, so you need to run it yourself.
+In tfaction v1, the `setup` action executed [aws-actions/configure-aws-credentials](https://github.com/aws-actions/configure-aws-credentials) internally.
+Starting from v2, this is no longer done automatically, so you need to call it yourself.
 
 ```yaml
 - name: Set up
@@ -49,14 +49,14 @@ Starting from v2, it is no longer executed automatically, so you need to run it 
     action: terraform-init
 ```
 
-## Using the Terraform Module
+## Terraform Module
 
-You can use https://github.com/suzuki-shunsuke/terraform-aws-tfaction to create IAM Roles with the minimum required permissions.
+You can use [terraform-aws-tfaction](https://github.com/suzuki-shunsuke/terraform-aws-tfaction) to create IAM Roles with the minimum required permissions.
 However, using this module is not mandatory.
 
 ## OIDC
 
 You can assume an IAM Role from GitHub Actions using OIDC.
-This is not directly related to tfaction, so the details are omitted here.
+This is not directly related to tfaction, so we will not cover it in detail here.
 
 https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws

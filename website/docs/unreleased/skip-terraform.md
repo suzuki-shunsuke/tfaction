@@ -1,16 +1,19 @@
 ---
-sidebar_position: 2600
+sidebar_position: 3000
 ---
 
 # Skipping terraform plan and apply
 
-If only files matching `skip_terraform_files` under a working directory are modified, terraform plan and apply are skipped.
-This is intended to skip unnecessary terraform plan and apply runs when editing files that do not affect their results.
+When only files matching `skip_terraform_files` under a working directory are modified, terraform plan and apply are skipped.
+This is intended to avoid unnecessary terraform plan and apply runs when editing files that do not affect their results.
 This feature is disabled by default.
 
-```yaml:tfaction-root.yaml
+```yaml
 skip_terraform_files:
-  - "**/*.md" # Ignore markdown edits
+  - "**/*.md" # Ignore markdown edits. Paths are relative to each working directory
+  - "!README.md" # Do not ignore README.md at the working directory root
 ```
 
-Only terraform plan and apply are skipped; other linting and formatting steps still run.
+Lines starting with `!` are negation patterns that exclude files matched by preceding globs.
+
+Only terraform plan and apply are skipped; other operations such as linting and formatting still run.

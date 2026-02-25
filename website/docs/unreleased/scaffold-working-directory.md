@@ -1,14 +1,14 @@
 ---
-sidebar_position: 1000
+sidebar_position: 1200
 ---
 
-# Creating a Root Module from a Template
+# Scaffolding Root Modules and Modules from Templates
 
-Let's add a GitHub Actions workflow to create a root module from a template.
+Add a GitHub Actions workflow to create root modules or modules from templates.
 
-1. Add a workflow
+1. Add the workflow
 
-```yaml:.github/workflows/scaffold_working_directory.yaml
+```yaml
 name: Scaffold a working directory
 run-name: Scaffold a working directory (${{inputs.working_dir}})
 on:
@@ -50,7 +50,7 @@ jobs:
           github_token: ${{steps.token.outputs.token}}
 ```
 
-2. Add a template as well.
+1. Add your templates
 
 ```
 templates/hello
@@ -59,23 +59,36 @@ templates/hello
   # ...
 ```
 
-3. Specify the template to use for each target group in tfaction-root.yaml.
+1. Specify the template for each target group in `tfaction-root.yaml`
 
-```yaml:tfaction-root.yaml
+```yaml
 target_groups:
   - working_directory: ""
     template_dir: templates/hello
 ```
 
-That completes the setup. When you run the workflow specifying a working directory, a PR will be created.
+That is all the setup needed. Specify a working directory and run the workflow, and a PR will be created.
 
 ## Template Engine
 
-Files in the template are processed with [Handlebars](https://handlebarsjs.com/).
+Files within the template are processed with [Handlebars](https://handlebarsjs.com/).
+
+```
+{{ working_directory }}
+```
+
 The following variables are available.
 
-- ``
+For root modules:
 
-## Running the Workflow
+- `s3_bucket_name_for_tfmigrate_history`
+- `gcs_bucket_name_for_tfmigrate_history`
+- `working_directory`
+- `target`
 
-Run the workflow to create a PR.
+For modules:
+
+- `module_name`: The module name (directory name)
+- `working_directory`
+- `github_repository`
+- `ref`: `module_${targetConfig.working_directory.replace(/\//g, "_")}_v0.1.0`

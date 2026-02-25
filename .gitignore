@@ -12,3 +12,4 @@ terragrunt.rendered.json
 .claude/plans
 
 ja
+*-ja.md
