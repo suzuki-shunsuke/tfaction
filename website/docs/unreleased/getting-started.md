@@ -7,22 +7,21 @@ sidebar_position: 200
 We will build a simple workflow using the minimum configuration required for tfaction.
 
 1. Create `tfaction.yaml`
-2. Create `tfaction-root.yaml`
-3. Install Terraform
-4. Create a GitHub App
-5. Create a GitHub Actions workflow
+1. Create `tfaction-root.yaml`
+1. Install Terraform
+1. Create a GitHub App
+1. Create a GitHub Actions workflow
 
 ## Prerequisites
 
 Create a GitHub repository.
-
 In this guide, you will set up tfaction and learn by running GitHub Actions.
-Once you’re done, you can safely archive the repository.
+Once you are done, you can safely archive the repository.
 
 ## Create a Root Module
 
 Create a simple root module using `null_resource`.
-For this example, we use Terraform’s Local Backend.
+For this example, we use Terraform's Local Backend.
 In real-world use cases, you would typically use something like the S3 backend to persist state, but we will omit that here for simplicity.
 
 ```tf
@@ -34,7 +33,6 @@ Although tfaction supports monorepos, in this chapter we create a single root mo
 ## tfaction.yaml
 
 Create `tfaction.yaml` in the root module directory.
-
 `tfaction.yaml` defines settings specific to each root module.
 For now, an empty object `{}` is sufficient.
 
@@ -48,14 +46,13 @@ In other words, CI will not run in directories that do not contain `tfaction.yam
 ## tfaction-root.yaml
 
 Create `tfaction-root.yaml` at the repository root.
-
 This file defines global tfaction settings.
 Below is the minimum required configuration:
 
 ```yaml
 plan_workflow_name: test.yaml
 target_groups:
-  - working_directory: "**"
+  - working_directory: ""
 ```
 
 - `plan_workflow_name` is required and specifies the file name (not the workflow name) of the GitHub Actions workflow that runs `terraform plan`.
@@ -64,7 +61,6 @@ target_groups:
 ## Install Terraform
 
 Terraform must be installed.
-
 tfaction internally uses [aqua](https://aquaproj.github.io/).
 If you create an `aqua.yaml` file and manage Terraform with aqua, tfaction will automatically install it.
 
@@ -79,7 +75,7 @@ packages:
 
 You may also install required tools using methods other than aqua.
 
-If you use `hashicorp/setup-terraform`, note that due to a known bug, you must set `terraform_wrapper` to `false`:
+If you use `hashicorp/setup-terraform`, note that due to a known bug you need to set `terraform_wrapper` to `false`:
 
 ```yaml
 - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
@@ -101,25 +97,23 @@ Create a GitHub App that tfaction will use to create commits and PRs.
 
 Although you can use GitHub Actions' `GITHUB_TOKEN`, it does not trigger new workflow runs when pushing commits, which can be inconvenient.
 Personal Access Tokens are also less recommended due to user management overhead, lack of commit signing, and token rotation complexity.
-
 A GitHub App is recommended instead.
+
 Create the GitHub App with the following settings:
 
 - GitHub App name: Must be globally unique. Prefixing it with the GitHub App owner name helps ensure uniqueness.
 - Homepage URL: Any value is fine. For example: https://github.com/suzuki-shunsuke/tfaction
-- Webhook: Disable (uncheck `Active`).
+- Webhook: Disable (uncheck `Active`)
 - Permissions:
   - Repository Permissions:
-    - Actions: Read
-    - Contents: Write
-    - Pull requests: Write
+    - Actions: Read (to download plan files from GitHub Artifacts during apply)
+    - Contents: Write (can be reduced to Read if using Securefix Action)
+    - Pull requests: Write (to post comments and add labels to PRs)
 
-After creating the GitHub App, install it in the repository where tfaction will run.
-
+After creating the GitHub App, install it in the repository where tfaction will run via "Install App".
 From the App Settings page, generate a Private Key.
-Download it and register it as a Repository Secret.
-
-Also register the App ID as a Repository Variable.
+Download it and register it as a [Repository Secret](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets).
+Also register the App ID as a [Repository Variable](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-variables).
 
 ## Create the Workflow for PRs
 
@@ -130,7 +124,7 @@ name: test
 on: pull_request
 jobs:
   plan:
-    timeout-minutes: 60
+    timeout-minutes: 30
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -138,7 +132,7 @@ jobs:
       TFACTION_JOB_TYPE: terraform
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -173,9 +167,11 @@ jobs:
 ## Create a PR
 
 Create a pull request and let the workflow run.
-
-`.terraform.lock.hcl` will be generated.
+The first CI run will fail, and `.terraform.lock.hcl` will be generated.
 The result of `terraform plan` will be commented on the PR using tfcmt.
+
+![](https://storage.googleapis.com/zenn-user-upload/43a38f15b1be-20260208.png)
+
 Labels are also added to the PR based on the result.
 
 Review the comment, and if everything looks good, merge the PR.
@@ -184,6 +180,7 @@ After merging, `terraform init` and `apply` will run, and the results will be po
 ## Create the Workflow for Apply
 
 ```yaml
+---
 name: apply
 on:
   push:
@@ -199,7 +196,7 @@ jobs:
       TFACTION_JOB_TYPE: terraform
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -230,22 +227,15 @@ jobs:
         with:
           action: apply
           github_token: ${{ steps.token.outputs.token }}
-
-      - name: Create follow up PR
-        uses: suzuki-shunsuke/tfaction@latest
-        if: failure()
-        with:
-          action: create-follow-up-pr
-          github_token: ${{ steps.token.outputs.token }}
 ```
 
 After adding this workflow, merge the PR.
-
 `terraform apply` will run, and the results will be posted as a PR comment.
 
-## Next
+![](https://storage.googleapis.com/zenn-user-upload/b5b32ce87bfd-20260208.png)
+
+---
 
 At this point, you have successfully built a simple workflow using tfaction.
-
 For a workflow of this simplicity, you could implement it without tfaction, so its advantages may not yet be fully apparent.
-In the next chapters, we will explore the more advanced features of tfaction.
+In the following chapters, we will explore the various features of tfaction.

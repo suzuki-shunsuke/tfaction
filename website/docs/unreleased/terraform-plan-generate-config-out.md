@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2100
+sidebar_position: 2500
 ---
 
 # Code Generation with terraform plan -generate-config-out
@@ -9,11 +9,11 @@ sidebar_position: 2100
 https://developer.hashicorp.com/terraform/language/import
 
 With tfaction, you can run this in CI, commit the results, and automatically generate code.
-This is especially useful when developers lack the permissions to run `terraform plan` locally.
+This is especially useful when developers do not have the permissions to run terraform plan locally.
 
 ## Creating a Workflow
 
-This workflow runs `terraform plan -generate-config-out` in a specified branch and directory to generate code and commit it.
+This workflow runs `terraform plan -generate-config-out` on a specified branch and directory to generate code and commit it.
 This workflow does not create a PR.
 You need to add import blocks to the target branch beforehand.
 After running the workflow, create a PR.

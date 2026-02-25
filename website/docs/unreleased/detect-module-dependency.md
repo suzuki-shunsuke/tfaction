@@ -2,9 +2,9 @@
 sidebar_position: 800
 ---
 
-# Run Terraform When a Dependent Local-Path Module is Updated
+# Trigger Terraform When Dependent Local-path Modules Are Updated
 
-By default, list-targets lists updated root modules, but if a root module references a module by traversing up the directory hierarchy, updating that referenced module does not add the root module to the list.
+By default, `list-targets` lists only the root modules that were directly updated. However, if a root module references a module via a relative path outside its directory, the root module will not be included in the list when only the referenced module is updated.
 
 ```
 foo/
@@ -21,20 +21,20 @@ module "db" {
 }
 ```
 
-By enabling `update_local_path_module_caller` in tfaction-root.yaml, root modules will also be added to the list when a dependent module is updated.
+By enabling `update_local_path_module_caller` in `tfaction-root.yaml`, root modules will also be included in the list when their dependent modules are updated.
 
-```yaml:tfaction-root.yaml
+```yaml
 update_local_path_module_caller:
   enabled: true
 ```
 
-Internally, dependencies are analyzed using a tool called [terraform-config-inspect](https://github.com/hashicorp/terraform-config-inspect).
+Internally, tfaction uses [terraform-config-inspect](https://github.com/hashicorp/terraform-config-inspect) to analyze dependencies.
 
-This feature is relatively popular, but personally I am not a big fan of it.
+While this feature is relatively popular, it has some drawbacks:
 
-1. It takes time
-   1. terraform-config-inspect needs to be built from source
-   1. terraform-config-inspect must be run on all root modules, so execution time increases proportionally with the number of root modules
-1. Plan and apply run simultaneously on all dependent root modules
-   1. You cannot apply to a development environment before production
-   1. If a problem occurs in one root module causing a plan failure or a dangerous change, it blocks applying to all other root modules
+1. It is time-consuming
+   1. `terraform-config-inspect` needs to be built from source
+   2. It must be run for every root module, so execution time scales linearly with the number of root modules
+1. All dependent root modules run `plan` and `apply` simultaneously
+   1. You cannot apply to a dev environment before production, for example
+   2. If one root module fails or contains a dangerous change, it blocks the apply for all other dependent root modules

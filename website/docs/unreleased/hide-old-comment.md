@@ -2,24 +2,24 @@
 sidebar_position: 300
 ---
 
-# Hide Old PR Comments
+# Hiding Old PR Comments
 
-In the workflow built in [Getting Started](getting-started), tfcmt posts comments on pull requests.  
-However, one issue is that old comments remain and continue to accumulate.
+In the workflow built in [Getting Started](./getting-started), tfcmt posts comments to the PR, but old comments remain visible indefinitely.
 
 ![](https://storage.googleapis.com/zenn-user-upload/0082918de91c-20260208.png)
 
 There are two solutions:
 
-1. Hide old comments using hide-comment action
-2. Use [tfcmt plan -patch](https://suzuki-shunsuke.github.io/tfcmt/plan-patch/) to update existing comments instead of creating new ones
+1. Use the `hide-comment` action to hide old comments
+1. Use [tfcmt plan -patch](https://suzuki-shunsuke.github.io/tfcmt/plan-patch/) to update existing comments instead of creating new ones
 
 We recommend option 1.
 
 ## hide-comment action
 
-Run `hide-comment` action.
-`pull_request:write` permission is required.
+Run the `hide-comment` action in your GitHub Actions workflow.
+
+The `pull_requests: write` permission is required.
 
 ```yaml
 - uses: suzuki-shunsuke/tfaction@latest
@@ -27,7 +27,7 @@ Run `hide-comment` action.
     action: hide-comment
 ```
 
-With this setup, old comments will be hidden.
+This hides old comments:
 
 ![](https://storage.googleapis.com/zenn-user-upload/bd7b16acc7af-20260208.png)
 
@@ -41,20 +41,18 @@ Create a tfcmt configuration file:
 plan_patch: true
 ```
 
-This causes `terraform plan` and `apply` comments to be updated instead of creating new ones.
+This causes `terraform plan` and `apply` result comments to be updated in place:
 
 ![](https://storage.googleapis.com/zenn-user-upload/c4224657d761-20260208.png)
 
-However, tfaction does not only post comments via tfcmt.
-Older comments created by tools other than tfcmt will still remain.
-
-Therefore, it is recommended to combine this with hide-comment action.
-That said, if you do so, you might conclude that using only hide-comment action is sufficient.
+However, tfaction posts comments from sources other than tfcmt, and those old comments will still remain.
+It is best to use this in combination with hide-comment action.
+That said, if you are using both together, hide-comment action alone may be sufficient.
 
 ```yaml
 - uses: suzuki-shunsuke/tfaction@latest
   with:
-    action: hide-comment
+    # Do not hide comments posted by tfcmt
     if: |
       Comment.HasMeta && Comment.Meta.SHA1 != Commit.SHA1 && Comment.Meta.Program != "tfcmt"
 ```

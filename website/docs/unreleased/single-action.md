@@ -4,7 +4,7 @@ sidebar_position: 600
 
 # tfaction v2 is a Single Action
 
-If you look at the workflow in Getting Started, you can see that tfaction calls the same action multiple times with different values for the `action` input.
+Looking at the workflow from [Getting Started](./getting-started), you can see that tfaction calls the same action multiple times with different values for the `action` input.
 
 ```yaml
 - uses: suzuki-shunsuke/tfaction@latest
@@ -20,13 +20,13 @@ If you look at the workflow in Getting Started, you can see that tfaction calls 
     action: plan
 ```
 
-In tfaction v2, the `action` input switches the behavior of the action.
+In tfaction v2, the `action` input switches the behavior of the action:
 
-- setup: Pre-processing
-- terraform-init: `terraform init`
-- plan: `terraform plan`
-- apply: `terraform apply`
+- `setup`: Pre-processing
+- `terraform-init`: `terraform init`
+- `plan`: `terraform plan`
+- `apply`: `terraform apply`
 
-For convenience, we sometimes refer to them by their action input value, such as "setup action."
+For convenience, we sometimes refer to each behavior by its `action` input value (e.g., "setup action").
 
 Using a single action improves both performance and maintainability.

@@ -4,11 +4,11 @@ sidebar_position: 900
 
 # Linting and Formatting
 
-You can perform linting and formatting using the `test` action.
+The `test` action provides linting and formatting capabilities:
 
-- terraform fmt
-- terraform validate
-- Optional
+- `terraform fmt`
+- `terraform validate`
+- Optional:
   - tflint
   - trivy
   - conftest
@@ -35,79 +35,77 @@ Run it after `terraform-init` and before `plan`.
     github_token: ${{ steps.token.outputs.token }}
 ```
 
-For now, let's disable tflint and trivy.
+To start, let's disable tflint and trivy:
 
-```yaml:tfaction-root.yaml
+```yaml
 tflint:
   enabled: false
 trivy:
   enabled: false
 ```
 
-This enables validation with terraform validate and automatic formatting with terraform fmt.
+This enables `terraform validate` for validation and `terraform fmt` for automatic formatting.
 
 ## terraform fmt
 
-If the code is not formatted, terraform fmt will format it and automatically push a commit.
+If the code is not formatted, `terraform fmt` will format it and automatically push a commit to the PR.
 
 ![terraform fmt](https://storage.googleapis.com/zenn-user-upload/a54a142fb196-20260208.png)
 
 ## terraform-docs
 
-[terraform-docs](https://terraform-docs.io/) is disabled by default, so let's enable it.
+[terraform-docs](https://terraform-docs.io/) is disabled by default. To enable it:
 
-```yaml:tfaction-root.yaml
+```yaml
 terraform_docs:
   enabled: true
 ```
 
-Documentation is automatically generated and updated.
-tfaction installs terraform-docs automatically.
+Documentation will be automatically generated and updated.
+terraform-docs is installed automatically by tfaction.
 
 ![](https://storage.googleapis.com/zenn-user-upload/80fbdc39621f-20260208.png)
 
-terraform-docs works without configuration, but if you want to write a configuration file, create it at one of the following paths (listed in order of priority):
+terraform-docs works without configuration, but if you want to customize it, create a configuration file at one of the following paths (in order of priority):
 
 1. `.terraform-docs.ya?ml` in the root module
 1. `.config/.terraform-docs.ya?ml` in the root module
-1. `.terraform-docs.ya?ml` in the repository root
-1. `.config/.terraform-docs.ya?ml` in the repository root
+1. `.terraform-docs.ya?ml` at the repository root
+1. `.config/.terraform-docs.ya?ml` at the repository root
 
 ## tflint
 
-[tflint](https://github.com/terraform-linters/tflint) is enabled by default, but you can also explicitly enable it in the configuration.
+[tflint](https://github.com/terraform-linters/tflint) is enabled by default. You can also explicitly enable it in configuration:
 
-```yaml:tfaction-root.yaml
+```yaml
 tflint:
   enabled: true
 ```
 
-You need to install tflint.
-Let's add it to aqua.yaml.
+tflint must be installed. Add it to `aqua.yaml`:
 
 ```sh
 aqua g -i terraform-linters/tflint
 ```
 
-```yaml:aqua.yaml
+```yaml
 packages:
   - name: terraform-linters/tflint@v0.61.0
 ```
 
-tflint performs linting and reviewdog creates reviews.
+tflint results are reported via reviewdog reviews.
 
 ![](https://storage.googleapis.com/zenn-user-upload/49d868efb665-20260208.png)
 
-Automatic fixes with tflint --fix are also supported.
-This is enabled by default, but can be disabled.
+Automatic fixes via `tflint --fix` are also enabled by default. To disable them:
 
 ```yaml
 tflint:
   fix: false
 ```
 
-[Refer to tflint's official documentation for configuration file details.](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/config.md)
-If you want to share a common configuration file, create one in the repository root and set the `TFLINT_CONFIG_FILE` environment variable.
+[Refer to the official tflint documentation for configuration file details.](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/config.md)
+If you want to share a tflint configuration across root modules, place the configuration file at the repository root and set the `TFLINT_CONFIG_FILE` environment variable:
 
 ```yaml
 env:
@@ -116,33 +114,32 @@ env:
 
 ## trivy
 
-[trivy](https://trivy.dev/) is enabled by default, but you can also explicitly enable it in the configuration.
+[trivy](https://trivy.dev/) is enabled by default. You can also explicitly enable it in configuration:
 
-```yaml:tfaction-root.yaml
+```yaml
 trivy:
   enabled: true
 ```
 
-You need to install trivy.
-Let's add it to aqua.yaml.
+trivy must be installed. Add it to `aqua.yaml`:
 
 ```sh
 aqua g -i aquasecurity/trivy
 ```
 
-```yaml:aqua.yaml
+```yaml
 packages:
   - name: aquasecurity/trivy@v0.69.1
 ```
 
-trivy performs linting and reviewdog creates reviews.
+trivy results are reported via reviewdog reviews.
 
 ### reviewdog
 
-trivy and tflint results are reflected in PRs through reviewdog.
-You can configure reviewdog's command-line options.
+Both trivy and tflint results are reported to the PR via reviewdog.
+You can configure reviewdog's command-line options:
 
-```yaml:tfaction-root.yaml
+```yaml
 tflint:
   reviewdog:
     filter_mode: added # Default is nofilter
@@ -153,36 +150,36 @@ trivy:
     fail_level: error # Default is any
 ```
 
-The important setting is `filter_mode`.
-The default is `nofilter`, which targets all files in the root module.
+The key setting is `filter_mode`.
+The default `nofilter` targets all files in the root module.
 On the other hand, `added` targets only changed files.
 Which is better depends on your situation.
-If you want to strictly enforce policies, `nofilter` is appropriate.
-However, it is often difficult to retroactively apply policies to existing code.
-In that case, it may be more practical to give up on applying policies to existing code and use `added` to apply policies only to new code.
+If you want strict policy enforcement, `nofilter` is appropriate.
+However, retroactively applying policies to existing code can be difficult.
+In that case, it may be more practical to use `added` and apply policies only to new code.
 
 ## conftest
 
-[conftest](https://www.conftest.dev/) is executed in the test and plan actions.
-In test, it runs against HCL; in plan, it runs against plan files.
-Usually, running against plan files is preferable.
+[conftest](https://www.conftest.dev/) runs in both the `test` and `plan` actions.
+In `test`, it runs against HCL files. In `plan`, it runs against plan files.
+Typically, running against plan files is preferable:
 
-- You can apply policies based on plan results (create, update, destroy)
-  - For example, you can apply policies only to new resources or apply policies on destroy
-- You can apply policies based on terraform's computed results
+- You can apply policies based on the plan result (create, update, destroy)
+  - For example, apply a policy only to new resources, or apply a policy on destroy
+- You can apply policies based on Terraform's computed values
 
-On the other hand, there are cases where running against HCL is better.
+However, running against HCL files can also be useful:
 
-- Settings like backend configuration are not included in plan files, so policies can only be applied against HCL
-- Since terraform plan carries risks such as arbitrary code execution and credential exfiltration, you can apply policies against HCL before running terraform plan to check for dangerous code
+- Backend configuration is not included in plan files, so policies for it must be applied against HCL
+- Since `terraform plan` carries risks such as arbitrary code execution and credential exfiltration, you may want to validate HCL before running `terraform plan` to catch dangerous code
 
-https://zenn.dev/shunsuke_suzuki/scraps/53d7f5e954f90d
+https://engineering.mercari.com/en/blog/entry/20230706-bucket-full-of-secrets-terraform-exfiltration/
 
-To run against HCL, specify `tf: true`.
+To run against HCL files, specify `tf: true`.
 To run against plan files, specify `plan: true`.
-If neither is specified, conftest can also run against non-Terraform files such as YAML or Dockerfiles.
+If neither is specified, you can run conftest against non-Terraform files such as YAML or Dockerfiles.
 
-```yaml:tfaction-root.yaml
+```yaml
 conftest:
   policies:
     - policy: policy/tf
@@ -197,9 +194,9 @@ conftest:
         - "*.yaml"
 ```
 
-`.conftest.policies[]` supports many options of the `conftest test` command.
+`.conftest.policies[]` supports most options of the `conftest test` command:
 
-```yaml:tfaction-root.yaml
+```yaml
 conftest:
   policies:
     - policy: # array or string
@@ -222,9 +219,9 @@ conftest:
         - main
 ```
 
-In addition, there are several tfaction-specific settings.
+In addition, there are several tfaction-specific settings:
 
-- id: Optional. An ID to identify the policy. Required when you want to override a policy.
-- plan: Set to true to run against plan files. Default is false.
-- tf: Set to true to run against _.tf and _.tf.json files. Default is false.
-- enabled: Default is true. Useful when you want to override and disable a setting.
+- `id`: Optional. An identifier for the policy. Required when you want to override a policy.
+- `plan`: Set to `true` to run against plan files. Default is `false`.
+- `tf`: Set to `true` to run against `*.tf` and `*.tf.json` files. Default is `false`.
+- `enabled`: Default is `true`. Can be used to disable a policy when overriding settings.
