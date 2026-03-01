@@ -318,6 +318,13 @@ export const RawConfig = z.object({
       changed_files: z.string().array(),
     })
     .optional(),
+  comments: z
+    .object({
+      id: z.string(),
+      body: z.string(),
+    })
+    .array()
+    .optional(),
 });
 export type RawConfig = z.infer<typeof RawConfig>;
 

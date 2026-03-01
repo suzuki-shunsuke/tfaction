@@ -239,6 +239,7 @@ const validateChangeLimits = async (
   maxChangedWorkingDirectories: number,
   octokit: ReturnType<typeof github.getOctokit>,
   prNumber: number,
+  commentOverrides?: Array<{ id: string; body: string }>,
 ): Promise<void> => {
   if (
     maxChangedWorkingDirectories > 0 &&
@@ -251,6 +252,7 @@ const validateChangeLimits = async (
       vars: {
         max_changed_dirs: `${maxChangedWorkingDirectories}`,
       },
+      commentOverrides,
     });
     throw new Error(
       `Too many working directories are changed (${targetConfigs.length}). Max is ${maxChangedWorkingDirectories}.`,
@@ -366,6 +368,7 @@ export const run = async (input: Input): Promise<Result> => {
     input.maxChangedWorkingDirectories,
     input.octokit,
     input.prNumber,
+    input.commentOverrides,
   );
 
   return result;
@@ -399,6 +402,7 @@ type Input = {
   prNumber: number;
   /** Relative paths from git_root_dir of changed files, for test_workflow matching */
   relativeChangedFiles?: string[];
+  commentOverrides?: Array<{ id: string; body: string }>;
 };
 
 /**
@@ -515,6 +519,7 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     prNumber: github.context.payload.pull_request?.number ?? 0,
     moduleCallers,
     relativeChangedFiles: pr.pr?.files ?? [],
+    commentOverrides: cfg.comments,
   });
 
   core.info(`result: ${JSON.stringify(result)}`);
