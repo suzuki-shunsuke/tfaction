@@ -12,7 +12,7 @@
   "dependencies": {
     "@actions/core": "3.0.0",
     "@actions/exec": "^3.0.0",
-    "@actions/github": "7.0.0",
+    "@actions/github": "9.0.0",
     "@actions/tool-cache": "^4.0.0",
     "@aws-sdk/client-secrets-manager": "3.993.0",
     "@csm-actions/securefix-action": "npm:@jsr/csm-actions__securefix-action@^0.1.3",
