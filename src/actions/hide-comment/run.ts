@@ -199,7 +199,12 @@ export const run = async (input: RunInput): Promise<RunResult> => {
 
     const meta = parseCommentMeta(comment.body);
     const context = buildCELContext(meta, commitSHA);
-    const result = evaluate(ifCondition, context);
+    let result: unknown = false;
+    try {
+      result = evaluate(ifCondition, context);
+    } catch (e: unknown) {
+      logger.debug(`evaluate the expression: ${e}`);
+    }
 
     if (result) {
       logger.debug(`Hiding comment ${comment.id}`);
