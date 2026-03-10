@@ -41,7 +41,7 @@ export const list = async (
         silent: true,
       },
     );
-    let terragruntVersion = "";
+    let terragruntVersion: string;
     if (terragruntVersionOut.stdout.startsWith("terragrunt version ")) {
       terragruntVersion = terragruntVersionOut.stdout.slice(
         "terragrunt version ".length,
