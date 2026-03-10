@@ -241,8 +241,8 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   }
 
   const installDir = path.join(lib.GitHubActionPath, "install");
-  let templatePath = "";
-  let content = "";
+  let templatePath: string;
+  let content: string;
 
   // Generate from S3 template
   if (inputs.s3BucketNameTfmigrateHistory) {
