@@ -148,6 +148,10 @@ export const dismissApprovalReviews = async (
           reviews(first: 100, states: [APPROVED], after: $cursor) {
             nodes {
               id
+              author {
+                __typename
+                login
+              }
             }
             pageInfo {
               hasNextPage
@@ -158,7 +162,7 @@ export const dismissApprovalReviews = async (
       }
     }`;
 
-    const reviewIds: string[] = [];
+    const reviewIds: Array<{ id: string; login: string | null }> = [];
     let cursor: string | null = null;
 
     while (true) {
@@ -166,7 +170,13 @@ export const dismissApprovalReviews = async (
         repository: {
           pullRequest: {
             reviews: {
-              nodes: Array<{ id: string }>;
+              nodes: Array<{
+                id: string;
+                author: {
+                  __typename: string;
+                  login: string;
+                } | null;
+              }>;
               pageInfo: {
                 hasNextPage: boolean;
                 endCursor: string;
@@ -182,7 +192,10 @@ export const dismissApprovalReviews = async (
       });
 
       for (const node of result.repository.pullRequest.reviews.nodes) {
-        reviewIds.push(node.id);
+        reviewIds.push({
+          id: node.id,
+          login: node.author?.__typename === "User" ? node.author.login : null,
+        });
       }
 
       if (!result.repository.pullRequest.reviews.pageInfo.hasNextPage) {
@@ -191,7 +204,8 @@ export const dismissApprovalReviews = async (
       cursor = result.repository.pullRequest.reviews.pageInfo.endCursor;
     }
 
-    for (const reviewId of reviewIds) {
+    const dismissedLogins: string[] = [];
+    for (const review of reviewIds) {
       try {
         await octokit.graphql(
           `mutation($reviewId: ID!, $message: String!) {
@@ -202,14 +216,32 @@ export const dismissApprovalReviews = async (
             }
           }`,
           {
-            reviewId,
-            message:
-              "Dismissing approval because terraform plan has been re-run. Please review the new plan output before approving again.",
+            reviewId: review.id,
+            message: `${review.login ? `@${review.login} ` : ""}Dismissing approval because terraform plan has been re-run. Please review the new plan output before approving again.`,
           },
         );
+        if (review.login) {
+          dismissedLogins.push(review.login);
+        }
       } catch (e) {
         core.warning(
-          `Failed to dismiss review ${reviewId}: ${e instanceof Error ? e.message : String(e)}`,
+          `Failed to dismiss review ${review.id}: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
+    }
+
+    const uniqueLogins = [...new Set(dismissedLogins)];
+    if (uniqueLogins.length > 0) {
+      try {
+        await octokit.rest.pulls.requestReviewers({
+          owner,
+          repo,
+          pull_number: prNumber,
+          reviewers: uniqueLogins,
+        });
+      } catch (e) {
+        core.warning(
+          `Failed to request reviewers: ${e instanceof Error ? e.message : String(e)}`,
         );
       }
     }
@@ -229,8 +261,8 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   }
 
   const installDir = path.join(lib.GitHubActionPath, "install");
-  let templatePath = "";
-  let content = "";
+  let templatePath: string;
+  let content: string;
 
   // Generate from S3 template
   if (inputs.s3BucketNameTfmigrateHistory) {
