@@ -204,6 +204,7 @@ export const dismissApprovalReviews = async (
       cursor = result.repository.pullRequest.reviews.pageInfo.endCursor;
     }
 
+    const dismissedLogins: string[] = [];
     for (const review of reviewIds) {
       try {
         await octokit.graphql(
@@ -219,9 +220,28 @@ export const dismissApprovalReviews = async (
             message: `${review.login ? `@${review.login} ` : ""}Dismissing approval because terraform plan has been re-run. Please review the new plan output before approving again.`,
           },
         );
+        if (review.login) {
+          dismissedLogins.push(review.login);
+        }
       } catch (e) {
         core.warning(
           `Failed to dismiss review ${review.id}: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
+    }
+
+    const uniqueLogins = [...new Set(dismissedLogins)];
+    if (uniqueLogins.length > 0) {
+      try {
+        await octokit.rest.pulls.requestReviewers({
+          owner,
+          repo,
+          pull_number: prNumber,
+          reviewers: uniqueLogins,
+        });
+      } catch (e) {
+        core.warning(
+          `Failed to request reviewers: ${e instanceof Error ? e.message : String(e)}`,
         );
       }
     }
