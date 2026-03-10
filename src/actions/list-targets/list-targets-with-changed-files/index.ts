@@ -208,7 +208,7 @@ const addTargetsFromChangedWorkingDirs = (
     if (terraformTargets.has(target) || tfmigrates.has(target)) {
       continue;
     }
-    let skipTerraform = false;
+    let skipTerraform: boolean;
     if (skips.has(target)) {
       skipTerraform = true;
     } else {
