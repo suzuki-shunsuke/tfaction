@@ -103,7 +103,10 @@ const createMockOctokit = () => ({
 
 // Helper to build a GraphQL reviews response
 const graphqlReviewsResponse = (
-  nodes: Array<{ id: string }>,
+  nodes: Array<{
+    id: string;
+    author?: { __typename: string; login: string } | null;
+  }>,
   hasNextPage: boolean,
   endCursor: string | null,
 ) => ({
@@ -447,7 +450,11 @@ describe("runTerraformPlan", () => {
     const mockOctokit = createMockOctokit();
     mockOctokit.graphql
       .mockResolvedValueOnce(
-        graphqlReviewsResponse([{ id: "PRR_1" }], false, null),
+        graphqlReviewsResponse(
+          [{ id: "PRR_1", author: { __typename: "User", login: "user1" } }],
+          false,
+          null,
+        ),
       )
       .mockResolvedValueOnce({}); // dismiss mutation
     vi.mocked(github.getOctokit).mockReturnValue(
@@ -620,7 +627,14 @@ describe("dismissApprovalReviews", () => {
     const mockOctokit = createMockOctokit();
     mockOctokit.graphql
       .mockResolvedValueOnce(
-        graphqlReviewsResponse([{ id: "PRR_1" }, { id: "PRR_2" }], false, null),
+        graphqlReviewsResponse(
+          [
+            { id: "PRR_1", author: { __typename: "User", login: "user1" } },
+            { id: "PRR_2", author: { __typename: "User", login: "user2" } },
+          ],
+          false,
+          null,
+        ),
       )
       .mockResolvedValueOnce({}) // dismiss PRR_1
       .mockResolvedValueOnce({}); // dismiss PRR_2
@@ -636,14 +650,18 @@ describe("dismissApprovalReviews", () => {
       expect.stringContaining("dismissPullRequestReview"),
       expect.objectContaining({
         reviewId: "PRR_1",
-        message: expect.stringContaining("terraform plan has been re-run"),
+        message: expect.stringMatching(
+          /^@user1 .*terraform plan has been re-run/,
+        ),
       }),
     );
     expect(mockOctokit.graphql).toHaveBeenCalledWith(
       expect.stringContaining("dismissPullRequestReview"),
       expect.objectContaining({
         reviewId: "PRR_2",
-        message: expect.stringContaining("terraform plan has been re-run"),
+        message: expect.stringMatching(
+          /^@user2 .*terraform plan has been re-run/,
+        ),
       }),
     );
   });
@@ -666,7 +684,14 @@ describe("dismissApprovalReviews", () => {
     const mockOctokit = createMockOctokit();
     mockOctokit.graphql
       .mockResolvedValueOnce(
-        graphqlReviewsResponse([{ id: "PRR_1" }, { id: "PRR_2" }], false, null),
+        graphqlReviewsResponse(
+          [
+            { id: "PRR_1", author: { __typename: "User", login: "user1" } },
+            { id: "PRR_2", author: { __typename: "User", login: "user2" } },
+          ],
+          false,
+          null,
+        ),
       )
       .mockRejectedValueOnce(new Error("Dismiss failed")) // dismiss PRR_1 fails
       .mockResolvedValueOnce({}); // dismiss PRR_2 succeeds
@@ -681,6 +706,62 @@ describe("dismissApprovalReviews", () => {
     );
     // 1 list query + 2 dismiss mutations (both attempted)
     expect(mockOctokit.graphql).toHaveBeenCalledTimes(3);
+  });
+
+  it("does not prepend mention for deleted user (null author)", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse([{ id: "PRR_1", author: null }], false, null),
+      )
+      .mockResolvedValueOnce({});
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(mockOctokit.graphql).toHaveBeenCalledWith(
+      expect.stringContaining("dismissPullRequestReview"),
+      expect.objectContaining({
+        reviewId: "PRR_1",
+        message: expect.stringMatching(/^Dismissing approval/),
+      }),
+    );
+  });
+
+  it("does not prepend mention for bot author", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse(
+          [
+            {
+              id: "PRR_1",
+              author: {
+                __typename: "Bot",
+                login: "github-actions[bot]",
+              },
+            },
+          ],
+          false,
+          null,
+        ),
+      )
+      .mockResolvedValueOnce({});
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    await dismissApprovalReviews("test-token", 42);
+
+    expect(mockOctokit.graphql).toHaveBeenCalledWith(
+      expect.stringContaining("dismissPullRequestReview"),
+      expect.objectContaining({
+        reviewId: "PRR_1",
+        message: expect.stringMatching(/^Dismissing approval/),
+      }),
+    );
   });
 
   it("does nothing when no approved reviews exist", async () => {
