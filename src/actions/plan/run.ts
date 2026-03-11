@@ -22,22 +22,29 @@ const PlanJson = z.object({
   resource_changes: z.array(ResourceChange).nullable().optional(),
 });
 
-export type ResultSummary = "no-op" | "update" | "delete";
+export type ResultSummary = "no-op" | "update" | "create" | "delete";
 
 export const getResultSummary = (planJsonContent: string): ResultSummary => {
   const plan = PlanJson.parse(JSON.parse(planJsonContent));
   const resourceChanges = plan.resource_changes ?? [];
   let hasUpdate = false;
+  let hasCreate = false;
   for (const rc of resourceChanges) {
     const actions = rc.change.actions;
     if (actions.includes("delete")) {
       return "delete";
     }
-    if (actions.includes("create") || actions.includes("update")) {
+    if (actions.includes("update")) {
       hasUpdate = true;
     }
+    if (actions.includes("create")) {
+      hasCreate = true;
+    }
   }
-  return hasUpdate ? "update" : "no-op";
+  if (hasUpdate) {
+    return "update";
+  }
+  return hasCreate ? "create" : "no-op";
 };
 
 type Inputs = {

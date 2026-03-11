@@ -1041,9 +1041,19 @@ describe("getResultSummary", () => {
     expect(getResultSummary(JSON.stringify(plan))).toBe("no-op");
   });
 
-  it("returns update when actions include create", () => {
+  it("returns create when actions include create", () => {
     const plan = {
       resource_changes: [{ change: { actions: ["create"] } }],
+    };
+    expect(getResultSummary(JSON.stringify(plan))).toBe("create");
+  });
+
+  it("returns update when actions include both create and update resources", () => {
+    const plan = {
+      resource_changes: [
+        { change: { actions: ["create"] } },
+        { change: { actions: ["update"] } },
+      ],
     };
     expect(getResultSummary(JSON.stringify(plan))).toBe("update");
   });
