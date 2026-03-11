@@ -28,32 +28,30 @@ describe("listFiles", () => {
   });
 
   it("extracts a single file", () => {
-    const out = makeSarif([
-      { results: [{ locations: [{ uri: "work/main.tf" }] }] },
-    ]);
-    expect(listFiles(out, "work")).toEqual(new Set(["main.tf"]));
+    const out = makeSarif([{ results: [{ locations: [{ uri: "main.tf" }] }] }]);
+    expect(listFiles(out, "work")).toEqual(new Set(["work/main.tf"]));
   });
 
   it("extracts multiple files from multiple results", () => {
     const out = makeSarif([
       {
         results: [
-          { locations: [{ uri: "work/main.tf" }] },
-          { locations: [{ uri: "work/variables.tf" }] },
+          { locations: [{ uri: "main.tf" }] },
+          { locations: [{ uri: "variables.tf" }] },
         ],
       },
     ]);
     expect(listFiles(out, "work")).toEqual(
-      new Set(["main.tf", "variables.tf"]),
+      new Set(["work/main.tf", "work/variables.tf"]),
     );
   });
 
   it("extracts files from multiple runs", () => {
     const out = makeSarif([
-      { results: [{ locations: [{ uri: "work/a.tf" }] }] },
-      { results: [{ locations: [{ uri: "work/b.tf" }] }] },
+      { results: [{ locations: [{ uri: "a.tf" }] }] },
+      { results: [{ locations: [{ uri: "b.tf" }] }] },
     ]);
-    expect(listFiles(out, "work")).toEqual(new Set(["a.tf", "b.tf"]));
+    expect(listFiles(out, "work")).toEqual(new Set(["work/a.tf", "work/b.tf"]));
   });
 
   it("extracts multiple files from multiple locations in a single result", () => {
@@ -61,24 +59,26 @@ describe("listFiles", () => {
       {
         results: [
           {
-            locations: [{ uri: "work/main.tf" }, { uri: "work/outputs.tf" }],
+            locations: [{ uri: "main.tf" }, { uri: "outputs.tf" }],
           },
         ],
       },
     ]);
-    expect(listFiles(out, "work")).toEqual(new Set(["main.tf", "outputs.tf"]));
+    expect(listFiles(out, "work")).toEqual(
+      new Set(["work/main.tf", "work/outputs.tf"]),
+    );
   });
 
   it("deduplicates files", () => {
     const out = makeSarif([
       {
         results: [
-          { locations: [{ uri: "work/main.tf" }] },
-          { locations: [{ uri: "work/main.tf" }] },
+          { locations: [{ uri: "main.tf" }] },
+          { locations: [{ uri: "main.tf" }] },
         ],
       },
     ]);
-    expect(listFiles(out, "work")).toEqual(new Set(["main.tf"]));
+    expect(listFiles(out, "work")).toEqual(new Set(["work/main.tf"]));
   });
 
   it("skips results without locations", () => {
@@ -86,20 +86,20 @@ describe("listFiles", () => {
       {
         results: [
           { locations: undefined },
-          { locations: [{ uri: "work/main.tf" }] },
+          { locations: [{ uri: "main.tf" }] },
         ],
       },
     ]);
-    expect(listFiles(out, "work")).toEqual(new Set(["main.tf"]));
+    expect(listFiles(out, "work")).toEqual(new Set(["work/main.tf"]));
   });
 
   it("computes relative path from workingDir", () => {
     const out = makeSarif([
       {
-        results: [{ locations: [{ uri: "env/dev/main.tf" }] }],
+        results: [{ locations: [{ uri: "main.tf" }] }],
       },
     ]);
-    expect(listFiles(out, "env/dev")).toEqual(new Set(["main.tf"]));
+    expect(listFiles(out, "env/dev")).toEqual(new Set(["env/dev/main.tf"]));
   });
 
   it("handles empty workingDir", () => {

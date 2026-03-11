@@ -39,10 +39,7 @@ export const listFiles = (out: string, workingDir: string): Set<string> => {
       }
       for (const location of result.locations) {
         files.add(
-          path.relative(
-            workingDir,
-            location.physicalLocation.artifactLocation.uri,
-          ),
+          path.join(workingDir, location.physicalLocation.artifactLocation.uri),
         );
       }
     }
