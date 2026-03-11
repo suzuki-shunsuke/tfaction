@@ -20,6 +20,13 @@ type Octokit = ReturnType<typeof github.getOctokit>;
 
 const LABEL_PREFIX = "tfaction:plan-result:";
 
+const LABEL_COLORS: Record<ResultSummary, string> = {
+  "no-op": "0e8a16",
+  create: "1d76db",
+  update: "ffff00",
+  delete: "d93f0b",
+};
+
 const PRIORITY: Record<ResultSummary, number> = {
   "no-op": 0,
   create: 1,
@@ -63,6 +70,21 @@ export const updatePlanResultLabel = async (
   // Remove stale plan-result labels
   for (const label of existingPlanLabels) {
     if (label === desiredLabel) {
+      // Label already on PR; ensure its color is correct
+      if (result !== undefined) {
+        const existing = currentLabels.find((l) => l.name === desiredLabel);
+        if (existing && existing.color !== LABEL_COLORS[result]) {
+          await octokit.rest.issues.updateLabel({
+            owner,
+            repo,
+            name: desiredLabel,
+            color: LABEL_COLORS[result],
+          });
+          core.info(
+            `Updated label "${desiredLabel}" color to #${LABEL_COLORS[result]}`,
+          );
+        }
+      }
       continue;
     }
     await octokit.rest.issues.removeLabel({
@@ -78,13 +100,29 @@ export const updatePlanResultLabel = async (
     desiredLabel !== undefined &&
     !existingPlanLabels.includes(desiredLabel)
   ) {
-    await octokit.rest.issues.addLabels({
+    const { data: addedLabels } = await octokit.rest.issues.addLabels({
       owner,
       repo,
       issue_number: prNumber,
       labels: [desiredLabel],
     });
     core.info(`Added label "${desiredLabel}" to PR #${prNumber}`);
+    if (result !== undefined) {
+      const added = addedLabels.find(
+        (l: { name: string }) => l.name === desiredLabel,
+      );
+      if (added && added.color !== LABEL_COLORS[result]) {
+        await octokit.rest.issues.updateLabel({
+          owner,
+          repo,
+          name: desiredLabel,
+          color: LABEL_COLORS[result],
+        });
+        core.info(
+          `Updated label "${desiredLabel}" color to #${LABEL_COLORS[result]}`,
+        );
+      }
+    }
   }
 };
 
