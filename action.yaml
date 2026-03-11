@@ -76,6 +76,11 @@ inputs:
       Available variables - Comment.HasMeta (bool), Comment.Meta (object with SHA1, Program, Command, JobName, PRNumber, Target, WorkflowName, Vars), Commit.SHA1 (string).
     required: false
 
+  # apply-label
+  result:
+    description: Job result (success, failure, cancelled, or skipped). Used by apply-label to manage labels.
+    required: false
+
   # update-drift-issue
   issue:
     description: The issue number. update-drift-issue uses this to update drift issues

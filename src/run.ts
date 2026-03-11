@@ -16,6 +16,7 @@ import * as updateDriftIssue from "./actions/update-drift-issue";
 import * as setDriftEnv from "./actions/set-drift-env";
 import * as syncDriftIssueDescription from "./actions/sync-drift-issue-description";
 import * as apply from "./actions/apply";
+import * as applyLabel from "./actions/apply-label";
 import * as plan from "./actions/plan";
 import * as planLabel from "./actions/plan-label";
 import * as releaseModule from "./actions/release-module";
@@ -34,6 +35,7 @@ interface API {
 export const main = async (inputs: Inputs) => {
   const actions = new Map<string, API>([
     ["apply", apply],
+    ["apply-label", applyLabel],
     ["create-drift-issues", createDriftIssues],
     ["create-follow-up-pr", createFollowUpPR],
     ["create-scaffold-pr", createScaffoldPR],
