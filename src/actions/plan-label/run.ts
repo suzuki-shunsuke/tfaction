@@ -16,13 +16,9 @@ export type RunInputs = {
   workflowRunId: number;
 };
 
+type Octokit = ReturnType<typeof github.getOctokit>;
+
 const LABEL_PREFIX = "tfaction:plan-result:";
-const ALL_LABELS = [
-  `${LABEL_PREFIX}no-op`,
-  `${LABEL_PREFIX}create`,
-  `${LABEL_PREFIX}update`,
-  `${LABEL_PREFIX}delete`,
-];
 
 const PRIORITY: Record<ResultSummary, number> = {
   "no-op": 0,
@@ -41,6 +37,55 @@ export const aggregateResultSummaries = (
     }
   }
   return result;
+};
+
+export const updatePlanResultLabel = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  prNumber: number,
+  result: ResultSummary | undefined,
+): Promise<void> => {
+  const desiredLabel =
+    result !== undefined ? `${LABEL_PREFIX}${result}` : undefined;
+
+  // Fetch current labels on the PR (1 API call)
+  const { data: currentLabels } = await octokit.rest.issues.listLabelsOnIssue({
+    owner,
+    repo,
+    issue_number: prNumber,
+  });
+
+  const existingPlanLabels = currentLabels
+    .map((l) => l.name)
+    .filter((name) => name.startsWith(LABEL_PREFIX));
+
+  // Remove stale plan-result labels
+  for (const label of existingPlanLabels) {
+    if (label === desiredLabel) {
+      continue;
+    }
+    await octokit.rest.issues.removeLabel({
+      owner,
+      repo,
+      issue_number: prNumber,
+      name: label,
+    });
+  }
+
+  // Add the desired label if it doesn't already exist
+  if (
+    desiredLabel !== undefined &&
+    !existingPlanLabels.includes(desiredLabel)
+  ) {
+    await octokit.rest.issues.addLabels({
+      owner,
+      repo,
+      issue_number: prNumber,
+      labels: [desiredLabel],
+    });
+    core.info(`Added label "${desiredLabel}" to PR #${prNumber}`);
+  }
 };
 
 export const main = async (inputs: RunInputs): Promise<void> => {
@@ -65,9 +110,12 @@ export const main = async (inputs: RunInputs): Promise<void> => {
     a.name.startsWith("terraform_plan_json_"),
   );
 
+  const octokit = github.getOctokit(inputs.githubToken);
+
   if (planArtifacts.length === 0) {
     core.info("No terraform plan JSON artifacts found");
     core.setOutput("result_summary", "no-op");
+    await updatePlanResultLabel(octokit, owner, repo, inputs.prNumber, "no-op");
     return;
   }
 
@@ -98,32 +146,5 @@ export const main = async (inputs: RunInputs): Promise<void> => {
   core.info(`Aggregated plan result: ${result}`);
 
   // Manage labels on the PR
-  const octokit = github.getOctokit(inputs.githubToken);
-  const labelToAdd = `${LABEL_PREFIX}${result}`;
-
-  // Remove existing plan-result labels
-  for (const label of ALL_LABELS) {
-    if (label === labelToAdd) {
-      continue;
-    }
-    try {
-      await octokit.rest.issues.removeLabel({
-        owner,
-        repo,
-        issue_number: inputs.prNumber,
-        name: label,
-      });
-    } catch {
-      // Label may not exist, ignore
-    }
-  }
-
-  // Add the new label
-  await octokit.rest.issues.addLabels({
-    owner,
-    repo,
-    issue_number: inputs.prNumber,
-    labels: [labelToAdd],
-  });
-  core.info(`Added label "${labelToAdd}" to PR #${inputs.prNumber}`);
+  await updatePlanResultLabel(octokit, owner, repo, inputs.prNumber, result);
 };

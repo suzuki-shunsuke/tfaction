@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as fs from "fs";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { aggregateResultSummaries, main, type RunInputs } from "./run";
+import {
+  aggregateResultSummaries,
+  main,
+  updatePlanResultLabel,
+  type RunInputs,
+} from "./run";
 
 vi.mock("@actions/core", () => ({
   setOutput: vi.fn(),
@@ -70,9 +75,150 @@ describe("aggregateResultSummaries", () => {
   });
 });
 
+describe("updatePlanResultLabel", () => {
+  const mockRemoveLabel = vi.fn();
+  const mockAddLabels = vi.fn();
+  const mockListLabelsOnIssue = vi.fn();
+
+  const octokit = {
+    rest: {
+      issues: {
+        removeLabel: mockRemoveLabel,
+        addLabels: mockAddLabels,
+        listLabelsOnIssue: mockListLabelsOnIssue,
+      },
+    },
+  } as unknown as ReturnType<typeof github.getOctokit>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRemoveLabel.mockResolvedValue({});
+    mockAddLabels.mockResolvedValue({});
+  });
+
+  it("does nothing when desired label already exists and no stale labels", async () => {
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [
+        { name: "tfaction:plan-result:create" },
+        { name: "unrelated-label" },
+      ],
+    });
+
+    await updatePlanResultLabel(
+      octokit,
+      "test-owner",
+      "test-repo",
+      42,
+      "create",
+    );
+
+    expect(mockRemoveLabel).not.toHaveBeenCalled();
+    expect(mockAddLabels).not.toHaveBeenCalled();
+  });
+
+  it("removes stale labels and adds new one", async () => {
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [
+        { name: "tfaction:plan-result:no-op" },
+        { name: "tfaction:plan-result:create" },
+        { name: "unrelated-label" },
+      ],
+    });
+
+    await updatePlanResultLabel(
+      octokit,
+      "test-owner",
+      "test-repo",
+      42,
+      "delete",
+    );
+
+    expect(mockRemoveLabel).toHaveBeenCalledTimes(2);
+    expect(mockRemoveLabel).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "tfaction:plan-result:no-op" }),
+    );
+    expect(mockRemoveLabel).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "tfaction:plan-result:create" }),
+    );
+    expect(mockAddLabels).toHaveBeenCalledWith(
+      expect.objectContaining({
+        labels: ["tfaction:plan-result:delete"],
+      }),
+    );
+  });
+
+  it("only removes stale labels when desired already exists", async () => {
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [
+        { name: "tfaction:plan-result:update" },
+        { name: "tfaction:plan-result:no-op" },
+      ],
+    });
+
+    await updatePlanResultLabel(
+      octokit,
+      "test-owner",
+      "test-repo",
+      42,
+      "update",
+    );
+
+    expect(mockRemoveLabel).toHaveBeenCalledTimes(1);
+    expect(mockRemoveLabel).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "tfaction:plan-result:no-op" }),
+    );
+    expect(mockAddLabels).not.toHaveBeenCalled();
+  });
+
+  it("adds label when no plan-result labels exist", async () => {
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [{ name: "unrelated-label" }],
+    });
+
+    await updatePlanResultLabel(
+      octokit,
+      "test-owner",
+      "test-repo",
+      42,
+      "create",
+    );
+
+    expect(mockRemoveLabel).not.toHaveBeenCalled();
+    expect(mockAddLabels).toHaveBeenCalledWith(
+      expect.objectContaining({
+        labels: ["tfaction:plan-result:create"],
+      }),
+    );
+  });
+
+  it("removes all plan-result labels when result is undefined", async () => {
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [
+        { name: "tfaction:plan-result:update" },
+        { name: "unrelated-label" },
+      ],
+    });
+
+    await updatePlanResultLabel(
+      octokit,
+      "test-owner",
+      "test-repo",
+      42,
+      undefined,
+    );
+
+    expect(mockRemoveLabel).toHaveBeenCalledTimes(1);
+    expect(mockRemoveLabel).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "tfaction:plan-result:update" }),
+    );
+    expect(mockAddLabels).not.toHaveBeenCalled();
+  });
+});
+
 describe("main", () => {
   const mockRemoveLabel = vi.fn();
   const mockAddLabels = vi.fn();
+  const mockListLabelsOnIssue = vi.fn();
 
   const inputs: RunInputs = {
     githubToken: "test-token",
@@ -84,23 +230,49 @@ describe("main", () => {
     vi.clearAllMocks();
     mockRemoveLabel.mockResolvedValue({});
     mockAddLabels.mockResolvedValue({});
+    mockListLabelsOnIssue.mockResolvedValue({ data: [] });
     vi.mocked(github.getOctokit).mockReturnValue({
       rest: {
         issues: {
           removeLabel: mockRemoveLabel,
           addLabels: mockAddLabels,
+          listLabelsOnIssue: mockListLabelsOnIssue,
         },
       },
     } as unknown as ReturnType<typeof github.getOctokit>);
   });
 
-  it("sets no-op when no artifacts found", async () => {
+  it("sets no-op and manages labels when no artifacts found", async () => {
     mockListArtifacts.mockResolvedValue({ artifacts: [] });
 
     await main(inputs);
 
     expect(core.setOutput).toHaveBeenCalledWith("result_summary", "no-op");
-    expect(mockAddLabels).not.toHaveBeenCalled();
+    expect(mockListLabelsOnIssue).toHaveBeenCalled();
+    expect(mockAddLabels).toHaveBeenCalledWith(
+      expect.objectContaining({
+        labels: ["tfaction:plan-result:no-op"],
+      }),
+    );
+  });
+
+  it("removes stale labels when no artifacts found", async () => {
+    mockListArtifacts.mockResolvedValue({ artifacts: [] });
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [{ name: "tfaction:plan-result:update" }],
+    });
+
+    await main(inputs);
+
+    expect(core.setOutput).toHaveBeenCalledWith("result_summary", "no-op");
+    expect(mockRemoveLabel).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "tfaction:plan-result:update" }),
+    );
+    expect(mockAddLabels).toHaveBeenCalledWith(
+      expect.objectContaining({
+        labels: ["tfaction:plan-result:no-op"],
+      }),
+    );
   });
 
   it("aggregates plan results and adds label", async () => {
@@ -133,7 +305,7 @@ describe("main", () => {
     });
   });
 
-  it("removes other plan-result labels", async () => {
+  it("removes stale plan-result labels and adds correct one", async () => {
     mockListArtifacts.mockResolvedValue({
       artifacts: [{ id: 1, name: "terraform_plan_json_target1" }],
     });
@@ -145,18 +317,24 @@ describe("main", () => {
       }),
     );
 
+    // Simulate existing stale labels on PR
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [
+        { name: "tfaction:plan-result:no-op" },
+        { name: "tfaction:plan-result:create" },
+        { name: "unrelated-label" },
+      ],
+    });
+
     await main(inputs);
 
-    // Should try to remove no-op, create, and update labels (not delete)
-    expect(mockRemoveLabel).toHaveBeenCalledTimes(3);
+    // Should remove only the stale plan-result labels
+    expect(mockRemoveLabel).toHaveBeenCalledTimes(2);
     expect(mockRemoveLabel).toHaveBeenCalledWith(
       expect.objectContaining({ name: "tfaction:plan-result:no-op" }),
     );
     expect(mockRemoveLabel).toHaveBeenCalledWith(
       expect.objectContaining({ name: "tfaction:plan-result:create" }),
-    );
-    expect(mockRemoveLabel).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "tfaction:plan-result:update" }),
     );
     expect(mockAddLabels).toHaveBeenCalledWith(
       expect.objectContaining({
