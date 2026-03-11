@@ -53,6 +53,9 @@ export const githubSecrets = core.getInput("github_secrets");
 export const getIf = (): string => core.getInput("if") || DEFAULT_CONDITION;
 
 // update-drift-issue
+// apply-label
+export const result = core.getInput("result");
+
 export const getRequiredIssue = (): string => {
   return core.getInput("issue", { required: true });
 };
