@@ -8,6 +8,7 @@ export type RunInputs = {
 };
 
 const FAIL_LABEL = "tfaction:apply-result:fail";
+const FAIL_LABEL_COLOR = "d93f0b";
 
 export const main = async (inputs: RunInputs): Promise<void> => {
   if (inputs.result === "skipped") {
@@ -41,12 +42,22 @@ export const main = async (inputs: RunInputs): Promise<void> => {
 
   // failure or cancelled
   if (!hasFailLabel) {
-    await octokit.rest.issues.addLabels({
+    const { data: addedLabels } = await octokit.rest.issues.addLabels({
       owner,
       repo,
       issue_number: inputs.prNumber,
       labels: [FAIL_LABEL],
     });
     core.info(`Added label "${FAIL_LABEL}" to PR #${inputs.prNumber}`);
+    const failLabel = addedLabels.find((l) => l.name === FAIL_LABEL);
+    if (failLabel && failLabel.color !== FAIL_LABEL_COLOR) {
+      await octokit.rest.issues.updateLabel({
+        owner,
+        repo,
+        name: FAIL_LABEL,
+        color: FAIL_LABEL_COLOR,
+      });
+      core.info(`Updated label "${FAIL_LABEL}" color to #${FAIL_LABEL_COLOR}`);
+    }
   }
 };

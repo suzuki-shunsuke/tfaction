@@ -20,6 +20,7 @@ describe("main", () => {
   const mockRemoveLabel = vi.fn();
   const mockAddLabels = vi.fn();
   const mockListLabelsOnIssue = vi.fn();
+  const mockUpdateLabel = vi.fn();
 
   const baseInputs: RunInputs = {
     githubToken: "test-token",
@@ -30,14 +31,16 @@ describe("main", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRemoveLabel.mockResolvedValue({});
-    mockAddLabels.mockResolvedValue({});
+    mockAddLabels.mockResolvedValue({ data: [] });
     mockListLabelsOnIssue.mockResolvedValue({ data: [] });
+    mockUpdateLabel.mockResolvedValue({});
     vi.mocked(github.getOctokit).mockReturnValue({
       rest: {
         issues: {
           removeLabel: mockRemoveLabel,
           addLabels: mockAddLabels,
           listLabelsOnIssue: mockListLabelsOnIssue,
+          updateLabel: mockUpdateLabel,
         },
       },
     } as unknown as ReturnType<typeof github.getOctokit>);
@@ -84,6 +87,9 @@ describe("main", () => {
     mockListLabelsOnIssue.mockResolvedValue({
       data: [{ name: "unrelated-label" }],
     });
+    mockAddLabels.mockResolvedValue({
+      data: [{ name: "tfaction:apply-result:fail", color: "d93f0b" }],
+    });
 
     await main({ ...baseInputs, result: "failure" });
 
@@ -94,6 +100,7 @@ describe("main", () => {
       labels: ["tfaction:apply-result:fail"],
     });
     expect(mockRemoveLabel).not.toHaveBeenCalled();
+    expect(mockUpdateLabel).not.toHaveBeenCalled();
   });
 
   it("does nothing when result is failure and fail label already exists", async () => {
@@ -111,6 +118,9 @@ describe("main", () => {
     mockListLabelsOnIssue.mockResolvedValue({
       data: [],
     });
+    mockAddLabels.mockResolvedValue({
+      data: [{ name: "tfaction:apply-result:fail", color: "d93f0b" }],
+    });
 
     await main({ ...baseInputs, result: "cancelled" });
 
@@ -120,5 +130,37 @@ describe("main", () => {
       issue_number: 42,
       labels: ["tfaction:apply-result:fail"],
     });
+    expect(mockUpdateLabel).not.toHaveBeenCalled();
+  });
+
+  it("updates label color when it is not red", async () => {
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [],
+    });
+    mockAddLabels.mockResolvedValue({
+      data: [{ name: "tfaction:apply-result:fail", color: "abcdef" }],
+    });
+
+    await main({ ...baseInputs, result: "failure" });
+
+    expect(mockUpdateLabel).toHaveBeenCalledWith({
+      owner: "test-owner",
+      repo: "test-repo",
+      name: "tfaction:apply-result:fail",
+      color: "d93f0b",
+    });
+  });
+
+  it("does not update label color when it is already red", async () => {
+    mockListLabelsOnIssue.mockResolvedValue({
+      data: [],
+    });
+    mockAddLabels.mockResolvedValue({
+      data: [{ name: "tfaction:apply-result:fail", color: "d93f0b" }],
+    });
+
+    await main({ ...baseInputs, result: "failure" });
+
+    expect(mockUpdateLabel).not.toHaveBeenCalled();
   });
 });
