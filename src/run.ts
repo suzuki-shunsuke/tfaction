@@ -17,6 +17,7 @@ import * as setDriftEnv from "./actions/set-drift-env";
 import * as syncDriftIssueDescription from "./actions/sync-drift-issue-description";
 import * as apply from "./actions/apply";
 import * as plan from "./actions/plan";
+import * as planLabel from "./actions/plan-label";
 import * as releaseModule from "./actions/release-module";
 import * as terraformInit from "./actions/terraform-init";
 import * as test from "./actions/test";
@@ -45,6 +46,7 @@ export const main = async (inputs: Inputs) => {
     ["output-github-secrets", outputGithubSecrets],
     ["pick-out-drift-issues", pickOutDriftIssues],
     ["plan", plan],
+    ["plan-label", planLabel],
     ["release-module", releaseModule],
     ["scaffold-tfmigrate", scaffoldTfmigrate],
     ["scaffold-working-dir", scaffoldWorkingDir],
