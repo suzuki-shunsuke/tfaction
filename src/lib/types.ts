@@ -193,6 +193,13 @@ const Replace = z.object({
 });
 export type Replace = z.infer<typeof Replace>;
 
+const TargetLabelRule = z.object({
+  regexp: z.string(),
+  label: z.string(),
+  color: z.string().optional(),
+});
+export type TargetLabelRule = z.infer<typeof TargetLabelRule>;
+
 export const RawConfig = z.object({
   aqua: z
     .object({
@@ -280,6 +287,7 @@ export const RawConfig = z.object({
     })
     .nullish(),
   skip_create_pr: z.boolean().default(false),
+  labels: TargetLabelRule.array().optional(),
   target_groups: TargetGroup.array(),
   tflint: TflintConfig.default(tflintDefaults),
   trivy: TrivyConfig.default(trivyDefaults),
