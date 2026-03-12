@@ -15,6 +15,7 @@ import {
   list as listModuleCallers,
   ModuleToCallers,
 } from "./list-module-callers";
+import { addTargetLabels } from "../target-labels";
 
 type TargetConfig = {
   target: string;
@@ -516,6 +517,22 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     moduleCallers,
     relativeChangedFiles: pr.pr?.files ?? [],
   });
+
+  if (cfg.labels && !env.isApply) {
+    const { owner, repo } = github.context.repo;
+    const prNumber = github.context.payload.pull_request?.number ?? 0;
+    if (prNumber > 0) {
+      const targetNames = result.targetConfigs.map((tc) => tc.target);
+      await addTargetLabels(
+        octokit,
+        owner,
+        repo,
+        prNumber,
+        targetNames,
+        cfg.labels,
+      );
+    }
+  }
 
   core.info(`result: ${JSON.stringify(result)}`);
   core.setOutput("targets", result.targetConfigs);
