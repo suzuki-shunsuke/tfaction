@@ -6,6 +6,13 @@ label_prefixes:
   tfmigrate: "migrate:"
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_amd64
 
+labels:
+  - regexp: ".*/foo$"
+    label: foo
+  - regexp: "^.*/terragrunt/*$"
+    label: terragrunt
+    color: 8e1f1b
+
 conftest:
   policies:
     - policy: tests/conftest/policy/hcl
