@@ -234,6 +234,7 @@ const downloadPlanFile = async (): Promise<string> => {
         plan_workflow_name: planWorkflowName,
         branch: branch,
       },
+      commentOverrides: cfg.comments,
     });
     throw new Error("No workflow run is found");
   }
@@ -258,6 +259,7 @@ const downloadPlanFile = async (): Promise<string> => {
         wf_sha: headSha,
         pr_sha: prHeadSha,
       },
+      commentOverrides: cfg.comments,
     });
     throw new Error(
       `workflow run's headSha (${headSha}) is different from the associated pull request's head sha (${prHeadSha})`,

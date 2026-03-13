@@ -65,6 +65,7 @@ type Inputs = {
   prNumber?: number;
   executor: aqua.Executor;
   secrets?: Record<string, string>;
+  commentOverrides?: Array<{ id: string; body: string }>;
 };
 
 export type RunInputs = {
@@ -138,6 +139,7 @@ export const disableAutoMergeForRenovateChange = async (
     vars: {
       tfaction_target: inputs.target,
     },
+    commentOverrides: inputs.commentOverrides,
   });
 };
 
@@ -300,6 +302,7 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
       vars: {
         tfaction_target: inputs.target,
       },
+      commentOverrides: inputs.commentOverrides,
     });
     throw new Error(
       ".tfmigrate.hcl is required but neither S3 nor GCS bucket is configured",
@@ -558,6 +561,7 @@ export const main = async (
     prNumber: runInputs.prNumber,
     executor,
     secrets: runInputs.secrets,
+    commentOverrides: config.comments,
   };
 
   const jobType = runInputs.jobType;
