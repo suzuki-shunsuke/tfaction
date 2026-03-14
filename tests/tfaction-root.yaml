@@ -7,6 +7,7 @@ label_prefixes:
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_amd64
 
 available_providers:
+  - name: registry.terraform.io/hashicorp/null
   - name: registry.opentofu.org/hashicorp/null
 
 labels:
