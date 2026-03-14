@@ -11,14 +11,14 @@ export type Inputs = {
   octokit: ReturnType<typeof github.getOctokit>;
   prNumber: number;
   templateKey: string;
-  vars: Record<string, string>;
+  vars: Record<string, string | string[]>;
 };
 
 type Metadata = {
   JobName: string;
   SHA1: string;
   TemplateKey: string;
-  Vars: Record<string, string>;
+  Vars: Record<string, string | string[]>;
 };
 
 export type ExecTemplateEntry = {
@@ -78,7 +78,7 @@ ${block}
 export const buildCommentBody = (
   message: string,
   templateKey: string,
-  vars: Record<string, string>,
+  vars: Record<string, string | string[]>,
 ): string => {
   const metadata: Metadata = {
     JobName: github.context.job,
