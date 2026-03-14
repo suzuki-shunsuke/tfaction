@@ -114,6 +114,11 @@ const JobConfig = z.object({
 });
 export type JobConfig = z.infer<typeof JobConfig>;
 
+const AvailableProvider = z.object({
+  name: z.string(),
+});
+export type AvailableProvider = z.infer<typeof AvailableProvider>;
+
 const TargetGroup = z.object({
   aws_region: z.string().optional(),
   aws_assume_role_arn: z.string().optional(),
@@ -143,6 +148,7 @@ const TargetGroup = z.object({
       enabled: z.boolean().optional(),
     })
     .optional(),
+  available_providers: AvailableProvider.array().optional(),
 });
 export type TargetGroup = z.infer<typeof TargetGroup>;
 
@@ -288,6 +294,7 @@ export const RawConfig = z.object({
     .nullish(),
   skip_create_pr: z.boolean().default(false),
   labels: TargetLabelRule.array().optional(),
+  available_providers: AvailableProvider.array().optional(),
   target_groups: TargetGroup.array(),
   tflint: TflintConfig.default(tflintDefaults),
   trivy: TrivyConfig.default(trivyDefaults),

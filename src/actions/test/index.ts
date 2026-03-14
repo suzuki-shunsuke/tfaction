@@ -1,5 +1,7 @@
 import * as path from "path";
 
+import * as github from "@actions/github";
+
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
@@ -39,6 +41,7 @@ export const main = async () => {
     githubToken,
     csmAppId,
     csmAppPrivateKey,
+    prNumber: github.context.payload.pull_request?.number ?? 0,
     executor,
   });
 };

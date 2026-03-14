@@ -7,6 +7,8 @@ label_prefixes:
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_arm64
 
 terraform_command: terragrunt
+available_providers:
+  - name: registry.opentofu.org/hashicorp/null
 
 conftest:
   policies:

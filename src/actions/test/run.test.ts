@@ -28,6 +28,10 @@ vi.mock("./fmt", () => ({
   fmt: vi.fn(),
 }));
 
+vi.mock("./check-providers", () => ({
+  checkProviders: vi.fn(),
+}));
+
 const createMockExecutor = () => ({
   exec: vi.fn().mockResolvedValue(0),
   getExecOutput: vi.fn().mockResolvedValue({
@@ -87,6 +91,7 @@ const createRunInput = (
   githubToken: "test-token",
   csmAppId: "app-id",
   csmAppPrivateKey: "app-key",
+  prNumber: 1,
   executor: executor as unknown as aqua.Executor,
   ...(fsOverride ? { fs: fsOverride } : {}),
 });

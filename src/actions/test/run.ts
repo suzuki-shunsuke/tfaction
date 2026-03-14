@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as types from "../../lib/types";
+import * as lib from "../../lib";
 import * as aqua from "../../aqua";
 import { TargetConfig } from "../get-target-config";
 import { run as runConftest } from "../../conftest";
@@ -11,6 +12,7 @@ import { run as runTflint } from "./tflint";
 import { run as runTerraformDocs } from "../../terraform-docs";
 import { create as createCommit } from "../../commit";
 import { fmt } from "./fmt";
+import { checkProviders } from "./check-providers";
 
 export type RunInput = {
   config: types.Config;
@@ -18,6 +20,7 @@ export type RunInput = {
   githubToken: string;
   csmAppId: string;
   csmAppPrivateKey: string;
+  prNumber: number;
   executor: aqua.Executor;
   fs?: {
     existsSync: typeof fs.existsSync;
@@ -68,6 +71,27 @@ export const run = async (input: RunInput): Promise<void> => {
       },
     });
   }
+
+  // Resolve available_providers: target group overrides root config
+  const tg = lib.getTargetFromTargetGroupsByWorkingDir(
+    config.target_groups,
+    targetConfig.working_directory,
+  );
+  const availableProviders =
+    tg?.available_providers ?? config.available_providers ?? [];
+  const terragruntRunAvailable =
+    tfCommand === "terragrunt" &&
+    (await aqua.checkTerrgruntRun(executor, workingDir));
+  await checkProviders({
+    executor,
+    tfCommand,
+    workingDir,
+    availableProviders,
+    target,
+    githubToken,
+    prNumber: input.prNumber,
+    terragruntRunAvailable,
+  });
 
   if (!destroy && !isModule) {
     await runConftest(
