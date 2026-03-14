@@ -113,6 +113,7 @@ describe("checkProviders", () => {
     target: "aws/test/dev",
     githubToken: "token",
     prNumber: 1,
+    terragruntRunAvailable: false,
     ...overrides,
   });
 
@@ -170,6 +171,50 @@ describe("checkProviders", () => {
     const input = createInput();
     await expect(checkProviders(input)).resolves.toBeUndefined();
     expect(mockPost).not.toHaveBeenCalled();
+  });
+
+  it("uses 'run -- version -json' when terragruntRunAvailable is true", async () => {
+    const mockGetExecOutput = vi.fn().mockResolvedValue({
+      exitCode: 0,
+      stdout: JSON.stringify({ provider_selections: {} }),
+      stderr: "",
+    });
+    const input = createInput({
+      executor: {
+        getExecOutput: mockGetExecOutput,
+      } as unknown as CheckProvidersInput["executor"],
+      tfCommand: "terragrunt",
+      terragruntRunAvailable: true,
+    });
+
+    await checkProviders(input);
+    expect(mockGetExecOutput).toHaveBeenCalledWith(
+      "terragrunt",
+      ["run", "--", "version", "-json"],
+      { cwd: "/work" },
+    );
+  });
+
+  it("uses 'version -json' when terragruntRunAvailable is false", async () => {
+    const mockGetExecOutput = vi.fn().mockResolvedValue({
+      exitCode: 0,
+      stdout: JSON.stringify({ provider_selections: {} }),
+      stderr: "",
+    });
+    const input = createInput({
+      executor: {
+        getExecOutput: mockGetExecOutput,
+      } as unknown as CheckProvidersInput["executor"],
+      tfCommand: "terragrunt",
+      terragruntRunAvailable: false,
+    });
+
+    await checkProviders(input);
+    expect(mockGetExecOutput).toHaveBeenCalledWith(
+      "terragrunt",
+      ["version", "-json"],
+      { cwd: "/work" },
+    );
   });
 
   it("does not post comment when prNumber is 0", async () => {

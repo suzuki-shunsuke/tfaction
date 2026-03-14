@@ -12,6 +12,7 @@ export type CheckProvidersInput = {
   target: string;
   githubToken: string;
   prNumber: number;
+  terragruntRunAvailable: boolean;
 };
 
 export const validateProviders = (
@@ -25,11 +26,12 @@ export const validateProviders = (
 export const checkProviders = async (
   input: CheckProvidersInput,
 ): Promise<void> => {
-  const result = await input.executor.getExecOutput(
-    input.tfCommand,
-    ["version", "-json"],
-    { cwd: input.workingDir },
-  );
+  const args = input.terragruntRunAvailable
+    ? ["run", "--", "version", "-json"]
+    : ["version", "-json"];
+  const result = await input.executor.getExecOutput(input.tfCommand, args, {
+    cwd: input.workingDir,
+  });
   const versionInfo = JSON.parse(result.stdout);
   const providerSelections: Record<string, string> =
     versionInfo.provider_selections ?? {};

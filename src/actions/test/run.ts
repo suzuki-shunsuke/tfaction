@@ -79,6 +79,9 @@ export const run = async (input: RunInput): Promise<void> => {
   );
   const availableProviders =
     tg?.available_providers ?? config.available_providers ?? [];
+  const terragruntRunAvailable =
+    tfCommand === "terragrunt" &&
+    (await aqua.checkTerrgruntRun(executor, workingDir));
   await checkProviders({
     executor,
     tfCommand,
@@ -87,6 +90,7 @@ export const run = async (input: RunInput): Promise<void> => {
     target,
     githubToken,
     prNumber: input.prNumber,
+    terragruntRunAvailable,
   });
 
   if (!destroy && !isModule) {
