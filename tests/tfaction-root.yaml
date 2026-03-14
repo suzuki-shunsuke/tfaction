@@ -6,6 +6,9 @@ label_prefixes:
   tfmigrate: "migrate:"
 providers_lock_opts: -platform=linux_amd64 -platform=darwin_amd64
 
+available_providers:
+  - name: registry.opentofu.org/hashicorp/null
+
 labels:
   - regexp: ".*/foo$"
     label: foo
