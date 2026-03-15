@@ -1,5 +1,9 @@
 name: JavaScript Action
 description: JavaScript Action
+runs:
+  using: node24
+  main: dist/index.js
+
 inputs:
   action:
     description: action
@@ -180,6 +184,3 @@ outputs:
   # list-targets-with-changed-files
   targets:
     description: list of targets
-runs:
-  using: node20
-  main: dist/index.js
