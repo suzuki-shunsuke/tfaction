@@ -10,6 +10,9 @@ terraform_command: tofu
 available_providers:
   - name: registry.opentofu.org/hashicorp/null
 
+auto_apps:
+  allow_auto_merge_change: true
+
 conftest:
   policies:
     - policy: tests/conftest/policy

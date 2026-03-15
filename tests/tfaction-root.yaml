@@ -9,6 +9,9 @@ providers_lock_opts: -platform=linux_amd64 -platform=darwin_amd64
 available_providers:
   - name: registry.terraform.io/hashicorp/null
 
+auto_apps:
+  allow_auto_merge_change: true
+
 labels:
   - regexp: ".*/foo$"
     label: foo
