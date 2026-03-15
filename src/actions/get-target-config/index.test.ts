@@ -14,7 +14,7 @@ test("default", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["aws_role_session_name", "tfaction-plan-tests_aws_foo_dev-" + runID],
@@ -62,7 +62,7 @@ test("config", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", false],
@@ -120,7 +120,7 @@ test("scaffold_working_dir", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -165,7 +165,7 @@ test("tfmigrate plan", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -218,7 +218,7 @@ test("tfmigrate apply", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -271,7 +271,7 @@ test("terraform apply", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -323,7 +323,7 @@ test("explicit aws_role_session_name overrides auto-generation", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -373,7 +373,7 @@ test("terraform_docs enabled in root config", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -427,7 +427,7 @@ test("environment variables from targetGroup", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -481,7 +481,7 @@ test("environment variables from root config", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -533,7 +533,7 @@ test("gcp configuration", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["enable_tflint", true],
       ["enable_trivy", true],
@@ -602,7 +602,7 @@ test("gcp_access_token_scopes", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -656,7 +656,7 @@ test("s3_bucket_name_tfmigrate_history", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -707,7 +707,7 @@ test("gcs_bucket_name_tfmigrate_history", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -855,7 +855,7 @@ test("only workingDir provided - target derived from workingDir", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -904,7 +904,7 @@ test("tflint_fix enabled in root config", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -959,7 +959,7 @@ test("target group env overrides root env", async () => {
       ["working_directory", "tests/aws/foo/dev"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],
@@ -1052,7 +1052,7 @@ test("type module is inferred from tfaction_module.yaml", async () => {
       ["working_directory", "tests/aws/modules/vpc"],
       [
         "providers_lock_opts",
-        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+        "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
       ],
       ["template_dir", "tests/templates/github"],
       ["enable_tflint", true],

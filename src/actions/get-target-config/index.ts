@@ -70,7 +70,7 @@ export const getTargetConfig = async (
     working_directory: t.workingDir,
     target: target,
     providers_lock_opts:
-      "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64",
+      "-platform=windows_amd64 -platform=linux_amd64 -platform=darwin_arm64",
     enable_tflint: config.tflint.enabled,
     enable_trivy: config.trivy.enabled,
     tflint_fix: config.tflint.fix,
