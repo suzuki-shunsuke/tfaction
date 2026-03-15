@@ -36,7 +36,7 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/js-yaml": "4.0.9",
-    "@types/node": "20.19.37",
+    "@types/node": "24.12.0",
     "@types/semver": "7.7.1",
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.4",
@@ -50,6 +50,6 @@
     "vitest": "4.1.0"
   },
   "volta": {
-    "node": "20.20.1"
+    "node": "24.14.0"
   }
 }
