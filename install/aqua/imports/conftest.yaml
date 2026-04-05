@@ -1,2 +1,2 @@
 packages:
-  - name: open-policy-agent/conftest@v0.67.1
+  - name: open-policy-agent/conftest@v0.68.0
