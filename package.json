@@ -42,7 +42,7 @@
     "@vercel/ncc": "0.38.4",
     "@vitest/coverage-v8": "4.1.4",
     "eslint": "10.2.0",
-    "globals": "17.4.0",
+    "globals": "17.5.0",
     "jiti": "2.6.1",
     "prettier": "3.8.2",
     "typescript": "5.9.3",
