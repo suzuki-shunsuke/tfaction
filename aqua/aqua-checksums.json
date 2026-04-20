@@ -56,28 +56,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.99.5/terragrunt_darwin_amd64.tar.gz",
-      "checksum": "058E2476C7452CF7A6F426C8E84AC25AAC2D56B48CEA042EC668E1F0DC6D9498",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.0.0/terragrunt_darwin_amd64.tar.gz",
+      "checksum": "A3E6ADF02CE169739224F4D8B1F56103EBE122FB1B6B1290EFA5C2064DB2CC66",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.99.5/terragrunt_darwin_arm64.tar.gz",
-      "checksum": "3F37BF521D2D3BF6F05F3C6FF09B6C12C276E84C076FE7173C0842A2101A7ECD",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.0.0/terragrunt_darwin_arm64.tar.gz",
+      "checksum": "37AC71758F470323CB3AB2D076550A8F03B274E8854D66F80A9D4008C65BE6D5",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.99.5/terragrunt_linux_amd64.tar.gz",
-      "checksum": "8050444125E87ABE077D602A6DA7DB7317D3E8D40D6DC8CB738FA009A005EFC4",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.0.0/terragrunt_linux_amd64.tar.gz",
+      "checksum": "059E02368F88D188B32F5BEF50368031F48D28AF1891FD798BE307EBE38F309F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.99.5/terragrunt_linux_arm64.tar.gz",
-      "checksum": "FED8C41B0FA8DC15AD81E941C79C5DB6B5FCBD3129BD25AF663308A478DFABD0",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.0.0/terragrunt_linux_arm64.tar.gz",
+      "checksum": "4E9993BD25E00D4F1A7F8D48E7AA881FC2EDB6EFFF3CC70B49F9E3F02000736E",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v0.99.5/terragrunt_windows_amd64.exe.tar.gz",
-      "checksum": "B5C853F0FBDBA8481A1E45A894E86260F24DD40930D4DA7C2E2EFCDBE7936D1F",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.0.0/terragrunt_windows_amd64.exe.tar.gz",
+      "checksum": "6188C71192C7B24A805BFB3304EDA82C0E2E46D391514F6EA4E48B760C59A209",
       "algorithm": "sha256"
     },
     {
