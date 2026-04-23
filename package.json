@@ -46,7 +46,7 @@
     "jiti": "2.6.1",
     "prettier": "3.8.3",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.58.2",
+    "typescript-eslint": "8.59.0",
     "vitest": "4.1.4"
   },
   "volta": {
