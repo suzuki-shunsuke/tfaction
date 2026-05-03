@@ -21,7 +21,7 @@ jobs:
       - run: cmdx schema
       - run: cmdx schema-doc
 
-      - uses: suzuki-shunsuke/gh-pages-action@5df123b4f8ae31edbe71bcc9a28a9598c29b1011 # v0.0.6
+      - uses: suzuki-shunsuke/gh-pages-action@ce95bfca768d3d1a0454f8efb6f81a557a18bc68 # v0.1.0
         if: github.event_name != 'pull_request'
         with:
           publish_dir: build
