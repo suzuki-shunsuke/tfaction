@@ -46,18 +46,18 @@ export const registerHelpers = () => {
   Handlebars.registerHelper(
     "join_command",
     function (this: { JoinCommand?: string }) {
-      return `
+      return new Handlebars.SafeString(`
 ${block}
 ${this.JoinCommand ?? ""}
 ${block}
-`;
+`);
     },
   );
 
   Handlebars.registerHelper(
     "hidden_combined_output",
     function (this: { CombinedOutput?: string }) {
-      return `
+      return new Handlebars.SafeString(`
 <details>
 
 ${block}
@@ -65,12 +65,14 @@ ${this.CombinedOutput ?? ""}
 ${block}
 
 </details>
-`;
+`);
     },
   );
 
   Handlebars.registerHelper("status", function (this: { ExitCode?: number }) {
-    return this.ExitCode === 0 ? ":white_check_mark:" : ":x:";
+    return new Handlebars.SafeString(
+      this.ExitCode === 0 ? ":white_check_mark:" : ":x:",
+    );
   });
 };
 
