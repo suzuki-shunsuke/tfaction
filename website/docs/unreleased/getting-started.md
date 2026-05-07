@@ -51,11 +51,14 @@ Below is the minimum required configuration:
 
 ```yaml
 plan_workflow_name: test.yaml
+available_providers:
+  - name: registry.terraform.io/hashicorp/null
 target_groups:
   - working_directory: ""
 ```
 
 - `plan_workflow_name` is required and specifies the file name (not the workflow name) of the GitHub Actions workflow that runs `terraform plan`.
+- `available_providers` is required and specifies the list of available providers.
 - `target_groups` is required and defines root module groups and their specific settings. In this example, we do not apply any special configuration.
 
 ## Install Terraform
