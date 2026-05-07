@@ -4,7 +4,6 @@ import * as github from "@actions/github";
 import * as yaml from "js-yaml";
 import Handlebars from "handlebars";
 
-import * as env from "../lib/env";
 import * as lib from "../lib";
 
 export type Inputs = {
@@ -41,7 +40,7 @@ const block = "```";
 
 export const registerHelpers = () => {
   Handlebars.registerHelper("link", () => {
-    return `[Build link](${env.GITHUB_SERVER_URL}/${github.context.serverUrl}/actions/runs/${github.context.runId})`;
+    return `[Build link](${github.context.serverUrl}/actions/runs/${github.context.runId})`;
   });
 
   Handlebars.registerHelper(
