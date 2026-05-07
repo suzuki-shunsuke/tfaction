@@ -41,7 +41,7 @@ const block = "```";
 
 export const registerHelpers = () => {
   Handlebars.registerHelper("link", () => {
-    return `[Build link](${env.GITHUB_SERVER_URL}/${github.context.serverUrl}/actions/runs/${github.context.runId})`;
+    return `[Build link](${github.context.serverUrl}/actions/runs/${github.context.runId})`;
   });
 
   Handlebars.registerHelper(
