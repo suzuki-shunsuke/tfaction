@@ -20,6 +20,11 @@ Always review the changes manually.
 Upgrade tfaction to v2 according to the guide.
 ```
 
+## Prerequisites
+
+By default, `tfaction-root.yaml` is located at the root of the repository.
+If it isn't, check the `TFACTION_CONFIG` environment variable in your workflow files for its actual location.
+
 ## Summary
 
 - GitHub Actions Workflow changes
