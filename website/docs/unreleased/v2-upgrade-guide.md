@@ -39,6 +39,7 @@ If it isn't, check the `TFACTION_CONFIG` environment variable in your workflow f
   - Add update-pr-branch action after apply action
 - tfaction-root.yaml changes
   - If `plan_workflow_name` specifies a workflow name, change it to a file name (e.g., `test` to `test.yaml`)
+  - Configure `available_providers`
   - Remove `skip_terraform_by_renovate` and `renovate_terraform_labels`. Add `skip_terraform_files` if needed
   - Remove tfsec support
     - Migration to trivy is recommended
@@ -210,6 +211,13 @@ After:
 
 ```yaml
 plan_workflow_name: test.yaml
+```
+
+## Configure `available_providers`
+
+```yaml
+available_providers:
+  - name: registry.terraform.io/hashicorp/null
 ```
 
 ## Remove `skip_terraform_by_renovate` and `renovate_terraform_labels`. Add `skip_terraform_files` if needed
