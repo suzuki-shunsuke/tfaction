@@ -4,7 +4,6 @@ import * as github from "@actions/github";
 import * as yaml from "js-yaml";
 import Handlebars from "handlebars";
 
-import * as env from "../lib/env";
 import * as lib from "../lib";
 
 export type Inputs = {
