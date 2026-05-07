@@ -1,2 +1,2 @@
 packages:
-  - name: reviewdog/reviewdog@v0.21.0
+  - name: reviewdog/nightly@v0.21.0-nightly20260505+f63592a0
