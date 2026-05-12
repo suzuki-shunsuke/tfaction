@@ -47,6 +47,10 @@ jobs:
           cache: npm
       - run: npm ci
 
+      - run: cmdx -v
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+
       - run: cmdx build
 
       - uses: suzuki-shunsuke/release-js-action@ff106e3a3f5b34f174a23db3110031fbf463f15c # v0.2.1
