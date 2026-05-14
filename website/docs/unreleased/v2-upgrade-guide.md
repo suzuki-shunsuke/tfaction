@@ -20,7 +20,7 @@ Always review the changes manually.
 Upgrade tfaction to v2 according to the guide.
 ```
 
-## Prerequisites
+## For AI
 
 By default, `tfaction-root.yaml` is located at the root of the repository.
 If it isn't, check the `TFACTION_CONFIG` environment variable in your workflow files for its actual location.
@@ -37,6 +37,7 @@ If it isn't, check the `TFACTION_CONFIG` environment variable in your workflow f
   - Remove workflows that use scaffold-module or create-scaffold-module-pr
   - Remove SSH Key configuration
   - Add update-pr-branch action after apply action
+  - Rename inputs `securefix_action_app_id` and `securefix_action_app_private_key` to `csm_app_id` and `csm_app_private_key`
 - tfaction-root.yaml changes
   - If `plan_workflow_name` specifies a workflow name, change it to a file name (e.g., `test` to `test.yaml`)
   - Configure `available_providers`
@@ -120,9 +121,6 @@ The `setup` action outputs the IAM Role ARN and other values based on tfaction-r
   id: setup
   with:
     action: setup
-    github_token: ${{steps.token.outputs.token}}
-    securefix_action_app_id: ${{vars.SECUREFIX_ACTION_CLIENT_APP_ID}}
-    securefix_action_app_private_key: ${{secrets.SECUREFIX_ACTION_CLIENT_APP_PRIVATE_KEY}}
 
 - uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
   if: steps.setup.outputs.aws_assume_role_arn != ''
