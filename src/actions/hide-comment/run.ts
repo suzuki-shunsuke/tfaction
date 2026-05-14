@@ -39,7 +39,7 @@ type Comment = {
 };
 
 export const DEFAULT_CONDITION =
-  'Comment.HasMeta && Comment.Meta.SHA1 != Commit.SHA1 && !(Comment.Meta.Program == "tfcmt" && Comment.Meta.Command == "apply")';
+  'Comment.HasMeta && Comment.Meta.SHA1 != Commit.SHA1 && !(has(Comment.Meta.Program) && has(Comment.Meta.Command) && Comment.Meta.Program == "tfcmt" && Comment.Meta.Command == "apply")';
 
 const metaPattern = /<!-- github-comment: ({.*?}) -->/s;
 

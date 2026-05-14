@@ -122,6 +122,17 @@ describe("run", () => {
       isMinimized,
     );
 
+  const makeGitHubCommentMeta = (
+    id: string,
+    sha: string,
+    isMinimized: boolean = false,
+  ) =>
+    makeComment(
+      id,
+      `Result\n<!-- github-comment: {"JobName":"lintnet","SHA1":"${sha}","TemplateKey":"default","Vars":{},"WorkflowName":"test"} -->`,
+      isMinimized,
+    );
+
   const graphqlPage = (
     nodes: Array<{ id: string; body: string; isMinimized: boolean }>,
     hasNextPage: boolean = false,
@@ -235,6 +246,31 @@ describe("run", () => {
       ]),
     );
     octokit.graphql.mockResolvedValue({});
+
+    const input: RunInput = {
+      octokit: octokit as unknown as RunInput["octokit"],
+      repoOwner: "owner",
+      repoName: "repo",
+      prNumber: 1,
+      commitSHA: "new-sha",
+      ifCondition: DEFAULT_CONDITION,
+      logger,
+    };
+
+    const result = await run(input);
+    expect(result.hiddenCount).toBe(1);
+    expect(result.totalCount).toBe(1);
+  });
+
+  it("hides github-comment-style comments (no Program/Command) with old SHA", async () => {
+    const octokit = createMockOctokit();
+    const logger = createMockLogger();
+
+    octokit.graphql
+      .mockResolvedValueOnce(
+        graphqlPage([makeGitHubCommentMeta("c1", "old-sha")]),
+      )
+      .mockResolvedValue({});
 
     const input: RunInput = {
       octokit: octokit as unknown as RunInput["octokit"],
