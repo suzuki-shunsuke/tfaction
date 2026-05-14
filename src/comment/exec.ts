@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import Handlebars from "handlebars";
+import stripAnsi from "strip-ansi";
 import { evaluate } from "@marcbachmann/cel-js";
 
 import {
@@ -131,6 +132,9 @@ export const execAndComment = async (
     const joinCommand = [command, ...(args ?? [])].join(" ");
     const templateContext = {
       ...celContext,
+      Stdout: stripAnsi(stdout),
+      Stderr: stripAnsi(stderr),
+      CombinedOutput: stripAnsi(combinedOutput),
       Vars: comment.vars ?? {},
       Command: command,
       JoinCommand: joinCommand,
