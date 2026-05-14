@@ -15,6 +15,8 @@ The `test` action provides linting and formatting capabilities:
 
 Run it after `terraform-init` and before `plan`.
 
+.github/workflows/test.yaml:
+
 ```yaml
 - name: terraform init
   uses: suzuki-shunsuke/tfaction@latest
@@ -36,6 +38,8 @@ Run it after `terraform-init` and before `plan`.
 ```
 
 To start, let's disable tflint and trivy:
+
+tfaction-root.yaml:
 
 ```yaml
 tflint:

@@ -27,8 +27,18 @@ A shallow clone is sufficient.
 1. Add a `list` job
 
 Run `list-targets` to get the list of target root modules and output it.
+This job is common for both plan and apply workflows, so it's good to define this as a reusable workflow.
+
+.github/workflows/workflow_call_list.yaml
 
 ```yaml
+name: list
+on:
+  workflow_call:
+    outputs:
+      targets:
+        description: JSON array of changed root module targets
+        value: ${{jobs.list.outputs.targets}}
 jobs:
   list:
     timeout-minutes: 10
@@ -39,7 +49,7 @@ jobs:
       targets: ${{steps.list-targets.outputs.targets}}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -50,26 +60,49 @@ jobs:
           action: list-targets
 ```
 
-1. Run plan using matrix builds after the `list` job
+2. Then call this workflow from the plan and apply workflows.
+
+.github/workflows/test.yaml:
 
 ```yaml
-plan:
-  name: "plan (${{matrix.target.target}})" # Different job name per root module
-  timeout-minutes: 30
-  runs-on: ubuntu-24.04
-  needs: [list] # Run after list
-  permissions:
-    contents: read
-  env:
-    # Set environment variables per root module
-    TFACTION_TARGET: "${{matrix.target.target}}"
-    TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
-    TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
-  if: "join(fromJSON(needs.list.outputs.targets), '') != ''" # Skip if no root modules changed
-  strategy:
-    fail-fast: false # Continue other root modules even if one fails
-    matrix:
-      target: ${{fromJSON(needs.list.outputs.targets)}}
+name: test
+on: pull_request
+jobs:
+  list:
+    uses: ./.github/workflows/workflow_call_list.yaml
+    permissions:
+      contents: read
+
+  plan:
+    name: "plan (${{matrix.target.target}})" # Different job name per root module
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
+    needs: [list] # Run after list
+    permissions:
+      contents: read
+    env:
+      # Set environment variables per root module
+      TFACTION_TARGET: "${{matrix.target.target}}"
+      TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
+      TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
+    if: "join(fromJSON(needs.list.outputs.targets), '') != ''" # Skip if no root modules changed
+    strategy:
+      fail-fast: false # Continue other root modules even if one fails
+      matrix:
+        target: ${{fromJSON(needs.list.outputs.targets)}}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      # ...
+```
+
+3. Update `tfaction-root.yaml`'s `target_groups` so that root modules are matched.
+
+```yaml
+target_groups:
+  - working_directory: "**"
 ```
 
 This runs CI via matrix builds only for the root modules changed in the PR.

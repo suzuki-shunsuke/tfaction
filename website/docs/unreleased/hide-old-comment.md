@@ -18,13 +18,21 @@ We recommend option 1.
 ## hide-comment action
 
 Run the `hide-comment` action in your GitHub Actions workflow.
-
 The `pull_requests: write` permission is required.
 
+.github/workflows/test.yaml:
+
 ```yaml
-- uses: suzuki-shunsuke/tfaction@latest
-  with:
-    action: hide-comment
+jobs:
+  hide-comment:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: hide-comment
 ```
 
 This hides old comments:
