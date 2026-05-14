@@ -77,7 +77,8 @@ inputs:
   if:
     description: >-
       CEL expression to determine which comments to hide.
-      Available variables - Comment.HasMeta (bool), Comment.Meta (object with SHA1, Program, Command, JobName, PRNumber, Target, WorkflowName, Vars), Commit.SHA1 (string).
+      Available variables - Comment.HasMeta (bool), Comment.Meta (object with SHA1, Vars, and optional Program, Command, JobName, PRNumber, Target, WorkflowName, TemplateKey), Commit.SHA1 (string).
+      Optional fields may be absent depending on which tool wrote the metadata (e.g. github-comment omits Program/Command); guard accesses with has() to avoid evaluation errors.
     required: false
 
   # apply-label
