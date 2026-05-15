@@ -328,18 +328,24 @@ export const run = async (input: Input): Promise<Result> => {
 
   // If no targets found, check test_workflow for fallback test targets
   const testWorkflow = input.config.test_workflow;
+  if (testWorkflow?.only_plan && testWorkflow?.plan_and_apply) {
+    const onlyPlanSet = new Set(testWorkflow.only_plan.working_directories);
+    const dupes = testWorkflow.plan_and_apply.working_directories.filter((wd) =>
+      onlyPlanSet.has(wd),
+    );
+    if (dupes.length > 0) {
+      throw new Error(
+        `test_workflow: working_directories appear in both only_plan and plan_and_apply: ${dupes.join(", ")}`,
+      );
+    }
+  }
   if (
     allTargetConfigs.length === 0 &&
     testWorkflow &&
     input.relativeChangedFiles
   ) {
-    const changedFilesMatch = input.relativeChangedFiles.some((file) =>
-      testWorkflow.changed_files.some((pattern) =>
-        minimatch(file, pattern, { dot: true }),
-      ),
-    );
-    if (changedFilesMatch) {
-      for (const wd of testWorkflow.working_directories) {
+    const addTestTargets = (wds: string[]) => {
+      for (const wd of wds) {
         const target = wdTargetMap.get(wd) ?? wd;
         const obj = getTargetConfigByTarget(
           config.target_groups,
@@ -352,6 +358,28 @@ export const run = async (input: Input): Promise<Result> => {
         if (obj !== undefined) {
           allTargetConfigs.push(obj);
         }
+      }
+    };
+    const planAndApply = testWorkflow.plan_and_apply;
+    if (planAndApply) {
+      const match = input.relativeChangedFiles.some((file) =>
+        planAndApply.changed_files.some((pattern) =>
+          minimatch(file, pattern, { dot: true }),
+        ),
+      );
+      if (match) {
+        addTestTargets(planAndApply.working_directories);
+      }
+    }
+    const onlyPlan = testWorkflow.only_plan;
+    if (onlyPlan && !isApply) {
+      const match = input.relativeChangedFiles.some((file) =>
+        onlyPlan.changed_files.some((pattern) =>
+          minimatch(file, pattern, { dot: true }),
+        ),
+      );
+      if (match) {
+        addTestTargets(onlyPlan.working_directories);
       }
     }
   }
@@ -379,8 +407,14 @@ type Input = {
     label_prefixes?: types.LabelPrefixes;
     skip_terraform_files?: string[];
     test_workflow?: {
-      working_directories: string[];
-      changed_files: string[];
+      only_plan?: {
+        working_directories: string[];
+        changed_files: string[];
+      };
+      plan_and_apply?: {
+        working_directories: string[];
+        changed_files: string[];
+      };
     };
   };
   isApply: boolean;

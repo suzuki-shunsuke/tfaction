@@ -1694,7 +1694,7 @@ test("module working dir with no changes produces no output", async () => {
 
 // test_workflow tests
 
-test("test_workflow: changed_files match and no working dirs changed adds test targets", async () => {
+test("test_workflow: plan_and_apply changed_files match and no working dirs changed adds test targets", async () => {
   expect(
     await run({
       config: {
@@ -1704,8 +1704,10 @@ test("test_workflow: changed_files match and no working dirs changed adds test t
           },
         ],
         test_workflow: {
-          working_directories: ["foo/dev"],
-          changed_files: [".github/workflows/*.yaml"],
+          plan_and_apply: {
+            working_directories: ["foo/dev"],
+            changed_files: [".github/workflows/*.yaml"],
+          },
         },
       },
       isApply: false,
@@ -1739,7 +1741,7 @@ test("test_workflow: changed_files match and no working dirs changed adds test t
   });
 });
 
-test("test_workflow: changed_files match but working dirs also changed returns normal targets", async () => {
+test("test_workflow: plan_and_apply changed_files match but working dirs also changed returns normal targets", async () => {
   expect(
     await run({
       config: {
@@ -1749,8 +1751,10 @@ test("test_workflow: changed_files match but working dirs also changed returns n
           },
         ],
         test_workflow: {
-          working_directories: ["foo/dev"],
-          changed_files: [".github/workflows/*.yaml"],
+          plan_and_apply: {
+            working_directories: ["foo/dev"],
+            changed_files: [".github/workflows/*.yaml"],
+          },
         },
       },
       isApply: false,
@@ -1784,7 +1788,7 @@ test("test_workflow: changed_files match but working dirs also changed returns n
   });
 });
 
-test("test_workflow: changed_files don't match and no working dirs changed returns no targets", async () => {
+test("test_workflow: plan_and_apply changed_files don't match and no working dirs changed returns no targets", async () => {
   expect(
     await run({
       config: {
@@ -1794,8 +1798,10 @@ test("test_workflow: changed_files don't match and no working dirs changed retur
           },
         ],
         test_workflow: {
-          working_directories: ["foo/dev"],
-          changed_files: [".github/workflows/*.yaml"],
+          plan_and_apply: {
+            working_directories: ["foo/dev"],
+            changed_files: [".github/workflows/*.yaml"],
+          },
         },
       },
       isApply: false,
@@ -1819,7 +1825,7 @@ test("test_workflow: changed_files don't match and no working dirs changed retur
   });
 });
 
-test("test_workflow: apply mode includes test targets", async () => {
+test("test_workflow: plan_and_apply apply mode includes test targets", async () => {
   expect(
     await run({
       config: {
@@ -1829,8 +1835,10 @@ test("test_workflow: apply mode includes test targets", async () => {
           },
         ],
         test_workflow: {
-          working_directories: ["foo/dev"],
-          changed_files: [".github/workflows/*.yaml"],
+          plan_and_apply: {
+            working_directories: ["foo/dev"],
+            changed_files: [".github/workflows/*.yaml"],
+          },
         },
       },
       isApply: true,
@@ -1862,4 +1870,246 @@ test("test_workflow: apply mode includes test targets", async () => {
       },
     ],
   });
+});
+
+test("test_workflow: only_plan changed_files match in plan mode adds targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          only_plan: {
+            working_directories: ["foo/diff"],
+            changed_files: [".github/workflows/test.yaml"],
+          },
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/diff/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: [".github/workflows/test.yaml"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/diff",
+        working_directory: "foo/diff",
+      },
+    ],
+  });
+});
+
+test("test_workflow: only_plan changed_files match in apply mode does NOT add targets", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          only_plan: {
+            working_directories: ["foo/diff"],
+            changed_files: [".github/workflows/test.yaml"],
+          },
+        },
+      },
+      isApply: true,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/diff/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: [".github/workflows/test.yaml"],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [],
+  });
+});
+
+test("test_workflow: only_plan and plan_and_apply both match in plan mode adds both", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          only_plan: {
+            working_directories: ["foo/diff"],
+            changed_files: [".github/workflows/test.yaml"],
+          },
+          plan_and_apply: {
+            working_directories: ["foo/nodiff"],
+            changed_files: [".github/workflows/apply.yaml"],
+          },
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/diff/tfaction.yaml", "foo/nodiff/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: [
+        ".github/workflows/test.yaml",
+        ".github/workflows/apply.yaml",
+      ],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/nodiff",
+        working_directory: "foo/nodiff",
+      },
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/diff",
+        working_directory: "foo/diff",
+      },
+    ],
+  });
+});
+
+test("test_workflow: only_plan and plan_and_apply both match in apply mode adds only plan_and_apply", async () => {
+  expect(
+    await run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          only_plan: {
+            working_directories: ["foo/diff"],
+            changed_files: [".github/workflows/test.yaml"],
+          },
+          plan_and_apply: {
+            working_directories: ["foo/nodiff"],
+            changed_files: [".github/workflows/apply.yaml"],
+          },
+        },
+      },
+      isApply: true,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/diff/tfaction.yaml", "foo/nodiff/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: [
+        ".github/workflows/test.yaml",
+        ".github/workflows/apply.yaml",
+      ],
+    }),
+  ).toStrictEqual({
+    targetConfigs: [
+      {
+        environment: undefined,
+        job_type: "terraform",
+        runs_on: "ubuntu-latest",
+        secrets: undefined,
+        skip_terraform: false,
+        target: "foo/nodiff",
+        working_directory: "foo/nodiff",
+      },
+    ],
+  });
+});
+
+test("test_workflow: duplicate working_directory in only_plan and plan_and_apply throws error", async () => {
+  await expect(
+    run({
+      config: {
+        target_groups: [
+          {
+            working_directory: "foo/**",
+          },
+        ],
+        test_workflow: {
+          only_plan: {
+            working_directories: ["foo/dev"],
+            changed_files: [".github/workflows/test.yaml"],
+          },
+          plan_and_apply: {
+            working_directories: ["foo/dev"],
+            changed_files: [".github/workflows/apply.yaml"],
+          },
+        },
+      },
+      isApply: false,
+      labels: [],
+      changedFiles: [],
+      configFiles: ["foo/dev/tfaction.yaml"],
+      prBody: "",
+      payload: {
+        pull_request: {
+          body: "",
+        },
+      },
+      moduleCallers: {},
+      octokit: {} as ReturnType<typeof import("@actions/github").getOctokit>,
+      prNumber: 0,
+      maxChangedWorkingDirectories: 0,
+      relativeChangedFiles: [".github/workflows/test.yaml"],
+    }),
+  ).rejects.toThrow(
+    /working_directories appear in both only_plan and plan_and_apply/,
+  );
 });
