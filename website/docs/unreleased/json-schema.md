@@ -7,7 +7,7 @@ sidebar_position: 400
 Both `tfaction-root.yaml` and `tfaction.yaml` have JSON Schemas.
 By adding the following comment at the top of your configuration file, editors like VSCode will provide validation and autocompletion, helping you avoid configuration mistakes.
 
-```yaml
+```yaml title="tfaction-root.yaml"
 # yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/tfaction/refs/heads/latest/schema/tfaction-root.json
 ```
 
@@ -18,7 +18,7 @@ You can pin a specific tfaction version and automate updates using the Renovate 
 # yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/tfaction/refs/tags/v2.0.0/schema/tfaction-root.json
 ```
 
-```json
+```json title="renovate.json"
 {
   "extends": [
     "github>suzuki-shunsuke/renovate-config:yaml-language-server#3.3.1"

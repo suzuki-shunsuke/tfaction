@@ -56,7 +56,7 @@ If the code is not formatted, `terraform fmt` will format it and automatically p
 
 [terraform-docs](https://terraform-docs.io/) is disabled by default. To enable it:
 
-```yaml
+```yaml title="tfaction-root.yaml"
 terraform_docs:
   enabled: true
 ```
@@ -77,7 +77,7 @@ terraform-docs works without configuration, but if you want to customize it, cre
 
 [tflint](https://github.com/terraform-linters/tflint) is enabled by default. You can also explicitly enable it in configuration:
 
-```yaml
+```yaml title="tfaction-root.yaml"
 tflint:
   enabled: true
 ```
@@ -88,7 +88,7 @@ tflint must be installed. Add it to `aqua.yaml`:
 aqua g -i terraform-linters/tflint
 ```
 
-```yaml
+```yaml title="aqua.yaml"
 packages:
   - name: terraform-linters/tflint@v0.61.0
 ```
@@ -99,7 +99,7 @@ tflint results are reported via reviewdog reviews.
 
 Automatic fixes via `tflint --fix` are also enabled by default. To disable them:
 
-```yaml
+```yaml title="tfaction-root.yaml"
 tflint:
   fix: false
 ```
@@ -116,7 +116,7 @@ env:
 
 [trivy](https://trivy.dev/) is enabled by default. You can also explicitly enable it in configuration:
 
-```yaml
+```yaml title="tfaction-root.yaml"
 trivy:
   enabled: true
 ```
@@ -127,7 +127,7 @@ trivy must be installed. Add it to `aqua.yaml`:
 aqua g -i aquasecurity/trivy
 ```
 
-```yaml
+```yaml title="aqua.yaml"
 packages:
   - name: aquasecurity/trivy@v0.69.1
 ```
@@ -139,7 +139,7 @@ trivy results are reported via reviewdog reviews.
 Both trivy and tflint results are reported to the PR via reviewdog.
 You can configure reviewdog's command-line options:
 
-```yaml
+```yaml title="tfaction-root.yaml"
 tflint:
   reviewdog:
     filter_mode: added # Default is nofilter
@@ -179,7 +179,7 @@ To run against HCL files, specify `tf: true`.
 To run against plan files, specify `plan: true`.
 If neither is specified, you can run conftest against non-Terraform files such as YAML or Dockerfiles.
 
-```yaml
+```yaml title="tfaction-root.yaml"
 conftest:
   policies:
     - policy: policy/tf
@@ -196,7 +196,7 @@ conftest:
 
 `.conftest.policies[]` supports most options of the `conftest test` command:
 
-```yaml
+```yaml title="tfaction-root.yaml"
 conftest:
   policies:
     - policy: # array or string

@@ -20,9 +20,7 @@ Within `tfaction.yaml`, per-job-type settings (`terraform_plan_config`, `terrafo
 `target_groups` in `tfaction-root.yaml` is a list of root module groups.
 Each group's settings take precedence over the top-level settings in `tfaction-root.yaml` (which apply to all root modules).
 
-```yaml
-# tfaction.yaml
-
+```yaml title="tfaction.yaml"
 # Priority 2
 aws_assume_role_arn: arn:aws:iam::123456789012:role/GitHubActions_Terraform_github_terraform_plan
 terraform_plan_config:
@@ -30,9 +28,7 @@ terraform_plan_config:
   aws_assume_role_arn: arn:aws:iam::123456789012:role/GitHubActions_Terraform_github_terraform_plan
 ```
 
-```yaml
-# tfaction-root.yaml
-
+```yaml title="tfaction-root.yaml"
 # Priority 5
 aws_assume_role_arn: arn:aws:iam::123456789012:role/GitHubActions_Terraform_github_terraform_plan
 target_groups:
