@@ -190,3 +190,16 @@ exec:
         {{join_command}}
 
         {{hidden_combined_output}}
+
+  terraform-config-inspect:
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{#if Vars.tfaction_target}}{{Vars.tfaction_target}}: {{/if}}Failed to resolve module dependencies
+
+        {{link}} | [document](https://suzuki-shunsuke.github.io/tfaction/docs/unreleased/detect-module-dependency)
+
+        Failed to resolve module dependencies using [terraform-config-inspect](https://github.com/hashicorp/terraform-config-inspect).
+
+        {{join_command}}
+
+        {{hidden_combined_output}}

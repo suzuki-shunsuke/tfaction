@@ -8,6 +8,7 @@ import * as aqua from "../../../../aqua";
  * List module callers in the git repository.
  * @param gitRootDir - Absolute path to the git root directory
  * @param configFiles - Relative file paths from git_root_dir to config files
+ * @param githubToken - GitHub token used to post a PR comment when `terraform-config-inspect` fails
  * @param executor
  * @returns Relative path to module from git_root_dir => Relative paths from git_root_dir to module callers
  */
@@ -15,6 +16,7 @@ export const list = async (
   gitRootDir: string,
   /** relative file paths from git_root_dir */
   configFiles: string[],
+  githubToken: string,
   executor: aqua.Executor,
 ): Promise<ModuleToCallers> => {
   const rawModuleCalls: ModuleCalls = {};
@@ -102,6 +104,12 @@ export const list = async (
       ["--json"],
       {
         cwd: absTfDir,
+        group: "terraform-config-inspect",
+        comment: {
+          token: githubToken,
+          key: "terraform-config-inspect",
+          vars: { tfaction_target: tfDir },
+        },
       },
     );
     const inspection = JSON.parse(outInspect.stdout);
