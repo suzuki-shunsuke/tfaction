@@ -275,9 +275,9 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   if (inputs.s3BucketNameTfmigrateHistory) {
     templatePath = path.join(installDir, "tfmigrate.hcl");
     content = fs.readFileSync(templatePath, "utf8");
-    content = content.replace(/%%TARGET%%/g, inputs.target);
+    content = content.replace(/{{target}}/g, inputs.target);
     content = content.replace(
-      /%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%/g,
+      /{{s3_bucket_name_tfmigrate_history}}/g,
       inputs.s3BucketNameTfmigrateHistory,
     );
   }
@@ -285,9 +285,9 @@ const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
   else if (inputs.gcsBucketNameTfmigrateHistory) {
     templatePath = path.join(installDir, "tfmigrate-gcs.hcl");
     content = fs.readFileSync(templatePath, "utf8");
-    content = content.replace(/%%TARGET%%/g, inputs.target);
+    content = content.replace(/{{target}}/g, inputs.target);
     content = content.replace(
-      /%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%/g,
+      /{{gcs_bucket_name_tfmigrate_history}}/g,
       inputs.gcsBucketNameTfmigrateHistory,
     );
   } else {

@@ -1,11 +1,11 @@
-# %%MODULE_NAME%%
+# {{module_name}}
 
-[Versions](https://github.com/%%GITHUB_REPOSITORY%%/releases?q=%%MODULE_PATH%%)
+[Versions](https://github.com/{{github_repository}}/releases?q={{module_path}})
 
 ## Example
 
 ```tf
 module "foo" {
-  source = "github.com/%%GITHUB_REPOSITORY%%//%%MODULE_PATH%%?ref=%%REF%%"
+  source = "github.com/{{github_repository}}//{{module_path}}?ref={{ref}}"
 }
 ```
