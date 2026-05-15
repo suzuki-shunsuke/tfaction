@@ -12,7 +12,8 @@ export type Comment = {
     | "terraform-docs"
     | "tfmigrate-plan"
     | "tfmigrate-apply"
-    | "drift-apply";
+    | "drift-apply"
+    | "terraform-config-inspect";
   vars?: Partial<Record<varKey, string>>;
   org?: string;
   repo?: string;

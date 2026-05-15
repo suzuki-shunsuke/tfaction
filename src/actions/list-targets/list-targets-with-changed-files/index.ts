@@ -523,16 +523,18 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
     moduleWorkingDirs.add(path.dirname(configFile));
   }
 
+  const githubToken = input.getRequiredGitHubToken();
+
   let moduleCallers: ModuleToCallers | null = null;
   if (cfg.update_local_path_module_caller?.enabled) {
     moduleCallers = await listModuleCallers(
       cfg.git_root_dir,
       configFiles,
+      githubToken,
       executor,
     );
   }
 
-  const githubToken = input.getRequiredGitHubToken();
   const octokit = github.getOctokit(githubToken);
 
   const result = await run({
