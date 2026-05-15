@@ -147,15 +147,15 @@ ${runURL}`;
   const mentions = assigneesArray.map((a) => `@${a}`).join(" ");
 
   let defaultPRBody = `This pull request was created automatically to follow up the failure of apply.
-      - Follow up #${prNumber} ([failed workflow](${runURL}))
+- Follow up #${prNumber} ([failed workflow](${runURL}))
 
-      Please write the description of this pull request below.
+Please write the description of this pull request below.
 
-      ## Why did the terraform apply fail?
+## Why did the terraform apply fail?
 
-      ## How do you fix the problem?
+## How do you fix the problem?
 
-      `;
+`;
 
   const vars = {
     target: target,
@@ -206,16 +206,16 @@ ${prData.body}
   const comment = cfg?.follow_up_pr?.pull_request?.comment
     ? Handlebars.compile(cfg?.follow_up_pr?.pull_request?.comment)(vars)
     : `${mentions}
-        This pull request was created because \`terraform apply\` failed.
+This pull request was created because \`terraform apply\` failed.
 
-        - #${prNumber}
+- #${prNumber}
 
-        Please handle this pull request.
+Please handle this pull request.
 
-        1. Check the error message #${prNumber}
-        1. Check the result of \`terraform plan\`
-        1. Add commits to this pull request and fix the problem if needed
-        1. Review and merge this pull request`;
+1. Check the error message #${prNumber}
+1. Check the result of \`terraform plan\`
+1. Add commits to this pull request and fix the problem if needed
+1. Review and merge this pull request`;
 
   return {
     branch,
