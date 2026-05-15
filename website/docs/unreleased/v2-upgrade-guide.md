@@ -56,6 +56,7 @@ If it isn't, check the `TFACTION_CONFIG` environment variable in your workflow f
   - Change `follow_up_pr_group_label` to `follow_up_pr.group_label`
   - Change `renovate_login` to `auto_apps.logins`
   - Remove `update_related_pull_requests`
+  - Rename `securefix_action` to `csm_actions`
 - Template changes
   - Update placeholders to use [Handlebars](https://handlebarsjs.com/)
 - `renovate.json` changes
