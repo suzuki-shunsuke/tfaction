@@ -20,9 +20,7 @@ We recommend option 1.
 Run the `hide-comment` action in your GitHub Actions workflow.
 The `pull_requests: write` permission is required.
 
-.github/workflows/test.yaml:
-
-```yaml
+```yaml title=".github/workflows/test.yaml"
 jobs:
   hide-comment:
     timeout-minutes: 10

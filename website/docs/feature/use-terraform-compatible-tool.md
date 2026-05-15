@@ -17,18 +17,14 @@ You can use tools such as [OpenTofu](https://opentofu.org/) and [Terragrunt](htt
 
 You can specify a tool by the setting `terraform_command` in `tfaction-root.yaml` and `tfaction.yaml`.
 
-tfaction-root.yaml
-
-```yaml
+```yaml title="tfaction-root.yaml"
 terraform_command: tofu # terragrunt
 target_groups:
   - working_directory: aws/
     terraform_command: tofu # terragrunt
 ```
 
-tfaction.yaml
-
-```yaml
+```yaml title="tfaction.yaml"
 terraform_command: tofu # terragrunt
 ```
 

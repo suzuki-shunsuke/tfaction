@@ -212,9 +212,7 @@ The priority is as following.
 
 e.g.
 
-tfaction-root.yaml
-
-```yaml
+```yaml title="tfaction-root.yaml"
 drift_detection:
   enabled: false
 
@@ -225,9 +223,7 @@ target_groups:
       enabled: true
 ```
 
-tfaction.yaml
-
-```yaml
+```yaml title="tfaction.yaml"
 drift_detection:
   enabled: false
 ```

@@ -29,9 +29,7 @@ A shallow clone is sufficient.
 Run `list-targets` to get the list of target root modules and output it.
 This job is common for both plan and apply workflows, so it's good to define this as a reusable workflow.
 
-.github/workflows/workflow_call_list.yaml
-
-```yaml
+```yaml title=".github/workflows/workflow_call_list.yaml"
 name: list
 on:
   workflow_call:
@@ -62,9 +60,7 @@ jobs:
 
 2. Then call this workflow from the plan and apply workflows.
 
-.github/workflows/test.yaml:
-
-```yaml
+```yaml title=".github/workflows/test.yaml"
 name: test
 on: pull_request
 jobs:

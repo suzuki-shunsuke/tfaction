@@ -25,9 +25,7 @@ modules/
 
 To run CI on the working directory A too, please update tfaction-root.yaml as the following.
 
-tfaction-root.yaml
-
-```yaml
+```yaml title="tfaction-root.yaml"
 update_local_path_module_caller:
   enabled: true
 ```

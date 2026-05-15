@@ -30,9 +30,7 @@ You shouldn't change many working directories and modules in one pull request.
 
 ## How to limit
 
-tfaction-root.yaml
-
-```yaml
+```yaml title="tfaction-root.yaml"
 limit_changed_dirs:
   working_dirs: 5 # The maximum number of changed working directories in one pull request
   modules: 5 # The maximum number of changed modules in one pull request

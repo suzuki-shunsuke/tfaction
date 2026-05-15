@@ -36,9 +36,7 @@ Create a simple root module using `null_resource`.
 For this example, we use Terraform's Local Backend.
 In real-world use cases, you would typically use something like the S3 backend to persist state, but we will omit that here for simplicity.
 
-main.tf:
-
-```tf
+```tf title="main.tf"
 resource "null_resource" "foo" {}
 ```
 
@@ -50,9 +48,7 @@ Create `tfaction.yaml` in the root module directory.
 `tfaction.yaml` defines settings specific to each root module.
 For now, an empty object `{}` is sufficient.
 
-tfaction.yaml:
-
-```yaml
+```yaml title="tfaction.yaml"
 {}
 ```
 
@@ -65,9 +61,7 @@ Create `tfaction-root.yaml` at the repository root.
 This file defines global tfaction settings.
 Below is the minimum required configuration:
 
-tfaction-root.yaml:
-
-```yaml
+```yaml title="tfaction-root.yaml"
 plan_workflow_name: test.yaml
 available_providers:
   - name: registry.terraform.io/hashicorp/null
@@ -85,9 +79,7 @@ Terraform must be installed.
 tfaction internally uses [aqua](https://aquaproj.github.io/).
 If you create an `aqua.yaml` file and manage Terraform with aqua, tfaction will automatically install it.
 
-aqua.yaml:
-
-```yaml
+```yaml title="aqua.yaml"
 # yaml-language-server: $schema=https://raw.githubusercontent.com/aquaproj/aqua/main/json-schema/aqua-yaml.json
 registries:
   - type: standard
@@ -142,9 +134,7 @@ Also register the App ID as a [Repository Variable](https://docs.github.com/en/a
 
 Create a workflow that runs `terraform plan` on the `pull_request` event.
 
-.github/workflows/test.yaml:
-
-```yaml
+```yaml title=".github/workflows/test.yaml"
 name: test
 on: pull_request
 jobs:
@@ -204,9 +194,7 @@ After merging, `terraform init` and `apply` will run, and the results will be po
 
 ## Create the Workflow for Apply
 
-.github/workflows/apply.yaml:
-
-```yaml
+```yaml title=".github/workflows/apply.yaml"
 ---
 name: apply
 on:

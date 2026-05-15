@@ -16,9 +16,7 @@ modules/
     main.tf
 ```
 
-foo/main.tf:
-
-```tf
+```tf title="foo/main.tf"
 module "db" {
   source = "../modules/db"
 }
@@ -26,9 +24,7 @@ module "db" {
 
 By enabling `update_local_path_module_caller` in `tfaction-root.yaml`, root modules will also be included in the list when their dependent modules are updated.
 
-tfaction-root.yaml:
-
-```yaml
+```yaml title="tfaction-root.yaml"
 update_local_path_module_caller:
   enabled: true
 ```
