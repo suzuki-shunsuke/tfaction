@@ -329,8 +329,18 @@ export const RawConfig = z.object({
     .optional(),
   test_workflow: z
     .object({
-      working_directories: z.string().array(),
-      changed_files: z.string().array(),
+      only_plan: z
+        .object({
+          working_directories: z.string().array(),
+          changed_files: z.string().array(),
+        })
+        .optional(),
+      plan_and_apply: z
+        .object({
+          working_directories: z.string().array(),
+          changed_files: z.string().array(),
+        })
+        .optional(),
     })
     .optional(),
 });
