@@ -42,9 +42,7 @@ You can configure policies at three layers.
 1. target_group in tfaction-root.yaml
 1. root in tfaction-root.yaml
 
-tfaction-root.yaml:
-
-```yaml
+```yaml title="tfaction-root.yaml"
 conftest:
   policies:
     - policy: policy/plan
@@ -58,9 +56,7 @@ target_groups:
       # ...
 ```
 
-tfaction.yaml:
-
-```yaml
+```yaml title="tfaction.yaml"
 conftest:
   policies:
     - id: plan

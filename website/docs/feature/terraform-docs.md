@@ -10,16 +10,12 @@ sidebar_position: 1130
 
 By default, this feature is disabled.
 
-tfaction-root.yaml:
-
-```yaml
+```yaml title="tfaction-root.yaml"
 terraform_docs:
   enabled: true
 ```
 
-tfaction.yaml:
-
-```yaml
+```yaml title="tfaction.yaml"
 terraform_docs:
   enabled: true
 ```

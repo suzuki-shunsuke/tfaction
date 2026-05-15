@@ -43,9 +43,7 @@ https://github.com/suzuki-shunsuke/tfaction-example/blob/836e7ce5decb3e8c3c368e3
     github_app_token: ${{steps.token.outputs.token}}
 ```
 
-github-comment.yaml
-
-```yaml
+```yaml title="github-comment.yaml"
 hide:
   default: |
     Comment.HasMeta && Comment.Meta.SHA1 != Commit.SHA1 && ! (Comment.Meta.Program == "tfcmt" && Comment.Meta.Command == "apply")

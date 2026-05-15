@@ -42,9 +42,7 @@ So we recommend enabling this feature, but you can disable this feature at your 
 
 You can disable this feature.
 
-tfaction-root.yaml
-
-```yaml
+```yaml title="tfaction-root.yaml"
 update_related_pull_requests:
   enabled: false
 ```

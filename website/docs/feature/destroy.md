@@ -10,9 +10,7 @@ Support destroying resources with `terraform plan`'s `-destroy` option.
 
 If you want to destroy all resources, please set `destroy: true` in `tfaction.yaml`.
 
-tfaction.yaml
-
-```yaml
+```yaml title="tfaction.yaml"
 destroy: true
 ```
 

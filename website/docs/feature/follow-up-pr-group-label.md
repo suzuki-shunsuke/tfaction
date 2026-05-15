@@ -10,9 +10,7 @@ This feature is disabled by default.
 
 You can add pull request labels to group original pull requests and follow-up pull requests.
 
-tfaction-root.yaml:
-
-```yaml
+```yaml title="tfaction-root.yaml"
 follow_up_pr_group_label:
   enabled: true # The default is false
   prefix: "tfaction:follow-up-pr-group/"

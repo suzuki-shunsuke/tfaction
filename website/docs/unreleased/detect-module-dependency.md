@@ -4,7 +4,8 @@ sidebar_position: 800
 
 # Trigger Terraform When Dependent Local-path Modules Are Updated
 
-By default, `list-targets` lists only the root modules that were directly updated. However, if a root module references a module via a relative path outside its directory, the root module will not be included in the list when only the referenced module is updated.
+By default, `list-targets` lists only the root modules that were directly updated.
+However, if a root module references a module via a relative path outside its directory, the root module will not be included in the list when only the referenced module is updated.
 
 ```
 foo/
@@ -15,7 +16,7 @@ modules/
     main.tf
 ```
 
-```tf
+```tf title="foo/main.tf"
 module "db" {
   source = "../modules/db"
 }
@@ -23,7 +24,7 @@ module "db" {
 
 By enabling `update_local_path_module_caller` in `tfaction-root.yaml`, root modules will also be included in the list when their dependent modules are updated.
 
-```yaml
+```yaml title="tfaction-root.yaml"
 update_local_path_module_caller:
   enabled: true
 ```
