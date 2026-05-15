@@ -2,8 +2,8 @@ tfmigrate {
   migration_dir = "./tfmigrate"
   history {
     storage "gcs" {
-      bucket = "%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%"
-      name   = "%%TARGET%%/history.json"
+      bucket = "{{gcs_bucket_name_tfmigrate_history}}"
+      name   = "{{target}}/history.json"
     }
   }
 }

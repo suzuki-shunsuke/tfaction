@@ -877,7 +877,7 @@ describe("runTfmigratePlan", () => {
   it("returns changed=true when .tfmigrate.hcl is created from S3 template", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
     vi.mocked(fs.readFileSync).mockReturnValue(
-      'bucket = "%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%"\nname = "%%TARGET%%"',
+      'bucket = "{{s3_bucket_name_tfmigrate_history}}"\nname = "{{target}}"',
     );
 
     const inputs = {
@@ -899,7 +899,7 @@ describe("runTfmigratePlan", () => {
   it("returns changed=true when .tfmigrate.hcl is created from GCS template", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
     vi.mocked(fs.readFileSync).mockReturnValue(
-      'bucket = "%%GCS_BUCKET_NAME_TFMIGRATE_HISTORY%%"\nname = "%%TARGET%%"',
+      'bucket = "{{gcs_bucket_name_tfmigrate_history}}"\nname = "{{target}}"',
     );
 
     const inputs = {
@@ -1297,7 +1297,7 @@ describe("main", () => {
   it("skips conftest when tfmigrate creates .tfmigrate.hcl", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
     vi.mocked(fs.readFileSync).mockReturnValue(
-      'bucket = "%%S3_BUCKET_NAME_TFMIGRATE_HISTORY%%"',
+      'bucket = "{{s3_bucket_name_tfmigrate_history}}"',
     );
 
     const targetConfig: getTargetConfig.TargetConfig = {
