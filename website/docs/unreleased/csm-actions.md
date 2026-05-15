@@ -27,7 +27,7 @@ At the same time, create the client-side GitHub App and register it in GitHub Se
 1. Specify the CSM Actions server repository in tfaction-root.yaml.
 
 ```yaml
-securefix_action:
+csm_actions:
   server_repository: csm-actions-server
   pull_request:
     base_branch: main
@@ -40,6 +40,6 @@ securefix_action:
   with:
     action: plan
     github_token: ${{steps.generate_token.outputs.token}}
-    securefix_action_app_id: ${{vars.CSM_APP_ID}}
-    securefix_action_app_private_key: ${{secrets.CSM_APP_PRIVATE_KEY}}
+    csm_action_app_id: ${{vars.CSM_APP_ID}}
+    csm_action_app_private_key: ${{secrets.CSM_APP_PRIVATE_KEY}}
 ```
