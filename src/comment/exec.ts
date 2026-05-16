@@ -9,7 +9,6 @@ import {
   type ExecTemplateEntry,
   loadConfig,
   registerHelpers,
-  buildCommentBody,
   postComment,
 } from "./index";
 import type { Comment } from "../aqua/run";
@@ -141,13 +140,19 @@ export const execAndComment = async (
     };
 
     const message = renderExecTemplate(match.template, templateContext);
-    const templateKey = key;
-    const body = buildCommentBody(message, templateKey, comment.vars ?? {});
 
     const octokit = github.getOctokit(comment.token);
     const prNumber = getPRNumber(comment);
 
-    await postComment(octokit, prNumber, body, comment.org, comment.repo);
+    await postComment(
+      octokit,
+      prNumber,
+      message,
+      key,
+      comment.vars ?? {},
+      comment.org,
+      comment.repo,
+    );
   }
 
   if (exitCode !== 0 && !execOptions?.ignoreReturnCode) {
