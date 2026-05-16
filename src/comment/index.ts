@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as yaml from "js-yaml";
 import Handlebars from "handlebars";
@@ -96,10 +97,16 @@ export const buildCommentBody = (
 export const postComment = async (
   octokit: ReturnType<typeof github.getOctokit>,
   prNumber: number,
-  body: string,
+  message: string,
+  templateKey: string,
+  vars: Record<string, string | string[]>,
   org?: string,
   repo?: string,
 ): Promise<void> => {
+  core.summary.addRaw(message).addEOL();
+  await core.summary.write();
+
+  const body = buildCommentBody(message, templateKey, vars);
   await octokit.rest.issues.createComment({
     owner: org ?? github.context.repo.owner,
     repo: repo ?? github.context.repo.repo,
@@ -120,7 +127,11 @@ export const post = async (inputs: Inputs): Promise<void> => {
   const template = Handlebars.compile(templateConfig.template);
   const message = template({ Vars: inputs.vars });
 
-  const body = buildCommentBody(message, inputs.templateKey, inputs.vars);
-
-  await postComment(inputs.octokit, inputs.prNumber, body);
+  await postComment(
+    inputs.octokit,
+    inputs.prNumber,
+    message,
+    inputs.templateKey,
+    inputs.vars,
+  );
 };
