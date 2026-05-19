@@ -181,7 +181,7 @@ export const writeOutputFiles = async (
   );
 
   // Write pr_files.txt
-  const filenames = files.map((f) => f.filename).join("\n");
+  const filenames = files.map((f) => `${f.filename}\n`).join("");
   await fs.writeFile(path.join(dir, "pr_files.txt"), filenames);
 
   // Write pr_all_filenames.txt (including previous_filename for renames)
@@ -194,11 +194,13 @@ export const writeOutputFiles = async (
   });
   await fs.writeFile(
     path.join(dir, "pr_all_filenames.txt"),
-    Array.from(allFilenames).join("\n"),
+    Array.from(allFilenames)
+      .map((f) => `${f}\n`)
+      .join(""),
   );
 
   // Write labels.txt
-  const labels = (prData.labels || []).map((l) => l.name).join("\n");
+  const labels = (prData.labels || []).map((l) => `${l.name}\n`).join("");
   await fs.writeFile(path.join(dir, "labels.txt"), labels);
 };
 
