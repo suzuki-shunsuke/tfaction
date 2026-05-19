@@ -156,7 +156,7 @@ describe("writeOutputFiles", () => {
       path.join(tempDir, "pr_files.txt"),
       "utf-8",
     );
-    expect(content).toBe("src/index.ts\nREADME.md");
+    expect(content).toBe("src/index.ts\nREADME.md\n");
   });
 
   it("writes pr_all_filenames.txt including previous_filename for renames", async () => {
@@ -190,7 +190,7 @@ describe("writeOutputFiles", () => {
       path.join(tempDir, "labels.txt"),
       "utf-8",
     );
-    expect(content).toBe("bug\nenhancement\nurgent");
+    expect(content).toBe("bug\nenhancement\nurgent\n");
   });
 
   it("handles empty labels array", async () => {
@@ -642,13 +642,13 @@ describe("run", () => {
       path.join(tempDir, "labels.txt"),
       "utf-8",
     );
-    expect(labelsContent).toBe("deployed");
+    expect(labelsContent).toBe("deployed\n");
 
     const filesContent = await fs.readFile(
       path.join(tempDir, "pr_files.txt"),
       "utf-8",
     );
-    expect(filesContent).toBe("file1.ts\nfile2.ts");
+    expect(filesContent).toBe("file1.ts\nfile2.ts\n");
   });
 
   it("logs info messages during execution", async () => {
