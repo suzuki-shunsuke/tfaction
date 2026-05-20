@@ -19,21 +19,19 @@ export type RunInput = {
 };
 
 export type RunResult = {
-  hiddenCount: number;
+  deletedCount: number;
   totalCount: number;
 };
 
-export const minimizeComment = async (
+export const deleteComment = async (
   octokit: ReturnType<typeof github.getOctokit>,
   commentId: string,
 ): Promise<void> => {
   await octokit.graphql(
     `
     mutation($id: ID!) {
-      minimizeComment(input: {subjectId: $id, classifier: OUTDATED}) {
-        minimizedComment {
-          isMinimized
-        }
+      deleteIssueComment(input: {id: $id}) {
+        clientMutationId
       }
     }
   `,
@@ -55,13 +53,10 @@ export const run = async (input: RunInput): Promise<RunResult> => {
   const comments = await listComments(octokit, repoOwner, repoName, prNumber);
   logger.info(`Found ${comments.length} comments on PR #${prNumber}`);
 
-  let hiddenCount = 0;
+  let deletedCount = 0;
   let totalCount = 0;
 
   for (const comment of comments) {
-    if (comment.isMinimized) {
-      continue;
-    }
     totalCount++;
 
     const meta = parseCommentMeta(comment.body);
@@ -74,11 +69,11 @@ export const run = async (input: RunInput): Promise<RunResult> => {
     }
 
     if (result) {
-      logger.debug(`Hiding comment ${comment.id}`);
-      await minimizeComment(octokit, comment.id);
-      hiddenCount++;
+      logger.debug(`Deleting comment ${comment.id}`);
+      await deleteComment(octokit, comment.id);
+      deletedCount++;
     }
   }
 
-  return { hiddenCount, totalCount };
+  return { deletedCount, totalCount };
 };

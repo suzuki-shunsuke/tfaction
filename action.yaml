@@ -73,10 +73,10 @@ inputs:
     description: Pull request number. scaffold-tfmigrate uses this to update pull requests.
     required: false
 
-  # hide-comment
+  # hide-comment / delete-comment
   if:
     description: >-
-      CEL expression to determine which comments to hide.
+      CEL expression to determine which comments to hide (hide-comment) or delete (delete-comment).
       Available variables - Comment.HasMeta (bool), Comment.Meta (object with SHA1, Vars, and optional Program, Command, JobName, PRNumber, Target, WorkflowName, TemplateKey), Commit.SHA1 (string).
       Optional fields may be absent depending on which tool wrote the metadata (e.g. github-comment omits Program/Command); guard accesses with has() to avoid evaluation errors.
     required: false
