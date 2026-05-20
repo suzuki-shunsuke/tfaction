@@ -38,6 +38,8 @@ If it isn't, check the `TFACTION_CONFIG` environment variable in your workflow f
   - Remove SSH Key configuration
   - Add update-pr-branch action after apply action
   - Rename inputs `securefix_action_app_id` and `securefix_action_app_private_key` to `csm_app_id` and `csm_app_private_key`
+  - Rename the output `plan` action's `plan_binary_artifact_path` to `plan_binary`
+  - Rename the output `plan` action's `plan_json_artifact_path` to `plan_json`
 - tfaction-root.yaml changes
   - If `plan_workflow_name` specifies a workflow name, change it to a file name (e.g., `test` to `test.yaml`)
   - Configure `available_providers`
