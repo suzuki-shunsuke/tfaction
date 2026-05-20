@@ -27,7 +27,7 @@ The release also includes feature additions such as the introduction of a templa
 - Automatic PR branch update when root modules are changed on the base branch compared to the feature branch
 - Added ability to skip terraform plan and apply on a per-file basis
 - Added ability to test workflows when workflow files are changed
-- Support deleting old comments instead of hidding them
+- Support deleting old comments instead of hiding them
 
 ### Performance Improvements
 
