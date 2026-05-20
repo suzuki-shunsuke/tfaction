@@ -8,7 +8,7 @@ In the workflow built in [Getting Started](./getting-started), tfcmt posts comme
 
 ![](https://storage.googleapis.com/zenn-user-upload/0082918de91c-20260208.png)
 
-There are two solutions:
+There are three solutions:
 
 1. Use the `hide-comment` action to hide old comments
 1. Use the `delete-comment` action to delete old comments
