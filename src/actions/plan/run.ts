@@ -437,7 +437,6 @@ export const runTerraformPlan = async (
   core.setOutput("detailed_exitcode", detailedExitcode);
 
   core.setOutput("plan_binary", tempPlanBinary);
-  core.setOutput("plan_binary_artifact_path", tempPlanBinary); // Keep for backward compatibility
 
   // If terraform plan failed, exit immediately
   if (detailedExitcode === 1) {
@@ -477,7 +476,6 @@ export const runTerraformPlan = async (
   core.setOutput("result_summary", getResultSummary(showResult.stdout));
 
   core.setOutput("plan_json", tempPlanJson);
-  core.setOutput("plan_json_artifact_path", tempPlanJson); // Keep for backward compatibility
 
   // Upload plan files as artifact
   core.startGroup("upload plan artifacts");
