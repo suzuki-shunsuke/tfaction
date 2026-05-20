@@ -2,7 +2,7 @@
 sidebar_position: 300
 ---
 
-# Hiding Old PR Comments
+# Hiding Or Delete Old PR Comments
 
 In the workflow built in [Getting Started](./getting-started), tfcmt posts comments to the PR, but old comments remain visible indefinitely.
 
@@ -11,6 +11,7 @@ In the workflow built in [Getting Started](./getting-started), tfcmt posts comme
 There are two solutions:
 
 1. Use the `hide-comment` action to hide old comments
+1. Use the `delete-comment` action to delete old comments
 1. Use [tfcmt plan -patch](https://suzuki-shunsuke.github.io/tfcmt/plan-patch/) to update existing comments instead of creating new ones
 
 We recommend option 1.
@@ -36,6 +37,24 @@ jobs:
 This hides old comments:
 
 ![](https://storage.googleapis.com/zenn-user-upload/bd7b16acc7af-20260208.png)
+
+## delete-comment action
+
+`delete-comment` action is similar to `hide-comment`, but it deletes old comments instead of hiding them.
+The `pull_requests: write` permission is required.
+
+```yaml title=".github/workflows/test.yaml"
+jobs:
+  hide-comment:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: delete-comment
+```
 
 ## tfcmt plan -patch
 
