@@ -65,7 +65,7 @@ describe("run", () => {
     vi.clearAllMocks();
   });
 
-  it("hides comments matching condition (different SHA, not apply)", async () => {
+  it("deletes comments matching condition (different SHA, not apply)", async () => {
     const octokit = createMockOctokit();
     const logger = createMockLogger();
 
@@ -89,7 +89,7 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(2);
+    expect(result.deletedCount).toBe(2);
     expect(result.totalCount).toBe(2);
   });
 
@@ -117,7 +117,7 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(1);
+    expect(result.deletedCount).toBe(1);
     expect(result.totalCount).toBe(2);
   });
 
@@ -144,11 +144,11 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(1);
+    expect(result.deletedCount).toBe(1);
     expect(result.totalCount).toBe(2);
   });
 
-  it("skips already-minimized comments", async () => {
+  it("deletes already-minimized comments matching condition", async () => {
     const octokit = createMockOctokit();
     const logger = createMockLogger();
 
@@ -171,11 +171,11 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(1);
-    expect(result.totalCount).toBe(1);
+    expect(result.deletedCount).toBe(2);
+    expect(result.totalCount).toBe(2);
   });
 
-  it("hides github-comment-style comments (no Program/Command) with old SHA", async () => {
+  it("deletes github-comment-style comments (no Program/Command) with old SHA", async () => {
     const octokit = createMockOctokit();
     const logger = createMockLogger();
 
@@ -196,7 +196,7 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(1);
+    expect(result.deletedCount).toBe(1);
     expect(result.totalCount).toBe(1);
   });
 
@@ -223,7 +223,7 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(1);
+    expect(result.deletedCount).toBe(1);
     expect(result.totalCount).toBe(2);
   });
 
@@ -244,7 +244,7 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(0);
+    expect(result.deletedCount).toBe(0);
     expect(result.totalCount).toBe(0);
   });
 
@@ -264,7 +264,7 @@ describe("run", () => {
     octokit.graphql.mockResolvedValueOnce(
       graphqlPage([makeMetaComment("c2", "old-sha", "tfcmt", "plan")]),
     );
-    // minimizeComment calls
+    // deleteComment calls
     octokit.graphql.mockResolvedValue({});
 
     const input: RunInput = {
@@ -278,7 +278,7 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(2);
+    expect(result.deletedCount).toBe(2);
     expect(result.totalCount).toBe(2);
   });
 
@@ -295,7 +295,7 @@ describe("run", () => {
       )
       .mockResolvedValue({});
 
-    // Custom condition that hides all comments with metadata (including apply)
+    // Custom condition that deletes all comments with metadata (including apply)
     const input: RunInput = {
       octokit: octokit as unknown as RunInput["octokit"],
       repoOwner: "owner",
@@ -307,7 +307,7 @@ describe("run", () => {
     };
 
     const result = await run(input);
-    expect(result.hiddenCount).toBe(2);
+    expect(result.deletedCount).toBe(2);
     expect(result.totalCount).toBe(2);
   });
 });

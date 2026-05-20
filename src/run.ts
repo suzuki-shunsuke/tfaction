@@ -1,6 +1,7 @@
 import * as createFollowUpPR from "./actions/create-follow-up-pr";
 import * as hideComment from "./actions/hide-comment";
 import * as createScaffoldPR from "./actions/create-scaffold-pr";
+import * as deleteComment from "./actions/delete-comment";
 import * as scaffoldTfmigrate from "./actions/scaffold-tfmigrate";
 import * as scaffoldWorkingDir from "./actions/scaffold-working-dir";
 import * as setup from "./actions/setup";
@@ -39,6 +40,7 @@ export const main = async (inputs: Inputs) => {
     ["create-drift-issues", createDriftIssues],
     ["create-follow-up-pr", createFollowUpPR],
     ["create-scaffold-pr", createScaffoldPR],
+    ["delete-comment", deleteComment],
     ["generate-config-out", generateConfigOut],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
     ["hide-comment", hideComment],
