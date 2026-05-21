@@ -1,11 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { run, type RunInput } from "./trivy";
+import { run, type Logger, type RunInput } from "./trivy";
 import type { Config } from "../../lib/types";
 
 describe("run", () => {
   const createMockExecutor = () => ({
     getExecOutput: vi.fn(),
     exec: vi.fn(),
+  });
+
+  const createMockLogger = (): Logger => ({
+    info: vi.fn(),
+    error: vi.fn(),
+    writeSummary: vi.fn().mockResolvedValue(undefined),
   });
 
   const createMockConfig = (overrides?: Partial<Config>): Config => ({
@@ -535,6 +541,170 @@ describe("run", () => {
       "reviewdog",
       expect.arrayContaining(["-f", "sarif"]),
       expect.any(Object),
+    );
+  });
+
+  it("re-runs trivy without --format, calls logger.error, and writes step summary preserving stdout/stderr order when exit code is non-zero", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify({ Results: [] }),
+        stderr: "",
+        exitCode: 1,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec
+      .mockImplementationOnce((_cmd, _args, options) => {
+        options?.listeners?.stdout?.(Buffer.from("line-stdout-1\n"));
+        options?.listeners?.stderr?.(Buffer.from("line-stderr-1\n"));
+        options?.listeners?.stdout?.(Buffer.from("line-stdout-2\n"));
+        return Promise.resolve(1);
+      })
+      .mockResolvedValueOnce(0); // reviewdog
+
+    const logger = createMockLogger();
+    const input: RunInput = {
+      executor: executor as unknown as RunInput["executor"],
+      workingDirectory: "/work",
+      githubToken: "token",
+      configPath: "",
+      trivy: { enabled: true },
+      eventName: "pull_request",
+      logger,
+    };
+
+    await expect(run(input)).rejects.toThrow("trivy failed");
+
+    expect(executor.exec).toHaveBeenCalledWith(
+      "trivy",
+      ["config", "."],
+      expect.objectContaining({
+        cwd: "/work",
+        ignoreReturnCode: true,
+      }),
+    );
+    // Re-run must NOT be wrapped in a log group.
+    const trivyReRunCall = executor.exec.mock.calls.find(
+      (call) => call[0] === "trivy",
+    );
+    expect(trivyReRunCall?.[2]).not.toHaveProperty("group");
+
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith("trivy failed");
+
+    expect(logger.writeSummary).toHaveBeenCalledTimes(1);
+    const summaryArg = vi.mocked(logger.writeSummary).mock.calls[0][0];
+    expect(summaryArg).toContain("## trivy");
+    expect(summaryArg).toContain("line-stdout-1\nline-stderr-1\nline-stdout-2");
+    expect(summaryArg).not.toContain("<details>");
+  });
+
+  it("does not re-run trivy or call logger.error when exit code is zero", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify({ Results: [] }),
+        stderr: "",
+        exitCode: 0,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec.mockResolvedValue(0);
+
+    const logger = createMockLogger();
+    const input: RunInput = {
+      executor: executor as unknown as RunInput["executor"],
+      workingDirectory: "/work",
+      githubToken: "token",
+      configPath: "",
+      trivy: { enabled: true },
+      eventName: "pull_request",
+      logger,
+    };
+
+    await run(input);
+
+    const trivyReRunCall = executor.exec.mock.calls.find(
+      (call) => call[0] === "trivy",
+    );
+    expect(trivyReRunCall).toBeUndefined();
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.writeSummary).not.toHaveBeenCalled();
+  });
+
+  it("does not write step summary when re-run output is empty", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify({ Results: [] }),
+        stderr: "",
+        exitCode: 1,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec
+      .mockResolvedValueOnce(1) // re-run: no listener calls = empty
+      .mockResolvedValueOnce(0); // reviewdog
+
+    const logger = createMockLogger();
+    const input: RunInput = {
+      executor: executor as unknown as RunInput["executor"],
+      workingDirectory: "/work",
+      githubToken: "token",
+      configPath: "",
+      trivy: { enabled: true },
+      eventName: "pull_request",
+      logger,
+    };
+
+    await expect(run(input)).rejects.toThrow("trivy failed");
+
+    expect(logger.error).toHaveBeenCalledWith("trivy failed");
+    expect(logger.writeSummary).not.toHaveBeenCalled();
+  });
+
+  it("passes --config in re-run when configPath is provided", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify({ Results: [] }),
+        stderr: "",
+        exitCode: 1,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec.mockResolvedValue(1);
+
+    const logger = createMockLogger();
+    const input: RunInput = {
+      executor: executor as unknown as RunInput["executor"],
+      workingDirectory: "/work",
+      githubToken: "token",
+      configPath: "/path/to/trivy.yaml",
+      trivy: { enabled: true },
+      eventName: "pull_request",
+      logger,
+    };
+
+    await expect(run(input)).rejects.toThrow("trivy failed");
+
+    expect(executor.exec).toHaveBeenCalledWith(
+      "trivy",
+      ["config", "--config", "/path/to/trivy.yaml", "."],
+      expect.objectContaining({ cwd: "/work" }),
     );
   });
 
