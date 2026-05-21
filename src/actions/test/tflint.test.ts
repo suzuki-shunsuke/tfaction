@@ -10,6 +10,7 @@ describe("run", () => {
   const createMockLogger = (): Logger => ({
     info: vi.fn(),
     setOutput: vi.fn(),
+    writeSummary: vi.fn().mockResolvedValue(undefined),
   });
 
   // Empty SARIF output (no results)
@@ -596,6 +597,218 @@ describe("run", () => {
       expect.objectContaining({
         githubToken: "fix-token",
       }),
+    );
+  });
+
+  it("re-runs tflint without --format and writes step summary preserving stdout/stderr order when exit code is non-zero", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({ stdout: "--call-module-type", stderr: "" })
+      .mockResolvedValueOnce({
+        stdout: emptySarifOutput,
+        stderr: "",
+        exitCode: 2,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec
+      .mockResolvedValueOnce(0) // tflint --init
+      .mockImplementationOnce((_cmd, _args, options) => {
+        options?.listeners?.stdout?.(Buffer.from("line-stdout-1\n"));
+        options?.listeners?.stderr?.(Buffer.from("line-stderr-1\n"));
+        options?.listeners?.stdout?.(Buffer.from("line-stdout-2\n"));
+        return Promise.resolve(2);
+      })
+      .mockResolvedValueOnce(0); // reviewdog
+
+    const logger = createMockLogger();
+    const input = createMockInput({
+      executor: executor as unknown as RunInput["executor"],
+      logger,
+    });
+
+    await run(input);
+
+    expect(executor.exec).toHaveBeenCalledWith(
+      "tflint",
+      ["--call-module-type=all"],
+      expect.objectContaining({ group: "tflint (human-readable)" }),
+    );
+    expect(logger.writeSummary).toHaveBeenCalledTimes(1);
+    const summaryArg = vi.mocked(logger.writeSummary).mock.calls[0][0];
+    expect(summaryArg).toContain("<details>");
+    expect(summaryArg).toContain("line-stdout-1\nline-stderr-1\nline-stdout-2");
+  });
+
+  it("does not re-run tflint when exit code is zero", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({ stdout: "--call-module-type", stderr: "" })
+      .mockResolvedValueOnce({
+        stdout: emptySarifOutput,
+        stderr: "",
+        exitCode: 0,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec.mockResolvedValue(0);
+
+    const logger = createMockLogger();
+    const input = createMockInput({
+      executor: executor as unknown as RunInput["executor"],
+      logger,
+    });
+
+    await run(input);
+
+    expect(executor.exec).not.toHaveBeenCalledWith(
+      "tflint",
+      ["--call-module-type=all"],
+      expect.objectContaining({ group: "tflint (human-readable)" }),
+    );
+    expect(logger.writeSummary).not.toHaveBeenCalled();
+  });
+
+  it("does not write step summary when re-run output is empty", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({ stdout: "--call-module-type", stderr: "" })
+      .mockResolvedValueOnce({
+        stdout: emptySarifOutput,
+        stderr: "",
+        exitCode: 2,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec
+      .mockResolvedValueOnce(0) // tflint --init
+      .mockResolvedValueOnce(2) // re-run: no listener calls = empty
+      .mockResolvedValueOnce(0); // reviewdog
+
+    const logger = createMockLogger();
+    const input = createMockInput({
+      executor: executor as unknown as RunInput["executor"],
+      logger,
+    });
+
+    await run(input);
+
+    expect(logger.writeSummary).not.toHaveBeenCalled();
+  });
+
+  it("does not re-run tflint when fix is true and changes are committed", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({ stdout: "--call-module-type", stderr: "" })
+      .mockResolvedValueOnce({
+        stdout: sarifOutputWithFile("main.tf"),
+        stderr: "",
+        exitCode: 2,
+      });
+    executor.exec.mockResolvedValue(0);
+
+    const createCommit = vi.fn().mockResolvedValue("");
+    const checkGitDiff = vi.fn().mockResolvedValue({
+      changedFiles: ["main.tf"],
+    });
+    const logger = createMockLogger();
+
+    const input = createMockInput({
+      executor: executor as unknown as RunInput["executor"],
+      fix: true,
+      createCommit,
+      checkGitDiff,
+      logger,
+    });
+
+    await expect(run(input)).rejects.toThrow("code is fixed by tflint --fix");
+
+    expect(logger.writeSummary).not.toHaveBeenCalled();
+    expect(executor.exec).not.toHaveBeenCalledWith(
+      "tflint",
+      ["--call-module-type=all"],
+      expect.objectContaining({ group: "tflint (human-readable)" }),
+    );
+  });
+
+  it("re-runs tflint when fix is true but no files changed and exit code is non-zero", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({ stdout: "--call-module-type", stderr: "" })
+      .mockResolvedValueOnce({
+        stdout: sarifOutputWithFile("main.tf"),
+        stderr: "",
+        exitCode: 2,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec
+      .mockResolvedValueOnce(0)
+      .mockImplementationOnce((_cmd, _args, options) => {
+        options?.listeners?.stdout?.(Buffer.from("1 issue found"));
+        return Promise.resolve(2);
+      })
+      .mockResolvedValueOnce(0);
+
+    const checkGitDiff = vi.fn().mockResolvedValue({ changedFiles: [] });
+    const logger = createMockLogger();
+
+    const input = createMockInput({
+      executor: executor as unknown as RunInput["executor"],
+      fix: true,
+      checkGitDiff,
+      logger,
+    });
+
+    await run(input);
+
+    expect(logger.writeSummary).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses --module in re-run when tflint does not support --call-module-type", async () => {
+    const executor = createMockExecutor();
+    executor.getExecOutput
+      .mockResolvedValueOnce({ stdout: "Usage: tflint [OPTIONS]", stderr: "" })
+      .mockResolvedValueOnce({
+        stdout: emptySarifOutput,
+        stderr: "",
+        exitCode: 2,
+      })
+      .mockResolvedValueOnce({
+        stdout: "-fail-level",
+        stderr: "",
+        exitCode: 0,
+      });
+    executor.exec
+      .mockResolvedValueOnce(0)
+      .mockImplementationOnce((_cmd, _args, options) => {
+        options?.listeners?.stdout?.(Buffer.from("issue"));
+        return Promise.resolve(2);
+      })
+      .mockResolvedValueOnce(0);
+
+    const input = createMockInput({
+      executor: executor as unknown as RunInput["executor"],
+    });
+
+    await run(input);
+
+    expect(executor.exec).toHaveBeenCalledWith(
+      "tflint",
+      ["--module"],
+      expect.objectContaining({ group: "tflint (human-readable)" }),
     );
   });
 

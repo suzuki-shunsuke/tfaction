@@ -10,6 +10,7 @@ import { listFiles } from "./sarif";
 export type Logger = {
   info: (message: string) => void;
   setOutput: (name: string, value: string) => void;
+  writeSummary: (content: string) => Promise<void>;
 };
 
 export type CommitCreator = (params: {
@@ -56,7 +57,14 @@ export const run = async (input: RunInput): Promise<void> => {
   const githubTokenForFix = input.githubTokenForFix || input.githubToken;
   const executor = input.executor;
   const eventName = input.eventName ?? github.context.eventName;
-  const logger = input.logger ?? { info: core.info, setOutput: core.setOutput };
+  const logger = input.logger ?? {
+    info: core.info,
+    setOutput: core.setOutput,
+    writeSummary: async (content: string) => {
+      core.summary.addRaw(content);
+      await core.summary.write();
+    },
+  };
   const createCommit = input.createCommit ?? defaultCreateCommit;
   const checkGitDiff = input.checkGitDiff ?? defaultCheckGitDiff;
 
@@ -68,22 +76,24 @@ export const run = async (input: RunInput): Promise<void> => {
     },
   });
 
-  const args = ["--format", "sarif"];
+  const commonArgs: string[] = [];
 
   const help = await executor.getExecOutput("tflint", ["--help"], {
     cwd: input.workingDirectory,
     silent: true,
   });
   if (help.stdout.includes("--call-module-type")) {
-    args.push("--call-module-type=all");
+    commonArgs.push("--call-module-type=all");
   } else {
-    args.push("--module");
-  }
-  if (input.fix) {
-    args.push("--fix");
+    commonArgs.push("--module");
   }
 
-  const out = await executor.getExecOutput("tflint", args, {
+  const sarifArgs = ["--format", "sarif", ...commonArgs];
+  if (input.fix) {
+    sarifArgs.push("--fix");
+  }
+
+  const out = await executor.getExecOutput("tflint", sarifArgs, {
     cwd: input.workingDirectory,
     group: "tflint",
     ignoreReturnCode: true,
@@ -108,6 +118,29 @@ export const run = async (input: RunInput): Promise<void> => {
         appPrivateKey: input.csmAppPrivateKey,
       });
       throw new Error("code is fixed by tflint --fix");
+    }
+  }
+
+  if (out.exitCode !== 0) {
+    let combined = "";
+    await executor.exec("tflint", commonArgs, {
+      cwd: input.workingDirectory,
+      group: "tflint (human-readable)",
+      ignoreReturnCode: true,
+      listeners: {
+        stdout: (data: Buffer) => {
+          combined += data.toString();
+        },
+        stderr: (data: Buffer) => {
+          combined += data.toString();
+        },
+      },
+    });
+    const body = combined.trim();
+    if (body.length > 0) {
+      await logger.writeSummary(
+        `<details><summary>tflint</summary>\n\n\`\`\`\n${body}\n\`\`\`\n\n</details>\n`,
+      );
     }
   }
 
