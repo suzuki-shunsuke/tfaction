@@ -9,6 +9,7 @@ import { listFiles } from "./sarif";
 
 export type Logger = {
   info: (message: string) => void;
+  error: (message: string) => void;
   setOutput: (name: string, value: string) => void;
   writeSummary: (content: string) => Promise<void>;
 };
@@ -59,6 +60,7 @@ export const run = async (input: RunInput): Promise<void> => {
   const eventName = input.eventName ?? github.context.eventName;
   const logger = input.logger ?? {
     info: core.info,
+    error: core.error,
     setOutput: core.setOutput,
     writeSummary: async (content: string) => {
       core.summary.addRaw(content);
@@ -122,10 +124,10 @@ export const run = async (input: RunInput): Promise<void> => {
   }
 
   if (out.exitCode !== 0) {
+    logger.error("tflint failed");
     let combined = "";
     await executor.exec("tflint", commonArgs, {
       cwd: input.workingDirectory,
-      group: "tflint (human-readable)",
       ignoreReturnCode: true,
       listeners: {
         stdout: (data: Buffer) => {
@@ -138,9 +140,7 @@ export const run = async (input: RunInput): Promise<void> => {
     });
     const body = combined.trim();
     if (body.length > 0) {
-      await logger.writeSummary(
-        `<details><summary>tflint</summary>\n\n\`\`\`\n${body}\n\`\`\`\n\n</details>\n`,
-      );
+      await logger.writeSummary(`## tflint\n\n\`\`\`\n${body}\n\`\`\`\n`);
     }
   }
 
