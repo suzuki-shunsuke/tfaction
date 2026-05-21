@@ -177,6 +177,7 @@ export class Executor {
     const envVars = this.env(options);
     try {
       if (options?.group) {
+        console.log("");
         core.startGroup(options.group);
       }
       if (options?.comment) {
@@ -194,6 +195,7 @@ export class Executor {
       });
     } finally {
       if (options?.group) {
+        console.log("");
         core.endGroup();
       }
     }
