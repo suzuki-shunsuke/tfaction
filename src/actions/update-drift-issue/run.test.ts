@@ -259,6 +259,48 @@ describe("run", () => {
     }
   });
 
+  it("closes issue when state=OPEN (uppercase) and status=success", async () => {
+    const input = createRunInput({
+      status: "success",
+      issueState: "OPEN",
+      skipTerraform: false,
+    });
+
+    await run(input);
+
+    expect(input.octokit.rest.issues.update).toHaveBeenCalledWith({
+      owner: "owner",
+      repo: "repo",
+      issue_number: 42,
+      state: "closed",
+    });
+  });
+
+  it("reopens issue when state=CLOSED (uppercase) and status=failure", async () => {
+    const input = createRunInput({
+      status: "failure",
+      issueState: "CLOSED",
+    });
+    input.octokit.graphql.mockResolvedValue({
+      repository: {
+        issue: {
+          comments: {
+            nodes: [],
+          },
+        },
+      },
+    });
+
+    await run(input);
+
+    expect(input.octokit.rest.issues.update).toHaveBeenCalledWith({
+      owner: "owner",
+      repo: "repo",
+      issue_number: 42,
+      state: "open",
+    });
+  });
+
   it("both comment and reopen happen when state=closed and status=failure", async () => {
     const input = createRunInput({
       status: "failure",

@@ -131,9 +131,11 @@ export const run = async (input: RunInput): Promise<void> => {
     await postCommentIfNeeded(input);
   }
 
+  const issueState = input.issueState?.toLowerCase();
+
   // Close the drift issue if job succeeded and terraform wasn't skipped
   if (
-    input.issueState === "open" &&
+    issueState === "open" &&
     input.status === "success" &&
     !input.skipTerraform
   ) {
@@ -142,7 +144,7 @@ export const run = async (input: RunInput): Promise<void> => {
   }
 
   // Reopen the drift issue if it was closed and job failed
-  if (input.issueState === "closed" && input.status !== "success") {
+  if (issueState === "closed" && input.status !== "success") {
     log.info("Reopening drift issue");
     await reopenIssue(input);
   }
