@@ -31,6 +31,7 @@ export const checkProviders = async (
     : ["version", "-json"];
   const result = await input.executor.getExecOutput(input.tfCommand, args, {
     cwd: input.workingDir,
+    group: `${input.tfCommand} version -json`,
   });
   const versionInfo = JSON.parse(result.stdout);
   const providerSelections: Record<string, string> =

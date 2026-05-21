@@ -191,7 +191,7 @@ describe("checkProviders", () => {
     expect(mockGetExecOutput).toHaveBeenCalledWith(
       "terragrunt",
       ["run", "--", "version", "-json"],
-      { cwd: "/work" },
+      { cwd: "/work", group: "terragrunt version -json" },
     );
   });
 
@@ -213,7 +213,7 @@ describe("checkProviders", () => {
     expect(mockGetExecOutput).toHaveBeenCalledWith(
       "terragrunt",
       ["version", "-json"],
-      { cwd: "/work" },
+      { cwd: "/work", group: "terragrunt version -json" },
     );
   });
 
