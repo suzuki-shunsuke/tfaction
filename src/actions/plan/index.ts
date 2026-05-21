@@ -37,6 +37,7 @@ export const main = async () => {
     ciInfoTempDir: env.all.CI_INFO_TEMP_DIR,
     prNumber: github.context.issue.number,
     secrets: mergeSecrets(input.secrets, input.awsSecrets),
+    stepSummaryPath: env.all.GITHUB_STEP_SUMMARY,
   });
 
   // Step 5: Commit .tfmigrate.hcl if changed (for tfmigrate job type)

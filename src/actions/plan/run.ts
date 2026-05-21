@@ -65,6 +65,7 @@ type Inputs = {
   prNumber?: number;
   executor: aqua.Executor;
   secrets?: Record<string, string>;
+  stepSummaryPath?: string;
 };
 
 export type RunInputs = {
@@ -76,6 +77,7 @@ export type RunInputs = {
   ciInfoTempDir?: string;
   prNumber?: number;
   secrets?: Record<string, string>;
+  stepSummaryPath?: string;
 };
 
 type TerraformPlanOutputs = {
@@ -385,58 +387,124 @@ export const runTerraformPlan = async (
 ): Promise<TerraformPlanOutputs> => {
   const installDir = path.join(lib.GitHubActionPath, "install");
 
-  // Create temp directory and copy plan binary
+  // Create temp directory for plan binary and captured plan output
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
   const tempPlanBinary = path.join(tempDir, "tfplan.binary");
   const tempPlanJson = path.join(tempDir, "tfplan.json");
+  const tempPlanOutput = path.join(tempDir, "plan.txt");
 
-  const planArgs = [
-    "-var",
-    `target:${inputs.target}`,
-    "-var",
-    `destroy:${inputs.destroy}`,
-  ];
-  // Set TFCMT_CONFIG for drift detection mode
-  if (inputs.driftIssueNumber) {
-    planArgs.push("-config", path.join(installDir, "tfcmt-drift.yaml"));
-  }
-  planArgs.push(
-    "plan",
-    "--",
-    inputs.tfCommand,
+  const executor = inputs.executor;
+
+  // Run terraform plan directly, capturing combined stdout/stderr while
+  // streaming to the Actions log. The captured output is replayed into
+  // tfcmt below so terraform plan runs only once.
+  const terraformPlanArgs = [
     "plan",
     "-no-color",
     "-detailed-exitcode",
     "-out",
     tempPlanBinary,
     "-input=false",
-  );
+  ];
   if (inputs.destroy) {
-    planArgs.push("-destroy");
+    terraformPlanArgs.push("-destroy");
     core.warning("The destroy option is enabled");
   }
 
-  const executor = inputs.executor;
-
-  // Run terraform plan with tfcmt
-  const planResult = await executor.getExecOutput("tfcmt", planArgs, {
-    cwd: inputs.workingDirectory,
-    ignoreReturnCode: true,
-    secretEnvs: inputs.secrets,
-    group: `${inputs.tfCommand} plan`,
-    env: {
-      GITHUB_TOKEN: inputs.githubTokenForGitHubProvider || inputs.githubToken,
-      TFCMT_GITHUB_TOKEN: inputs.githubToken,
-      TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
+  let combinedPlanOutput = "";
+  const detailedExitcode = await executor.exec(
+    inputs.tfCommand,
+    terraformPlanArgs,
+    {
+      cwd: inputs.workingDirectory,
+      ignoreReturnCode: true,
+      secretEnvs: inputs.secrets,
+      group: `${inputs.tfCommand} plan`,
+      env: {
+        GITHUB_TOKEN: inputs.githubTokenForGitHubProvider || inputs.githubToken,
+        TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
+      },
+      listeners: {
+        stdout: (data: Buffer) => {
+          combinedPlanOutput += data.toString();
+        },
+        stderr: (data: Buffer) => {
+          combinedPlanOutput += data.toString();
+        },
+      },
     },
-  });
-
-  const detailedExitcode = planResult.exitCode;
+  );
+  fs.writeFileSync(tempPlanOutput, combinedPlanOutput);
 
   // Set detailed_exitcode output immediately
   core.setOutput("detailed_exitcode", detailedExitcode);
 
   core.setOutput("plan_binary", tempPlanBinary);
+
+  // Replay captured output into tfcmt for PR comment and Step Summary.
+  // Two tfcmt invocations are required because --output writes to a file
+  // instead of the PR; there is no single-call "both" mode.
+  const tfcmtGlobalArgs = [
+    "-var",
+    `target:${inputs.target}`,
+    "-var",
+    `destroy:${inputs.destroy}`,
+  ];
+  if (inputs.driftIssueNumber) {
+    tfcmtGlobalArgs.push("-config", path.join(installDir, "tfcmt-drift.yaml"));
+  }
+  // Use positional args ($1, $2) so the temp path / exit code are not
+  // interpolated into the shell script body.
+  const tfcmtReplayArgs = [
+    "plan",
+    "--",
+    "bash",
+    "-c",
+    'cat "$1" && exit "$2"',
+    "_",
+    tempPlanOutput,
+    String(detailedExitcode),
+  ];
+  const tfcmtEnv = {
+    TFCMT_GITHUB_TOKEN: inputs.githubToken,
+  };
+
+  try {
+    await executor.exec("tfcmt", [...tfcmtGlobalArgs, ...tfcmtReplayArgs], {
+      cwd: inputs.workingDirectory,
+      ignoreReturnCode: true,
+      group: "tfcmt plan",
+      env: tfcmtEnv,
+    });
+  } catch (e) {
+    core.warning(
+      `Failed to post tfcmt PR comment: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
+
+  if (inputs.stepSummaryPath) {
+    try {
+      await executor.exec(
+        "tfcmt",
+        [
+          "--output",
+          inputs.stepSummaryPath,
+          ...tfcmtGlobalArgs,
+          ...tfcmtReplayArgs,
+        ],
+        {
+          cwd: inputs.workingDirectory,
+          ignoreReturnCode: true,
+          group: "tfcmt plan (step summary)",
+          env: tfcmtEnv,
+        },
+      );
+    } catch (e) {
+      core.warning(
+        `Failed to write tfcmt Step Summary: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  }
 
   // If terraform plan failed, exit immediately
   if (detailedExitcode === 1) {
@@ -556,6 +624,7 @@ export const main = async (
     prNumber: runInputs.prNumber,
     executor,
     secrets: runInputs.secrets,
+    stepSummaryPath: runInputs.stepSummaryPath,
   };
 
   const jobType = runInputs.jobType;
