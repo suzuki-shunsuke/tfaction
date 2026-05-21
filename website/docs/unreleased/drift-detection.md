@@ -74,12 +74,9 @@ If a root module corresponding to an issue is no longer found (e.g., because it 
 ## Enable in tfaction-root.yaml
 
 Drift Detection is disabled by default.
+To enable it, add `drift_detection` to your `tfaction-root.yaml`.
 
-```yaml
-drift_detection: {}
-```
-
-```yaml
+```yaml title="tfaction-root.yaml"
 drift_detection:
   enabled: true
   # Repository where issues are created. Defaults to the repository where tfaction runs.
@@ -96,21 +93,21 @@ The default is 168 hours (7 days).
 
 You can enable or disable drift detection per target group or root module.
 
-```yaml
+```yaml title="tfaction-root.yaml"
 target_groups:
   - working_directory: "**"
     drift_detection:
       enabled: true
 ```
 
-```yaml
+```yaml title="tfaction.yaml"
 drift_detection:
   enabled: true
 ```
 
 ## Create a workflow to periodically detect drift
 
-```yaml
+```yaml title=".github/workflows/drift-detection.yaml"
 name: Detect drift
 on:
   workflow_dispatch:
@@ -129,7 +126,7 @@ jobs:
       contents: read
       issues: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
       - uses: suzuki-shunsuke/tfaction@latest
@@ -138,7 +135,7 @@ jobs:
           action: pick-out-drift-issues
 
   detect:
-    timeout-minutes: 60
+    timeout-minutes: 20
     name: "detect (${{matrix.issue.target}})"
     runs-on: ${{matrix.issue.runs_on}}
     needs: pick-out
@@ -151,7 +148,7 @@ jobs:
       matrix:
         issue: ${{fromJSON(needs.pick-out.outputs.issues)}}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -163,6 +160,11 @@ jobs:
       - uses: suzuki-shunsuke/tfaction@latest
         with:
           action: setup
+
+      - name: terraform init
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: terraform-init
 
       - uses: suzuki-shunsuke/tfaction@latest
         with:
@@ -181,7 +183,7 @@ jobs:
 
 ## Create a workflow to periodically create drift issues
 
-```yaml
+```yaml title=".github/workflows/create-drift-issues.yaml"
 name: Create drift issues
 on:
   workflow_dispatch:
@@ -193,9 +195,11 @@ jobs:
   create-drift-issues:
     timeout-minutes: 30
     runs-on: ubuntu-24.04
-    permissions: {}
+    permissions:
+      contents: read
+      issues: write
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -208,7 +212,8 @@ jobs:
 
 Add a step at the beginning of the job to get or create a drift issue:
 
-```yaml
+```yaml title=".github/workflows/apply.yaml"
+# issues: write is required
 - uses: suzuki-shunsuke/tfaction@latest
   with:
     action: get-or-create-drift-issue
@@ -216,7 +221,8 @@ Add a step at the beginning of the job to get or create a drift issue:
 
 Add a step at the end of the job to update the drift issue:
 
-```yaml
+```yaml title=".github/workflows/apply.yaml"
+# issues: write is required
 - uses: suzuki-shunsuke/tfaction@latest
   if: always()
   with:
