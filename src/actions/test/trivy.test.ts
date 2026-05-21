@@ -156,7 +156,16 @@ describe("run", () => {
 
     expect(executor.getExecOutput).toHaveBeenCalledWith(
       "trivy",
-      ["config", "--format", "sarif", "--config", "/path/to/trivy.yaml", "."],
+      [
+        "config",
+        "--format",
+        "sarif",
+        "--exit-code",
+        "1",
+        "--config",
+        "/path/to/trivy.yaml",
+        ".",
+      ],
       expect.any(Object),
     );
   });
@@ -190,7 +199,7 @@ describe("run", () => {
 
     expect(executor.getExecOutput).toHaveBeenCalledWith(
       "trivy",
-      ["config", "--format", "sarif", "."],
+      ["config", "--format", "sarif", "--exit-code", "1", "."],
       expect.any(Object),
     );
   });
@@ -581,7 +590,7 @@ describe("run", () => {
 
     expect(executor.exec).toHaveBeenCalledWith(
       "trivy",
-      ["config", "."],
+      ["config", "--exit-code", "1", "."],
       expect.objectContaining({
         cwd: "/work",
         ignoreReturnCode: true,
@@ -703,7 +712,7 @@ describe("run", () => {
 
     expect(executor.exec).toHaveBeenCalledWith(
       "trivy",
-      ["config", "--config", "/path/to/trivy.yaml", "."],
+      ["config", "--exit-code", "1", "--config", "/path/to/trivy.yaml", "."],
       expect.objectContaining({ cwd: "/work" }),
     );
   });

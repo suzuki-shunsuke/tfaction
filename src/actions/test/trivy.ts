@@ -33,8 +33,16 @@ export const run = async (input: RunInput): Promise<void> => {
   };
 
   const configFlags = input.configPath ? ["--config", input.configPath] : [];
-  const sarifArgs = ["config", "--format", "sarif", ...configFlags, "."];
-  const humanArgs = ["config", ...configFlags, "."];
+  const sarifArgs = [
+    "config",
+    "--format",
+    "sarif",
+    "--exit-code",
+    "1",
+    ...configFlags,
+    ".",
+  ];
+  const humanArgs = ["config", "--exit-code", "1", ...configFlags, "."];
 
   const out = await executor.getExecOutput("trivy", sarifArgs, {
     cwd: input.workingDirectory,
