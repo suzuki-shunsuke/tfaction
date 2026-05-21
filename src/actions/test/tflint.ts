@@ -148,7 +148,10 @@ export const run = async (input: RunInput): Promise<void> => {
 
   const reporter =
     eventName == "pull_request" ? "github-pr-review" : "github-check";
-  logger.info(`Reviewdog input: ${out.stdout}`);
+
+  core.startGroup("reviewdog input");
+  logger.info(out.stdout);
+  core.endGroup();
 
   const reviewdogArgs = [
     "-f",
