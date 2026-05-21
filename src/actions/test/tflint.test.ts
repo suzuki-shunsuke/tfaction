@@ -9,6 +9,7 @@ describe("run", () => {
 
   const createMockLogger = (): Logger => ({
     info: vi.fn(),
+    error: vi.fn(),
     setOutput: vi.fn(),
     writeSummary: vi.fn().mockResolvedValue(undefined),
   });
@@ -632,14 +633,21 @@ describe("run", () => {
 
     await run(input);
 
-    expect(executor.exec).toHaveBeenCalledWith(
-      "tflint",
-      ["--call-module-type=all"],
-      expect.objectContaining({ group: "tflint (human-readable)" }),
+    const reRunCall = executor.exec.mock.calls.find(
+      (call) =>
+        call[0] === "tflint" &&
+        Array.isArray(call[1]) &&
+        call[1].length === 1 &&
+        call[1][0] === "--call-module-type=all",
     );
+    expect(reRunCall).toBeDefined();
+    expect(reRunCall?.[2]).not.toHaveProperty("group");
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith("tflint failed");
     expect(logger.writeSummary).toHaveBeenCalledTimes(1);
     const summaryArg = vi.mocked(logger.writeSummary).mock.calls[0][0];
-    expect(summaryArg).toContain("<details>");
+    expect(summaryArg).toContain("## tflint");
+    expect(summaryArg).not.toContain("<details>");
     expect(summaryArg).toContain("line-stdout-1\nline-stderr-1\nline-stdout-2");
   });
 
@@ -667,11 +675,15 @@ describe("run", () => {
 
     await run(input);
 
-    expect(executor.exec).not.toHaveBeenCalledWith(
-      "tflint",
-      ["--call-module-type=all"],
-      expect.objectContaining({ group: "tflint (human-readable)" }),
+    const reRunCall = executor.exec.mock.calls.find(
+      (call) =>
+        call[0] === "tflint" &&
+        Array.isArray(call[1]) &&
+        call[1].length === 1 &&
+        call[1][0] === "--call-module-type=all",
     );
+    expect(reRunCall).toBeUndefined();
+    expect(logger.error).not.toHaveBeenCalled();
     expect(logger.writeSummary).not.toHaveBeenCalled();
   });
 
@@ -702,6 +714,7 @@ describe("run", () => {
 
     await run(input);
 
+    expect(logger.error).toHaveBeenCalledWith("tflint failed");
     expect(logger.writeSummary).not.toHaveBeenCalled();
   });
 
@@ -732,12 +745,16 @@ describe("run", () => {
 
     await expect(run(input)).rejects.toThrow("code is fixed by tflint --fix");
 
+    expect(logger.error).not.toHaveBeenCalled();
     expect(logger.writeSummary).not.toHaveBeenCalled();
-    expect(executor.exec).not.toHaveBeenCalledWith(
-      "tflint",
-      ["--call-module-type=all"],
-      expect.objectContaining({ group: "tflint (human-readable)" }),
+    const reRunCall = executor.exec.mock.calls.find(
+      (call) =>
+        call[0] === "tflint" &&
+        Array.isArray(call[1]) &&
+        call[1].length === 1 &&
+        call[1][0] === "--call-module-type=all",
     );
+    expect(reRunCall).toBeUndefined();
   });
 
   it("re-runs tflint when fix is true but no files changed and exit code is non-zero", async () => {
@@ -808,7 +825,7 @@ describe("run", () => {
     expect(executor.exec).toHaveBeenCalledWith(
       "tflint",
       ["--module"],
-      expect.objectContaining({ group: "tflint (human-readable)" }),
+      expect.objectContaining({ ignoreReturnCode: true }),
     );
   });
 
