@@ -1,3 +1,4 @@
+import * as core from "@actions/core";
 import * as github from "@actions/github";
 
 import * as aqua from "../../aqua";
@@ -5,6 +6,8 @@ import * as types from "../../lib/types";
 
 export type Logger = {
   info: (message: string) => void;
+  error: (message: string) => void;
+  writeSummary: (content: string) => Promise<void>;
 };
 
 export type RunInput = {
@@ -14,19 +17,59 @@ export type RunInput = {
   configPath: string;
   trivy?: types.TrivyConfig;
   eventName?: string;
+  logger?: Logger;
 };
 
 export const run = async (input: RunInput): Promise<void> => {
-  const args = input.configPath
-    ? ["config", "--format", "sarif", "--config", input.configPath, "."]
-    : ["config", "--format", "sarif", "."];
   const executor = input.executor;
   const eventName = input.eventName ?? github.context.eventName;
-  const out = await executor.getExecOutput("trivy", args, {
+  const logger = input.logger ?? {
+    info: core.info,
+    error: core.error,
+    writeSummary: async (content: string) => {
+      core.summary.addRaw(content);
+      await core.summary.write();
+    },
+  };
+
+  const configFlags = input.configPath ? ["--config", input.configPath] : [];
+  const sarifArgs = [
+    "config",
+    "--format",
+    "sarif",
+    "--exit-code",
+    "1",
+    ...configFlags,
+    ".",
+  ];
+  const humanArgs = ["config", "--exit-code", "1", ...configFlags, "."];
+
+  const out = await executor.getExecOutput("trivy", sarifArgs, {
     cwd: input.workingDirectory,
     ignoreReturnCode: true,
     group: "trivy",
   });
+
+  if (out.exitCode !== 0) {
+    logger.error("trivy failed");
+    let combined = "";
+    await executor.exec("trivy", humanArgs, {
+      cwd: input.workingDirectory,
+      ignoreReturnCode: true,
+      listeners: {
+        stdout: (data: Buffer) => {
+          combined += data.toString();
+        },
+        stderr: (data: Buffer) => {
+          combined += data.toString();
+        },
+      },
+    });
+    const body = combined.trim();
+    if (body.length > 0) {
+      await logger.writeSummary(`## trivy\n\n\`\`\`\n${body}\n\`\`\`\n`);
+    }
+  }
 
   const filterMode = input.trivy?.reviewdog?.filter_mode ?? "nofilter";
 
