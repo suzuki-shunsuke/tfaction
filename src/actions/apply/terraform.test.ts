@@ -39,7 +39,7 @@ vi.mock("fs", async () => {
   return {
     ...actual,
     mkdtempSync: vi.fn(),
-    createWriteStream: vi.fn(),
+    writeFileSync: vi.fn(),
     readFileSync: vi.fn(),
     rmdirSync: vi.fn(),
   };
@@ -78,6 +78,7 @@ vi.mock("../../lib/env", () => ({
     CI_INFO_PR_NUMBER: "42",
     CI_INFO_TEMP_DIR: "/tmp/ci-info",
     CI_INFO_HEAD_REF: "feature-branch",
+    GITHUB_STEP_SUMMARY: "",
   },
 }));
 
@@ -111,12 +112,6 @@ const createMockExecutor = () => ({
   githubToken: "mock-token",
   env: vi.fn(),
   buildArgs: vi.fn(),
-});
-
-// Helper to create a mock write stream
-const createMockWriteStream = () => ({
-  write: vi.fn(),
-  end: vi.fn(),
 });
 
 // Helper to create a mock config
@@ -172,7 +167,6 @@ const setupMainMocks = async (
   const config = createMockConfig(options.config ?? {});
   const targetConfig = createMockTargetConfig(options.targetConfig ?? {});
   const mockExecutor = createMockExecutor();
-  const mockWriteStream = createMockWriteStream();
 
   vi.mocked(lib.getConfig).mockResolvedValue(config as never);
   vi.mocked(getTargetConfigMod.getTargetConfig).mockResolvedValue(
@@ -187,11 +181,9 @@ const setupMainMocks = async (
     Object.assign(envMod.all, options.envOverrides);
   }
 
-  // Mock fs for downloadPlanFile
+  // Mock fs for downloadPlanFile and apply output capture
   vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/tfaction-test");
-  vi.mocked(fs.createWriteStream).mockReturnValue(
-    mockWriteStream as unknown as fs.WriteStream,
-  );
+  vi.mocked(fs.writeFileSync).mockReturnValue(undefined);
   vi.mocked(fs.readFileSync).mockReturnValue(
     JSON.stringify({
       head: { sha: options.prHeadSha ?? "abc123" },
@@ -225,7 +217,7 @@ const setupMainMocks = async (
     mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
   );
 
-  return { config, targetConfig, mockExecutor, mockWriteStream, mockOctokit };
+  return { config, targetConfig, mockExecutor, mockOctokit };
 };
 
 describe("main", () => {
@@ -240,6 +232,7 @@ describe("main", () => {
       CI_INFO_PR_NUMBER: "42",
       CI_INFO_TEMP_DIR: "/tmp/ci-info",
       CI_INFO_HEAD_REF: "feature-branch",
+      GITHUB_STEP_SUMMARY: "",
     });
   });
 
@@ -252,15 +245,10 @@ describe("main", () => {
 
     await main();
 
-    // Verify tfcmt apply was called with terraform
+    // Step A: terraform apply runs directly (not via tfcmt --)
     expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "tfcmt",
+      "terraform",
       expect.arrayContaining([
-        "-var",
-        "target:aws/dev/vpc",
-        "apply",
-        "--",
-        "terraform",
         "apply",
         "-auto-approve",
         "-no-color",
@@ -269,6 +257,25 @@ describe("main", () => {
       expect.objectContaining({
         cwd: path.join("/git/root", "aws/dev/vpc"),
         ignoreReturnCode: true,
+      }),
+    );
+
+    // Step B: tfcmt apply replays the captured output for the PR comment
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "tfcmt",
+      expect.arrayContaining([
+        "-var",
+        "target:aws/dev/vpc",
+        "apply",
+        "--",
+        "bash",
+        "-c",
+        'cat "$1" && exit "$2"',
+      ]),
+      expect.objectContaining({
+        cwd: path.join("/git/root", "aws/dev/vpc"),
+        ignoreReturnCode: true,
+        group: "tfcmt apply",
       }),
     );
   });
@@ -281,9 +288,90 @@ describe("main", () => {
     await main();
 
     expect(mockExecutor.exec).toHaveBeenCalledWith(
-      "tfcmt",
-      expect.arrayContaining(["tofu", "apply"]),
+      "tofu",
+      expect.arrayContaining(["apply", "-auto-approve"]),
       expect.any(Object),
+    );
+  });
+
+  it("does not call tfcmt --output when GITHUB_STEP_SUMMARY is empty", async () => {
+    const { mockExecutor } = await setupMainMocks();
+
+    await main();
+
+    const stepSummaryCall = mockExecutor.exec.mock.calls.find(
+      (call: unknown[]) =>
+        call[0] === "tfcmt" &&
+        Array.isArray(call[1]) &&
+        (call[1] as string[]).includes("--output"),
+    );
+    expect(stepSummaryCall).toBeUndefined();
+  });
+
+  it("writes Step Summary via tfcmt --output when GITHUB_STEP_SUMMARY is set", async () => {
+    const { mockExecutor } = await setupMainMocks({
+      envOverrides: { GITHUB_STEP_SUMMARY: "/tmp/step-summary.md" },
+    });
+
+    await main();
+
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "tfcmt",
+      expect.arrayContaining([
+        "--output",
+        "/tmp/step-summary.md",
+        "-var",
+        "target:aws/dev/vpc",
+        "apply",
+        "--",
+      ]),
+      expect.objectContaining({
+        group: "tfcmt apply (step summary)",
+        ignoreReturnCode: true,
+      }),
+    );
+  });
+
+  it("warns but does not throw when the PR comment tfcmt call fails", async () => {
+    const { mockExecutor } = await setupMainMocks();
+
+    mockExecutor.exec.mockImplementation((cmd: string, args?: string[]) => {
+      if (
+        cmd === "tfcmt" &&
+        args &&
+        args.includes("apply") &&
+        args.includes("--") &&
+        !args.includes("--output") &&
+        !args.some((a) => a.includes("tfcmt-drift.yaml"))
+      ) {
+        return Promise.reject(new Error("network error"));
+      }
+      return Promise.resolve(0);
+    });
+
+    await main();
+
+    expect(core.warning).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to post tfcmt PR comment"),
+    );
+  });
+
+  it("warns but does not throw when the Step Summary tfcmt call fails", async () => {
+    const { mockExecutor } = await setupMainMocks({
+      envOverrides: { GITHUB_STEP_SUMMARY: "/tmp/step-summary.md" },
+    });
+
+    mockExecutor.exec.mockImplementation((cmd: string, args?: string[]) => {
+      if (cmd === "tfcmt" && args && args.includes("--output")) {
+        return Promise.reject(new Error("write error"));
+      }
+      return Promise.resolve(0);
+    });
+
+    await main();
+
+    expect(core.warning).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to write tfcmt Step Summary"),
     );
   });
 
@@ -390,9 +478,14 @@ describe("main", () => {
   it('throws "terraform apply failed" when exit code is non-zero', async () => {
     const { mockExecutor } = await setupMainMocks();
 
-    // Make tfcmt apply return non-zero
-    mockExecutor.exec.mockImplementation((_cmd: string, args?: string[]) => {
-      if (args && args.includes("apply") && args.includes("-auto-approve")) {
+    // Make the direct terraform apply call return non-zero
+    mockExecutor.exec.mockImplementation((cmd: string, args?: string[]) => {
+      if (
+        cmd === "terraform" &&
+        args &&
+        args.includes("apply") &&
+        args.includes("-auto-approve")
+      ) {
         return Promise.resolve(1);
       }
       return Promise.resolve(0);
