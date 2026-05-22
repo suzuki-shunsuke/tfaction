@@ -55,56 +55,93 @@ export const main = async (
     throw new Error("PLAN_FILE_PATH is not set");
   }
 
-  // Create a temporary file for apply output
+  // Create a temp directory for the captured apply output. The same file
+  // is later replayed into tfcmt (for the PR comment and Job Summary) and
+  // into the drift issue notification.
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
   const applyOutput = path.join(tempDir, "apply_output.txt");
-  const outputStream = fs.createWriteStream(applyOutput);
 
-  // Run terraform apply with tfcmt
-  let exitCode = 0;
+  // Run terraform/terragrunt apply directly, capturing combined
+  // stdout/stderr while @actions/exec streams to the Actions log. The
+  // captured output is replayed into tfcmt below so apply runs only once.
+  let combinedApplyOutput = "";
+  const exitCode = await executor.exec(
+    tfCommand,
+    ["apply", "-auto-approve", "-no-color", "-input=false", planFilePath],
+    {
+      cwd: workingDir,
+      ignoreReturnCode: true,
+      secretEnvs: secrets,
+      group: `${tfCommand} apply`,
+      env: {
+        GITHUB_TOKEN: githubTokenForGitHubProvider || githubToken,
+        TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
+      },
+      listeners: {
+        stdout: (data: Buffer) => {
+          combinedApplyOutput += data.toString();
+        },
+        stderr: (data: Buffer) => {
+          combinedApplyOutput += data.toString();
+        },
+      },
+    },
+  );
+  fs.writeFileSync(applyOutput, combinedApplyOutput);
+
+  // Replay captured output into tfcmt for PR comment and Step Summary.
+  // Two tfcmt invocations are required because --output writes to a file
+  // instead of the PR; there is no single-call "both" mode.
+  const tfcmtGlobalArgs = ["-var", `target:${targetConfig.target}`];
+  // Positional args ($1, $2) keep the temp path / exit code out of the
+  // shell script body.
+  const tfcmtReplayArgs = [
+    "apply",
+    "--",
+    "bash",
+    "-c",
+    'cat "$1" && exit "$2"',
+    "_",
+    applyOutput,
+    String(exitCode),
+  ];
+  const tfcmtEnv = {
+    GITHUB_TOKEN: githubTokenForGitHubProvider || githubToken,
+    TFCMT_GITHUB_TOKEN: githubToken,
+    TERRAGRUNT_LOG_DISABLE: "true",
+  };
+
   try {
-    await executor
-      .exec(
+    await executor.exec("tfcmt", [...tfcmtGlobalArgs, ...tfcmtReplayArgs], {
+      cwd: workingDir,
+      ignoreReturnCode: true,
+      group: "tfcmt apply",
+      env: tfcmtEnv,
+    });
+  } catch (e) {
+    core.warning(
+      `Failed to post tfcmt PR comment: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
+
+  const stepSummaryPath = env.all.GITHUB_STEP_SUMMARY;
+  if (stepSummaryPath) {
+    try {
+      await executor.exec(
         "tfcmt",
-        [
-          "-var",
-          `target:${targetConfig.target}`,
-          "apply",
-          "--",
-          tfCommand,
-          "apply",
-          "-auto-approve",
-          "-no-color",
-          "-input=false",
-          planFilePath,
-        ],
+        ["--output", stepSummaryPath, ...tfcmtGlobalArgs, ...tfcmtReplayArgs],
         {
           cwd: workingDir,
           ignoreReturnCode: true,
-          secretEnvs: secrets,
-          group: `${tfCommand} apply`,
-          env: {
-            GITHUB_TOKEN: githubTokenForGitHubProvider || githubToken,
-            TFCMT_GITHUB_TOKEN: githubToken,
-            TERRAGRUNT_LOG_DISABLE: "true", // https://suzuki-shunsuke.github.io/tfcmt/terragrunt
-          },
-          listeners: {
-            stdout: (data: Buffer) => {
-              process.stdout.write(data);
-              outputStream.write(data);
-            },
-            stderr: (data: Buffer) => {
-              process.stderr.write(data);
-              outputStream.write(data);
-            },
-          },
+          group: "tfcmt apply (step summary)",
+          env: tfcmtEnv,
         },
-      )
-      .then((code) => {
-        exitCode = code;
-      });
-  } finally {
-    outputStream.end();
+      );
+    } catch (e) {
+      core.warning(
+        `Failed to write tfcmt Step Summary: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
   }
 
   // If this is a drift issue, post the result to the drift issue
