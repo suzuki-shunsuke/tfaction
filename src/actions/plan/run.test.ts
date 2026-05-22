@@ -155,17 +155,12 @@ describe("runTerraformPlan", () => {
   });
 
   it("returns correctly when detailedExitcode=0 (no changes)", async () => {
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = createBaseInputs(mockExecutor);
     const result = await runTerraformPlan(inputs);
@@ -182,11 +177,7 @@ describe("runTerraformPlan", () => {
   });
 
   it("throws error when detailedExitcode=1 (failure)", async () => {
-    mockExecutor.getExecOutput.mockResolvedValueOnce({
-      exitCode: 1,
-      stdout: "",
-      stderr: "Error: terraform plan failed",
-    });
+    mockExecutor.exec.mockResolvedValueOnce(1); // terraform plan fails
 
     const inputs = createBaseInputs(mockExecutor);
 
@@ -197,17 +188,12 @@ describe("runTerraformPlan", () => {
   });
 
   it("returns correctly when detailedExitcode=2 (has changes)", async () => {
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 2,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(2); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = createBaseInputs(mockExecutor);
     const result = await runTerraformPlan(inputs);
@@ -219,17 +205,12 @@ describe("runTerraformPlan", () => {
   });
 
   it("adds -destroy flag when destroy=true", async () => {
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -237,8 +218,8 @@ describe("runTerraformPlan", () => {
     };
     await runTerraformPlan(inputs);
 
-    expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
-      "tfcmt",
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "terraform",
       expect.arrayContaining(["-destroy"]),
       expect.any(Object),
     );
@@ -246,17 +227,12 @@ describe("runTerraformPlan", () => {
   });
 
   it("uses tfcmt-drift.yaml config when driftIssueNumber is set", async () => {
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 2,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(2); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -267,7 +243,7 @@ describe("runTerraformPlan", () => {
       "Drift detected: terraform plan has changes",
     );
 
-    expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
       "tfcmt",
       expect.arrayContaining([
         "-config",
@@ -278,17 +254,12 @@ describe("runTerraformPlan", () => {
   });
 
   it("throws error when drift detection mode and changes detected", async () => {
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 2,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(2); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -297,6 +268,77 @@ describe("runTerraformPlan", () => {
 
     await expect(runTerraformPlan(inputs)).rejects.toThrow(
       "Drift detected: terraform plan has changes",
+    );
+  });
+
+  it("calls tfcmt for both PR comment and Step Summary when stepSummaryPath is set", async () => {
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
+
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      stepSummaryPath: "/tmp/step-summary",
+    };
+    await runTerraformPlan(inputs);
+
+    const tfcmtCalls = mockExecutor.exec.mock.calls.filter(
+      ([cmd]) => cmd === "tfcmt",
+    );
+    expect(tfcmtCalls).toHaveLength(2);
+    expect(tfcmtCalls[0][1]).not.toContain("--output");
+    expect(tfcmtCalls[1][1]).toEqual(
+      expect.arrayContaining(["--output", "/tmp/step-summary"]),
+    );
+  });
+
+  it("skips Step Summary tfcmt call when stepSummaryPath is empty", async () => {
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
+
+    const inputs = createBaseInputs(mockExecutor); // no stepSummaryPath
+    await runTerraformPlan(inputs);
+
+    const tfcmtCalls = mockExecutor.exec.mock.calls.filter(
+      ([cmd]) => cmd === "tfcmt",
+    );
+    expect(tfcmtCalls).toHaveLength(1);
+    expect(tfcmtCalls[0][1]).not.toContain("--output");
+  });
+
+  it("replays captured terraform plan output into tfcmt via bash", async () => {
+    mockExecutor.exec.mockResolvedValueOnce(2); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
+      stderr: "",
+    }); // terraform show
+
+    const inputs = createBaseInputs(mockExecutor);
+    await runTerraformPlan(inputs);
+
+    const tfcmtCall = mockExecutor.exec.mock.calls.find(
+      ([cmd]) => cmd === "tfcmt",
+    );
+    expect(tfcmtCall).toBeDefined();
+    expect(tfcmtCall![1]).toEqual(
+      expect.arrayContaining([
+        "plan",
+        "--",
+        "bash",
+        "-c",
+        'cat "$1" && exit "$2"',
+        "_",
+        path.join(tempDir, "plan.txt"),
+        "2",
+      ]),
     );
   });
 
@@ -313,18 +355,12 @@ describe("runTerraformPlan", () => {
       }),
     );
 
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 2,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
-        stderr: "",
-      });
-    mockExecutor.exec.mockResolvedValue(0);
+    mockExecutor.exec.mockResolvedValueOnce(2); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -355,17 +391,12 @@ describe("runTerraformPlan", () => {
       }),
     );
 
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 2,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(2); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -379,17 +410,12 @@ describe("runTerraformPlan", () => {
   });
 
   it("skips renovate check when PR author is not renovate", async () => {
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 2,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(2); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": [{"change": {"actions": ["update"]}}]}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -404,17 +430,12 @@ describe("runTerraformPlan", () => {
 
   it("writes plan JSON from terraform show output", async () => {
     const planJsonContent = '{"format_version": "1.0", "resource_changes": []}';
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: planJsonContent,
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: planJsonContent,
+      stderr: "",
+    }); // terraform show
 
     const inputs = createBaseInputs(mockExecutor);
     await runTerraformPlan(inputs);
@@ -426,17 +447,12 @@ describe("runTerraformPlan", () => {
   });
 
   it("sets artifact name outputs with normalized target", async () => {
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = createBaseInputs(mockExecutor);
     await runTerraformPlan(inputs);
@@ -466,17 +482,12 @@ describe("runTerraformPlan", () => {
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -500,17 +511,12 @@ describe("runTerraformPlan", () => {
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -528,17 +534,12 @@ describe("runTerraformPlan", () => {
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -556,17 +557,12 @@ describe("runTerraformPlan", () => {
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const inputs = {
       ...createBaseInputs(mockExecutor),
@@ -1225,17 +1221,12 @@ describe("main", () => {
 
   it("runs terraform plan for terraform job type", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const targetConfig: getTargetConfig.TargetConfig = {
       working_directory: "aws/test",
@@ -1253,7 +1244,12 @@ describe("main", () => {
 
     await main(targetConfig, runInputs);
 
-    expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "terraform",
+      expect.arrayContaining(["plan"]),
+      expect.any(Object),
+    );
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
       "tfcmt",
       expect.arrayContaining(["plan", "--"]),
       expect.any(Object),
@@ -1322,17 +1318,12 @@ describe("main", () => {
 
   it("uses target config destroy setting", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const targetConfig: getTargetConfig.TargetConfig = {
       working_directory: "aws/test",
@@ -1351,8 +1342,8 @@ describe("main", () => {
 
     await main(targetConfig, runInputs);
 
-    expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
-      "tfcmt",
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "terraform",
       expect.arrayContaining(["-destroy"]),
       expect.any(Object),
     );
@@ -1360,17 +1351,12 @@ describe("main", () => {
 
   it("passes driftIssueNumber to runTerraformPlan", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const targetConfig: getTargetConfig.TargetConfig = {
       working_directory: "aws/test",
@@ -1389,7 +1375,7 @@ describe("main", () => {
 
     await main(targetConfig, runInputs);
 
-    expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
       "tfcmt",
       expect.arrayContaining([
         "-config",
@@ -1401,17 +1387,12 @@ describe("main", () => {
 
   it("uses target config terraform_command", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
-    mockExecutor.getExecOutput
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: "",
-        stderr: "",
-      })
-      .mockResolvedValueOnce({
-        exitCode: 0,
-        stdout: '{"resource_changes": []}',
-        stderr: "",
-      });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
 
     const targetConfig: getTargetConfig.TargetConfig = {
       working_directory: "aws/test",
@@ -1429,9 +1410,9 @@ describe("main", () => {
 
     await main(targetConfig, runInputs);
 
-    expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
-      "tfcmt",
-      expect.arrayContaining(["tofu", "plan"]),
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "tofu",
+      expect.arrayContaining(["plan"]),
       expect.any(Object),
     );
   });
