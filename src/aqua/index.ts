@@ -108,6 +108,45 @@ export interface ExecOptions extends exec.ExecOptions {
   comment?: Comment;
 }
 
+export const buildFailureSummary = (
+  command: string,
+  args: string[] | undefined,
+  output: string,
+): string => {
+  const joined = [command, ...(args ?? [])].join(" ");
+  const body = output.trim();
+  const block = body.length > 0 ? `\n\n\`\`\`\n${body}\n\`\`\`\n` : "\n";
+  return `## :x: \`${joined}\` failed${block}`;
+};
+
+const writeFailureSummary = async (
+  command: string,
+  args: string[] | undefined,
+  output: string,
+): Promise<void> => {
+  core.summary.addRaw(buildFailureSummary(command, args, output));
+  await core.summary.write();
+};
+
+const buildCapturingListeners = (
+  options: ExecOptions | undefined,
+  append: (chunk: string) => void,
+): exec.ExecOptions["listeners"] => {
+  const userStdout = options?.listeners?.stdout;
+  const userStderr = options?.listeners?.stderr;
+  return {
+    ...options?.listeners,
+    stdout: (data: Buffer) => {
+      append(data.toString());
+      userStdout?.(data);
+    },
+    stderr: (data: Buffer) => {
+      append(data.toString());
+      userStderr?.(data);
+    },
+  };
+};
+
 export class Executor {
   installDir: string;
   githubToken?: string;
@@ -144,6 +183,14 @@ export class Executor {
   ): Promise<number> {
     const bArgs = this.buildArgs(command, args);
     const envVars = this.env(options);
+    const captureForSummary = !options?.ignoreReturnCode;
+    let captured = "";
+    let summaryHandled = false;
+    const listeners = captureForSummary
+      ? buildCapturingListeners(options, (chunk) => {
+          captured += chunk;
+        })
+      : options?.listeners;
     try {
       if (options?.group) {
         core.startGroup(options.group);
@@ -153,14 +200,29 @@ export class Executor {
           bArgs.command,
           bArgs.args,
           options.comment,
-          { ...options, env: envVars },
+          { ...options, env: envVars, listeners },
         );
+        if (captureForSummary && result.exitCode !== 0) {
+          if (!result.commentPosted) {
+            await writeFailureSummary(bArgs.command, bArgs.args, captured);
+          }
+          summaryHandled = true;
+          throw new Error(
+            `Command failed with exit code ${result.exitCode}: ${[bArgs.command, ...(bArgs.args ?? [])].join(" ")}`,
+          );
+        }
         return result.exitCode;
       }
       return await exec.exec(bArgs.command, bArgs.args, {
         ...options,
         env: envVars,
+        listeners,
       });
+    } catch (error) {
+      if (captureForSummary && !summaryHandled) {
+        await writeFailureSummary(bArgs.command, bArgs.args, captured);
+      }
+      throw error;
     } finally {
       if (options?.group) {
         core.endGroup();
@@ -175,6 +237,14 @@ export class Executor {
   ): Promise<exec.ExecOutput> {
     const bArgs = this.buildArgs(command, args);
     const envVars = this.env(options);
+    const captureForSummary = !options?.ignoreReturnCode;
+    let captured = "";
+    let summaryHandled = false;
+    const listeners = captureForSummary
+      ? buildCapturingListeners(options, (chunk) => {
+          captured += chunk;
+        })
+      : options?.listeners;
     try {
       if (options?.group) {
         console.log("");
@@ -185,14 +255,33 @@ export class Executor {
           bArgs.command,
           bArgs.args,
           options.comment,
-          { ...options, env: envVars },
+          { ...options, env: envVars, listeners },
         );
-        return result;
+        if (captureForSummary && result.exitCode !== 0) {
+          if (!result.commentPosted) {
+            await writeFailureSummary(bArgs.command, bArgs.args, captured);
+          }
+          summaryHandled = true;
+          throw new Error(
+            `Command failed with exit code ${result.exitCode}: ${[bArgs.command, ...(bArgs.args ?? [])].join(" ")}`,
+          );
+        }
+        return {
+          exitCode: result.exitCode,
+          stdout: result.stdout,
+          stderr: result.stderr,
+        };
       }
       return await exec.getExecOutput(bArgs.command, bArgs.args, {
         ...options,
         env: envVars,
+        listeners,
       });
+    } catch (error) {
+      if (captureForSummary && !summaryHandled) {
+        await writeFailureSummary(bArgs.command, bArgs.args, captured);
+      }
+      throw error;
     } finally {
       if (options?.group) {
         console.log("");

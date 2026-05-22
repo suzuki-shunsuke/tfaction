@@ -17,6 +17,7 @@ export type ExecResult = {
   exitCode: number;
   stdout: string;
   stderr: string;
+  commentPosted: boolean;
 };
 
 export const evaluateWhen = (
@@ -103,18 +104,14 @@ export const execAndComment = async (
   });
 
   const exitCode = result.exitCode;
+  let commentPosted = false;
 
   const config = loadConfig();
   const key = comment.key ?? "default";
   const templates = config.exec[key] ?? config.exec["default"];
   if (!templates) {
     core.warning(`No exec comment templates found for key "${key}"`);
-    if (exitCode !== 0 && !execOptions?.ignoreReturnCode) {
-      throw new Error(
-        `Command failed with exit code ${exitCode}: ${command} ${(args ?? []).join(" ")}`,
-      );
-    }
-    return { exitCode, stdout, stderr };
+    return { exitCode, stdout, stderr, commentPosted };
   }
 
   const celContext = {
@@ -153,13 +150,8 @@ export const execAndComment = async (
       comment.org,
       comment.repo,
     );
+    commentPosted = true;
   }
 
-  if (exitCode !== 0 && !execOptions?.ignoreReturnCode) {
-    throw new Error(
-      `Command failed with exit code ${exitCode}: ${command} ${(args ?? []).join(" ")}`,
-    );
-  }
-
-  return { exitCode, stdout, stderr };
+  return { exitCode, stdout, stderr, commentPosted };
 };
