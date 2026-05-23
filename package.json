@@ -41,14 +41,14 @@
     "@types/semver": "7.7.1",
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.4",
-    "@vitest/coverage-v8": "4.1.6",
+    "@vitest/coverage-v8": "4.1.7",
     "eslint": "10.4.0",
     "globals": "17.6.0",
     "jiti": "2.7.0",
     "prettier": "3.8.3",
     "typescript": "6.0.3",
     "typescript-eslint": "8.59.4",
-    "vitest": "4.1.6"
+    "vitest": "4.1.7"
   },
   "volta": {
     "node": "24.15.0"
