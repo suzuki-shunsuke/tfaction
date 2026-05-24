@@ -538,6 +538,13 @@ describe("checkDriftDetectionEnabled", () => {
     expect(checkDriftDetectionEnabled(cfg, targetGroup, wdCfg)).toBe(false);
   });
 
+  it("defaults to true when cfg.drift_detection exists but enabled is undefined", () => {
+    const cfg = createConfig({});
+    const targetGroup = createTargetGroup(undefined);
+    const wdCfg = createTargetConfig(undefined);
+    expect(checkDriftDetectionEnabled(cfg, targetGroup, wdCfg)).toBe(true);
+  });
+
   it("handles undefined targetGroup", () => {
     const cfg = createConfig({ enabled: true });
     const wdCfg = createTargetConfig(undefined);

@@ -48,7 +48,10 @@ export const checkDriftDetectionEnabled = (
   if (targetGroup?.drift_detection) {
     return targetGroup.drift_detection.enabled ?? true;
   }
-  return cfg.drift_detection?.enabled ?? false;
+  if (cfg.drift_detection) {
+    return cfg.drift_detection.enabled ?? true;
+  }
+  return false;
 };
 
 export interface DriftIssueRepo {
