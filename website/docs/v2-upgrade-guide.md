@@ -88,30 +88,31 @@ with:
 The following actions are supported:
 
 - apply
+- apply-label
 - create-drift-issues
 - create-follow-up-pr
-- create-scaffold-module-pr
 - create-scaffold-pr
-- export-aws-secrets-manager
-- export-secrets
+- delete-comment
 - generate-config-out
-- get-global-config
 - get-or-create-drift-issue
 - get-target-config
+- hide-comment
 - list-targets
+- output-aws-secrets-manager
+- output-github-secrets
 - pick-out-drift-issues
 - plan
+- plan-label
 - release-module
-- scaffold-module
 - scaffold-tfmigrate
 - scaffold-working-dir
-- set-drift-env
 - setup
+- set-drift-env
 - sync-drift-issue-description
 - terraform-init
 - test
-- test-module
 - update-drift-issue
+- update-pr-branch
 
 ## Explicitly run `aws-actions/configure-aws-credentials` or `google-github-actions/auth` if AWS or Google Cloud authentication is required
 

@@ -43,8 +43,8 @@ export const main = async (inputs: Inputs) => {
     ["delete-comment", deleteComment],
     ["generate-config-out", generateConfigOut],
     ["get-or-create-drift-issue", getOrCreateDriftIssue],
-    ["hide-comment", hideComment],
     ["get-target-config", getTargetConfig],
+    ["hide-comment", hideComment],
     ["list-targets", listTargets],
     ["output-aws-secrets-manager", outputAWSSecretsManager],
     ["output-github-secrets", outputGithubSecrets],
@@ -55,12 +55,12 @@ export const main = async (inputs: Inputs) => {
     ["scaffold-tfmigrate", scaffoldTfmigrate],
     ["scaffold-working-dir", scaffoldWorkingDir],
     ["setup", setup],
+    ["set-drift-env", setDriftEnv],
+    ["sync-drift-issue-description", syncDriftIssueDescription],
     ["terraform-init", terraformInit],
     ["test", test],
     ["update-drift-issue", updateDriftIssue],
     ["update-pr-branch", updatePrBranch],
-    ["set-drift-env", setDriftEnv],
-    ["sync-drift-issue-description", syncDriftIssueDescription],
   ]);
   const action = actions.get(inputs.action);
   if (action === undefined) {
