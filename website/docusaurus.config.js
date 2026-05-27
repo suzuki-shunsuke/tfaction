@@ -23,7 +23,8 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/suzuki-shunsuke/tfaction/edit/main",
+          editUrl:
+            "https://github.com/suzuki-shunsuke/tfaction/edit/main/website",
           routeBasePath: "/",
         },
         pages: false,
