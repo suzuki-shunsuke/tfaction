@@ -1,184 +1,121 @@
 ---
 sidebar_position: 100
-slug: /
 ---
 
-# tfaction
+# What is tfaction
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/suzuki-shunsuke/tfaction)
-[NotebookLM](https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451) | [Who uses tfaction?](https://github.com/suzuki-shunsuke/tfaction#who-uses-tfaction) | [Release Note](https://github.com/suzuki-shunsuke/tfaction/releases) | [MIT LICENSE](https://github.com/suzuki-shunsuke/tfaction/blob/main/LICENSE)
+tfaction is a set of GitHub Actions for building workflows that run Terraform or OpenTofu on GitHub Actions.
 
-tfaction is a framework for a Monorepo to build high-level Terraform workflows using GitHub Actions.
-You don't have to run `terraform apply` in your laptop, and don't have to reinvent the wheel for Terraform Workflows anymore.
-
-## :bulb: NotebookLM and DeepWiki for tfaction
-
-You can ask any questions about tfaction to the notebook and DeepWiki!
-
-- [Notebook](https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451)
-  - This notebook is built based on the document.
-- [DeepWiki](https://deepwiki.com/suzuki-shunsuke/tfaction)
+It provides a basic GitHub Flow where `terraform plan` runs on pull requests, and `terraform apply` runs when the PR is merged.
 
 ## Features
 
-- Run `terraform plan` in pull requests, and run `terraform apply` by merging pull requests into the default branch
-- [Dynamic build matrix for Monorepo](/tfaction/docs/feature/build-matrix)
-  - CI is run on only changed working directories
-- Notify the results of CI to pull requests using tfcmt, github-comment, and reviewdog
-  - You don't have to check CI log
-- [Run `terraform apply` safely using the plan file created by the merged pull request's `terraform plan`](/tfaction/docs/feature/plan-file)
-- [Update related pull requests automatically when the remote state is updated](/tfaction/docs/feature/auto-update-related-prs)
-  - Keep the result of CI including `terraform plan` up-to-date
-- [Create a pull request automatically to follow up the apply failure](/tfaction/docs/feature/follow-up-pr)
-- Support linters
-  - terraform validate
-  - [trivy](https://github.com/aquasecurity/trivy)
-  - [tflint](https://github.com/terraform-linters/tflint)
-  - [conftest](https://www.conftest.dev/)
-- [Support tfmigrate](/tfaction/docs/feature/tfmigrate)
-- [Update dependencies by Renovate safely](/tfaction/docs/feature/renovate)
-  - Prevent Renovate from applying unexpected changes, and enables to merge pull requests without changes safely
-- [Workflows for Terraform Modules](/tfaction/docs/feature/module)
-  - Scaffold, Test, Release Modules
-- Workflows for scaffolding
-  - Scaffold a working directory, Terraform Module, pull request for tfmigrate
-- [Update .terraform.lock.hcl automatically](/tfaction/docs/feature/auto-fix)
-  - A commit is pushed automatically, so you don't have to update .terraform.lock.hcl manually
-- [Format Terraform Configuration automatically](/tfaction/docs/feature/auto-fix)
-  - A commit is pushed automatically, so you don't have to format Terraform configuration manually
-- [Drift Detection](/tfaction/docs/feature/drift-detection)
-  - Detect the drift periodically and manage the drift as GitHub Issues
-- [Support Terraform compatible tools such as OpenTofu and Terragrunt](/tfaction/docs/feature/use-terraform-compatible-tool)
-- [Support running CI on working directories that depend on a updated local path Module](/tfaction/docs/feature/local-path-module)
-- [Generate code by `terraform plan -generate-config-out` to import resources](/tfaction/docs/feature/generate-config-out)
-- [Generate document by terraform-docs](/tfaction/docs/feature/terraform-docs)
-- [Securefix Action](feature/securefix-action.md)
+- Provides simple workflows powered by GitHub Actions
+  - No need to run `terraform apply` locally
+- OSS (MIT LICENSE)
+  - Free to use
+  - No vendor lock-in to SaaS platforms
+- Supports OpenTofu and Terragrunt
+- Feature-rich
+  - Native support for peripheral tools like tflint, trivy, and conftest in addition to Terraform
+  - Thoughtful details such as automatic code fixes and automatic PR branch updates
+  - Drift Detection support
+- Flexibility
+  - Since it uses GitHub Actions, you can add steps before or after tfaction's steps, or use only specific features -- workflows are highly customizable
+- Reduced workflow operation and maintenance costs
+  - No need to build workflows from scratch
+  - Features are enabled simply by adding a few lines to declarative configuration files
 
-[Dynamic build matrix for Monorepo](feature/build-matrix.md)
+Below is an overview of tfaction's key features.
 
-![image](https://user-images.githubusercontent.com/13323303/151699474-b6cf9927-a0d1-4eb7-85fd-19504432362c.png)
+## Monorepo Support
 
-Notify the result of CI to pull requests with [tfcmt](https://github.com/suzuki-shunsuke/tfcmt), [github-comment](https://github.com/suzuki-shunsuke/github-comment), and [reviewdog](https://github.com/reviewdog/reviewdog)
+Natively supports monorepos that manage multiple Terraform root modules.
+CI runs only for root modules changed in a PR.
+There is also a feature that triggers CI for a root module when a dependent local-path module is updated.
 
-Result of `terraform plan`
+## Clear PR Comments for `terraform plan` and `apply` Results
 
-![image](https://user-images.githubusercontent.com/13323303/147400233-8b9411d6-0255-4c36-9e9f-35e44223c979.png)
+Using a tool called [tfcmt](https://github.com/suzuki-shunsuke/tfcmt), tfaction posts clear and easy-to-read summaries of `terraform plan` and `apply` results directly to pull requests.
 
-Result of `trivy`
+![tfcmt](https://user-images.githubusercontent.com/13323303/136236949-bac1a28d-4db2-4a08-900a-708a0a02311c.png)
 
-![image](https://github.com/suzuki-shunsuke/trivy-config-action/assets/13323303/e4d7f6f7-3df3-44bb-8f98-535173ce096e)
+## Linting
 
-Result of `tflint`
+Runs linting with tools such as `terraform validate`, `tflint`, `trivy`, and `conftest`.
 
-![image](https://user-images.githubusercontent.com/13323303/153742833-403ea6c5-a780-4d2a-a30c-3a481c0971b1.png)
+`tflint` and `trivy` results are reported in a developer-friendly way using reviewdog.
 
-Result of `conftest`
+![tflint](https://user-images.githubusercontent.com/13323303/153742908-2512f73a-1505-4c0c-9284-b6deb8983c2f.png)
 
-![image](https://user-images.githubusercontent.com/13323303/150035710-249c4cbd-47fa-46d7-ae0d-28ab4ace1a64.png)
+`conftest` can be executed against both HCL files and plan files.
 
-[Update related pull requests automatically when the remote state is updated](/tfaction/docs/feature/auto-update-related-prs)
+## Automatic Code Fixes
 
-![image](https://user-images.githubusercontent.com/13323303/151699327-ba31892c-c4a6-47e7-a944-15fca81dfbfb.png)
+Runs `.terraform.lock.hcl` updates, `terraform fmt`, `terraform-docs`, `tflint --fix`, and other tools to automatically fix code and push commits to the PR.
 
-[Create a pull request automatically to follow up the apply failure](/tfaction/docs/feature/follow-up-pr)
+![commit](https://user-images.githubusercontent.com/13323303/155866979-52dd2e6f-9885-4af1-bac0-abd1280fdea5.png)
 
-![image](https://user-images.githubusercontent.com/13323303/151699230-1c109a57-47d1-4c3b-9c3a-4dfec786a043.png)
+![fmt](https://user-images.githubusercontent.com/13323303/155866989-8cbcd50e-4764-4f47-a50f-102d04a04f89.png)
 
-![image](https://user-images.githubusercontent.com/13323303/151699142-6d19cd51-eac5-4f69-bfe5-7920df69edc6.png)
+Additionally, if a PR's feature branch is behind the base branch, it automatically updates the branch.
+In practice, having issues fixed automatically provides a far better developer experience than simply failing CI.
 
-[Support tfmigrate](/tfaction/docs/feature/tfmigrate)
+## Safe `apply` Using Plan Files
 
-`tfmigrate plan`
+The plan file generated during `terraform plan` in the PR is used during `terraform apply`, preventing discrepancies between the plan result and the actual apply.
 
-![image](https://user-images.githubusercontent.com/13323303/150029520-fd3aac78-d76a-41ee-9df0-a7fc02fb12b7.png)
+## Auto-disable Renovate Auto-merge When `terraform plan` Shows Changes
 
-`tfmigrate apply`
+Prevents unexpected changes from being applied when a Renovate PR is auto-merged.
 
-![image](https://user-images.githubusercontent.com/13323303/150029697-316218e0-cb1e-4a8d-ad5c-0c12e1cb68dc.png)
+![renovate](https://github.com/user-attachments/assets/5c14a9dc-fbb6-44a4-99b3-952dbfe9885d)
 
-[Update dependencies by Renovate safely](/tfaction/docs/feature/renovate)
+## Automatically Create Follow-up PRs When `terraform apply` Fails
 
-CI fails if there are changes, which enables you to merge pull requests without unexpected changes safely.
+When `terraform apply` fails, tfaction automatically creates a follow-up PR to help address the failure.
 
-![image](https://user-images.githubusercontent.com/13323303/150064670-2c6a646f-81f2-496f-b69a-873b6469593e.png)
+## Scaffold Working Directory Workflow
 
-[Update .terraform.lock.hcl automatically](/tfaction/docs/feature/auto-fix)
+Provides a workflow for adding root modules based on user-defined templates.
+It is executed via `workflow_dispatch`.
+Compared to running scripts locally, this approach has fewer environment dependencies and makes investigation easier by reviewing the action logs when issues occur.
 
-![image](https://user-images.githubusercontent.com/13323303/155866735-85f964d8-7bb7-411c-9b20-5f7abcea3e1a.png)
+## Drift Detection
 
---
+Periodically detects drift between code and the actual infrastructure state, and manages it via GitHub Issues.
+The `plan` result is recorded as a comment in the issue, making it easy to identify when drift occurred.
+Because it leverages GitHub Issues, everything is managed within GitHub.
 
-![image](https://user-images.githubusercontent.com/13323303/155866753-32012a3b-02fe-4f58-935e-178283ae2c77.png)
+## Support for OpenTofu and Terragrunt
 
-[Format Terraform Configuration](/tfaction/docs/feature/auto-fix)
+Supports not only Terraform but also Terraform-compatible tools such as OpenTofu, as well as Terragrunt.
 
-![image](https://user-images.githubusercontent.com/13323303/155866979-52dd2e6f-9885-4af1-bac0-abd1280fdea5.png)
+## tfmigrate
 
---
+Runs [tfmigrate](https://github.com/minamijoyo/tfmigrate) on GitHub Actions to achieve state migration as IaC.
+Although the need for tfmigrate has decreased since Terraform officially added support for `moved` blocks, `removed` blocks, and `import` blocks, it remains useful when you need to move resources between states.
 
-![image](https://user-images.githubusercontent.com/13323303/155866989-8cbcd50e-4764-4f47-a50f-102d04a04f89.png)
+## CSM (Client/Server Model) Actions (Securefix Action) Support
 
-[Drift Detection](/tfaction/docs/feature/drift-detection)
+CSM Actions applies the Client/Server Model to GitHub Actions, enabling safer commit and PR creation.
 
-![image](https://user-images.githubusercontent.com/13323303/233079963-68765f2e-1efd-4278-b6c3-145eae9ef9c0.png)
+https://github.com/csm-actions/docs
 
-## Available versions
+https://github.com/csm-actions/securefix-action
 
-:::caution
-We don't add `*/dist/*.js` in the main branch and feature branches anymore.
-So you can't specify `main` and feature branches as versions.
+tfaction natively supports this.
 
-```yaml
-# This never works as setup/dist/index.js doesn't exist.
-uses: suzuki-shunsuke/tfaction/setup@main
-```
+## Import via `terraform plan -generate-config-out`
 
-:::
+`terraform plan -generate-config-out` is a very useful command that generates resource blocks from import blocks.
 
-The following versions are available.
+https://developer.hashicorp.com/terraform/language/import
 
-1. [Release versions](https://github.com/suzuki-shunsuke/tfaction/releases)
+tfaction can run this in CI, commit the result, and auto-generate code.
+This is especially convenient when running `terraform plan` locally is difficult due to permission constraints.
 
-```yaml
-uses: suzuki-shunsuke/tfaction/setup@v1.12.1
-```
+---
 
-2. [Pull Request versions](https://github.com/suzuki-shunsuke/tfaction/branches/all?query=pr%2F&lastTab=overview): These versions are removed when we feel unnecessary. These versions are used to test pull requests.
-
-```yaml
-uses: suzuki-shunsuke/tfaction/setup@pr/2017
-```
-
-3. [latest branch](https://github.com/suzuki-shunsuke/tfaction/tree/latest): [This branch is built by CI when the main branch is updated](https://github.com/suzuki-shunsuke/tfaction/blob/latest/.github/workflows/main.yaml). Note that we push commits to the latest branch forcibly.
-
-```yaml
-uses: suzuki-shunsuke/tfaction/setup@latest
-```
-
-Pull Request versions and the latest branch are unstable.
-These versions are for testing.
-You should use [release versions](https://github.com/suzuki-shunsuke/tfaction/releases) in production.
-
-## Who uses tfaction?
-
-Please see [here](https://github.com/suzuki-shunsuke/tfaction#who-uses-tfaction).
-
-## Blog, Slide
-
-- English
-  - [2023-06-05 Terraform's Drift Detection by tfaction](https://dev.to/suzukishunsuke/terraforms-drift-detection-by-tfaction-1dkh)
-  - [2022-02-12 tfaction - Build Terraform Workflow with GitHub Actions](https://speakerdeck.com/szksh/tfaction-build-terraform-workflow-with-github-actions)
-- Japanese
-  - [2023-06-05 tfaction による Terraform の Drift Detection](https://zenn.dev/shunsuke_suzuki/articles/tfaction-drift-detection)
-  - [2022-03-03 tfaction v0.5.0 の update](https://zenn.dev/shunsuke_suzuki/articles/tfaction-v050)
-  - [2022-02-06 tfaction の導入ガイド](https://zenn.dev/shunsuke_suzuki/articles/tfaction-setup)
-  - [2022-02-04 Terraform の CI を AWS CodeBuild から GitHub Actions + tfaction に移行しました](https://blog.studysapuri.jp/entry/2022/02/04/080000)
-  - [2022-01-24 tfaction - GitHub Actions で良い感じの Terraform Workflow を構築](https://zenn.dev/shunsuke_suzuki/articles/tfaction-introduction)
-
-## Release Notes
-
-https://github.com/suzuki-shunsuke/tfaction/releases
-
-## LICENSE
-
-[MIT](https://github.com/suzuki-shunsuke/tfaction/blob/main/LICENSE)
+This concludes the overview of tfaction.
+In the next chapter, we will implement a simple workflow using the minimum tfaction configuration.

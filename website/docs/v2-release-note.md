@@ -4,6 +4,8 @@ sidebar_position: 3600
 
 # v2 Release Note
 
+[See also the upgrade guide.](./v2-upgrade-guide.md)
+
 ## Summary
 
 tfaction v2 includes various breaking changes, and all users need to modify their code.

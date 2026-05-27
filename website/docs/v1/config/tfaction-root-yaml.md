@@ -55,7 +55,7 @@ tfaction assumes that there are multiple working directories in the repository.
 Working directory is a directory where terraform commands such as `terraform init`, `terraform plan`, and `terraform apply` are run.
 tfaction treats directories where `tfaction.yaml` is located as working directories.
 Working directory has an attribute `target`, which is an identifier of the working directory. `target` must be unique.
-`target` is used in pull request comments and labels and the input of [scaffold working directory](/feature/scaffold-working-dir).
+`target` is used in pull request comments and labels and the input of [scaffold working directory](/v1/feature/scaffold-working-dir).
 The attribute `working_directory` of the working directory is a relative file path to the working directory.
 
 ## `target_groups`

@@ -13,7 +13,7 @@ You can introduce tfmigrate to Terraform Workflow easily with tfaction.
 
 `tfmigrate plan` is run in the pull request CI, and `tfmigrate apply` is run in the main branch.
 
-The label prefix `tfmigrate:` can be changed in the configuration file [tfaction-root.yaml](/config/tfaction-root-yaml).
+The label prefix `tfmigrate:` can be changed in the configuration file [tfaction-root.yaml](/v1/config/tfaction-root-yaml).
 
 ```yaml
 label_prefixes:

@@ -41,12 +41,12 @@ permissions:
   - Add labels to pull requests
   - Review pull requests by reviewdog
 - `issues: read`
-  - [Search related pull requests with labels](/tfaction/docs/feature/auto-update-related-prs)
+  - [Search related pull requests with labels](/tfaction/docs/v1/feature/auto-update-related-prs)
     - `gh pr list`'s `-l` option requires the permission
 - `issues: write`
   - Create labels
 - `actions: read`
-  - [Download plan files from GitHub Artifacts](/tfaction/docs/feature/plan-file)
+  - [Download plan files from GitHub Artifacts](/tfaction/docs/v1/feature/plan-file)
 
 ## Refer to tfaction-example
 

@@ -23,7 +23,7 @@ Drift Detection is the feature to detect `drift`. You can track the drift using 
 This feature detects `drift` but doesn't resolve it automatically. You have to resolve it yourself.
 :::
 
-This feature is disabled by default. To enable this feature, please see [Set up](#setup).
+This feature is disabled by default. To enable this feature, please see [Set up](#set-up).
 
 tfaction creates GitHub Issues per working directory and manages each working directory's drift with GitHub Issues.
 

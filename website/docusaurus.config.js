@@ -23,7 +23,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/suzuki-shunsuke/tfaction-docs/edit/main",
+          editUrl: "https://github.com/suzuki-shunsuke/tfaction/edit/main",
           routeBasePath: "/",
         },
         pages: false,
@@ -38,24 +38,19 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      // announcementBar: {
-      //   id: "notebooklm",
-      //   content: `<a href="https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451">Google NotebookLM for tfaction (2025-11-15)</a>`,
-      //   backgroundColor: "#7FFF00",
-      //   textColor: "#091E42",
-      //   isCloseable: true,
-      // },
+      announcementBar: {
+        id: "release-v2",
+        content: `<a href="/tfaction/docs/v2-release-note">tfaction v2 is out (2026-05-27)</a>`,
+        backgroundColor: "#7FFF00",
+        textColor: "#091E42",
+        isCloseable: true,
+      },
       navbar: {
         title: "tfaction",
         items: [
           {
             href: "https://github.com/suzuki-shunsuke/tfaction",
             label: "GitHub",
-            position: "right",
-          },
-          {
-            href: "https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451",
-            label: "NotebookLM",
             position: "right",
           },
           {
@@ -113,7 +108,7 @@ const config = {
           // /docs/oldDoc -> /docs/newDoc
           {
             from: "/codes/001",
-            to: "/feature/limit-changed-dirs",
+            to: "/limit-max-changed-dirs",
           },
         ],
       },
