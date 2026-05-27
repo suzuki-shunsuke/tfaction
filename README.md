@@ -1,6 +1,6 @@
 # tfaction
 
-[Website](https://suzuki-shunsuke.github.io/tfaction/docs/) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/suzuki-shunsuke/tfaction) 
+[Website](https://suzuki-shunsuke.github.io/tfaction/docs/) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/suzuki-shunsuke/tfaction)
 
 Framework for Monorepo to build high level Terraform Workflows by GitHub Actions
 
