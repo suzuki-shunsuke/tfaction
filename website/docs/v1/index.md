@@ -16,47 +16,45 @@ The document will be removed in near future.
 tfaction is a framework for a Monorepo to build high-level Terraform workflows using GitHub Actions.
 You don't have to run `terraform apply` in your laptop, and don't have to reinvent the wheel for Terraform Workflows anymore.
 
-## :bulb: NotebookLM and DeepWiki for tfaction
+## :bulb: DeepWiki for tfaction
 
-You can ask any questions about tfaction to the notebook and DeepWiki!
+You can ask any questions about tfaction to DeepWiki!
 
-- [Notebook](https://notebooklm.google.com/notebook/77adecc4-c88b-4b98-830f-fb79a448c451)
-  - This notebook is built based on the document.
 - [DeepWiki](https://deepwiki.com/suzuki-shunsuke/tfaction)
 
 ## Features
 
 - Run `terraform plan` in pull requests, and run `terraform apply` by merging pull requests into the default branch
-- [Dynamic build matrix for Monorepo](/tfaction/docs/feature/build-matrix)
+- [Dynamic build matrix for Monorepo](feature/build-matrix.md)
   - CI is run on only changed working directories
 - Notify the results of CI to pull requests using tfcmt, github-comment, and reviewdog
   - You don't have to check CI log
-- [Run `terraform apply` safely using the plan file created by the merged pull request's `terraform plan`](/tfaction/docs/feature/plan-file)
-- [Update related pull requests automatically when the remote state is updated](/tfaction/docs/feature/auto-update-related-prs)
+- [Run `terraform apply` safely using the plan file created by the merged pull request's `terraform plan`](feature/plan-file.md)
+- [Update related pull requests automatically when the remote state is updated](feature/auto-update-related-prs.md)
   - Keep the result of CI including `terraform plan` up-to-date
-- [Create a pull request automatically to follow up the apply failure](/tfaction/docs/feature/follow-up-pr)
+- [Create a pull request automatically to follow up the apply failure](feature/follow-up-pr.md)
 - Support linters
   - terraform validate
   - [trivy](https://github.com/aquasecurity/trivy)
   - [tflint](https://github.com/terraform-linters/tflint)
   - [conftest](https://www.conftest.dev/)
-- [Support tfmigrate](/tfaction/docs/feature/tfmigrate)
-- [Update dependencies by Renovate safely](/tfaction/docs/feature/renovate)
+- [Support tfmigrate](feature/tfmigrate.md)
+- [Update dependencies by Renovate safely](feature/renovate.md)
   - Prevent Renovate from applying unexpected changes, and enables to merge pull requests without changes safely
-- [Workflows for Terraform Modules](/tfaction/docs/feature/module)
+- [Workflows for Terraform Modules](feature/module.md)
   - Scaffold, Test, Release Modules
 - Workflows for scaffolding
   - Scaffold a working directory, Terraform Module, pull request for tfmigrate
-- [Update .terraform.lock.hcl automatically](/tfaction/docs/feature/auto-fix)
+- [Update .terraform.lock.hcl automatically](feature/auto-fix.md)
   - A commit is pushed automatically, so you don't have to update .terraform.lock.hcl manually
-- [Format Terraform Configuration automatically](/tfaction/docs/feature/auto-fix)
+- [Format Terraform Configuration automatically](feature/auto-fix.md)
   - A commit is pushed automatically, so you don't have to format Terraform configuration manually
-- [Drift Detection](/tfaction/docs/feature/drift-detection)
+- [Drift Detection](feature/drift-detection.md)
   - Detect the drift periodically and manage the drift as GitHub Issues
-- [Support Terraform compatible tools such as OpenTofu and Terragrunt](/tfaction/docs/feature/use-terraform-compatible-tool)
-- [Support running CI on working directories that depend on a updated local path Module](/tfaction/docs/feature/local-path-module)
-- [Generate code by `terraform plan -generate-config-out` to import resources](/tfaction/docs/feature/generate-config-out)
-- [Generate document by terraform-docs](/tfaction/docs/feature/terraform-docs)
+- [Support Terraform compatible tools such as OpenTofu and Terragrunt](feature/use-terraform-compatible-tool.md)
+- [Support running CI on working directories that depend on a updated local path Module](feature/local-path-module.md)
+- [Generate code by `terraform plan -generate-config-out` to import resources](feature/generate-config-out.md)
+- [Generate document by terraform-docs](feature/terraform-docs.md)
 - [Securefix Action](feature/securefix-action.md)
 
 [Dynamic build matrix for Monorepo](feature/build-matrix.md)
@@ -81,17 +79,17 @@ Result of `conftest`
 
 ![image](https://user-images.githubusercontent.com/13323303/150035710-249c4cbd-47fa-46d7-ae0d-28ab4ace1a64.png)
 
-[Update related pull requests automatically when the remote state is updated](/tfaction/docs/feature/auto-update-related-prs)
+[Update related pull requests automatically when the remote state is updated](feature/auto-update-related-prs.md)
 
 ![image](https://user-images.githubusercontent.com/13323303/151699327-ba31892c-c4a6-47e7-a944-15fca81dfbfb.png)
 
-[Create a pull request automatically to follow up the apply failure](/tfaction/docs/feature/follow-up-pr)
+[Create a pull request automatically to follow up the apply failure](feature/follow-up-pr.md)
 
 ![image](https://user-images.githubusercontent.com/13323303/151699230-1c109a57-47d1-4c3b-9c3a-4dfec786a043.png)
 
 ![image](https://user-images.githubusercontent.com/13323303/151699142-6d19cd51-eac5-4f69-bfe5-7920df69edc6.png)
 
-[Support tfmigrate](/tfaction/docs/feature/tfmigrate)
+[Support tfmigrate](feature/tfmigrate.md)
 
 `tfmigrate plan`
 
@@ -101,13 +99,13 @@ Result of `conftest`
 
 ![image](https://user-images.githubusercontent.com/13323303/150029697-316218e0-cb1e-4a8d-ad5c-0c12e1cb68dc.png)
 
-[Update dependencies by Renovate safely](/tfaction/docs/feature/renovate)
+[Update dependencies by Renovate safely](feature/renovate.md)
 
 CI fails if there are changes, which enables you to merge pull requests without unexpected changes safely.
 
 ![image](https://user-images.githubusercontent.com/13323303/150064670-2c6a646f-81f2-496f-b69a-873b6469593e.png)
 
-[Update .terraform.lock.hcl automatically](/tfaction/docs/feature/auto-fix)
+[Update .terraform.lock.hcl automatically](feature/auto-fix.md)
 
 ![image](https://user-images.githubusercontent.com/13323303/155866735-85f964d8-7bb7-411c-9b20-5f7abcea3e1a.png)
 
@@ -115,7 +113,7 @@ CI fails if there are changes, which enables you to merge pull requests without 
 
 ![image](https://user-images.githubusercontent.com/13323303/155866753-32012a3b-02fe-4f58-935e-178283ae2c77.png)
 
-[Format Terraform Configuration](/tfaction/docs/feature/auto-fix)
+[Format Terraform Configuration](feature/auto-fix.md)
 
 ![image](https://user-images.githubusercontent.com/13323303/155866979-52dd2e6f-9885-4af1-bac0-abd1280fdea5.png)
 
@@ -123,7 +121,7 @@ CI fails if there are changes, which enables you to merge pull requests without 
 
 ![image](https://user-images.githubusercontent.com/13323303/155866989-8cbcd50e-4764-4f47-a50f-102d04a04f89.png)
 
-[Drift Detection](/tfaction/docs/feature/drift-detection)
+[Drift Detection](feature/drift-detection.md)
 
 ![image](https://user-images.githubusercontent.com/13323303/233079963-68765f2e-1efd-4278-b6c3-145eae9ef9c0.png)
 
