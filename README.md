@@ -1,14 +1,8 @@
 # tfaction
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/suzuki-shunsuke/tfaction)
+[Website](https://suzuki-shunsuke.github.io/tfaction/docs/) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/suzuki-shunsuke/tfaction) 
 
 Framework for Monorepo to build high level Terraform Workflows by GitHub Actions
-
-## Document
-
-https://suzuki-shunsuke.github.io/tfaction/docs/
-
-[Source code](https://github.com/suzuki-shunsuke/tfaction-docs)
 
 ## Who uses tfaction?
 
@@ -35,7 +29,3 @@ https://suzuki-shunsuke.github.io/tfaction/docs/
   - [コンパウンドスタートアップのためのスケーラブルでセキュアなInfrastructure as Codeパイプラインを考える](https://speakerdeck.com/yuyatakeyama/scalable-and-secure-infrastructure-as-code-pipeline-for-a-compound-startup-c8f5baa6-b9ac-48e5-a680-f8830004ed7f)
 - [estie, Inc.](https://www.estie.jp/)
   - [Terraformをモノレポ化した話 — tfactionを使ったプロダクト横断IaC運用の実践](https://www.estie.jp/blog/entry/2026/02/03/102141)
-
-## LICENSE
-
-[MIT](LICENSE)
