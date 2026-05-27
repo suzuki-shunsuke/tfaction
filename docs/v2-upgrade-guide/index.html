@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">v2 Upgrade Guide | tfaction</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://suzuki-shunsuke.github.io/tfaction/docs/v2-upgrade-guide"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="v2 Upgrade Guide | tfaction"><meta data-rh="true" name="description" content="The v2 upgrade includes several breaking changes."><meta data-rh="true" property="og:description" content="The v2 upgrade includes several breaking changes."><link data-rh="true" rel="canonical" href="https://suzuki-shunsuke.github.io/tfaction/docs/v2-upgrade-guide"><link data-rh="true" rel="alternate" href="https://suzuki-shunsuke.github.io/tfaction/docs/v2-upgrade-guide" hreflang="en"><link data-rh="true" rel="alternate" href="https://suzuki-shunsuke.github.io/tfaction/docs/v2-upgrade-guide" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://LUUUGNZT4I-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"v2 Upgrade Guide","item":"https://suzuki-shunsuke.github.io/tfaction/docs/v2-upgrade-guide"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="tfaction" href="/tfaction/docs/opensearch.xml"><link rel="stylesheet" href="/tfaction/docs/assets/css/styles.acda609c.css">
-<script src="/tfaction/docs/assets/js/runtime~main.219645ae.js" defer="defer"></script>
+<script src="/tfaction/docs/assets/js/runtime~main.13539232.js" defer="defer"></script>
 <script src="/tfaction/docs/assets/js/main.547df540.js" defer="defer"></script>
 </head>
 <body>
@@ -97,30 +97,31 @@ If it isn&#x27;t, check the <code>TFACTION_CONFIG</code> environment variable in
 <p>The following actions are supported:</p>
 <ul>
 <li class="">apply</li>
+<li class="">apply-label</li>
 <li class="">create-drift-issues</li>
 <li class="">create-follow-up-pr</li>
-<li class="">create-scaffold-module-pr</li>
 <li class="">create-scaffold-pr</li>
-<li class="">export-aws-secrets-manager</li>
-<li class="">export-secrets</li>
+<li class="">delete-comment</li>
 <li class="">generate-config-out</li>
-<li class="">get-global-config</li>
 <li class="">get-or-create-drift-issue</li>
 <li class="">get-target-config</li>
+<li class="">hide-comment</li>
 <li class="">list-targets</li>
+<li class="">output-aws-secrets-manager</li>
+<li class="">output-github-secrets</li>
 <li class="">pick-out-drift-issues</li>
 <li class="">plan</li>
+<li class="">plan-label</li>
 <li class="">release-module</li>
-<li class="">scaffold-module</li>
 <li class="">scaffold-tfmigrate</li>
 <li class="">scaffold-working-dir</li>
-<li class="">set-drift-env</li>
 <li class="">setup</li>
+<li class="">set-drift-env</li>
 <li class="">sync-drift-issue-description</li>
 <li class="">terraform-init</li>
 <li class="">test</li>
-<li class="">test-module</li>
 <li class="">update-drift-issue</li>
+<li class="">update-pr-branch</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="explicitly-run-aws-actionsconfigure-aws-credentials-or-google-github-actionsauth-if-aws-or-google-cloud-authentication-is-required">Explicitly run <code>aws-actions/configure-aws-credentials</code> or <code>google-github-actions/auth</code> if AWS or Google Cloud authentication is required<a href="#explicitly-run-aws-actionsconfigure-aws-credentials-or-google-github-actionsauth-if-aws-or-google-cloud-authentication-is-required" class="hash-link" aria-label="Direct link to explicitly-run-aws-actionsconfigure-aws-credentials-or-google-github-actionsauth-if-aws-or-google-cloud-authentication-is-required" title="Direct link to explicitly-run-aws-actionsconfigure-aws-credentials-or-google-github-actionsauth-if-aws-or-google-cloud-authentication-is-required" translate="no">​</a></h2>
 <p>In v1, the setup action ran <code>aws-actions/configure-aws-credentials</code> or <code>google-github-actions/auth</code> internally.
