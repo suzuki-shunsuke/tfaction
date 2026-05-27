@@ -7,6 +7,8 @@ sidebar_position: 3700
 The v2 upgrade includes several breaking changes.
 All tfaction users need to address these changes.
 
+[See also the release note.](./v2-release-note.md)
+
 ## Let a coding agent handle the upgrade
 
 You can have a coding agent such as Claude Code perform the upgrade by providing the official upgrade guide.
