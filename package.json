@@ -42,7 +42,7 @@
     "@types/tmp": "0.2.6",
     "@vercel/ncc": "0.38.4",
     "@vitest/coverage-v8": "4.1.7",
-    "eslint": "10.4.0",
+    "eslint": "10.4.1",
     "globals": "17.6.0",
     "jiti": "2.7.0",
     "prettier": "3.8.3",
