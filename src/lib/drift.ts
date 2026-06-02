@@ -19,7 +19,7 @@ export const createIssue = async (
   const body = `
   This issues was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
 
-  About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
+  About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/drift-detection).
   `;
 
   const issue = await octokit.rest.issues.create({

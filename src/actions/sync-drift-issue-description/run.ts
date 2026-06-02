@@ -26,7 +26,7 @@ export type RunInput = {
 export const buildBody = (comment: Comment): string => {
   return `This issue was created by [tfaction](https://suzuki-shunsuke.github.io/tfaction/docs/).
 
-About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection).
+About this issue, please see [the document](https://suzuki-shunsuke.github.io/tfaction/docs/drift-detection).
 
 ## Latest comment
 

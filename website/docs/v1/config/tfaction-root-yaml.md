@@ -109,7 +109,7 @@ aqua:
     prune: true # default is false
 
 # tfaction >= v1.3.0
-# https://suzuki-shunsuke.github.io/tfaction/docs/feature/local-path-module
+# https://suzuki-shunsuke.github.io/tfaction/docs/detect-module-dependency
 # https://github.com/suzuki-shunsuke/tfaction/pull/1528
 update_local_path_module_caller:
   enabled: true
