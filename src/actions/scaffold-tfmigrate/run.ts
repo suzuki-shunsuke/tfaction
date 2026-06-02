@@ -126,12 +126,12 @@ gh pr create -R "${repository}" ${draftFlag}\\
   -l "${label}" \\
   -H "${branch}" \\
   -t "Scaffold tfmigrate migration (${target})" \\
-  -b "This pull request was created by [GitHub Actions](${runURL}). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)"
+  -b "This pull request was created by [GitHub Actions](${runURL}). About tfmigrate, please see https://github.com/minamijoyo/tfmigrate [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/tfmigrate)"
 \`\`\`
 
 Then please fix the generated migration file.
 
-[Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
+[Reference](https://suzuki-shunsuke.github.io/tfaction/docs/skip-create-pr)
 `;
 
   fs.appendFileSync(stepSummaryPath, guide);
@@ -298,7 +298,7 @@ export const run = async (input: RunInput): Promise<void> => {
     ? Handlebars.compile(config?.scaffold_tfmigrate?.pull_request?.body)(vars)
     : `@${actor} This pull request was created by [GitHub Actions workflow_dispatch event](${runURL})
     About tfmigrate, please see https://github.com/minamijoyo/tfmigrate
-    [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/feature/tfmigrate)
+    [tfaction - tfmigrate](https://suzuki-shunsuke.github.io/tfaction/docs/tfmigrate)
     Please fix the generated migration file.`;
 
   const prComment = config?.scaffold_tfmigrate?.pull_request?.comment

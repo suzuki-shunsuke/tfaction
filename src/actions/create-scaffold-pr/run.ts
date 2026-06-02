@@ -57,7 +57,7 @@ gh pr create -R "${repository}" ${draftOpt}\\
   -b "${escapedBody}"
 \`\`\`
 
-[Reference](https://suzuki-shunsuke.github.io/tfaction/docs/feature/skip-creating-pr)
+[Reference](https://suzuki-shunsuke.github.io/tfaction/docs/skip-create-pr)
 `;
 
   core.summary.addRaw(summary);
