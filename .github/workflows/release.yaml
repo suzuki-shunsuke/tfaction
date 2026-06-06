@@ -16,6 +16,9 @@ jobs:
     with:
       version: ${{inputs.tag}}
       pr: ${{inputs.pr}}
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
     permissions:
       contents: write
       pull-requests: write
+      id-token: write
