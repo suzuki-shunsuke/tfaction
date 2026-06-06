@@ -18,6 +18,8 @@ on:
         required: true
       gh_app_private_key:
         required: true
+      TAKUMI_GUARD_BOT_ID:
+        required: true
 
 jobs:
   create-pr-branch:
@@ -26,9 +28,12 @@ jobs:
       version: pr/${{inputs.pr}}
       pr: ${{inputs.pr}}
       is_comment: ${{inputs.is_comment}}
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
     permissions:
       contents: write
       pull-requests: write
+      id-token: write
 
   test-normal:
     name: Test Normal (${{matrix.env.key}})

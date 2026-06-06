@@ -8,6 +8,9 @@ jobs:
     uses: ./.github/workflows/wc-release.yaml
     with:
       version: latest
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
     permissions:
       contents: write
       pull-requests: write
+      id-token: write

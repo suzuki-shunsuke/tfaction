@@ -6,6 +6,8 @@ on:
         required: false
       gh_app_private_key:
         required: false
+      TAKUMI_GUARD_BOT_ID:
+        required: true
 jobs:
   path-filter:
     # Get changed files to filter jobs
@@ -52,7 +54,10 @@ jobs:
 
   test:
     uses: ./.github/workflows/wc-test.yaml
-    permissions: {}
+    permissions:
+      id-token: write
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
 
   create-pr-branch:
     uses: ./.github/workflows/wc-create-pr-branch.yaml
@@ -62,11 +67,13 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      id-token: write
     with:
       pr: ${{github.event.pull_request.number}}
     secrets:
       gh_app_id: ${{secrets.gh_app_id}}
       gh_app_private_key: ${{secrets.gh_app_private_key}}
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
 
   typos:
     uses: ./.github/workflows/workflow_call_typos.yaml

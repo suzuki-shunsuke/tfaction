@@ -5,7 +5,9 @@ permissions: {}
 jobs:
   autofix:
     runs-on: ubuntu-24.04
-    permissions: {}
+    permissions:
+      id-token: write # Required for OIDC
+      contents: read
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -20,7 +22,12 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
+      - uses: flatt-security/setup-takumi-guard-npm@9a5d797c2085b6326d3a2985c08e3a114b9b88c1 # v1.1.1
+        with:
+          bot-id: ${{secrets.TAKUMI_GUARD_BOT_ID}}
       - run: npm ci
+      - name: Restore .npmrc to avoid committing the registry auth token
+        run: git checkout -- .npmrc
 
       - run: aqua upc -prune
       - run: aqua upc -prune

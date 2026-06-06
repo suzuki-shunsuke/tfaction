@@ -18,17 +18,22 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      id-token: write
     with:
       pr: ${{fromJSON(inputs.pr)}}
       is_comment: ${{inputs.is_comment}}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
       gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
   release:
     uses: ./.github/workflows/wc-release.yaml
     with:
       version: latest
       pr: ${{fromJSON(inputs.pr)}}
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
     permissions:
       contents: write
       pull-requests: write
+      id-token: write
