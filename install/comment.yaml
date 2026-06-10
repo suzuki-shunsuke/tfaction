@@ -135,7 +135,7 @@ exec:
         {{hidden_combined_output}}
 
   tfmigrate-apply:
-    - when: true
+    - when: "true"
       template: |
         ## {{status}} {{#if Vars.tfaction_target}}{{Vars.tfaction_target}}: {{/if}} tfmigrate apply
 
@@ -146,7 +146,7 @@ exec:
         {{hidden_combined_output}}
 
   drift-apply:
-    - when: true
+    - when: "true"
       template: |
         ## {{status}} tfmigrate apply
 
@@ -170,7 +170,7 @@ exec:
         {{{CombinedOutput}}}
 
   tfmigrate-plan:
-    - when: true
+    - when: "true"
       template: |
         ## {{status}} {{#if Vars.tfaction_target}}{{Vars.tfaction_target}}: {{/if}} tfmigrate plan
 
