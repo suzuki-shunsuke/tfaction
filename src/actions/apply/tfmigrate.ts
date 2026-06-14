@@ -75,6 +75,7 @@ export const main = async (
         comment: {
           token: githubToken,
           key: "tfmigrate-apply",
+          pr: env.all.CI_INFO_PR_NUMBER,
           vars: {
             tfaction_target: targetConfig.target,
           },
