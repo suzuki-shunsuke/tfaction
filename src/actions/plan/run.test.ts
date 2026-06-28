@@ -498,11 +498,7 @@ describe("runTerraformPlan", () => {
 
     // 1 list query + 1 dismiss mutation
     expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
-    expect(mockOctokit.rest.pulls.requestReviewers).toHaveBeenCalledWith(
-      expect.objectContaining({
-        reviewers: ["user1"],
-      }),
-    );
+    expect(mockOctokit.rest.pulls.requestReviewers).not.toHaveBeenCalled();
   });
 
   it("skips dismissApprovalReviews when disabled", async () => {
@@ -670,11 +666,7 @@ describe("dismissApprovalReviews", () => {
         ),
       }),
     );
-    expect(mockOctokit.rest.pulls.requestReviewers).toHaveBeenCalledWith(
-      expect.objectContaining({
-        reviewers: ["user1", "user2"],
-      }),
-    );
+    expect(mockOctokit.rest.pulls.requestReviewers).not.toHaveBeenCalled();
   });
 
   it("handles GraphQL query failure gracefully", async () => {
@@ -717,12 +709,6 @@ describe("dismissApprovalReviews", () => {
     );
     // 1 list query + 2 dismiss mutations (both attempted)
     expect(mockOctokit.graphql).toHaveBeenCalledTimes(3);
-    // Only user2 was successfully dismissed
-    expect(mockOctokit.rest.pulls.requestReviewers).toHaveBeenCalledWith(
-      expect.objectContaining({
-        reviewers: ["user2"],
-      }),
-    );
   });
 
   it("does not prepend mention for deleted user (null author)", async () => {
@@ -745,8 +731,6 @@ describe("dismissApprovalReviews", () => {
         message: expect.stringMatching(/^Dismissing approval/),
       }),
     );
-    // null author means no login, so no re-review request
-    expect(mockOctokit.rest.pulls.requestReviewers).not.toHaveBeenCalled();
   });
 
   it("does not prepend mention for bot author", async () => {
@@ -781,8 +765,6 @@ describe("dismissApprovalReviews", () => {
         message: expect.stringMatching(/^Dismissing approval/),
       }),
     );
-    // Bot author has no User login, so no re-review request
-    expect(mockOctokit.rest.pulls.requestReviewers).not.toHaveBeenCalled();
   });
 
   it("does nothing when no approved reviews exist", async () => {
@@ -798,60 +780,6 @@ describe("dismissApprovalReviews", () => {
 
     // Only the list query, no dismiss mutations
     expect(mockOctokit.graphql).toHaveBeenCalledTimes(1);
-    expect(mockOctokit.rest.pulls.requestReviewers).not.toHaveBeenCalled();
-  });
-
-  it("requests re-review with deduplicated logins", async () => {
-    const mockOctokit = createMockOctokit();
-    mockOctokit.graphql
-      .mockResolvedValueOnce(
-        graphqlReviewsResponse(
-          [
-            { id: "PRR_1", author: { __typename: "User", login: "user1" } },
-            { id: "PRR_2", author: { __typename: "User", login: "user1" } },
-          ],
-          false,
-          null,
-        ),
-      )
-      .mockResolvedValueOnce({}) // dismiss PRR_1
-      .mockResolvedValueOnce({}); // dismiss PRR_2
-    vi.mocked(github.getOctokit).mockReturnValue(
-      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
-    );
-
-    await dismissApprovalReviews("test-token", 42);
-
-    expect(mockOctokit.rest.pulls.requestReviewers).toHaveBeenCalledWith(
-      expect.objectContaining({
-        reviewers: ["user1"],
-      }),
-    );
-  });
-
-  it("handles requestReviewers failure gracefully", async () => {
-    const mockOctokit = createMockOctokit();
-    mockOctokit.graphql
-      .mockResolvedValueOnce(
-        graphqlReviewsResponse(
-          [{ id: "PRR_1", author: { __typename: "User", login: "user1" } }],
-          false,
-          null,
-        ),
-      )
-      .mockResolvedValueOnce({}); // dismiss PRR_1
-    mockOctokit.rest.pulls.requestReviewers.mockRejectedValueOnce(
-      new Error("Request reviewers failed"),
-    );
-    vi.mocked(github.getOctokit).mockReturnValue(
-      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
-    );
-
-    await dismissApprovalReviews("test-token", 42);
-
-    expect(core.warning).toHaveBeenCalledWith(
-      "Failed to request reviewers: Request reviewers failed",
-    );
   });
 });
 
