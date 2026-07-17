@@ -56,28 +56,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.0/terragrunt_darwin_amd64.tar.gz",
-      "checksum": "E583C2FE62E3F36DE2E8431AEF3EB6E7D3C41FAECD2858F957A027C86440EFDC",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.1/terragrunt_darwin_amd64.tar.gz",
+      "checksum": "73E768A69FA44A60F9D9174F54AAF179327E08706F633C9C79D5F5C9622C91C2",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.0/terragrunt_darwin_arm64.tar.gz",
-      "checksum": "E741FFF6DF025C97ACD57DDD5400FCBE51C81224F8CAA64AF74120F27455E1B7",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.1/terragrunt_darwin_arm64.tar.gz",
+      "checksum": "9EC8F678B9AE6C81D5D9D77B94CBF6349CE639D5938694B4ADC9DEA73E416794",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.0/terragrunt_linux_amd64.tar.gz",
-      "checksum": "088EF297929D28F3ABBD1C2851C5E8E6BA7FE551AC84451C16836D3E3EA8A76B",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.1/terragrunt_linux_amd64.tar.gz",
+      "checksum": "CE90077AC31EF17A2BA10D11D45F36C6501997A8F4F79D703BB7DABA37032F53",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.0/terragrunt_linux_arm64.tar.gz",
-      "checksum": "46BDD3CF156710BDED8CD96077E65A3AFFA9F9C46686382E4D0E2A6D8B049924",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.1/terragrunt_linux_arm64.tar.gz",
+      "checksum": "A374A7993FF3D99665A7E014007D3647EC7F0465C9D55C85E9F94C932E73CEA2",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.0/terragrunt_windows_amd64.exe.tar.gz",
-      "checksum": "BB6EB234A2536309CC4EC01DEC3E69D8C5BCA28222DB65364DA3256030E72AD9",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.1/terragrunt_windows_amd64.exe.tar.gz",
+      "checksum": "DD50A324691E072A3AC879E9EC43D6310E2936C929FDA658EB2811FEFCC75115",
       "algorithm": "sha256"
     },
     {
