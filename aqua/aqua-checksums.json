@@ -286,28 +286,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.63.1/tflint_darwin_amd64.zip",
-      "checksum": "1A22782473E4A01F0DD23EDC649BED4420655A9E3459FFC06951E698EED7AD01",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_darwin_amd64.zip",
+      "checksum": "0F3A9FD17526014646A2DFC3F9122F7B4161ABE3D6B0F0F03F9014483DDF4D19",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.63.1/tflint_darwin_arm64.zip",
-      "checksum": "6AAB157B22367DCAB1635B370E98D6E791D9B40B021D4F9BAEF010D88F53E16B",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_darwin_arm64.zip",
+      "checksum": "2496E9CB3D24992D553B45E7C87A0FDC9449CA975233876247A9BFEDA857E6C0",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.63.1/tflint_linux_amd64.zip",
-      "checksum": "8441A7D97DF20431F19C9B9D27FF4C63E308C964E86660BC7CC0CF7BBE0725E8",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_linux_amd64.zip",
+      "checksum": "CCA9D13E2E1D7A2C627AF60FF899A3C9B74212899416AEB96EC764D2EF954537",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.63.1/tflint_linux_arm64.zip",
-      "checksum": "6D858CA7F11858C3FE3C5E29CC746823ABCCB55E2D2E2DA130FA7AD7EA4EECB8",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_linux_arm64.zip",
+      "checksum": "560DA89AACF59389D4EB029730DD5B109B7288096C32F2726A0D9E783A5EA8EB",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.63.1/tflint_windows_amd64.zip",
-      "checksum": "5FBFB643B83C4AD489BDE15A0E0D46E53DC9AA8DFA76D25DA3C4BD2698A41A19",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_windows_amd64.zip",
+      "checksum": "FB42FB859D844B156A8EA9D3363078C4D8B85CA78782E60876B08C9B8E59F303",
       "algorithm": "sha256"
     },
     {
@@ -361,8 +361,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.539.0/registry.yaml",
-      "checksum": "E022DF660F01744ABFE3E93FABC7FE17E36885549E447BB2667208D2E5804F4D",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.540.0/registry.yaml",
+      "checksum": "90525C31FA88F20E65C812B7F3098046F4EA8BFE8B68D7DAE8296748D2AD34A8",
       "algorithm": "sha256"
     }
   ]
