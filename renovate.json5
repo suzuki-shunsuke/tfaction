@@ -6,4 +6,14 @@
     "github>aquaproj/aqua-renovate-config#2.13.0",
     "github>aquaproj/aqua-renovate-config:file#2.13.0(aqua/.*\\.yaml)",
   ],
+  packageRules: [
+    {
+      // typescript-eslint doesn't support TypeScript 7 yet.
+      // Its peer dependency is `typescript: ">=4.8.4 <6.1.0"`, so `npm i` fails with ERESOLVE.
+      // https://github.com/typescript-eslint/typescript-eslint/issues/12518
+      matchManagers: ["npm"],
+      matchDepNames: ["typescript"],
+      allowedVersions: "<7",
+    },
+  ],
 }
