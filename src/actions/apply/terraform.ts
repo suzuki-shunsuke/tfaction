@@ -7,6 +7,7 @@ import * as lib from "../../lib";
 import * as drift from "../../lib/drift";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
+import * as planStorage from "../../lib/plan_storage";
 import * as aqua from "../../aqua";
 import * as getTargetConfig from "../get-target-config";
 import {
@@ -234,6 +235,42 @@ const downloadArtifact = async (
   await artifact.downloadArtifact(targetArtifact.id, artifactOpts);
 };
 
+// Download an artifact if it exists. Returns false when the artifact is not
+// found, without failing the step (used to probe for the metadata artifact).
+const tryDownloadArtifact = async (
+  token: string,
+  owner: string,
+  repo: string,
+  runId: number,
+  artifactName: string,
+  dest: string,
+): Promise<boolean> => {
+  const artifact = new DefaultArtifactClient();
+  const artifactOpts: DownloadArtifactOptions & FindOptions = {
+    findBy: {
+      token: token,
+      repositoryOwner: owner,
+      repositoryName: repo,
+      workflowRunId: runId,
+    },
+    path: dest,
+  };
+  let targetArtifact;
+  try {
+    ({ artifact: targetArtifact } = await artifact.getArtifact(
+      artifactName,
+      artifactOpts,
+    ));
+  } catch {
+    return false;
+  }
+  if (!targetArtifact) {
+    return false;
+  }
+  await artifact.downloadArtifact(targetArtifact.id, artifactOpts);
+  return true;
+};
+
 const downloadPlanFile = async (): Promise<string> => {
   const cfg = await lib.getConfig();
   const githubToken = input.githubToken;
@@ -301,18 +338,66 @@ const downloadPlanFile = async (): Promise<string> => {
     );
   }
 
-  // Download artifact
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-"));
 
-  await downloadArtifact(
+  const downloadPlanFileFromArtifacts = async (): Promise<string> => {
+    await downloadArtifact(
+      githubToken,
+      github.context.repo.owner,
+      github.context.repo.repo,
+      runId,
+      artifactName,
+      tempDir,
+    );
+    return path.join(tempDir, filename);
+  };
+
+  // Resolve where the plan file is stored from the metadata artifact of the
+  // plan run (already bound by the head_sha check above). apply does not look
+  // at its own config, so a config change between plan and apply does not
+  // break resolution.
+  const metaArtifactName = planStorage.metaArtifactName(target);
+  const hasMeta = await tryDownloadArtifact(
     githubToken,
     github.context.repo.owner,
     github.context.repo.repo,
     runId,
-    artifactName,
+    metaArtifactName,
     tempDir,
   );
 
-  const sourcePath = path.join(tempDir, filename);
+  // Backward compatibility: plan runs from before this feature have no
+  // metadata file, so fall back to the plan file in GitHub Artifacts.
+  if (!hasMeta) {
+    return downloadPlanFileFromArtifacts();
+  }
+
+  const meta = planStorage.PlanMeta.parse(
+    JSON.parse(
+      fs.readFileSync(path.join(tempDir, planStorage.metaFileName), "utf8"),
+    ),
+  );
+
+  if (meta.storage === "github-artifacts") {
+    return downloadPlanFileFromArtifacts();
+  }
+
+  // storage === "s3": pull the plan file from S3 and verify its hash.
+  if (!meta.bucket || !meta.key_prefix || !meta.hash) {
+    throw new Error(
+      "invalid plan metadata: bucket, key_prefix, or hash is missing",
+    );
+  }
+  const sourcePath = await planStorage.downloadPlanFromS3(
+    meta.bucket,
+    meta.key_prefix,
+    tempDir,
+  );
+  const actualHash = planStorage.sha256File(sourcePath);
+  if (actualHash !== meta.hash.plan) {
+    throw new Error(
+      `plan file hash mismatch: expected ${meta.hash.plan}, got ${actualHash}`,
+    );
+  }
   return sourcePath;
 };

@@ -1,4 +1,4 @@
-import { run, Result } from "./index";
+import { run, Result, getTargetConfig } from "./index";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
 import { expect, test } from "vitest";
@@ -1115,4 +1115,57 @@ test("type is omitted from outputs when not set (default root module)", async ()
   );
   // type should not be in outputs when not set
   expect(result.outputs.has("type")).toBe(false);
+});
+
+test("plan_file_s3 is resolved from the target group", async () => {
+  const targetConfig = await getTargetConfig(
+    {
+      target: "tests/aws/foo/dev",
+      workingDir: "tests/aws/foo/dev",
+      isApply: false,
+      jobType: "terraform",
+    },
+    await lib.applyConfigDefaults(
+      {
+        plan_workflow_name: "plan.yaml",
+        target_groups: [
+          {
+            working_directory: "tests/aws/**",
+            plan_file_s3: { bucket: "group-bucket", key_prefix: "prefix/" },
+          },
+        ],
+      },
+      "tests/tfaction-root.yaml",
+      "",
+    ),
+  );
+  expect(targetConfig.plan_file_s3).toStrictEqual({
+    bucket: "group-bucket",
+    key_prefix: "prefix/",
+  });
+});
+
+test("plan_file_s3 falls back to the root config", async () => {
+  const targetConfig = await getTargetConfig(
+    {
+      target: "tests/aws/foo/dev",
+      workingDir: "tests/aws/foo/dev",
+      isApply: false,
+      jobType: "terraform",
+    },
+    await lib.applyConfigDefaults(
+      {
+        plan_workflow_name: "plan.yaml",
+        plan_file_s3: { bucket: "root-bucket" },
+        target_groups: [
+          {
+            working_directory: "tests/aws/**",
+          },
+        ],
+      },
+      "tests/tfaction-root.yaml",
+      "",
+    ),
+  );
+  expect(targetConfig.plan_file_s3).toStrictEqual({ bucket: "root-bucket" });
 });

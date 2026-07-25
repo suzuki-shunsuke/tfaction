@@ -8,7 +8,8 @@ import {
   type FindOptions,
   type DownloadArtifactOptions,
 } from "@actions/artifact";
-import { getResultSummary, type ResultSummary } from "../plan/run";
+import { type ResultSummary } from "../plan/run";
+import * as planStorage from "../../lib/plan_storage";
 
 export type RunInputs = {
   githubToken: string;
@@ -143,21 +144,21 @@ export const main = async (inputs: RunInputs): Promise<void> => {
     findBy,
   });
 
-  // Filter plan JSON artifacts
+  // Filter plan metadata artifacts
   const planArtifacts = artifacts.filter((a) =>
-    a.name.startsWith("terraform_plan_json_"),
+    a.name.startsWith(planStorage.metaArtifactNamePrefix),
   );
 
   const octokit = github.getOctokit(inputs.githubToken);
 
   if (planArtifacts.length === 0) {
-    core.info("No terraform plan JSON artifacts found");
+    core.info("No terraform plan metadata artifacts found");
     core.setOutput("result_summary", "no-op");
     await updatePlanResultLabel(octokit, owner, repo, inputs.prNumber, "no-op");
     return;
   }
 
-  // Download each artifact and get result summary
+  // Download each metadata artifact and read its result summary
   const summaries: ResultSummary[] = [];
   for (const art of planArtifacts) {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-plan-"));
@@ -167,16 +168,18 @@ export const main = async (inputs: RunInputs): Promise<void> => {
     };
     await artifact.downloadArtifact(art.id, opts);
 
-    // Read the plan JSON file
-    const planJsonPath = path.join(tempDir, "tfplan.json");
-    if (!fs.existsSync(planJsonPath)) {
+    // Read the plan metadata file
+    const metaPath = path.join(tempDir, planStorage.metaFileName);
+    if (!fs.existsSync(metaPath)) {
       core.warning(
-        `Plan JSON file not found in artifact ${art.name}, skipping`,
+        `Plan metadata file not found in artifact ${art.name}, skipping`,
       );
       continue;
     }
-    const content = fs.readFileSync(planJsonPath, "utf8");
-    summaries.push(getResultSummary(content));
+    const meta = planStorage.PlanMeta.parse(
+      JSON.parse(fs.readFileSync(metaPath, "utf8")),
+    );
+    summaries.push(meta.summary);
   }
 
   const result = aggregateResultSummaries(summaries);

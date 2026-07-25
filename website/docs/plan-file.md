@@ -17,3 +17,5 @@ terraform apply plan.tfplan
 Without a plan file, there is a risk that terraform apply produces different results than what was reviewed during terraform plan.
 tfaction uploads the plan file to GitHub Artifacts and downloads it during terraform apply.
 Since GitHub Artifacts is used, there is no dependency on S3, GCS, or other external storage. Additionally, uploaded plan files cannot be tampered with after the fact, making this approach secure.
+
+If you want to avoid exposing plan files through GitHub Artifacts, you can instead [store them in S3 with access control](plan-file-s3.md).

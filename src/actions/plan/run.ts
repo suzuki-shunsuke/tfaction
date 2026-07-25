@@ -8,6 +8,8 @@ import { z } from "zod";
 import * as aqua from "../../aqua";
 import * as lib from "../../lib";
 import * as env from "../../lib/env";
+import * as types from "../../lib/types";
+import * as planStorage from "../../lib/plan_storage";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../../conftest";
 import { post } from "../../comment";
@@ -66,6 +68,7 @@ type Inputs = {
   executor: aqua.Executor;
   secrets?: Record<string, string>;
   stepSummaryPath?: string;
+  planFileS3?: types.PlanFileS3;
 };
 
 export type RunInputs = {
@@ -521,19 +524,59 @@ export const runTerraformPlan = async (
     },
   );
   fs.writeFileSync(tempPlanJson, showResult.stdout);
-  core.setOutput("result_summary", getResultSummary(showResult.stdout));
+  const summary = getResultSummary(showResult.stdout);
+  core.setOutput("result_summary", summary);
 
   core.setOutput("plan_json", tempPlanJson);
 
-  // Upload plan files as artifact
+  // Upload the plan file and a self-describing metadata file.
+  // When plan_file_s3 is set, the plan file is stored in S3 (only the metadata
+  // file goes to GitHub Artifacts); otherwise the plan file is uploaded to
+  // GitHub Artifacts as before. Restricting access to the bucket is the user's
+  // responsibility (see the plan-file-s3 docs). The metadata file records where
+  // the plan file is stored, so apply resolves the location from it without
+  // looking at its own config.
   core.startGroup("upload plan artifacts");
   const artifact = new DefaultArtifactClient();
-  const artifactNameBinary = `terraform_plan_file_${inputs.target.replaceAll("/", "__")}`;
-  core.setOutput("plan_binary_artifact_name", artifactNameBinary);
-  const artifactNameJson = `terraform_plan_json_${inputs.target.replaceAll("/", "__")}`;
-  core.setOutput("plan_json_artifact_name", artifactNameJson);
-  await artifact.uploadArtifact(artifactNameBinary, [tempPlanBinary], tempDir);
-  await artifact.uploadArtifact(artifactNameJson, [tempPlanJson], tempDir);
+  const metaPath = path.join(tempDir, planStorage.metaFileName);
+
+  let meta: planStorage.PlanMeta;
+  if (inputs.planFileS3) {
+    const { keyPrefix, hash } = await planStorage.uploadPlanToS3(
+      {
+        bucket: inputs.planFileS3.bucket,
+        keyPrefix: inputs.planFileS3.key_prefix,
+        runId: env.all.GITHUB_RUN_ID,
+        attempt: env.all.GITHUB_RUN_ATTEMPT,
+        target: inputs.target,
+      },
+      tempPlanBinary,
+    );
+    meta = {
+      storage: "s3",
+      bucket: inputs.planFileS3.bucket,
+      key_prefix: keyPrefix,
+      hash: { plan: hash },
+      summary,
+    };
+  } else {
+    const artifactNameBinary = `terraform_plan_file_${inputs.target.replaceAll("/", "__")}`;
+    core.setOutput("plan_binary_artifact_name", artifactNameBinary);
+    const artifactNameJson = `terraform_plan_json_${inputs.target.replaceAll("/", "__")}`;
+    core.setOutput("plan_json_artifact_name", artifactNameJson);
+    await artifact.uploadArtifact(
+      artifactNameBinary,
+      [tempPlanBinary],
+      tempDir,
+    );
+    await artifact.uploadArtifact(artifactNameJson, [tempPlanJson], tempDir);
+    meta = { storage: "github-artifacts", summary };
+  }
+
+  fs.writeFileSync(metaPath, JSON.stringify(meta));
+  const metaArtifactName = planStorage.metaArtifactName(inputs.target);
+  core.setOutput("plan_meta_artifact_name", metaArtifactName);
+  await artifact.uploadArtifact(metaArtifactName, [metaPath], tempDir);
   core.endGroup();
 
   // If no changes, exit successfully
@@ -605,6 +648,7 @@ export const main = async (
     executor,
     secrets: runInputs.secrets,
     stepSummaryPath: runInputs.stepSummaryPath,
+    planFileS3: targetConfig.plan_file_s3,
   };
 
   const jobType = runInputs.jobType;

@@ -80,6 +80,19 @@ vi.mock("../../comment", () => ({
   post: vi.fn(),
 }));
 
+vi.mock("../../lib/plan_storage", async () => {
+  const actual = await vi.importActual<typeof import("../../lib/plan_storage")>(
+    "../../lib/plan_storage",
+  );
+  return {
+    ...actual,
+    uploadPlanToS3: vi.fn().mockResolvedValue({
+      keyPrefix: "tfaction_plan/1/1/aws/test/dev/",
+      hash: "hash-xyz",
+    }),
+  };
+});
+
 // Helper to create a mock executor
 const createMockExecutor = () => ({
   exec: vi.fn().mockResolvedValue(0),
@@ -464,6 +477,38 @@ describe("runTerraformPlan", () => {
     expect(core.setOutput).toHaveBeenCalledWith(
       "plan_json_artifact_name",
       "terraform_plan_json_aws__test__dev",
+    );
+  });
+
+  it("uploads the plan file to S3 when plan_file_s3 is set", async () => {
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
+
+    const planStorage = await import("../../lib/plan_storage");
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      planFileS3: { bucket: "my-bucket", key_prefix: "tfaction_plan/" },
+    };
+    await runTerraformPlan(inputs);
+
+    // The plan file is uploaded to S3, not to GitHub Artifacts
+    expect(planStorage.uploadPlanToS3).toHaveBeenCalled();
+    expect(core.setOutput).toHaveBeenCalledWith(
+      "plan_meta_artifact_name",
+      "terraform_plan_meta_aws__test__dev",
+    );
+    expect(core.setOutput).not.toHaveBeenCalledWith(
+      "plan_binary_artifact_name",
+      expect.anything(),
+    );
+    // The metadata records that the plan file is stored in S3
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+      expect.stringContaining("plan_meta.json"),
+      expect.stringContaining('"storage":"s3"'),
     );
   });
 

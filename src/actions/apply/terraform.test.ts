@@ -100,6 +100,19 @@ vi.mock("../../comment", () => ({
   post: vi.fn(),
 }));
 
+vi.mock("../../lib/plan_storage", async () => {
+  const actual = await vi.importActual<typeof import("../../lib/plan_storage")>(
+    "../../lib/plan_storage",
+  );
+  return {
+    ...actual,
+    downloadPlanFromS3: vi
+      .fn()
+      .mockResolvedValue("/tmp/tfaction-test/plan.out"),
+    sha256File: vi.fn().mockReturnValue("hash-abc"),
+  };
+});
+
 // Helper to create a mock executor
 const createMockExecutor = () => ({
   exec: vi.fn().mockResolvedValue(0),
@@ -157,6 +170,7 @@ const setupMainMocks = async (
     envOverrides?: Record<string, string>;
     workflowRuns?: Array<{ head_sha: string; id: number }>;
     prHeadSha?: string;
+    meta?: Record<string, unknown>;
   } = {},
 ) => {
   const lib = await import("../../lib");
@@ -184,11 +198,16 @@ const setupMainMocks = async (
   // Mock fs for downloadPlanFile and apply output capture
   vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/tfaction-test");
   vi.mocked(fs.writeFileSync).mockReturnValue(undefined);
-  vi.mocked(fs.readFileSync).mockReturnValue(
-    JSON.stringify({
+  vi.mocked(fs.readFileSync).mockImplementation((p) => {
+    if (String(p).endsWith("plan_meta.json")) {
+      return JSON.stringify(
+        options.meta ?? { storage: "github-artifacts", summary: "no-op" },
+      );
+    }
+    return JSON.stringify({
       head: { sha: options.prHeadSha ?? "abc123" },
-    }),
-  );
+    });
+  });
   vi.mocked(fs.rmdirSync).mockReturnValue(undefined);
 
   // Mock core.getInput for downloadPlanFile's github_token
@@ -492,5 +511,44 @@ describe("main", () => {
     });
 
     await expect(main()).rejects.toThrow("terraform apply failed");
+  });
+
+  it("pulls the plan file from S3 and verifies its hash", async () => {
+    const { mockExecutor } = await setupMainMocks({
+      meta: {
+        storage: "s3",
+        bucket: "my-bucket",
+        key_prefix: "tfaction_plan/1001/1/aws/dev/vpc/",
+        hash: { plan: "hash-abc" },
+        summary: "create",
+      },
+    });
+
+    await main();
+
+    // apply runs against the plan file pulled from S3
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "terraform",
+      expect.arrayContaining([
+        "apply",
+        "-auto-approve",
+        "/tmp/tfaction-test/plan.out",
+      ]),
+      expect.anything(),
+    );
+  });
+
+  it("throws when the S3 plan file hash does not match", async () => {
+    await setupMainMocks({
+      meta: {
+        storage: "s3",
+        bucket: "my-bucket",
+        key_prefix: "tfaction_plan/1001/1/aws/dev/vpc/",
+        hash: { plan: "different-hash" },
+        summary: "create",
+      },
+    });
+
+    await expect(main()).rejects.toThrow("plan file hash mismatch");
   });
 });
