@@ -25,21 +25,31 @@ export const metaArtifactName = (target: string): string =>
 // Prefix of the metadata artifact name, used to filter artifacts.
 export const metaArtifactNamePrefix = "terraform_plan_meta_";
 
+// A file stored in S3: its full object key and its SHA-256 (for tamper
+// detection). The plan binary is identified by the key's basename (plan.out),
+// so more files can be added later without a discriminator field.
+const PlanFile = z.object({
+  key: z.string(),
+  hash: z.string(),
+});
+export type PlanFile = z.infer<typeof PlanFile>;
+
 // The metadata file is self-describing: it records where the plan file is
-// stored (storage), the plan file hash (for tamper detection), and the plan
-// result summary (for plan-label). All of these are non-sensitive.
+// stored (storage), the stored files with their hashes (for tamper detection),
+// and the plan result summary (for plan-label). All of these are non-sensitive.
 export const PlanMeta = z.object({
   storage: z.enum(["s3", "github-artifacts"]),
   bucket: z.string().optional(),
-  key_prefix: z.string().optional(),
-  hash: z
-    .object({
-      plan: z.string(),
-    })
-    .optional(),
+  files: PlanFile.array().optional(),
   summary: z.enum(["no-op", "update", "create", "delete"]),
 });
 export type PlanMeta = z.infer<typeof PlanMeta>;
+
+// Find the plan binary entry among the stored files by its key basename.
+export const findPlanFile = (
+  files: PlanFile[] | undefined,
+): PlanFile | undefined =>
+  files?.find((f) => path.basename(f.key) === planFileName);
 
 export const sha256File = (filePath: string): string =>
   crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
@@ -70,37 +80,36 @@ export type UploadPlanToS3Params = {
   target: string;
 };
 
-// Upload the plan file to S3 and return the resolved key prefix and hash.
+// Upload the plan file to S3 and return its object key and hash.
 export const uploadPlanToS3 = async (
   params: UploadPlanToS3Params,
   planBinaryPath: string,
-): Promise<{ keyPrefix: string; hash: string }> => {
+): Promise<PlanFile> => {
   const s3 = new S3Client({});
-  const keyPrefix = buildKeyPrefix(
+  const key = `${buildKeyPrefix(
     params.keyPrefix,
     params.runId,
     params.attempt,
     params.target,
-  );
+  )}${planFileName}`;
   await s3.send(
     new PutObjectCommand({
       Bucket: params.bucket,
-      Key: `${keyPrefix}${planFileName}`,
+      Key: key,
       Body: fs.readFileSync(planBinaryPath),
     }),
   );
-  return { keyPrefix, hash: sha256File(planBinaryPath) };
+  return { key, hash: sha256File(planBinaryPath) };
 };
 
-// Download the plan file from S3 to dest and return its path.
-// The S3 client region is resolved from the environment (AWS_REGION, etc.).
+// Download a file from S3 to dest (named by the key's basename) and return its
+// path. The S3 client region is resolved from the environment (AWS_REGION etc).
 export const downloadPlanFromS3 = async (
   bucket: string,
-  keyPrefix: string,
+  key: string,
   dest: string,
 ): Promise<string> => {
   const s3 = new S3Client({});
-  const key = `${keyPrefix}${planFileName}`;
   const res = await s3.send(
     new GetObjectCommand({
       Bucket: bucket,
@@ -111,7 +120,7 @@ export const downloadPlanFromS3 = async (
     throw new Error(`plan file not found in S3: ${bucket}/${key}`);
   }
   const bytes = await res.Body.transformToByteArray();
-  const filePath = path.join(dest, planFileName);
+  const filePath = path.join(dest, path.basename(key));
   fs.writeFileSync(filePath, Buffer.from(bytes));
   return filePath;
 };

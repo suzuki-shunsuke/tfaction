@@ -87,7 +87,7 @@ vi.mock("../../lib/plan_storage", async () => {
   return {
     ...actual,
     uploadPlanToS3: vi.fn().mockResolvedValue({
-      keyPrefix: "tfaction_plan/1/1/aws/test/dev/",
+      key: "tfaction_plan/1/1/aws/test/dev/plan.out",
       hash: "hash-xyz",
     }),
   };

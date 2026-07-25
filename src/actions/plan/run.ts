@@ -542,7 +542,7 @@ export const runTerraformPlan = async (
 
   let meta: planStorage.PlanMeta;
   if (inputs.planFileS3) {
-    const { keyPrefix, hash } = await planStorage.uploadPlanToS3(
+    const planFile = await planStorage.uploadPlanToS3(
       {
         bucket: inputs.planFileS3.bucket,
         keyPrefix: inputs.planFileS3.key_prefix,
@@ -555,8 +555,7 @@ export const runTerraformPlan = async (
     meta = {
       storage: "s3",
       bucket: inputs.planFileS3.bucket,
-      key_prefix: keyPrefix,
-      hash: { plan: hash },
+      files: [planFile],
       summary,
     };
   } else {

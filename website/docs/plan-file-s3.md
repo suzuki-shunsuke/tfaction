@@ -49,15 +49,17 @@ A self-describing metadata file is uploaded to GitHub Artifacts as `terraform_pl
 {
   "storage": "s3",
   "bucket": "my-plan-file-bucket",
-  "key_prefix": "tfaction_plan/1234/1/aws/dev/vpc/",
-  "hash": {
-    "plan": "<SHA-256 of plan.out>"
-  },
+  "files": [
+    {
+      "key": "tfaction_plan/1234/1/aws/dev/vpc/plan.out",
+      "hash": "<SHA-256 of plan.out>"
+    }
+  ],
   "summary": "create"
 }
 ```
 
-`apply` reads this metadata file (from the plan run that is bound by tfaction's existing head SHA check), pulls the plan file from S3, and verifies its SHA-256 against `hash.plan`.
+`apply` reads this metadata file (from the plan run that is bound by tfaction's existing head SHA check), finds the plan file entry (identified by the `plan.out` basename of its `key`), pulls it from S3, and verifies its SHA-256 against the entry's `hash`.
 If the hash does not match, `apply` aborts.
 Because `apply` resolves the location from the metadata file rather than from its own configuration, changing the configuration or the bucket between plan and apply does not break resolution.
 

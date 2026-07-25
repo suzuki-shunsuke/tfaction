@@ -392,20 +392,22 @@ const downloadPlanFile = async (): Promise<string> => {
   }
 
   // storage === "s3": pull the plan file from S3 and verify its hash.
-  if (!meta.bucket || !meta.key_prefix || !meta.hash) {
-    throw new Error(
-      "invalid plan metadata: bucket, key_prefix, or hash is missing",
-    );
+  if (!meta.bucket) {
+    throw new Error("invalid plan metadata: bucket is missing");
+  }
+  const planFile = planStorage.findPlanFile(meta.files);
+  if (!planFile) {
+    throw new Error("invalid plan metadata: plan file entry is missing");
   }
   const sourcePath = await planStorage.downloadPlanFromS3(
     meta.bucket,
-    meta.key_prefix,
+    planFile.key,
     tempDir,
   );
   const actualHash = planStorage.sha256File(sourcePath);
-  if (actualHash !== meta.hash.plan) {
+  if (actualHash !== planFile.hash) {
     throw new Error(
-      `plan file hash mismatch: expected ${meta.hash.plan}, got ${actualHash}`,
+      `plan file hash mismatch: expected ${planFile.hash}, got ${actualHash}`,
     );
   }
   return sourcePath;

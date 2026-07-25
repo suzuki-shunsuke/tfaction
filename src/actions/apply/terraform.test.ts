@@ -530,8 +530,12 @@ describe("main", () => {
       meta: {
         storage: "s3",
         bucket: "my-bucket",
-        key_prefix: "tfaction_plan/1001/1/aws/dev/vpc/",
-        hash: { plan: "hash-abc" },
+        files: [
+          {
+            key: "tfaction_plan/1001/1/aws/dev/vpc/plan.out",
+            hash: "hash-abc",
+          },
+        ],
         summary: "create",
       },
     });
@@ -555,8 +559,12 @@ describe("main", () => {
       meta: {
         storage: "s3",
         bucket: "my-bucket",
-        key_prefix: "tfaction_plan/1001/1/aws/dev/vpc/",
-        hash: { plan: "different-hash" },
+        files: [
+          {
+            key: "tfaction_plan/1001/1/aws/dev/vpc/plan.out",
+            hash: "different-hash",
+          },
+        ],
         summary: "create",
       },
     });
@@ -582,11 +590,24 @@ describe("main", () => {
     expect(core.warning).toHaveBeenCalled();
   });
 
-  it("throws when the S3 metadata is missing bucket/key_prefix/hash", async () => {
+  it("throws when the S3 metadata has no bucket", async () => {
     await setupMainMocks({
       meta: { storage: "s3", summary: "create" },
     });
 
     await expect(main()).rejects.toThrow("invalid plan metadata");
+  });
+
+  it("throws when the S3 metadata has no plan file entry", async () => {
+    await setupMainMocks({
+      meta: {
+        storage: "s3",
+        bucket: "my-bucket",
+        files: [],
+        summary: "create",
+      },
+    });
+
+    await expect(main()).rejects.toThrow("plan file entry is missing");
   });
 });
