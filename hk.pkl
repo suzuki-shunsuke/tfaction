@@ -6,42 +6,42 @@ local linters = new Mapping<String, Step> {
     fix = check
   }
   // ["lychee"] = Builtins.lychee
+  // nllint / langcheck take the target files as arguments ({{files}}), but do
+  // not need batching: without batch, hk passes all matched files to a single
+  // invocation, avoiding the overhead of spawning one process per batch.
   ["nllint"] {
     glob = List("**/*")
     check = "nllint -s {{files}}"
     fix = "nllint -s -f {{files}}"
-    batch = true
   }
   ["langcheck"] {
     // https://github.com/suzuki-shunsuke/langcheck
     glob = List("**/*")
     check = "langcheck check {{files}}"
     fix = "langcheck check {{files}}" // run as check in fix mode (no real fix possible)
-    batch = true
   }
+  // These run whole-repo commands that ignore {{files}}, so they must not be
+  // batched. batch = true would split the changed files into groups and run
+  // the same command once per group in parallel (redundant).
   ["fmt"] {
     glob = List("**/*")
     check = "npm run fmt"
     fix = "npm run fmt"
-    batch = true
   }
   ["build"] {
     glob = List("**/*")
     check = "npm run build"
     fix = "npm run build"
-    batch = true
   }
   ["lint"] {
     glob = List("**/*")
     check = "npm run lint"
     fix = "npm run lint"
-    batch = true
   }
   ["test"] {
     glob = List("**/*")
     check = "npm t"
     fix = "npm t"
-    batch = true
   }
 }
 
