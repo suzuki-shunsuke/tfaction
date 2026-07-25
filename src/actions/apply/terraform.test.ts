@@ -25,12 +25,13 @@ vi.mock("@actions/github", () => ({
   },
 }));
 
+const mockGetArtifact = vi.fn();
+const mockDownloadArtifact = vi.fn();
+
 vi.mock("@actions/artifact", () => ({
   DefaultArtifactClient: class MockArtifactClient {
-    getArtifact = vi.fn().mockResolvedValue({
-      artifact: { id: 123 },
-    });
-    downloadArtifact = vi.fn().mockResolvedValue({});
+    getArtifact = mockGetArtifact;
+    downloadArtifact = mockDownloadArtifact;
   },
 }));
 
@@ -171,6 +172,7 @@ const setupMainMocks = async (
     workflowRuns?: Array<{ head_sha: string; id: number }>;
     prHeadSha?: string;
     meta?: Record<string, unknown>;
+    noMeta?: boolean;
   } = {},
 ) => {
   const lib = await import("../../lib");
@@ -196,6 +198,16 @@ const setupMainMocks = async (
   }
 
   // Mock fs for downloadPlanFile and apply output capture
+  // Artifact mocks: getArtifact returns "not found" for the metadata artifact
+  // when noMeta is set, so the backward-compat fallback can be tested.
+  mockDownloadArtifact.mockResolvedValue({});
+  mockGetArtifact.mockImplementation((name: string) => {
+    if (options.noMeta && name.startsWith("terraform_plan_meta_")) {
+      return Promise.resolve({ artifact: undefined });
+    }
+    return Promise.resolve({ artifact: { id: 123 } });
+  });
+
   vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/tfaction-test");
   vi.mocked(fs.writeFileSync).mockReturnValue(undefined);
   vi.mocked(fs.readFileSync).mockImplementation((p) => {
@@ -550,5 +562,31 @@ describe("main", () => {
     });
 
     await expect(main()).rejects.toThrow("plan file hash mismatch");
+  });
+
+  it("falls back to GitHub Artifacts when no metadata artifact exists", async () => {
+    const { mockExecutor } = await setupMainMocks({ noMeta: true });
+
+    await main();
+
+    // apply runs against the plan file downloaded from GitHub Artifacts
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "terraform",
+      expect.arrayContaining([
+        "apply",
+        "-auto-approve",
+        expect.stringContaining("tfplan.binary"),
+      ]),
+      expect.anything(),
+    );
+    expect(core.warning).toHaveBeenCalled();
+  });
+
+  it("throws when the S3 metadata is missing bucket/key_prefix/hash", async () => {
+    await setupMainMocks({
+      meta: { storage: "s3", summary: "create" },
+    });
+
+    await expect(main()).rejects.toThrow("invalid plan metadata");
   });
 });

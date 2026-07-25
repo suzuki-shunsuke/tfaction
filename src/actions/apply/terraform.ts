@@ -261,7 +261,10 @@ const tryDownloadArtifact = async (
       artifactName,
       artifactOpts,
     ));
-  } catch {
+  } catch (error) {
+    // getArtifact throws when the artifact is not found, but the same path is
+    // taken on transient errors, so log the reason to keep it diagnosable.
+    core.info(`Artifact "${artifactName}" was not downloaded: ${error}`);
     return false;
   }
   if (!targetArtifact) {
@@ -368,7 +371,13 @@ const downloadPlanFile = async (): Promise<string> => {
 
   // Backward compatibility: plan runs from before this feature have no
   // metadata file, so fall back to the plan file in GitHub Artifacts.
+  // This also triggers on a transient failure to download the metadata
+  // artifact, so warn to keep that case diagnosable.
   if (!hasMeta) {
+    core.warning(
+      `No plan metadata artifact "${metaArtifactName}" was found; ` +
+        "falling back to the plan file in GitHub Artifacts.",
+    );
     return downloadPlanFileFromArtifacts();
   }
 
