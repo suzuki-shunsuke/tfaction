@@ -1,0 +1,69 @@
+amends "package://github.com/jdx/hk/releases/download/v1.50.0/hk@1.50.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.50.0/hk@1.50.0#/Builtins.pkl"
+
+local linters = new Mapping<String, Step> {
+  ["typos"] = (Builtins.typos) {
+    fix = check
+  }
+  // ["lychee"] = Builtins.lychee
+  ["nllint"] {
+    glob = List("**/*")
+    check = "nllint -s {{files}}"
+    fix = "nllint -s -f {{files}}"
+    batch = true
+  }
+  ["langcheck"] {
+    // https://github.com/suzuki-shunsuke/langcheck
+    glob = List("**/*")
+    check = "langcheck check {{files}}"
+    fix = "langcheck check {{files}}" // run as check in fix mode (no real fix possible)
+    batch = true
+  }
+  ["fmt"] {
+    glob = List("**/*")
+    check = "npm run fmt"
+    fix = "npm run fmt"
+    batch = true
+  }
+  ["build"] {
+    glob = List("**/*")
+    check = "npm run build"
+    fix = "npm run build"
+    batch = true
+  }
+  ["lint"] {
+    glob = List("**/*")
+    check = "npm run lint"
+    fix = "npm run lint"
+    batch = true
+  }
+  ["test"] {
+    glob = List("**/*")
+    check = "npm t"
+    fix = "npm t"
+    batch = true
+  }
+}
+
+hooks {
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps = linters
+  }
+  ["commit-msg"] {
+    steps {
+      ["langcheck"] {
+        // https://github.com/suzuki-shunsuke/langcheck
+        check = "langcheck check {{commit_msg_file}}"
+      }
+    }
+  }
+  ["fix"] {
+    fix = true
+    steps = linters
+  }
+  ["check"] {
+    steps = linters
+  }
+}
