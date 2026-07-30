@@ -35,7 +35,7 @@ Pass all secrets to the output-github-secrets action. It outputs only the requir
 - uses: suzuki-shunsuke/tfaction@latest
   with:
     action: terraform-init
-    github_secrets: ${{ steps.github-secrets.outputs.secrets }}
+    secrets: ${{ steps.github-secrets.outputs.secrets }}
 ```
 
 ## AWS Secrets Manager
