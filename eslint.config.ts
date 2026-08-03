@@ -38,5 +38,26 @@ export default defineConfig([
       "@typescript-eslint/require-await": "error",
     },
   },
+  {
+    // js-yaml's load() doesn't resolve YAML merge keys (`<<`) by default since
+    // v5, so it must be called only through src/lib/yaml.ts.
+    // https://github.com/suzuki-shunsuke/tfaction/issues/4213
+    files: ["**/*.{ts,mts,cts}"],
+    ignores: ["src/lib/yaml.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "js-yaml",
+              message:
+                "Use loadYaml() in src/lib/yaml.ts instead. js-yaml's load() doesn't resolve YAML merge keys (`<<`) by default.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   globalIgnores(["docusaurus.config.js", "website/*", "build/*", "dist/*"]),
 ]);

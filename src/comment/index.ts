@@ -2,10 +2,10 @@ import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import * as yaml from "js-yaml";
 import Handlebars from "handlebars";
 
 import * as lib from "../lib";
+import { loadYaml } from "../lib/yaml";
 
 export type Inputs = {
   octokit: ReturnType<typeof github.getOctokit>;
@@ -34,7 +34,7 @@ export type CommentConfig = {
 export const loadConfig = (): CommentConfig => {
   const configPath = path.join(lib.GitHubActionPath, "install", "comment.yaml");
   const content = fs.readFileSync(configPath, "utf8");
-  return yaml.load(content) as CommentConfig;
+  return loadYaml(content) as CommentConfig;
 };
 
 const block = "```";
