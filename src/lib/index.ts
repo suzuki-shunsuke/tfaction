@@ -1,12 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as core from "@actions/core";
-import { load } from "js-yaml";
 import { minimatch } from "minimatch";
 import { z } from "zod";
 import * as env from "./env";
 import { fileURLToPath } from "node:url";
 import { listWorkingDirFiles, getRootDir as getGitRootDir } from "./git";
+import { loadYaml } from "./yaml";
 import {
   RawConfig,
   Config,
@@ -62,7 +62,7 @@ export const applyConfigDefaults = async (
 export const getConfig = async (): Promise<Config> => {
   const configPath = env.TFACTION_CONFIG;
   const workspace = env.GITHUB_WORKSPACE;
-  const raw = RawConfig.parse(load(fs.readFileSync(configPath, "utf8")));
+  const raw = RawConfig.parse(loadYaml(fs.readFileSync(configPath, "utf8")));
   return await applyConfigDefaults(raw, configPath, workspace);
 };
 
@@ -116,7 +116,7 @@ export const getTargetFromTargetGroupsByWorkingDir = (
 };
 
 export const readTargetConfig = (p: string): TargetConfig => {
-  return TargetConfig.parse(load(fs.readFileSync(p, "utf8")));
+  return TargetConfig.parse(loadYaml(fs.readFileSync(p, "utf8")));
 };
 
 export const getJobConfig = (
