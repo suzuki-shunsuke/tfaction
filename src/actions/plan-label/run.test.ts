@@ -348,8 +348,8 @@ describe("main", () => {
   it("aggregates plan results and adds label", async () => {
     mockListArtifacts.mockResolvedValue({
       artifacts: [
-        { id: 1, name: "terraform_plan_json_target1" },
-        { id: 2, name: "terraform_plan_json_target2" },
+        { id: 1, name: "terraform_plan_meta_target1" },
+        { id: 2, name: "terraform_plan_meta_target2" },
       ],
     });
     mockDownloadArtifact.mockResolvedValue({});
@@ -360,11 +360,11 @@ describe("main", () => {
 
     // First plan: no changes, second plan: has create
     vi.mocked(fs.readFileSync)
-      .mockReturnValueOnce(JSON.stringify({ resource_changes: [] }))
       .mockReturnValueOnce(
-        JSON.stringify({
-          resource_changes: [{ change: { actions: ["create"] } }],
-        }),
+        JSON.stringify({ storage: "github-artifacts", summary: "no-op" }),
+      )
+      .mockReturnValueOnce(
+        JSON.stringify({ storage: "github-artifacts", summary: "create" }),
       );
 
     await main(inputs);
@@ -380,14 +380,12 @@ describe("main", () => {
 
   it("removes stale plan-result labels and adds correct one", async () => {
     mockListArtifacts.mockResolvedValue({
-      artifacts: [{ id: 1, name: "terraform_plan_json_target1" }],
+      artifacts: [{ id: 1, name: "terraform_plan_meta_target1" }],
     });
     mockDownloadArtifact.mockResolvedValue({});
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.readFileSync).mockReturnValue(
-      JSON.stringify({
-        resource_changes: [{ change: { actions: ["delete"] } }],
-      }),
+      JSON.stringify({ storage: "github-artifacts", summary: "delete" }),
     );
 
     // Simulate existing stale labels on PR
@@ -419,9 +417,9 @@ describe("main", () => {
     );
   });
 
-  it("skips artifacts without plan JSON file", async () => {
+  it("skips artifacts without plan metadata file", async () => {
     mockListArtifacts.mockResolvedValue({
-      artifacts: [{ id: 1, name: "terraform_plan_json_target1" }],
+      artifacts: [{ id: 1, name: "terraform_plan_meta_target1" }],
     });
     mockDownloadArtifact.mockResolvedValue({});
     vi.mocked(fs.existsSync).mockReturnValue(false);
@@ -435,7 +433,7 @@ describe("main", () => {
   it("filters out non-plan artifacts", async () => {
     mockListArtifacts.mockResolvedValue({
       artifacts: [
-        { id: 1, name: "terraform_plan_json_target1" },
+        { id: 1, name: "terraform_plan_meta_target1" },
         { id: 2, name: "terraform_plan_file_target1" },
         { id: 3, name: "other_artifact" },
       ],
@@ -443,12 +441,12 @@ describe("main", () => {
     mockDownloadArtifact.mockResolvedValue({});
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.readFileSync).mockReturnValue(
-      JSON.stringify({ resource_changes: [] }),
+      JSON.stringify({ storage: "github-artifacts", summary: "no-op" }),
     );
 
     await main(inputs);
 
-    // Only 1 artifact should be downloaded (the plan JSON one)
+    // Only 1 artifact should be downloaded (the plan metadata one)
     expect(mockDownloadArtifact).toHaveBeenCalledTimes(1);
   });
 });

@@ -119,6 +119,14 @@ const AvailableProvider = z.object({
 });
 export type AvailableProvider = z.infer<typeof AvailableProvider>;
 
+// Store the plan file in S3 with access control instead of GitHub Artifacts.
+// The object key becomes `<key_prefix><run id>/<attempt>/<target>/plan.out`.
+const PlanFileS3 = z.object({
+  bucket: z.string(),
+  key_prefix: z.string().optional(),
+});
+export type PlanFileS3 = z.infer<typeof PlanFileS3>;
+
 const TargetGroup = z.object({
   aws_region: z.string().optional(),
   aws_assume_role_arn: z.string().optional(),
@@ -149,6 +157,7 @@ const TargetGroup = z.object({
     })
     .optional(),
   available_providers: AvailableProvider.array().optional(),
+  plan_file_s3: PlanFileS3.optional(),
 });
 export type TargetGroup = z.infer<typeof TargetGroup>;
 
@@ -175,6 +184,7 @@ export const TargetConfig = z.object({
   terraform_command: z.string().optional(),
   terraform_docs: TerraformDocsConfig.optional(),
   conftest: ConftestConfig.optional(),
+  plan_file_s3: PlanFileS3.optional(),
 });
 export type TargetConfig = z.infer<typeof TargetConfig>;
 
@@ -232,6 +242,7 @@ export const RawConfig = z.object({
   env: z.record(z.string(), z.string()).optional(),
   label_prefixes: LabelPrefixes.default(labelPrefixesDefaults),
   plan_workflow_name: z.string(),
+  plan_file_s3: PlanFileS3.optional(),
   auto_apps: z
     .object({
       logins: z.string().array().default(["renovate[bot]", "dependabot[bot]"]),

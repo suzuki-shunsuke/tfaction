@@ -53,6 +53,9 @@ export interface TargetConfig {
 
   // Secrets mapping (env_name -> secret_name)
   secretsConfig?: Record<string, string>;
+
+  // Store the plan file in S3 instead of GitHub Artifacts
+  plan_file_s3?: types.PlanFileS3;
 }
 
 export const getTargetConfig = async (
@@ -230,6 +233,8 @@ export const getTargetConfig = async (
       wdConfig?.terraform_docs?.enabled ??
       config?.terraform_docs?.enabled ??
       false;
+    result.plan_file_s3 =
+      wdConfig.plan_file_s3 ?? targetGroup.plan_file_s3 ?? config.plan_file_s3;
 
     // Collect envs
     const envMap = lib.setEnvs(
@@ -290,6 +295,7 @@ export const run = async (
       key !== "env" &&
       key !== "target" &&
       key !== "secretsConfig" &&
+      key !== "plan_file_s3" &&
       value !== undefined
     ) {
       outputs.set(key, value);

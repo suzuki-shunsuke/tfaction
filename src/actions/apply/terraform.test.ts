@@ -25,12 +25,13 @@ vi.mock("@actions/github", () => ({
   },
 }));
 
+const mockGetArtifact = vi.fn();
+const mockDownloadArtifact = vi.fn();
+
 vi.mock("@actions/artifact", () => ({
   DefaultArtifactClient: class MockArtifactClient {
-    getArtifact = vi.fn().mockResolvedValue({
-      artifact: { id: 123 },
-    });
-    downloadArtifact = vi.fn().mockResolvedValue({});
+    getArtifact = mockGetArtifact;
+    downloadArtifact = mockDownloadArtifact;
   },
 }));
 
@@ -100,6 +101,19 @@ vi.mock("../../comment", () => ({
   post: vi.fn(),
 }));
 
+vi.mock("../../lib/plan_storage", async () => {
+  const actual = await vi.importActual<typeof import("../../lib/plan_storage")>(
+    "../../lib/plan_storage",
+  );
+  return {
+    ...actual,
+    downloadPlanFromS3: vi
+      .fn()
+      .mockResolvedValue("/tmp/tfaction-test/plan.out"),
+    sha256File: vi.fn().mockReturnValue("hash-abc"),
+  };
+});
+
 // Helper to create a mock executor
 const createMockExecutor = () => ({
   exec: vi.fn().mockResolvedValue(0),
@@ -157,6 +171,8 @@ const setupMainMocks = async (
     envOverrides?: Record<string, string>;
     workflowRuns?: Array<{ head_sha: string; id: number }>;
     prHeadSha?: string;
+    meta?: Record<string, unknown>;
+    noMeta?: boolean;
   } = {},
 ) => {
   const lib = await import("../../lib");
@@ -182,13 +198,28 @@ const setupMainMocks = async (
   }
 
   // Mock fs for downloadPlanFile and apply output capture
+  // Artifact mocks: getArtifact returns "not found" for the metadata artifact
+  // when noMeta is set, so the backward-compat fallback can be tested.
+  mockDownloadArtifact.mockResolvedValue({});
+  mockGetArtifact.mockImplementation((name: string) => {
+    if (options.noMeta && name.startsWith("terraform_plan_meta_")) {
+      return Promise.resolve({ artifact: undefined });
+    }
+    return Promise.resolve({ artifact: { id: 123 } });
+  });
+
   vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/tfaction-test");
   vi.mocked(fs.writeFileSync).mockReturnValue(undefined);
-  vi.mocked(fs.readFileSync).mockReturnValue(
-    JSON.stringify({
+  vi.mocked(fs.readFileSync).mockImplementation((p) => {
+    if (String(p).endsWith("plan_meta.json")) {
+      return JSON.stringify(
+        options.meta ?? { storage: "github-artifacts", summary: "no-op" },
+      );
+    }
+    return JSON.stringify({
       head: { sha: options.prHeadSha ?? "abc123" },
-    }),
-  );
+    });
+  });
   vi.mocked(fs.rmdirSync).mockReturnValue(undefined);
 
   // Mock core.getInput for downloadPlanFile's github_token
@@ -492,5 +523,91 @@ describe("main", () => {
     });
 
     await expect(main()).rejects.toThrow("terraform apply failed");
+  });
+
+  it("pulls the plan file from S3 and verifies its hash", async () => {
+    const { mockExecutor } = await setupMainMocks({
+      meta: {
+        storage: "s3",
+        bucket: "my-bucket",
+        files: [
+          {
+            key: "tfaction_plan/1001/1/aws/dev/vpc/plan.out",
+            hash: "hash-abc",
+          },
+        ],
+        summary: "create",
+      },
+    });
+
+    await main();
+
+    // apply runs against the plan file pulled from S3
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "terraform",
+      expect.arrayContaining([
+        "apply",
+        "-auto-approve",
+        "/tmp/tfaction-test/plan.out",
+      ]),
+      expect.anything(),
+    );
+  });
+
+  it("throws when the S3 plan file hash does not match", async () => {
+    await setupMainMocks({
+      meta: {
+        storage: "s3",
+        bucket: "my-bucket",
+        files: [
+          {
+            key: "tfaction_plan/1001/1/aws/dev/vpc/plan.out",
+            hash: "different-hash",
+          },
+        ],
+        summary: "create",
+      },
+    });
+
+    await expect(main()).rejects.toThrow("plan file hash mismatch");
+  });
+
+  it("falls back to GitHub Artifacts when no metadata artifact exists", async () => {
+    const { mockExecutor } = await setupMainMocks({ noMeta: true });
+
+    await main();
+
+    // apply runs against the plan file downloaded from GitHub Artifacts
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "terraform",
+      expect.arrayContaining([
+        "apply",
+        "-auto-approve",
+        expect.stringContaining("tfplan.binary"),
+      ]),
+      expect.anything(),
+    );
+    expect(core.warning).toHaveBeenCalled();
+  });
+
+  it("throws when the S3 metadata has no bucket", async () => {
+    await setupMainMocks({
+      meta: { storage: "s3", summary: "create" },
+    });
+
+    await expect(main()).rejects.toThrow("invalid plan metadata");
+  });
+
+  it("throws when the S3 metadata has no plan file entry", async () => {
+    await setupMainMocks({
+      meta: {
+        storage: "s3",
+        bucket: "my-bucket",
+        files: [],
+        summary: "create",
+      },
+    });
+
+    await expect(main()).rejects.toThrow("plan file entry is missing");
   });
 });
