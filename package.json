@@ -40,7 +40,7 @@
     "@types/node": "24.13.3",
     "@types/semver": "7.8.0",
     "@types/tmp": "0.2.6",
-    "@vercel/ncc": "0.44.1",
+    "@vercel/ncc": "0.45.0",
     "@vitest/coverage-v8": "4.1.10",
     "eslint": "10.8.1",
     "globals": "17.11.0",
