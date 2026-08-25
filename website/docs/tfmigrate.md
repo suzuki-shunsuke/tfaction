@@ -80,9 +80,25 @@ target_groups:
 ## Moving Resources Across States
 
 tfmigrate supports moving resources between different states.
-When doing this with tfaction, use an ignore label to prevent terraform plan from running.
+When doing this with tfaction, use a skip label to prevent terraform plan from running.
 
 For example, suppose you are moving resources from working directory `foo` to `bar` and running tfmigrate in `foo`.
 Both `foo` and `bar` require code changes, so CI runs in both directories.
 In `foo`, tfmigrate moves the resources from `foo` to `bar`, but in `bar`, terraform plan and apply would also run.
-By adding an `ignore:bar` label, you can prevent terraform plan and apply from running in `bar`.
+By adding a `skip:bar` label, `list-targets` reports `skip_terraform: true` for `bar`.
+
+:::warning
+The label alone does not stop anything.
+Your workflow has to gate the plan and apply steps with `skip_terraform`, otherwise terraform plan and apply run in `bar` anyway.
+Without the gate, `bar` produces a destroy plan and applies it once the pull request is merged, deleting the resources you are moving.
+See [Skipping terraform plan and apply](skip-terraform.md).
+:::
+
+```yaml
+- uses: suzuki-shunsuke/tfaction@latest
+  if: matrix.target.skip_terraform != true
+  with:
+    action: plan
+```
+
+The label prefix is `skip:` by default and can be changed with `label_prefixes.skip`.

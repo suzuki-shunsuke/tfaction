@@ -11,6 +11,7 @@ import { getTargetConfig } from "../get-target-config";
 import { main as runPlan } from "./run";
 import { create as createCommit } from "../../commit";
 import { mergeSecrets } from "../../lib/secret";
+import { warnSkipTerraform } from "../../lib/skip-terraform";
 
 export const main = async () => {
   // Step 1: Get target config
@@ -27,6 +28,10 @@ export const main = async () => {
 
   const jobType = env.all.TFACTION_JOB_TYPE;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
+
+  if (env.TFACTION_SKIP_TERRAFORM && !driftIssueNumber) {
+    core.warning(warnSkipTerraform("plan"));
+  }
 
   await runPlan(targetConfig, {
     githubToken: input.githubToken,

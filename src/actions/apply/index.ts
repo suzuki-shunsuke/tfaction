@@ -1,12 +1,18 @@
+import * as core from "@actions/core";
 import * as terraformApply from "./terraform";
 import * as tfmigrateApply from "./tfmigrate";
 import * as env from "../../lib/env";
 import * as input from "../../lib/input";
 import { mergeSecrets } from "../../lib/secret";
+import { warnSkipTerraform } from "../../lib/skip-terraform";
 
 export const main = async () => {
   const jobType = env.all.TFACTION_JOB_TYPE;
   const secrets = mergeSecrets(input.secrets, input.awsSecrets);
+
+  if (env.TFACTION_SKIP_TERRAFORM) {
+    core.warning(warnSkipTerraform("apply"));
+  }
 
   const githubTokenForGitHubProvider =
     input.githubTokenForGitHubProvider || undefined;
