@@ -11,8 +11,8 @@ Two things trigger this:
 1. The skip label: a label named `<label_prefixes.skip><target>` is added to the pull request
 
 The [list-targets](actions.md#list-targets) action makes the decision and reports it as the `skip_terraform` field of each target.
-tfaction does not skip anything on its own, so your workflow has to gate the `plan` and `apply` steps with that field.
-This means the feature requires a workflow that runs jobs from list-targets output. See [Monorepo](monorepo.md).
+Your workflow has to act on that field, either by gating the `plan` and `apply` steps with it or by passing it as the `TFACTION_SKIP_TERRAFORM` environment variable.
+Either way, the feature requires a workflow that runs jobs from list-targets output. See [Monorepo](monorepo.md).
 
 Only terraform plan and apply are skipped; other operations such as linting and formatting still run.
 
@@ -35,7 +35,24 @@ Only terraform plan and apply are skipped; other operations such as linting and 
 Both steps must be gated.
 If only the plan step is gated, no plan file is uploaded to GitHub Artifacts and the apply step fails while downloading it.
 
-If [Drift Detection](drift-detection.md) is enabled, set `TFACTION_SKIP_TERRAFORM` as well so that the [update-drift-issue](actions.md#update-drift-issue) action does not close the drift issue when apply was skipped:
+## TFACTION_SKIP_TERRAFORM
+
+If the `TFACTION_SKIP_TERRAFORM` environment variable is `true`, the plan and apply actions warn and do nothing.
+This is a backstop for workflows that don't gate the steps, so that a missing gate doesn't silently plan and apply a root module that was supposed to be skipped.
+
+```yaml title=".github/workflows/test.yaml"
+jobs:
+  plan:
+    env:
+      TFACTION_SKIP_TERRAFORM: ${{matrix.target.skip_terraform}}
+```
+
+Gating the steps is still recommended, because then the actions don't run at all.
+The environment variable isn't applied to drift detection jobs, where terraform plan always has to run.
+
+## Drift Detection
+
+If [Drift Detection](drift-detection.md) is enabled, set `TFACTION_SKIP_TERRAFORM` in the apply job so that the [update-drift-issue](actions.md#update-drift-issue) action does not close the drift issue when apply was skipped:
 
 ```yaml title=".github/workflows/apply.yaml"
 jobs:

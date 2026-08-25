@@ -16,3 +16,4 @@ This document describes common inputs and environment variables shared across mu
 - `TFACTION_JOB_TYPE`: One of `terraform` | `tfmigrate` | `scaffold_working_dir`. Used to change the behavior of actions.
   - `terraform`: Runs terraform plan or apply
   - `tfmigrate`: Runs tfmigrate plan or apply
+- `TFACTION_SKIP_TERRAFORM`: `true` | `false`. If `true`, plan and apply do nothing

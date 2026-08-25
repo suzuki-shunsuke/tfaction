@@ -29,8 +29,16 @@ export const main = async () => {
   const jobType = env.all.TFACTION_JOB_TYPE;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
 
-  if (env.TFACTION_SKIP_TERRAFORM && !driftIssueNumber) {
+  // list-targets decides whether terraform plan is necessary, and the workflow
+  // is expected to gate this step with the skip_terraform field.
+  // Honor TFACTION_SKIP_TERRAFORM as a backstop for workflows that don't.
+  if (
+    jobType === "terraform" &&
+    !driftIssueNumber &&
+    env.TFACTION_SKIP_TERRAFORM
+  ) {
     core.warning(warnSkipTerraform("plan"));
+    return;
   }
 
   await runPlan(targetConfig, {

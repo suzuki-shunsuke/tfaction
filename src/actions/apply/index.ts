@@ -10,14 +10,17 @@ export const main = async () => {
   const jobType = env.all.TFACTION_JOB_TYPE;
   const secrets = mergeSecrets(input.secrets, input.awsSecrets);
 
-  if (env.TFACTION_SKIP_TERRAFORM) {
-    core.warning(warnSkipTerraform("apply"));
-  }
-
   const githubTokenForGitHubProvider =
     input.githubTokenForGitHubProvider || undefined;
 
   if (jobType === "terraform") {
+    // list-targets decides whether terraform apply is necessary, and the
+    // workflow is expected to gate this step with the skip_terraform field.
+    // Honor TFACTION_SKIP_TERRAFORM as a backstop for workflows that don't.
+    if (env.TFACTION_SKIP_TERRAFORM) {
+      core.warning(warnSkipTerraform("apply"));
+      return;
+    }
     await terraformApply.main(secrets, githubTokenForGitHubProvider);
   } else if (jobType === "tfmigrate") {
     await tfmigrateApply.main(secrets, githubTokenForGitHubProvider);

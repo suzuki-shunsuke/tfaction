@@ -181,6 +181,9 @@ Gate the plan and apply steps with the field:
     action: apply
 ```
 
+Setting `TFACTION_SKIP_TERRAFORM` on the job also works: the plan and apply actions then warn and do nothing.
+Gating the steps is recommended, because then the actions don't run at all.
+
 If [Drift Detection](drift-detection.md) is enabled, set `TFACTION_SKIP_TERRAFORM` in the apply job as well so that the update-drift-issue action does not close the drift issue when apply was skipped:
 
 ```yaml title=".github/workflows/apply.yaml"

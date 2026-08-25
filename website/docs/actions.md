@@ -24,6 +24,7 @@ Environment variables:
 - TFACTION_JOB_TYPE: One of `terraform` | `tfmigrate` | `scaffold_working_dir`. Controls the behavior of the action.
   - `terraform`: Runs terraform plan or apply
   - `tfmigrate`: Runs tfmigrate plan or apply
+- TFACTION_SKIP_TERRAFORM: `true` | `false`. If `true`, plan and apply do nothing. See [Skipping terraform plan and apply](skip-terraform.md)
 - TFACTION_IS_APPLY: `true` | `false`. Set to `true` in apply workflows and `false` in plan workflows.
   - Required to switch between plan-specific and apply-specific configuration.
   ```yaml title="tfaction.yaml"
@@ -48,14 +49,15 @@ All inputs are optional.
 Environment variables:
 
 - TFACTION_JOB_TYPE
+- TFACTION_SKIP_TERRAFORM
 
+1. If TFACTION_SKIP_TERRAFORM is `true`, warns and does nothing
 1. Downloads the plan file from GitHub Artifacts
    1. Fails if plan_workflow_name is incorrect
 1. Runs terraform apply and notifies via tfcmt
 1. If drift detection is enabled, updates the drift issue
 
-This action does not check `skip_terraform` by itself.
-To skip apply, gate the step with the `skip_terraform` field of the [list-targets](#list-targets) output.
+Gating the step with the `skip_terraform` field of the [list-targets](#list-targets) output is the recommended way to skip apply.
 See [Skipping terraform plan and apply](skip-terraform.md).
 
 ## create-drift-issues
@@ -146,7 +148,7 @@ The outputs are intended to be used as env, runs-on, and environment in subseque
 - target: Alias for working_directory. By default, same as `working_directory`
 - runs_on: Job execution environment. Defaults to `ubuntu-latest`
 - environment: GitHub Environments
-- skip_terraform: Whether terraform plan and apply are unnecessary. Gate the plan and apply steps with this field. See [Skipping terraform plan and apply](skip-terraform.md)
+- skip_terraform: Whether terraform plan and apply are unnecessary. The workflow has to act on this field. See [Skipping terraform plan and apply](skip-terraform.md)
 - type: Working directory type. Set to `module` for modules
 
 ```yaml title=".github/workflows/test.yaml"
@@ -226,8 +228,11 @@ Uploads the plan file in both binary and JSON formats to GitHub Artifacts.
 If configured, runs Conftest against the plan file.
 If the plan result is not "No Change" on a Renovate PR and the setting is enabled, disables auto-merge.
 
-This action does not check `skip_terraform` by itself.
-To skip plan, gate the step with the `skip_terraform` field of the [list-targets](#list-targets) output.
+Environment variables:
+
+- TFACTION_SKIP_TERRAFORM: If `true`, warns and does nothing. Not applied to drift detection jobs
+
+Gating the step with the `skip_terraform` field of the [list-targets](#list-targets) output is the recommended way to skip plan.
 See [Skipping terraform plan and apply](skip-terraform.md).
 
 ## release-module

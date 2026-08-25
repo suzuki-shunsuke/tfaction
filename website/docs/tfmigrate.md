@@ -89,8 +89,8 @@ By adding a `skip:bar` label, `list-targets` reports `skip_terraform: true` for 
 
 :::warning
 The label alone does not stop anything.
-Your workflow has to gate the plan and apply steps with `skip_terraform`, otherwise terraform plan and apply run in `bar` anyway.
-Without the gate, `bar` produces a destroy plan and applies it once the pull request is merged, deleting the resources you are moving.
+Your workflow has to act on `skip_terraform`, either by gating the plan and apply steps with it or by passing it as `TFACTION_SKIP_TERRAFORM`.
+Otherwise `bar` produces a destroy plan and applies it once the pull request is merged, deleting the resources you are moving.
 See [Skipping terraform plan and apply](skip-terraform.md).
 :::
 

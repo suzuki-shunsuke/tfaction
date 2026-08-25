@@ -1,15 +1,16 @@
 /**
- * Builds a warning message telling the user that the step should have been
- * gated with the `skip_terraform` field of the list-targets output.
+ * Builds a warning message for a plan or apply step that runs even though
+ * terraform is skipped.
  *
- * tfaction doesn't skip terraform plan and apply by itself.
- * list-targets decides whether they're necessary and reports it as
- * `skip_terraform`, and the workflow has to gate the steps with it.
+ * list-targets decides whether terraform plan and apply are necessary and
+ * reports it as the `skip_terraform` field of each target. Gating the step
+ * with that field is the recommended way to act on it, so that the action
+ * doesn't run at all. Honoring `TFACTION_SKIP_TERRAFORM` is a backstop for
+ * workflows that don't gate the step.
  */
 export const warnSkipTerraform = (action: "plan" | "apply"): string =>
-  `TFACTION_SKIP_TERRAFORM is true, but the ${action} action is running.
-tfaction doesn't skip terraform ${action} by itself.
-Gate the step with the skip_terraform field of the list-targets output:
+  `terraform ${action} is skipped because TFACTION_SKIP_TERRAFORM is true.
+Gate the step with the skip_terraform field of the list-targets output so that the action doesn't run at all:
 
   - uses: suzuki-shunsuke/tfaction@latest
     if: matrix.target.skip_terraform != true
