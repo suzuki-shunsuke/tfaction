@@ -44,6 +44,10 @@ jobs:
       TFACTION_SKIP_TERRAFORM: ${{matrix.target.skip_terraform}}
 ```
 
+Don't gate the update-drift-issue step itself.
+It has to keep running with `if: always()` so that a failure elsewhere in the job still comments on the drift issue and reopens it.
+`TFACTION_SKIP_TERRAFORM` only suppresses closing the issue.
+
 ## skip_terraform_files
 
 When only files matching `skip_terraform_files` under a working directory are modified, `skip_terraform` becomes `true`.
