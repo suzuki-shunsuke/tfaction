@@ -30,4 +30,4 @@ Framework for Monorepo to build high level Terraform Workflows by GitHub Actions
 - [estie, Inc.](https://www.estie.jp/)
   - [Terraformをモノレポ化した話 — tfactionを使ったプロダクト横断IaC運用の実践](https://www.estie.jp/blog/entry/2026/02/03/102141)
 - [ENECHANGE Ltd.](https://enechange.co.jp/)
-  - [tfactionでTerraform CIを強化 — apply実行基盤の構築に向けて](https://tech.enechange.co.jp/entry/2026/08/24/143950)
+  - [tfactionでTerraform CIを強化 — apply実行基盤の構築に向けて (Strengthening Terraform CI with tfaction — Toward Building an Apply Execution Platform)](https://tech.enechange.co.jp/entry/2026/08/24/143950)
