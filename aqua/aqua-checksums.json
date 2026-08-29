@@ -336,28 +336,28 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.15.9/terraform_1.15.9_darwin_amd64.zip",
-      "checksum": "3E97C499FAC8074ADFA3760300662A0158F2FD325144965DD0028DEEC4086C6B",
+      "id": "http/releases.hashicorp.com/terraform/1.16.0/terraform_1.16.0_darwin_amd64.zip",
+      "checksum": "2B2B7D37F6893474FA3622FA96053E54949C4DDFCA4ABA105380718157936465",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.15.9/terraform_1.15.9_darwin_arm64.zip",
-      "checksum": "05B27586A5D7D84105690ECCCC7EDBBF48BC3D6D577745CB61F163BA990ADF4F",
+      "id": "http/releases.hashicorp.com/terraform/1.16.0/terraform_1.16.0_darwin_arm64.zip",
+      "checksum": "5DD692C6CC76B596029FF3C2B2B4C3A1710F92D3DE6D2DA3F66BD2E0C2DAA92A",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.15.9/terraform_1.15.9_linux_amd64.zip",
-      "checksum": "76EDD0B22D2F27D3D2E097CD793209646F719CF60F02FF3AF626B07361137DA1",
+      "id": "http/releases.hashicorp.com/terraform/1.16.0/terraform_1.16.0_linux_amd64.zip",
+      "checksum": "41D05B927AA174F15D1228C4EBA832A323B716C68B415EF5A00179F46CC602D3",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.15.9/terraform_1.15.9_linux_arm64.zip",
-      "checksum": "0AFA6C29F61CA5EA270E950E43E50ECF2418B598507BF580E8AE76E1E6699B19",
+      "id": "http/releases.hashicorp.com/terraform/1.16.0/terraform_1.16.0_linux_arm64.zip",
+      "checksum": "60F86CEA49A653E22A93C000F16CBFA391CE41C6F6A11D36557C35DA411F684C",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.15.9/terraform_1.15.9_windows_amd64.zip",
-      "checksum": "B0FCD57E2ABD19FC6D8E64B86A22F5F3FB734B0407385553CDCFFC64677F18B6",
+      "id": "http/releases.hashicorp.com/terraform/1.16.0/terraform_1.16.0_windows_amd64.zip",
+      "checksum": "2A50A95205189C1C9FCEFBD34EAA9E94EC905A32A4880BFEA34EF9F97757C73F",
       "algorithm": "sha256"
     },
     {
