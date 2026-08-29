@@ -8,7 +8,7 @@ import { run } from "./run";
 type Inputs = {
   commitMessage: string;
   githubToken: string;
-  /** A relative path from github.workspace to Git Root Directory */
+  /** An absolute path to the Git Root Directory */
   rootDir?: string;
   /** Relative paths from Git Root Directory */
   files: Set<string>;
@@ -53,6 +53,7 @@ export const create = async (inputs: Inputs): Promise<string> => {
 
   return run({
     commitMessage: inputs.commitMessage,
+    rootDir: inputs.rootDir,
     files: inputs.files,
     branch,
     repoOwner: github.context.repo.owner,

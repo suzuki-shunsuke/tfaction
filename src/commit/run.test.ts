@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import * as commit from "@suzuki-shunsuke/commit-ts";
 import { run, type RunInput, type Logger } from "./run";
 
 describe("run", () => {
@@ -50,6 +51,30 @@ describe("run", () => {
     expect(result).toBe("");
     expect(octokit.rest.repos.get).not.toHaveBeenCalled();
     expect(octokit.rest.pulls.create).not.toHaveBeenCalled();
+  });
+
+  it("passes rootDir to createCommit so paths resolve from the git root", async () => {
+    const octokit = createMockOctokit();
+    const logger = createMockLogger();
+    const input: RunInput = {
+      commitMessage: "test commit",
+      rootDir: "/home/runner/work/repo/repo/yoo",
+      files: new Set(["tests/opentofu/bar-2/.terraform.lock.hcl"]),
+      branch: "feature-branch",
+      repoOwner: "owner",
+      repoName: "repo",
+      octokit: octokit as unknown as RunInput["octokit"],
+      logger,
+    };
+
+    await run(input);
+
+    expect(commit.createCommit).toHaveBeenCalledWith(
+      octokit,
+      expect.objectContaining({
+        rootDir: "/home/runner/work/repo/repo/yoo",
+      }),
+    );
   });
 
   it("creates PR and returns html_url when pr is specified", async () => {
