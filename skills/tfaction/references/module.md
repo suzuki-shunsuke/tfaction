@@ -13,11 +13,11 @@ type: module
 
 ## Scaffolding a Module from a Template
 
-See [Creating a Root Module from a Template](./scaffold-working-directory).
+See [Creating a Root Module from a Template](./scaffold-working-directory.md).
 
 ## Testing a Module
 
-See [Lint](./lint).
+See [Lint](./lint.md).
 
 ## Releasing a Module
 

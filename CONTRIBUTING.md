@@ -21,7 +21,7 @@ After you update code, you have to run the following things.
 - Test TypeScript: `npm t`
 - Lint TypeScript: `npm run lint`
 - Format code: `npm run fmt`
-- [Update Document](website)
+- [Update Document](skills/tfaction/references)
 
 ## Node.js version management
 

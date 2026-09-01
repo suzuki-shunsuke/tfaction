@@ -4,7 +4,7 @@ sidebar_position: 600
 
 # tfaction v2 is a Single Action
 
-Looking at the workflow from [Getting Started](./getting-started), you can see that tfaction calls the same action multiple times with different values for the `action` input.
+Looking at the workflow from [Getting Started](./getting-started.md), you can see that tfaction calls the same action multiple times with different values for the `action` input.
 
 ```yaml
 - uses: suzuki-shunsuke/tfaction@latest

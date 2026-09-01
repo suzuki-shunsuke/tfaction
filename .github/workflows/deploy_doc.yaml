@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - website/**
+      - skills/tfaction/references/**
       - .github/workflows/deploy_doc.yaml
       - .github/workflows/workflow_call_deploy_doc.yaml
 permissions: {}
