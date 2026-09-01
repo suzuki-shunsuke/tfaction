@@ -166,10 +166,6 @@ outputs:
   csm_actions_server_repository:
     description: CSM Actions Server Repository
 
-  # check-terraform-skip
-  skip_terraform:
-    description: whether terraform is skipped
-
   # list-module-caller
   file:
     description: |
