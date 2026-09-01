@@ -92,6 +92,13 @@ jobs:
         with:
           persist-credentials: false
       # ...
+      - name: Plan
+        uses: suzuki-shunsuke/tfaction@latest
+        # Skip plan for root modules where terraform plan is unnecessary.
+        # https://suzuki-shunsuke.github.io/tfaction/docs/skip-terraform
+        if: matrix.target.skip_terraform != true
+        with:
+          action: plan
 ```
 
 3. Update `tfaction-root.yaml`'s `target_groups` so that root modules are matched.
