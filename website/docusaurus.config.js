@@ -5,6 +5,48 @@ const { themes } = require("prism-react-renderer");
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
 
+// The v1 documentation was removed. Redirect its pages to the v2 upgrade guide.
+const v1Paths = [
+  "/v1",
+  "/v1/config/add-working-directory",
+  "/v1/config/aqua",
+  "/v1/config/config",
+  "/v1/config/github-token",
+  "/v1/config/pull_request_target",
+  "/v1/config/secret",
+  "/v1/config/setup",
+  "/v1/config/terraform-cli-options",
+  "/v1/config/tfaction-root-yaml",
+  "/v1/config/tfaction-yaml",
+  "/v1/config/tfprovidercheck",
+  "/v1/feature",
+  "/v1/feature/auto-fix",
+  "/v1/feature/auto-update-related-prs",
+  "/v1/feature/build-matrix",
+  "/v1/feature/conftest",
+  "/v1/feature/debug-mode",
+  "/v1/feature/destroy",
+  "/v1/feature/drift-detection",
+  "/v1/feature/follow-up-pr",
+  "/v1/feature/follow-up-pr-group-label",
+  "/v1/feature/generate-config-out",
+  "/v1/feature/limit-changed-dirs",
+  "/v1/feature/linter",
+  "/v1/feature/local-path-module",
+  "/v1/feature/module",
+  "/v1/feature/plan-file",
+  "/v1/feature/provider-dep",
+  "/v1/feature/renovate",
+  "/v1/feature/scaffold-working-dir",
+  "/v1/feature/securefix-action",
+  "/v1/feature/skip-creating-pr",
+  "/v1/feature/support-skipping-terraform-renovate-pr",
+  "/v1/feature/terraform-docs",
+  "/v1/feature/tfcmt",
+  "/v1/feature/tfmigrate",
+  "/v1/feature/use-terraform-compatible-tool",
+];
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "tfaction",
@@ -110,6 +152,10 @@ const config = {
           {
             from: "/codes/001",
             to: "/limit-max-changed-dirs",
+          },
+          {
+            from: v1Paths,
+            to: "/v2-upgrade-guide",
           },
         ],
       },
