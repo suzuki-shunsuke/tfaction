@@ -96,6 +96,23 @@ describe("run", () => {
     expect(result.envVars.TFACTION_DRIFT_ISSUE_STATE).toBe("closed");
   });
 
+  it("normalizes a GraphQL IssueState enum to lowercase", () => {
+    const input: RunInput = {
+      issue: {
+        number: 2,
+        state: "OPEN",
+        target: "test/target",
+      },
+      repoOwner: "org",
+      repoName: "project",
+      serverUrl: "https://github.com",
+    };
+
+    const result = run(input);
+
+    expect(result.envVars.TFACTION_DRIFT_ISSUE_STATE).toBe("open");
+  });
+
   it("handles GitHub Enterprise Server URL", () => {
     const input: RunInput = {
       issue: {

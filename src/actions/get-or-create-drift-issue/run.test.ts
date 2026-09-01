@@ -261,9 +261,11 @@ describe("run", () => {
       deps,
     );
 
+    // The search result is a GraphQL IssueState enum, so the state is
+    // normalized to lowercase.
     expect(result).toEqual({
       number: 10,
-      state: "OPEN",
+      state: "open",
       url: "https://github.com/owner/repo/issues/10",
     });
     expect(deps.createIssue).not.toHaveBeenCalled();
