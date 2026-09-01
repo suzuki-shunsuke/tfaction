@@ -4,7 +4,7 @@ sidebar_position: 300
 
 # Hiding Or Delete Old PR Comments
 
-In the workflow built in [Getting Started](./getting-started), tfcmt posts comments to the PR, but old comments remain visible indefinitely.
+In the workflow built in [Getting Started](./getting-started.md), tfcmt posts comments to the PR, but old comments remain visible indefinitely.
 
 ![](https://storage.googleapis.com/zenn-user-upload/0082918de91c-20260208.png)
 

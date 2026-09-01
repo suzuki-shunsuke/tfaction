@@ -64,9 +64,15 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          // The documentation lives in the tfaction Agent Skill so that it has
+          // a single source. `path` is resolved against this directory.
+          path: "../skills/tfaction/references",
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl:
-            "https://github.com/suzuki-shunsuke/tfaction/edit/main/website",
+          // `editUrl` must be a function here. Given a string, Docusaurus joins
+          // it with the docs path relative to this directory without resolving
+          // the leading "..", which would produce a broken URL.
+          editUrl: ({ docPath }) =>
+            `https://github.com/suzuki-shunsuke/tfaction/edit/main/skills/tfaction/references/${docPath}`,
           routeBasePath: "/",
         },
         pages: false,
