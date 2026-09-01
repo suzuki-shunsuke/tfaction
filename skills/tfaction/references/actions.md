@@ -103,6 +103,7 @@ Runs `terraform plan --generate-config-out` to generate code and commits it.
 
 Creates a drift issue for a specific root module if one does not exist.
 Exports the environment variables TFACTION_DRIFT_ISSUE_NUMBER and TFACTION_DRIFT_ISSUE_STATE.
+TFACTION_DRIFT_ISSUE_STATE is `open` or `closed`.
 Does nothing if drift detection is disabled.
 
 ## get-target-config

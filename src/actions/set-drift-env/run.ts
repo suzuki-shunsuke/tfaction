@@ -63,7 +63,9 @@ export const run = (input: RunInput): RunResult => {
     TFACTION_DRIFT_ISSUE_REPO_NAME: repoName,
     TFACTION_DRIFT_ISSUE_REPO_FULLNAME: `${repoOwner}/${repoName}`,
     TFACTION_DRIFT_ISSUE_NUMBER: issue.number,
-    TFACTION_DRIFT_ISSUE_STATE: issue.state,
+    // pick-out-drift-issues returns a GraphQL IssueState enum (`OPEN`).
+    // Normalize it so that TFACTION_DRIFT_ISSUE_STATE is always lowercase.
+    TFACTION_DRIFT_ISSUE_STATE: issue.state.toLowerCase(),
     TFACTION_DRIFT_ISSUE_URL: issueUrl,
 
     // TFACTION environment variables

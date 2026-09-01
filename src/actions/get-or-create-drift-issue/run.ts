@@ -173,7 +173,10 @@ export const run = async (
 
   return {
     number: issue.number,
-    state: issue.state,
+    // The search result is a GraphQL IssueState enum (`OPEN`), while a newly
+    // created issue comes from the REST API (`open`). Normalize the value so
+    // that TFACTION_DRIFT_ISSUE_STATE doesn't depend on which path was taken.
+    state: issue.state.toLowerCase(),
     url: issue.url,
   };
 };
