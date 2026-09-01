@@ -25,6 +25,7 @@ Don't read every reference file. Read only the one that matches the task.
 - A setting can appear in five places, and the effective value is not "the most specific file wins" alone. From highest to lowest: `tfaction.yaml` per-job-type block, `tfaction.yaml` top level, `tfaction-root.yaml` `target_groups[]` per-job-type block, `tfaction-root.yaml` `target_groups[]`, `tfaction-root.yaml` top level. Check [Configuration Priority](references/config-priority.md) before concluding a setting is being ignored.
 - `terraform apply` consumes the plan file produced during `terraform plan`. Once an apply fails, that plan file is stale and rerunning the failed workflow run fails again — a new pull request is needed. This is what follow-up PRs automate.
 - `list-targets` lists only the root modules that were directly changed. A root module that references a module through a relative path outside its own directory is not listed when only that module changes, unless module dependency detection is configured.
+- The `skip:<target>` label and `skip_terraform_files` do not skip anything by themselves. `list-targets` only reports the decision as the `skip_terraform` field of each target, and the workflow has to act on it: gate the `plan` and `apply` steps with `if: matrix.target.skip_terraform != true`, or pass it as the `TFACTION_SKIP_TERRAFORM` environment variable, which makes those actions warn and do nothing. Gate both steps — gating only `plan` leaves no plan file for `apply` to download. Never gate `update-drift-issue`; it has to keep running with `if: always()`. See [Skipping terraform plan and apply](references/skip-terraform.md).
 - Approvals are dismissed right after `terraform plan` by default, so reviewers must approve after seeing the plan. This is on unless it is explicitly disabled.
 - Drift detection is off by default and is enabled per root module.
 - Storing plan files in S3 is AWS-only and applies only to the `terraform` job type; `tfmigrate` does not use a plan-file artifact.
@@ -75,7 +76,7 @@ Don't read every reference file. Read only the one that matches the task.
 - [Disable PR creation](references/skip-create-pr.md) — to have tfaction push a commit and branch, and print a GitHub CLI command, instead of opening a pull request itself.
 - [Notify bot PR events](references/notify-bot-pr-event.md) — to get notified when a bot-authored pull request is reviewed, merged, or closed.
 - [Limiting the Number of Root Modules Changed in a Single PR](references/limit-max-changed-dirs.md) — to cap how many root modules one pull request may touch. No limit by default.
-- [Skipping terraform plan and apply](references/skip-terraform.md) — to skip plan and apply when only files that cannot affect the result were changed. Off by default.
+- [Skipping terraform plan and apply](references/skip-terraform.md) — to skip plan and apply for a root module, either because only files that cannot affect the result were changed (`skip_terraform_files`, off by default) or because a `skip:<target>` label was added to the pull request, and to see how the workflow has to act on the `skip_terraform` field.
 - [Testing Workflow Changes](references/test-workflow.md) — to run plan, or plan and apply, on chosen directories when a workflow changed but no root module did.
 
 ## Upgrading to v2
