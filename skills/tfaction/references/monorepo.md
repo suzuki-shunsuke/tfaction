@@ -4,7 +4,7 @@ sidebar_position: 700
 
 # Monorepo
 
-In [Getting Started](./getting-started), there was only one root module. Now let's set up a monorepo.
+In [Getting Started](./getting-started.md), there was only one root module. Now let's set up a monorepo.
 
 ```
 foo/

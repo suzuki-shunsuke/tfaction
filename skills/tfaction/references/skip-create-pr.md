@@ -21,7 +21,7 @@ This means the PR author will be you rather than an app, which resolves the foll
 
 ## Not receiving notifications when the PR is reviewed or merged
 
-See [Notify bot PR events](./notify-bot-pr-event).
+See [Notify bot PR events](./notify-bot-pr-event.md).
 
 ## PR does not appear in your list of created PRs
 
