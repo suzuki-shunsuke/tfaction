@@ -11,6 +11,7 @@ import { getTargetConfig } from "../get-target-config";
 import { main as runPlan } from "./run";
 import { create as createCommit } from "../../commit";
 import { mergeSecrets } from "../../lib/secret";
+import { warnSkipTerraform } from "../../lib/skip-terraform";
 
 export const main = async () => {
   // Step 1: Get target config
@@ -27,6 +28,18 @@ export const main = async () => {
 
   const jobType = env.all.TFACTION_JOB_TYPE;
   const driftIssueNumber = env.all.TFACTION_DRIFT_ISSUE_NUMBER;
+
+  // list-targets decides whether terraform plan is necessary, and the workflow
+  // is expected to gate this step with the skip_terraform field.
+  // Honor TFACTION_SKIP_TERRAFORM as a backstop for workflows that don't.
+  if (
+    jobType === "terraform" &&
+    !driftIssueNumber &&
+    env.TFACTION_SKIP_TERRAFORM
+  ) {
+    core.warning(warnSkipTerraform("plan"));
+    return;
+  }
 
   await runPlan(targetConfig, {
     githubToken: input.githubToken,

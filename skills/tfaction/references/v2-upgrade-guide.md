@@ -34,7 +34,7 @@ If it isn't, check the `TFACTION_CONFIG` environment variable in your workflow f
   - If AWS or Google Cloud authentication is required, explicitly run `aws-actions/configure-aws-credentials` or `google-github-actions/auth`
   - Remove the feature that exports secrets as environment variables via export-secrets or export-aws-secrets-manager
   - Migrate tfaction-go to `suzuki-shunsuke/tfaction/*`
-  - Add the `TFACTION_SKIP_TERRAFORM` environment variable to jobs
+  - Gate the plan and apply steps with `skip_terraform`
   - Remove module testing jobs that use `test-module`
   - Remove workflows that use scaffold-module or create-scaffold-module-pr
   - Remove SSH Key configuration
@@ -161,14 +161,43 @@ After:
     action: create-drift-issues
 ```
 
-## Add the `TFACTION_SKIP_TERRAFORM` environment variable to jobs
+## Gate the plan and apply steps with `skip_terraform`
 
-```yaml
+In v1, the terraform-plan and terraform-apply actions decided by themselves whether to skip terraform plan and apply.
+In v2, the [list-targets](actions.md#list-targets) action makes the decision and reports it as the `skip_terraform` field of each target, and the workflow decides what to do with it.
+Gate the plan and apply steps with the field:
+
+```yaml title=".github/workflows/test.yaml"
+- uses: suzuki-shunsuke/tfaction@latest
+  if: matrix.target.skip_terraform != true
+  with:
+    action: plan
+```
+
+```yaml title=".github/workflows/apply.yaml"
+- uses: suzuki-shunsuke/tfaction@latest
+  if: matrix.target.skip_terraform != true
+  with:
+    action: apply
+```
+
+Setting `TFACTION_SKIP_TERRAFORM` on the job also works: the plan and apply actions then warn and do nothing.
+Gating the steps is recommended, because then the actions don't run at all.
+
+If [Drift Detection](drift-detection.md) is enabled, set `TFACTION_SKIP_TERRAFORM` in the apply job as well so that the update-drift-issue action does not close the drift issue when apply was skipped:
+
+```yaml title=".github/workflows/apply.yaml"
 jobs:
-  plan:
+  apply:
     env:
       TFACTION_SKIP_TERRAFORM: "${{matrix.target.skip_terraform}}"
 ```
+
+Don't gate the update-drift-issue step itself.
+It has to keep running with `if: always()` so that a failure elsewhere in the job still comments on the drift issue and reopens it.
+`TFACTION_SKIP_TERRAFORM` only suppresses closing the issue.
+
+See [Skipping terraform plan and apply](skip-terraform.md).
 
 ## Remove module testing jobs that use `test-module`
 
