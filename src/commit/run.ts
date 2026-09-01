@@ -19,6 +19,8 @@ export type PullRequest = {
 
 export type RunInput = {
   commitMessage: string;
+  /** An absolute path to the Git Root Directory */
+  rootDir?: string;
   files: Set<string>;
   branch: string;
   repoOwner: string;
@@ -37,6 +39,7 @@ export const run = async (input: RunInput): Promise<string> => {
     repo: repoName,
     branch,
     message: commitMessage,
+    rootDir: input.rootDir,
     files: [...files],
     deleteIfNotExist: true,
     logger: {
