@@ -102,11 +102,6 @@ const config = {
             label: "GitHub",
             position: "right",
           },
-          {
-            href: "https://deepwiki.com/suzuki-shunsuke/tfaction",
-            label: "DeepWiki",
-            position: "right",
-          },
         ],
       },
       footer: {
