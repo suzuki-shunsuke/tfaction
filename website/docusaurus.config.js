@@ -88,8 +88,8 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       announcementBar: {
-        id: "release-v2",
-        content: `<a href="/tfaction/docs/v2-release-note">tfaction v2 is out (2026-05-27)</a>`,
+        id: "agent-skill",
+        content: `<a href="/tfaction/docs/overview#agent-skill">Agent Skill is available (2026-09-02)</a>`,
         backgroundColor: "#7FFF00",
         textColor: "#091E42",
         isCloseable: true,

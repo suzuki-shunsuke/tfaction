@@ -4,6 +4,14 @@
 
 Framework for Monorepo to build high level Terraform Workflows by GitHub Actions
 
+## Agent Skill
+
+tfaction provides an [Agent Skill](https://suzuki-shunsuke.github.io/tfaction/docs/overview#agent-skill), so coding agents can set up tfaction, troubleshoot workflow failures, and answer questions about tfaction.
+
+```sh
+gh skill install suzuki-shunsuke/tfaction tfaction
+```
+
 ## Who uses tfaction?
 
 > [!NOTE]
