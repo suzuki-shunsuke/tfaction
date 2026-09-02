@@ -17,6 +17,10 @@ local linters = new Mapping<String, Step> {
   ["langcheck"] {
     // https://github.com/suzuki-shunsuke/langcheck
     glob = List("**/*")
+    // README.md lists the titles of Japanese blog posts about tfaction, which
+    // langcheck reports as disallowed characters. The titles must stay as they
+    // are, so the file is excluded.
+    exclude = List("README.md")
     check = "langcheck check {{files}}"
     fix = "langcheck check {{files}}" // run as check in fix mode (no real fix possible)
   }
