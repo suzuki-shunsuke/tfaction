@@ -8,6 +8,16 @@ tfaction is a set of GitHub Actions for building workflows that run Terraform or
 
 It provides a basic GitHub Flow where `terraform plan` runs on pull requests, and `terraform apply` runs when the PR is merged.
 
+## Agent Skill
+
+tfaction provides an [Agent Skill](https://agentskills.io/home).
+Once it is installed, coding agents understand tfaction and can work on various tfaction related tasks, such as setting up tfaction, troubleshooting workflow failures, and answering questions about tfaction.
+Agent Skills are supported by various coding agents such as Claude Code, GitHub Copilot, Cursor, Codex, and Gemini CLI.
+
+```sh
+gh skill install suzuki-shunsuke/tfaction tfaction
+```
+
 ## Features
 
 - Provides simple workflows powered by GitHub Actions
