@@ -112,6 +112,27 @@ describe("run", () => {
     );
   });
 
+  it("passes secretEnvs to providers", async () => {
+    const secrets = {
+      AWS_ACCESS_KEY_ID: "key",
+      AWS_SECRET_ACCESS_KEY: "secret",
+    };
+    const input = {
+      ...createBaseInput(mockExecutor),
+      secrets,
+    };
+
+    await run(input);
+
+    expect(mockExecutor.exec).toHaveBeenLastCalledWith(
+      "terraform",
+      ["providers"],
+      expect.objectContaining({
+        secretEnvs: secrets,
+      }),
+    );
+  });
+
   it("PR, init succeeds, lock not changed: init + providers lock + providers, no commit", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
     const gitMod = await import("../../lib/git");

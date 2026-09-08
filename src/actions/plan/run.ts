@@ -347,6 +347,7 @@ export const runTfmigratePlan = async (
     {
       cwd: inputs.workingDirectory,
       silent: true,
+      secretEnvs: inputs.secrets,
       group: `${inputs.tfCommand} show`,
       comment: {
         token: inputs.githubToken,
@@ -517,6 +518,7 @@ export const runTerraformPlan = async (
     {
       cwd: inputs.workingDirectory,
       silent: true,
+      secretEnvs: inputs.secrets,
       group: `${inputs.tfCommand} show`,
       comment: {
         token: inputs.githubToken,

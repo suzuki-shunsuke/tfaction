@@ -459,6 +459,30 @@ describe("runTerraformPlan", () => {
     );
   });
 
+  it("passes secretEnvs to terraform show", async () => {
+    const secrets = {
+      AWS_ACCESS_KEY_ID: "key",
+      AWS_SECRET_ACCESS_KEY: "secret",
+    };
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    }); // terraform show
+
+    const inputs = { ...createBaseInputs(mockExecutor), secrets };
+    await runTerraformPlan(inputs);
+
+    expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
+      "terraform",
+      ["show", "-json", path.join(tempDir, "tfplan.binary")],
+      expect.objectContaining({
+        secretEnvs: secrets,
+      }),
+    );
+  });
+
   it("sets artifact name outputs with normalized target", async () => {
     mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
     mockExecutor.getExecOutput.mockResolvedValueOnce({
@@ -976,6 +1000,31 @@ describe("runTfmigratePlan", () => {
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       path.join(tempDir, "tfplan.json"),
       '{"resource_changes": []}',
+    );
+  });
+
+  it("passes secretEnvs to terraform show", async () => {
+    const secrets = {
+      AWS_ACCESS_KEY_ID: "key",
+      AWS_SECRET_ACCESS_KEY: "secret",
+    };
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    mockExecutor.exec.mockResolvedValue(0);
+    mockExecutor.getExecOutput.mockResolvedValue({
+      exitCode: 0,
+      stdout: '{"resource_changes": []}',
+      stderr: "",
+    });
+
+    const inputs = { ...createBaseInputs(mockExecutor), secrets };
+    await runTfmigratePlan(inputs);
+
+    expect(mockExecutor.getExecOutput).toHaveBeenCalledWith(
+      "terraform",
+      ["show", "-json", path.join(tempDir, "tfplan.binary")],
+      expect.objectContaining({
+        secretEnvs: secrets,
+      }),
     );
   });
 });

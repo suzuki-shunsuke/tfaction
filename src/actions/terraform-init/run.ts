@@ -140,6 +140,7 @@ export const run = async (input: RunInput): Promise<void> => {
     input.terragruntRunAvailable ? ["run", "--", "providers"] : ["providers"],
     {
       cwd: input.workingDir,
+      secretEnvs: input.secrets,
       group: input.terragruntRunAvailable
         ? `${input.tfCommand} run -- providers`
         : `${input.tfCommand} providers`,
