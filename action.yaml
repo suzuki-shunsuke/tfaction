@@ -43,10 +43,44 @@ inputs:
 
   # commit
   csm_app_id:
-    description: GitHub App ID
+    description: |
+      GitHub App ID.
+      Either csm_client_id or csm_app_id identifies the app.
+    required: false
+  csm_client_id:
+    description: |
+      GitHub App Client ID.
+      Either csm_client_id or csm_app_id identifies the app.
+      csm_client_id takes precedence when both are set.
     required: false
   csm_app_private_key:
-    description: GitHub App Private Key
+    description: |
+      GitHub App Private Key.
+      Either csm_app_private_key or csm_aws_kms_key_id is required when the app
+      is used.
+    required: false
+  csm_aws_kms_key_id:
+    description: |
+      Key ID, key ARN, alias name, or alias ARN of an AWS KMS key holding the
+      GitHub App private key.
+      Set this instead of csm_app_private_key when the private key is stored in
+      AWS KMS and can never be exported.
+    required: false
+  csm_aws_region:
+    description: |
+      The AWS region of the KMS key.
+      It can be omitted when csm_aws_kms_key_id is an ARN, which carries the
+      region. Otherwise it falls back to the AWS SDK's own resolution, such as
+      the AWS_REGION environment variable.
+    required: false
+  csm_aws_role_to_assume:
+    description: |
+      ARN of the AWS IAM role to assume with the GitHub OIDC token.
+      The job needs the permission `id-token: write`.
+      The credentials are kept inside this action and are never exported, so
+      later steps of the job can't see them.
+      Leave this unset to use the standard AWS credential chain instead, which
+      is what aws-actions/configure-aws-credentials sets up.
     required: false
 
   # generate-config-out

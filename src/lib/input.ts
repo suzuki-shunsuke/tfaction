@@ -17,8 +17,8 @@ export const getRequiredGitHubToken = (): string => {
   return core.getInput("github_token", { required: true });
 };
 
-export const csmAppId = core.getInput("csm_app_id");
-export const csmAppPrivateKey = core.getInput("csm_app_private_key");
+export { newAppOctokit } from "./app_octokit";
+export type { NewAppOctokit } from "./app_octokit";
 
 // all actions
 export const action = core.getInput("action");

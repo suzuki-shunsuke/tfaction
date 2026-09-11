@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../../lib/app_octokit";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -23,8 +24,7 @@ export type RunInput = {
   terragruntRunAvailable: boolean;
   executor: aqua.Executor;
   serverRepository: string;
-  appId: string;
-  appPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   secrets?: Record<string, string>;
 };
 
@@ -127,8 +127,7 @@ export const run = async (input: RunInput): Promise<void> => {
           rootDir: input.gitRootDir,
           files: new Set([lockFileFromGitRootDir]),
           serverRepository: input.serverRepository,
-          appId: input.appId,
-          appPrivateKey: input.appPrivateKey,
+          newAppOctokit: input.newAppOctokit,
         });
         throw new Error(".terraform.lock.hcl is updated");
       }

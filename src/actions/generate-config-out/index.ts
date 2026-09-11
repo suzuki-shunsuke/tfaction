@@ -14,8 +14,7 @@ export const main = async () => {
   const githubToken = input.githubToken;
   const branch = input.branch;
   const file = input.file;
-  const csmAppId = input.csmAppId;
-  const csmAppPrivateKey = input.csmAppPrivateKey;
+  const newAppOctokit = input.newAppOctokit;
 
   if (!branch) {
     throw new Error("branch input is required");
@@ -118,8 +117,7 @@ export const main = async () => {
       ),
     ]),
     serverRepository: csmActionsServerRepository ?? "",
-    appId: csmAppId,
-    appPrivateKey: csmAppPrivateKey,
+    newAppOctokit,
     branch,
   });
 };

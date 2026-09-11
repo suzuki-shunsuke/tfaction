@@ -12,8 +12,7 @@ import { run } from "./run";
 export const main = async () => {
   const config = await lib.getConfig();
   const githubToken = input.githubToken;
-  const csmAppId = input.csmAppId;
-  const csmAppPrivateKey = input.csmAppPrivateKey;
+  const newAppOctokit = input.newAppOctokit;
 
   const targetConfig = await getTargetConfig(
     {
@@ -39,8 +38,7 @@ export const main = async () => {
     config,
     targetConfig,
     githubToken,
-    csmAppId,
-    csmAppPrivateKey,
+    newAppOctokit,
     prNumber: github.context.payload.pull_request?.number ?? 0,
     executor,
   });

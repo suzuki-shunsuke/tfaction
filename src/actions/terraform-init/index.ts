@@ -50,8 +50,7 @@ export const main = async () => {
     terragruntRunAvailable,
     executor,
     serverRepository: config.csm_actions?.server_repository ?? "",
-    appId: input.csmAppId,
-    appPrivateKey: input.csmAppPrivateKey,
+    newAppOctokit: input.newAppOctokit,
     secrets: mergeSecrets(input.secrets, input.awsSecrets),
   });
 };

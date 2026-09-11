@@ -3,6 +3,8 @@ import * as fs from "fs";
 import { isPullRequestEvent, run, type RunInput } from "./run";
 import type * as aqua from "../../aqua";
 
+const newAppOctokit = () => ({ request: () => Promise.resolve({ data: {} }) });
+
 vi.mock("@actions/core", () => ({
   startGroup: vi.fn(),
   endGroup: vi.fn(),
@@ -54,8 +56,7 @@ const createBaseInput = (executor: MockExecutor): RunInput => ({
   terragruntRunAvailable: false,
   executor: executor as unknown as aqua.Executor,
   serverRepository: "",
-  appId: "",
-  appPrivateKey: "",
+  newAppOctokit,
 });
 
 describe("isPullRequestEvent", () => {

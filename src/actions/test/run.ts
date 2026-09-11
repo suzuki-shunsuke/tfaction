@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../../lib/app_octokit";
 import * as core from "@actions/core";
 import * as fs from "fs";
 import * as path from "path";
@@ -18,8 +19,7 @@ export type RunInput = {
   config: types.Config;
   targetConfig: TargetConfig;
   githubToken: string;
-  csmAppId: string;
-  csmAppPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   prNumber: number;
   executor: aqua.Executor;
   fs?: {
@@ -139,8 +139,7 @@ export const run = async (input: RunInput): Promise<void> => {
       githubTokenForFix: "",
       fix: targetConfig.tflint_fix,
       serverRepository,
-      csmAppId: input.csmAppId,
-      csmAppPrivateKey: input.csmAppPrivateKey,
+      newAppOctokit: input.newAppOctokit,
       executor,
       tflint: config.tflint,
     });
@@ -188,8 +187,7 @@ export const run = async (input: RunInput): Promise<void> => {
           githubToken,
           files: new Set(files),
           serverRepository,
-          appId: input.csmAppId,
-          appPrivateKey: input.csmAppPrivateKey,
+          newAppOctokit: input.newAppOctokit,
         });
         if (!isModule) {
           throw new Error("code will be automatically formatted");
@@ -202,8 +200,7 @@ export const run = async (input: RunInput): Promise<void> => {
     await runTerraformDocs({
       workingDirectory: workingDir,
       githubToken,
-      csmAppId: input.csmAppId,
-      csmAppPrivateKey: input.csmAppPrivateKey,
+      newAppOctokit: input.newAppOctokit,
       csmActionsServerRepository: serverRepository,
       executor,
       repoRoot: config.git_root_dir,
