@@ -40,6 +40,6 @@ csm_actions:
   with:
     action: plan
     github_token: ${{steps.generate_token.outputs.token}}
-    csm_action_app_id: ${{vars.CSM_APP_ID}}
-    csm_action_app_private_key: ${{secrets.CSM_APP_PRIVATE_KEY}}
+    csm_app_id: ${{vars.CSM_APP_ID}}
+    csm_app_private_key: ${{secrets.CSM_APP_PRIVATE_KEY}}
 ```
