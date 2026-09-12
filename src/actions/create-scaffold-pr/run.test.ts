@@ -44,6 +44,8 @@ import {
   type RunInput,
 } from "./run";
 
+const newAppOctokit = () => ({ request: () => Promise.resolve({ data: {} }) });
+
 describe("escapeForShellDoubleQuote", () => {
   it("leaves normal strings unchanged", () => {
     expect(escapeForShellDoubleQuote("hello world")).toBe("hello world");
@@ -151,8 +153,7 @@ describe("writeSkipCreatePrSummary", () => {
 describe("run", () => {
   const defaultRunInput: RunInput = {
     githubToken: "test-token",
-    csmAppId: "",
-    csmAppPrivateKey: "",
+    newAppOctokit,
     target: "my/target",
     workingDir: "my/working-dir",
     actor: "user1",

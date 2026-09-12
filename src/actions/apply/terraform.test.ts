@@ -85,8 +85,7 @@ vi.mock("../../lib/env", () => ({
 
 vi.mock("../../lib/input", () => ({
   githubToken: "mock-github-token",
-  csmAppId: "mock-app-id",
-  csmAppPrivateKey: "mock-private-key",
+  newAppOctokit: () => ({ request: () => Promise.resolve({ data: {} }) }),
 }));
 
 vi.mock("../../aqua", () => ({

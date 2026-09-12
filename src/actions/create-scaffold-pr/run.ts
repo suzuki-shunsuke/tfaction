@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../../lib/app_octokit";
 import * as core from "@actions/core";
 import Handlebars from "handlebars";
 
@@ -66,8 +67,7 @@ gh pr create -R "${repository}" ${draftOpt}\\
 
 export interface RunInput {
   githubToken: string;
-  csmAppId: string;
-  csmAppPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   target: string;
   workingDir: string;
   actor: string;
@@ -76,8 +76,7 @@ export interface RunInput {
 }
 
 export const run = async (input: RunInput): Promise<void> => {
-  const { githubToken, csmAppId, csmAppPrivateKey, actor, repository, runURL } =
-    input;
+  const { githubToken, newAppOctokit, actor, repository, runURL } = input;
 
   const config = await lib.getConfig();
 
@@ -179,8 +178,7 @@ export const run = async (input: RunInput): Promise<void> => {
     githubToken,
     files: new Set(files),
     serverRepository: csmActionsServerRepository,
-    appId: csmAppId,
-    appPrivateKey: csmAppPrivateKey,
+    newAppOctokit,
     branch,
     pr: skipCreatePr
       ? undefined

@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../../lib/app_octokit";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
@@ -325,8 +326,7 @@ export const postSkipCreateComment = async (
 
 export interface RunInput {
   githubToken: string;
-  csmAppId: string;
-  csmAppPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   actor: string;
   prAuthor: string;
   target: string;
@@ -343,8 +343,7 @@ export interface RunInput {
 export const run = async (input: RunInput): Promise<void> => {
   const {
     githubToken,
-    csmAppId,
-    csmAppPrivateKey,
+    newAppOctokit,
     actor,
     prAuthor,
     target: envTarget,
@@ -434,8 +433,7 @@ export const run = async (input: RunInput): Promise<void> => {
     rootDir: config.git_root_dir,
     files: new Set([failedPrsFile]),
     serverRepository: csmActionsServerRepository,
-    appId: csmAppId,
-    appPrivateKey: csmAppPrivateKey,
+    newAppOctokit,
     branch: prParams.branch,
     pr: skipCreatePr
       ? undefined

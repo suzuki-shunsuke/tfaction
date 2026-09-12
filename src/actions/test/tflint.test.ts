@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { run, type RunInput, type Logger } from "./tflint";
 
+const newAppOctokit = () => ({ request: () => Promise.resolve({ data: {} }) });
+
 describe("run", () => {
   const createMockExecutor = () => ({
     getExecOutput: vi.fn(),
@@ -48,8 +50,7 @@ describe("run", () => {
     githubTokenForFix: "",
     fix: false,
     serverRepository: "",
-    csmAppId: "",
-    csmAppPrivateKey: "",
+    newAppOctokit,
     tflint: { enabled: true, fix: false },
     eventName: "pull_request",
     logger: createMockLogger(),
@@ -458,8 +459,7 @@ describe("run", () => {
       logger,
       githubTokenForFix: "fix-token",
       serverRepository: "server-repo",
-      csmAppId: "app-id",
-      csmAppPrivateKey: "app-key",
+      newAppOctokit,
     });
 
     await expect(run(input)).rejects.toThrow("code is fixed by tflint --fix");
@@ -470,8 +470,7 @@ describe("run", () => {
       githubToken: "fix-token",
       files: new Set(["main.tf"]),
       serverRepository: "server-repo",
-      appId: "app-id",
-      appPrivateKey: "app-key",
+      newAppOctokit,
     });
   });
 
