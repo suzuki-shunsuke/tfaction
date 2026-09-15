@@ -70,6 +70,8 @@ steps:
 
 The KMS key must be an RSA 2048 key whose usage is `SIGN_VERIFY`, created with `--origin EXTERNAL` so that the GitHub App's existing private key can be imported into it. The IAM role needs `kms:Sign` on that key, and its trust policy has to allow the repository running tfaction.
 
+Importing a private key into KMS involves a number of steps, such as wrapping the key with the public key KMS hands out for the import. The agent skill [github-app-private-key-aws-kms](https://github.com/suzuki-shunsuke/agent-skills/blob/main/skills/github-app-private-key-aws-kms/SKILL.md) documents the whole AWS setup, so a coding agent can do it for you.
+
 Leaving `csm_aws_role_to_assume` unset reads the credentials from `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`, which is what [aws-actions/configure-aws-credentials](https://github.com/aws-actions/configure-aws-credentials) exports. Signing reads nothing else, so leave `aws-profile` unset on that action: a profile in `~/.aws/credentials` doesn't reach the signing, and neither does IMDS on a self-hosted EC2 runner. This applies to the signing only. tfaction's other AWS calls, such as reading a plan file from S3 or a secret from Secrets Manager, still go through the AWS SDK and resolve credentials as they always did.
 
 `csm_client_id` identifies the app by its Client ID, which GitHub recommends over the App ID. `csm_app_id` still works, and takes second place when both are set.
