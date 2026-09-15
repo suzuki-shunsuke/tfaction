@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../lib/app_octokit";
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import * as fs from "fs";
@@ -22,8 +23,7 @@ export type RunInput = {
   workingDirectory: string;
   repoRoot: string;
   githubToken: string;
-  csmAppId: string;
-  csmAppPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   csmActionsServerRepository: string;
   executor: aqua.Executor;
   eventName?: string;
@@ -157,8 +157,7 @@ export const run = async (input: RunInput): Promise<void> => {
       await commitCreate({
         githubToken: input.githubToken,
         commitMessage: "docs: generate document by terraform-docs",
-        appId: input.csmAppId,
-        appPrivateKey: input.csmAppPrivateKey,
+        newAppOctokit: input.newAppOctokit,
         serverRepository: input.csmActionsServerRepository,
         files: new Set([
           path.join(

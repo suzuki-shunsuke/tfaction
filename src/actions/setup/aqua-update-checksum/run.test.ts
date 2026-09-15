@@ -35,6 +35,8 @@ import {
   main,
 } from "./run";
 
+const newAppOctokit = () => ({ request: () => Promise.resolve({ data: {} }) });
+
 const createMockExecutor = () =>
   ({ exec: vi.fn().mockResolvedValue(undefined) }) as unknown as aqua.Executor;
 
@@ -137,8 +139,7 @@ describe("checkIfChanged", () => {
 describe("main", () => {
   const defaultInputs = {
     githubToken: "token",
-    csmAppId: "app-id",
-    csmAppPrivateKey: "app-key",
+    newAppOctokit,
   };
 
   const defaultCfg = {
@@ -252,8 +253,7 @@ describe("main", () => {
       rootDir: "/repo",
       files: new Set(["working-dir/aqua-checksums.json"]),
       serverRepository: "owner/repo",
-      appId: "app-id",
-      appPrivateKey: "app-key",
+      newAppOctokit,
     });
   });
 

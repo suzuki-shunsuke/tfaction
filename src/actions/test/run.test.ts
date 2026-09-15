@@ -4,6 +4,8 @@ import type * as aqua from "../../aqua";
 import type { TargetConfig } from "../get-target-config";
 import type * as types from "../../lib/types";
 
+const newAppOctokit = () => ({ request: () => Promise.resolve({ data: {} }) });
+
 vi.mock("../../conftest", () => ({
   run: vi.fn(),
 }));
@@ -89,8 +91,7 @@ const createRunInput = (
   config: { ...createBaseConfig(), ...configOverrides } as types.Config,
   targetConfig: createBaseTargetConfig(targetConfigOverrides),
   githubToken: "test-token",
-  csmAppId: "app-id",
-  csmAppPrivateKey: "app-key",
+  newAppOctokit,
   prNumber: 1,
   executor: executor as unknown as aqua.Executor,
   ...(fsOverride ? { fs: fsOverride } : {}),
@@ -260,8 +261,7 @@ describe("run", () => {
       githubTokenForFix: "",
       fix: true,
       serverRepository: "owner/repo",
-      csmAppId: "app-id",
-      csmAppPrivateKey: "app-key",
+      newAppOctokit,
       executor: input.executor,
       tflint: tflintConfig,
     });
@@ -285,8 +285,7 @@ describe("run", () => {
       githubToken: "test-token",
       files: new Set(["aws/test/main.tf", "aws/test/variables.tf"]),
       serverRepository: "",
-      appId: "app-id",
-      appPrivateKey: "app-key",
+      newAppOctokit,
     });
   });
 
@@ -391,8 +390,7 @@ describe("run", () => {
     expect(terraformDocsMod.run).toHaveBeenCalledWith({
       workingDirectory: "/git/root/aws/test",
       githubToken: "test-token",
-      csmAppId: "app-id",
-      csmAppPrivateKey: "app-key",
+      newAppOctokit,
       csmActionsServerRepository: "owner/server",
       executor: input.executor,
       repoRoot: "/git/root",

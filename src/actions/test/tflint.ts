@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../../lib/app_octokit";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as path from "path";
@@ -19,8 +20,7 @@ export type CommitCreator = (params: {
   githubToken: string;
   files: Set<string>;
   serverRepository: string;
-  appId: string;
-  appPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
 }) => Promise<string>;
 
 export type GitDiffChecker = (
@@ -39,8 +39,7 @@ export type RunInput = {
   githubTokenForFix: string;
   fix: boolean;
   serverRepository: string;
-  csmAppId: string;
-  csmAppPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   tflint?: types.TflintConfig;
   eventName?: string;
   logger?: Logger;
@@ -116,8 +115,7 @@ export const run = async (input: RunInput): Promise<void> => {
         githubToken: githubTokenForFix,
         files: new Set(changedFiles),
         serverRepository: input.serverRepository,
-        appId: input.csmAppId,
-        appPrivateKey: input.csmAppPrivateKey,
+        newAppOctokit: input.newAppOctokit,
       });
       throw new Error("code is fixed by tflint --fix");
     }

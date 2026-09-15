@@ -69,6 +69,8 @@ import {
   type RunInput,
 } from "./run";
 
+const newAppOctokit = () => ({ request: () => Promise.resolve({ data: {} }) });
+
 const createMockOctokit = () => ({
   rest: {
     issues: {
@@ -86,8 +88,7 @@ const defaultRunInput: RunInput = {
   githubToken: "test-token",
   migrationName: "main",
   prNumber: "",
-  csmAppId: "",
-  csmAppPrivateKey: "",
+  newAppOctokit,
   target: "aws/dev",
   workingDir: "aws/dev",
   actor: "user1",

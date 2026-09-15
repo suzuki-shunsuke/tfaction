@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { findConfigFile, run, type RunInput, type FileSystem } from "./index";
 
+const newAppOctokit = () => ({ request: () => Promise.resolve({ data: {} }) });
+
 describe("findConfigFile", () => {
   const createMockFs = (existingPaths: string[]): FileSystem => ({
     existsSync: (path: string) => existingPaths.includes(path),
@@ -97,8 +99,7 @@ describe("run", () => {
       workingDirectory: "/repo/work",
       repoRoot: "/repo",
       githubToken: "token",
-      csmAppId: "app-id",
-      csmAppPrivateKey: "private-key",
+      newAppOctokit,
       csmActionsServerRepository: "",
       executor: createMockExecutor() as unknown as RunInput["executor"],
       eventName: "pull_request",
@@ -474,8 +475,7 @@ describe("run", () => {
     expect(input.commitCreate).toHaveBeenCalledWith({
       githubToken: "token",
       commitMessage: "docs: generate document by terraform-docs",
-      appId: "app-id",
-      appPrivateKey: "private-key",
+      newAppOctokit,
       serverRepository: "",
       files: new Set(["work/README.md"]),
     });

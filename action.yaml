@@ -43,10 +43,50 @@ inputs:
 
   # commit
   csm_app_id:
-    description: GitHub App ID
+    description: |
+      GitHub App ID.
+      Either csm_client_id or csm_app_id identifies the app.
+    required: false
+  csm_client_id:
+    description: |
+      GitHub App Client ID.
+      Either csm_client_id or csm_app_id identifies the app.
+      csm_client_id takes precedence when both are set.
     required: false
   csm_app_private_key:
-    description: GitHub App Private Key
+    description: |
+      GitHub App Private Key.
+      Either csm_app_private_key or csm_aws_kms_key_id is required when the app
+      is used.
+    required: false
+  csm_aws_kms_key_id:
+    description: |
+      Key ID, key ARN, alias name, or alias ARN of an AWS KMS key holding the
+      GitHub App private key.
+      Set this instead of csm_app_private_key when the private key is stored in
+      AWS KMS and can never be exported.
+    required: false
+  csm_aws_region:
+    description: |
+      The AWS region of the KMS key, which is also the region of the STS
+      endpoint when csm_aws_role_to_assume is set.
+      It can be omitted when csm_aws_kms_key_id is an ARN, which carries the
+      region. Otherwise it falls back to AWS_REGION or AWS_DEFAULT_REGION, and
+      the action fails when none of them says which region the key is in.
+    required: false
+  csm_aws_role_to_assume:
+    description: |
+      ARN of the AWS IAM role to assume with the GitHub OIDC token.
+      The job needs the permission `id-token: write`.
+      The credentials are kept inside this action and are never exported, so
+      later steps of the job can't see them.
+      Leave this unset to read credentials from AWS_ACCESS_KEY_ID,
+      AWS_SECRET_ACCESS_KEY and AWS_SESSION_TOKEN instead, which is what
+      aws-actions/configure-aws-credentials exports.
+      Signing the JSON Web Token reads nothing else, so a profile in
+      ~/.aws/credentials, IMDS on a self-hosted EC2 runner and the credentials
+      of an ECS or EKS task don't reach it, even though tfaction's own S3 and
+      Secrets Manager calls still resolve them through the AWS SDK.
     required: false
 
   # generate-config-out

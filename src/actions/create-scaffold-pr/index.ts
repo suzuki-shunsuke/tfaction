@@ -5,8 +5,7 @@ import { run } from "./run";
 export const main = async () => {
   await run({
     githubToken: input.githubToken,
-    csmAppId: input.csmAppId,
-    csmAppPrivateKey: input.csmAppPrivateKey,
+    newAppOctokit: input.newAppOctokit,
     target: env.all.TFACTION_TARGET,
     workingDir: env.all.TFACTION_WORKING_DIR,
     actor: env.all.GITHUB_ACTOR,

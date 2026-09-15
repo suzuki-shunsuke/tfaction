@@ -19,6 +19,9 @@ import {
 } from "./update-branch";
 import { run } from "./run";
 
+const appOctokit = { request: () => Promise.resolve({ data: {} }) };
+const newAppOctokit = () => appOctokit;
+
 const createMockLogger = () => ({
   info: vi.fn(),
   notice: vi.fn(),
@@ -29,8 +32,7 @@ const createBaseInput = (overrides: Partial<RunInput> = {}): RunInput => ({
   githubToken: "gh-token",
   target: "aws/dev/vpc",
   csmActionsServerRepository: "",
-  csmAppId: "",
-  csmAppPrivateKey: "",
+  newAppOctokit,
   repoOwner: "owner",
   repoName: "repo",
   serverUrl: "https://github.com",
@@ -98,8 +100,7 @@ describe("run", () => {
 
     const input = createBaseInput({
       csmActionsServerRepository: "server-repo",
-      csmAppId: "app-id",
-      csmAppPrivateKey: "private-key",
+      newAppOctokit,
       createGithubAppToken,
       hasExpired,
       revokeToken,
@@ -108,8 +109,7 @@ describe("run", () => {
     await run(input);
 
     expect(createGithubAppToken).toHaveBeenCalledWith({
-      appId: "app-id",
-      privateKey: "private-key",
+      octokit: appOctokit,
       owner: "owner",
       repositories: ["server-repo"],
       permissions: { issues: "write" },

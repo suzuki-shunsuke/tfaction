@@ -81,8 +81,7 @@ export const main = async () => {
               path.relative(config.git_root_dir, tfmigrateHclPath),
             ]),
             serverRepository,
-            appId: input.csmAppId,
-            appPrivateKey: input.csmAppPrivateKey,
+            newAppOctokit: input.newAppOctokit,
           });
         }
       }

@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../lib/app_octokit";
 import * as path from "path";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
@@ -13,8 +14,7 @@ type Inputs = {
   /** Relative paths from Git Root Directory */
   files: Set<string>;
   serverRepository: string;
-  appId: string;
-  appPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   branch?: string;
   pr?: securefix.PullRequest;
 };
@@ -28,15 +28,8 @@ export const create = async (inputs: Inputs): Promise<string> => {
     }
   }
   if (inputs.serverRepository) {
-    if (!inputs.appId || !inputs.appPrivateKey) {
-      throw new Error(
-        "app_id and app_private_key are required when csm_actions_server_repository is set",
-      );
-    }
-
     await securefix.request({
-      appId: inputs.appId,
-      privateKey: inputs.appPrivateKey,
+      appOctokit: inputs.newAppOctokit(),
       serverRepository: inputs.serverRepository,
       branch: inputs.branch,
       files: inputs.files,

@@ -103,12 +103,10 @@ export const main = async () => {
         maxBehindBy: -1,
         githubToken: githubToken,
         defaultGitHubToken: "",
-        appID: "",
-        appPrivateKey: "",
         csmServerRepoOwner: csmServerRepoOwner,
         csmServerRepoName: csmServerRepoName,
-        csmAppID: input.csmAppId,
-        csmAppPrivateKey: input.csmAppPrivateKey,
+        csmAppOctokit: csmServerRepoName ? input.newAppOctokit() : undefined,
+
         baseBranch: github.context.payload.pull_request?.base?.ref ?? "",
         headBranch: github.context.payload.pull_request?.head?.ref ?? "",
         contextPRNumber: prNumber,
@@ -162,8 +160,7 @@ export const main = async () => {
         config,
         {
           githubToken: githubToken,
-          csmAppId: input.csmAppId,
-          csmAppPrivateKey: input.csmAppPrivateKey,
+          newAppOctokit: input.newAppOctokit,
         },
       );
     } catch (error) {

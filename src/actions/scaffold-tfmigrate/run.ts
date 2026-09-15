@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../../lib/app_octokit";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import * as fs from "fs";
@@ -184,8 +185,7 @@ export interface RunInput {
   githubToken: string;
   migrationName: string;
   prNumber: string;
-  csmAppId: string;
-  csmAppPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   target: string;
   workingDir: string;
   actor: string;
@@ -199,8 +199,7 @@ export const run = async (input: RunInput): Promise<void> => {
     githubToken,
     migrationName,
     prNumber,
-    csmAppId,
-    csmAppPrivateKey,
+    newAppOctokit,
     actor,
     runURL,
     repository,
@@ -315,8 +314,7 @@ export const run = async (input: RunInput): Promise<void> => {
     githubToken,
     files: new Set(files),
     serverRepository: csmActionsServerRepository ?? "",
-    appId: csmAppId,
-    appPrivateKey: csmAppPrivateKey,
+    newAppOctokit,
     branch,
     pr: shouldSkipPr
       ? undefined

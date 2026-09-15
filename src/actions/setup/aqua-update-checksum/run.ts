@@ -1,3 +1,4 @@
+import type { NewAppOctokit } from "../../../lib/app_octokit";
 import * as core from "@actions/core";
 import * as fs from "fs";
 import * as path from "path";
@@ -8,8 +9,7 @@ import * as commit from "../../../commit";
 
 export type Inputs = {
   githubToken: string;
-  csmAppId: string;
-  csmAppPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
 };
 
 /**
@@ -123,8 +123,7 @@ export const main = async (
     rootDir: cfg.git_root_dir,
     files: new Set([checksumFileFromRootDir]),
     serverRepository: cfg?.csm_actions?.server_repository ?? "",
-    appId: inputs.csmAppId,
-    appPrivateKey: inputs.csmAppPrivateKey,
+    newAppOctokit: inputs.newAppOctokit,
   });
   throw new Error(`${checksumFileOutput} is updated.`);
 };

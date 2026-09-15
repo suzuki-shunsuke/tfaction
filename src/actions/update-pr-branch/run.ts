@@ -1,3 +1,5 @@
+import type { Client } from "@suzuki-shunsuke/github-app-token";
+import type { NewAppOctokit } from "../../lib/app_octokit";
 import * as github from "@actions/github";
 import {
   listRelatedPullRequests,
@@ -11,15 +13,13 @@ export type RunInput = {
   githubToken: string;
   target: string;
   csmActionsServerRepository: string;
-  csmAppId: string;
-  csmAppPrivateKey: string;
+  newAppOctokit: NewAppOctokit;
   repoOwner: string;
   repoName: string;
   serverUrl: string;
   updateBranchFn: UpdateBranchFn;
   createGithubAppToken: (params: {
-    appId: string;
-    privateKey: string;
+    octokit: Client;
     owner: string;
     repositories: string[];
     permissions: Record<string, string>;
@@ -40,8 +40,7 @@ export const run = async (input: RunInput): Promise<void> => {
 
   if (input.csmActionsServerRepository) {
     const token = await input.createGithubAppToken({
-      appId: input.csmAppId,
-      privateKey: input.csmAppPrivateKey,
+      octokit: input.newAppOctokit(),
       owner: input.repoOwner,
       repositories: [input.csmActionsServerRepository],
       permissions: {
