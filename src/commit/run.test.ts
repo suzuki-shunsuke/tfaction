@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as commit from "@suzuki-shunsuke/commit-ts";
 import { run, type RunInput, type Logger } from "./run";
 
+// Mock commit.createCommit. vitest hoists vi.mock to the top of the module,
+// so from v5 on it has to be written at the module's top level scope.
+vi.mock("@suzuki-shunsuke/commit-ts", () => ({
+  createCommit: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe("run", () => {
   const createMockOctokit = () => ({
     rest: {
@@ -23,11 +29,6 @@ describe("run", () => {
     info: vi.fn(),
     notice: vi.fn(),
   });
-
-  // Mock commit.createCommit
-  vi.mock("@suzuki-shunsuke/commit-ts", () => ({
-    createCommit: vi.fn().mockResolvedValue(undefined),
-  }));
 
   beforeEach(() => {
     vi.clearAllMocks();
