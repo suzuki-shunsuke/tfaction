@@ -10,6 +10,8 @@ import * as lib from "../../lib";
 import * as env from "../../lib/env";
 import * as types from "../../lib/types";
 import * as planStorage from "../../lib/plan_storage";
+import * as planHashLib from "../../lib/plan_hash";
+import * as git from "../../lib/git";
 import * as getTargetConfig from "../get-target-config";
 import * as conftest from "../../conftest";
 import { post } from "../../comment";
@@ -64,6 +66,7 @@ type Inputs = {
   gcsBucketNameTfmigrateHistory?: string;
   allowAutoMergeChange: boolean;
   dismissApprovalBeforePlan: boolean;
+  skipDismissIfUnchanged?: types.SkipDismissIfUnchanged;
   prNumber?: number;
   executor: aqua.Executor;
   secrets?: Record<string, string>;
@@ -242,6 +245,132 @@ export const dismissApprovalReviews = async (
       `Failed to list reviews: ${e instanceof Error ? e.message : String(e)}`,
     );
   }
+};
+
+const isSkipDismissIfUnchangedEnabled = (inputs: Inputs): boolean =>
+  inputs.dismissApprovalBeforePlan &&
+  inputs.prNumber !== undefined &&
+  inputs.skipDismissIfUnchanged?.enabled !== false;
+
+const isForbidden = (e: unknown): boolean =>
+  typeof e === "object" &&
+  e !== null &&
+  "status" in e &&
+  (e.status === 403 || e.status === 401);
+
+// Compute a one-way hash of the plan result to compare it with the previous
+// plan. Returns undefined if the feature is disabled or the computation fails.
+export const computePlanHashIfNeeded = async (
+  inputs: Inputs,
+  planJsonContent: string,
+): Promise<string | undefined> => {
+  if (!isSkipDismissIfUnchangedEnabled(inputs)) {
+    return undefined;
+  }
+  const keyId = inputs.skipDismissIfUnchanged?.aws_kms_key_id;
+  const lockFilePath = path.join(
+    inputs.workingDirectory,
+    ".terraform.lock.hcl",
+  );
+  try {
+    return await planHashLib.computePlanHash(planJsonContent, {
+      target: inputs.target,
+      destroy: inputs.destroy,
+      treeSHA: await git.getTreeSHA(inputs.workingDirectory),
+      lockFile: fs.existsSync(lockFilePath)
+        ? fs.readFileSync(lockFilePath, "utf8")
+        : null,
+      awsKMSKey: keyId
+        ? { keyId, region: inputs.skipDismissIfUnchanged?.aws_region }
+        : undefined,
+    });
+  } catch (e) {
+    core.warning(
+      `Failed to compute the plan hash: ${e instanceof Error ? e.message : String(e)}`,
+    );
+    return undefined;
+  }
+};
+
+const PRHead = z.object({
+  head: z.object({
+    ref: z.string(),
+    repo: z.object({ id: z.number() }).nullish(),
+  }),
+});
+
+// Get the plan hash of the latest previous plan run of the target on the
+// pull request's head branch. Returns undefined if it isn't found.
+const getPreviousPlanHash = async (
+  inputs: Inputs,
+): Promise<string | undefined> => {
+  const prJsonFile = path.join(inputs.ciInfoTempDir || "", "pr.json");
+  if (!inputs.ciInfoTempDir || !fs.existsSync(prJsonFile)) {
+    core.info(`PR JSON file not found: ${prJsonFile}`);
+    return undefined;
+  }
+  const pr = PRHead.parse(JSON.parse(fs.readFileSync(prJsonFile, "utf8")));
+  if (!pr.head.repo) {
+    // The head repository was deleted
+    return undefined;
+  }
+  const meta = await planStorage.downloadPreviousPlanMeta({
+    octokit: github.getOctokit(inputs.githubToken),
+    token: inputs.githubToken,
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    target: inputs.target,
+    headRef: pr.head.ref,
+    headRepoId: pr.head.repo.id,
+    currentRunId: Number(env.all.GITHUB_RUN_ID),
+    dest: fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-")),
+  });
+  return meta?.plan_hash;
+};
+
+// Dismiss approvals unless the plan result is the same as the previous plan.
+// If the previous plan hash can't be got, approvals are dismissed.
+export const dismissApprovalsIfNeeded = async (
+  inputs: Inputs,
+  detailedExitcode: number,
+  planHash: string | undefined,
+): Promise<void> => {
+  if (!inputs.dismissApprovalBeforePlan || !inputs.prNumber) {
+    return;
+  }
+  // Skip for Renovate PRs with no changes (detailedExitcode === 0)
+  if (
+    detailedExitcode === 0 &&
+    inputs.prAuthor !== undefined &&
+    inputs.autoAppsLogins.includes(inputs.prAuthor)
+  ) {
+    core.info("Skipping dismiss approval reviews: Renovate PR with no changes");
+    return;
+  }
+  if (planHash !== undefined && isSkipDismissIfUnchangedEnabled(inputs)) {
+    try {
+      const previousPlanHash = await getPreviousPlanHash(inputs);
+      if (previousPlanHash === planHash) {
+        core.info(
+          "Skipping dismiss approval reviews: the plan result is the same as the previous plan",
+        );
+        return;
+      }
+      core.info(
+        previousPlanHash === undefined
+          ? "The plan hash of the previous plan was not found"
+          : "The plan result has changed since the previous plan",
+      );
+    } catch (e) {
+      core.warning(
+        `Failed to get the plan hash of the previous plan: ${e instanceof Error ? e.message : String(e)}` +
+          (isForbidden(e)
+            ? ". The GitHub token requires the actions:read permission to read artifacts of previous workflow runs. To disable this feature, set dismiss_approval_before_plan.skip_if_unchanged.enabled to false."
+            : ""),
+      );
+    }
+  }
+  await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
 };
 
 const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
@@ -494,37 +623,34 @@ export const runTerraformPlan = async (
     throw new Error("terraform plan failed");
   }
 
-  // Dismiss existing approval reviews so reviewers must review the new plan
-  // Skip for Renovate PRs with no changes (detailedExitcode === 0)
-  if (inputs.dismissApprovalBeforePlan && inputs.prNumber) {
-    if (
-      detailedExitcode === 0 &&
-      inputs.prAuthor !== undefined &&
-      inputs.autoAppsLogins.includes(inputs.prAuthor)
-    ) {
-      core.info(
-        "Skipping dismiss approval reviews: Renovate PR with no changes",
-      );
-    } else {
-      await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
-    }
-  }
-
   // Run terraform show to convert plan to JSON
-  const showResult = await executor.getExecOutput(
-    inputs.tfCommand,
-    ["show", "-json", tempPlanBinary],
-    {
-      cwd: inputs.workingDirectory,
-      silent: true,
-      group: `${inputs.tfCommand} show`,
-      comment: {
-        token: inputs.githubToken,
+  let planJsonContent: string;
+  try {
+    const showResult = await executor.getExecOutput(
+      inputs.tfCommand,
+      ["show", "-json", tempPlanBinary],
+      {
+        cwd: inputs.workingDirectory,
+        silent: true,
+        group: `${inputs.tfCommand} show`,
+        comment: {
+          token: inputs.githubToken,
+        },
       },
-    },
-  );
-  fs.writeFileSync(tempPlanJson, showResult.stdout);
-  const summary = getResultSummary(showResult.stdout);
+    );
+    planJsonContent = showResult.stdout;
+  } catch (e) {
+    // The plan result can't be compared, so dismiss approvals before failing.
+    await dismissApprovalsIfNeeded(inputs, detailedExitcode, undefined);
+    throw e;
+  }
+  fs.writeFileSync(tempPlanJson, planJsonContent);
+
+  // Dismiss existing approval reviews so reviewers must review the new plan
+  const planHash = await computePlanHashIfNeeded(inputs, planJsonContent);
+  await dismissApprovalsIfNeeded(inputs, detailedExitcode, planHash);
+
+  const summary = getResultSummary(planJsonContent);
   core.setOutput("result_summary", summary);
 
   core.setOutput("plan_json", tempPlanJson);
@@ -557,6 +683,7 @@ export const runTerraformPlan = async (
       bucket: inputs.planFileS3.bucket,
       files: [planFile],
       summary,
+      plan_hash: planHash,
     };
   } else {
     const artifactNameBinary = `terraform_plan_file_${inputs.target.replaceAll("/", "__")}`;
@@ -569,7 +696,7 @@ export const runTerraformPlan = async (
       tempDir,
     );
     await artifact.uploadArtifact(artifactNameJson, [tempPlanJson], tempDir);
-    meta = { storage: "github-artifacts", summary };
+    meta = { storage: "github-artifacts", summary, plan_hash: planHash };
   }
 
   fs.writeFileSync(metaPath, JSON.stringify(meta));
@@ -643,6 +770,8 @@ export const main = async (
     allowAutoMergeChange: config.auto_apps.allow_auto_merge_change,
     dismissApprovalBeforePlan:
       config.dismiss_approval_before_plan?.enabled !== false,
+    skipDismissIfUnchanged:
+      config.dismiss_approval_before_plan?.skip_if_unchanged,
     prNumber: runInputs.prNumber,
     executor,
     secrets: runInputs.secrets,

@@ -15,6 +15,8 @@ import {
 import type * as aqua from "../../aqua";
 import type * as getTargetConfig from "../get-target-config";
 import { post } from "../../comment";
+import * as planStorage from "../../lib/plan_storage";
+import { computePlanHash } from "../../lib/plan_hash";
 
 // Mock modules
 vi.mock("@actions/core", () => ({
@@ -76,6 +78,10 @@ vi.mock("../../conftest", () => ({
   run: vi.fn(),
 }));
 
+vi.mock("../../lib/git", () => ({
+  getTreeSHA: vi.fn().mockResolvedValue("tree-sha"),
+}));
+
 vi.mock("../../comment", () => ({
   post: vi.fn(),
 }));
@@ -90,6 +96,7 @@ vi.mock("../../lib/plan_storage", async () => {
       key: "tfaction_plan/1/1/aws/test/dev/plan.out",
       hash: "hash-xyz",
     }),
+    downloadPreviousPlanMeta: vi.fn(),
   };
 });
 
@@ -617,6 +624,150 @@ describe("runTerraformPlan", () => {
     expect(core.info).toHaveBeenCalledWith(
       "Skipping dismiss approval reviews: Renovate PR with no changes",
     );
+  });
+
+  describe("skip_if_unchanged", () => {
+    const lockFile = 'provider "registry.terraform.io/hashicorp/null" {}';
+    const planJson =
+      '{"resource_changes": [{"address": "null_resource.foo", "change": {"actions": ["create"]}}]}';
+
+    const setup = (previousPlanHash: string | undefined) => {
+      const mockOctokit = createMockOctokit();
+      mockOctokit.graphql
+        .mockResolvedValueOnce(
+          graphqlReviewsResponse(
+            [{ id: "PRR_1", author: { __typename: "User", login: "user1" } }],
+            false,
+            null,
+          ),
+        )
+        .mockResolvedValueOnce({}); // dismiss mutation
+      vi.mocked(github.getOctokit).mockReturnValue(
+        mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+      );
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockImplementation((p) =>
+        String(p).endsWith("pr.json")
+          ? JSON.stringify({ head: { ref: "feature", repo: { id: 1 } } })
+          : lockFile,
+      );
+      vi.mocked(planStorage.downloadPreviousPlanMeta).mockResolvedValue(
+        previousPlanHash === undefined
+          ? undefined
+          : {
+              storage: "github-artifacts",
+              summary: "create",
+              plan_hash: previousPlanHash,
+            },
+      );
+      mockExecutor.exec.mockResolvedValueOnce(2); // terraform plan
+      mockExecutor.getExecOutput.mockResolvedValueOnce({
+        exitCode: 0,
+        stdout: planJson,
+        stderr: "",
+      }); // terraform show
+      return mockOctokit;
+    };
+
+    const inputs = () => ({
+      ...createBaseInputs(mockExecutor),
+      dismissApprovalBeforePlan: true,
+      prNumber: 42,
+      ciInfoTempDir: "/tmp/ci-info",
+    });
+
+    it("doesn't dismiss approvals if the plan result is unchanged", async () => {
+      const hash = await computePlanHash(planJson, {
+        target: "aws/test/dev",
+        destroy: false,
+        treeSHA: "tree-sha",
+        lockFile,
+      });
+      const mockOctokit = setup(hash);
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).not.toHaveBeenCalled();
+      expect(planStorage.downloadPreviousPlanMeta).toHaveBeenCalledWith(
+        expect.objectContaining({
+          target: "aws/test/dev",
+          headRef: "feature",
+          headRepoId: 1,
+        }),
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining("plan_meta.json"),
+        expect.stringContaining(`"plan_hash":"${hash}"`),
+      );
+    });
+
+    it("dismisses approvals if the plan result has changed", async () => {
+      const mockOctokit = setup("v1:sha256:other");
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+    });
+
+    it("dismisses approvals if the previous plan is not found", async () => {
+      const mockOctokit = setup(undefined);
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+    });
+
+    it("dismisses approvals if getting the previous plan fails", async () => {
+      const mockOctokit = setup(undefined);
+      vi.mocked(planStorage.downloadPreviousPlanMeta).mockRejectedValue(
+        new Error("forbidden"),
+      );
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+      expect(core.warning).toHaveBeenCalledWith(
+        "Failed to get the plan hash of the previous plan: forbidden",
+      );
+    });
+
+    it("dismisses approvals if disabled", async () => {
+      const hash = await computePlanHash(planJson, {
+        target: "aws/test/dev",
+        destroy: false,
+        treeSHA: "tree-sha",
+        lockFile,
+      });
+      const mockOctokit = setup(hash);
+      await runTerraformPlan({
+        ...inputs(),
+        skipDismissIfUnchanged: { enabled: false },
+      });
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+      expect(planStorage.downloadPreviousPlanMeta).not.toHaveBeenCalled();
+    });
+
+    it("tells the required permission if forbidden", async () => {
+      const mockOctokit = setup(undefined);
+      vi.mocked(planStorage.downloadPreviousPlanMeta).mockRejectedValue(
+        Object.assign(new Error("Resource not accessible by integration"), {
+          status: 403,
+        }),
+      );
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+      expect(core.warning).toHaveBeenCalledWith(
+        expect.stringContaining("actions:read"),
+      );
+    });
+
+    it("dismisses approvals if terraform show fails", async () => {
+      const mockOctokit = setup(undefined);
+      mockExecutor.getExecOutput.mockReset();
+      mockExecutor.getExecOutput.mockRejectedValue(new Error("show failed"));
+      await expect(runTerraformPlan(inputs())).rejects.toThrow("show failed");
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+      expect(planStorage.downloadPreviousPlanMeta).not.toHaveBeenCalled();
+    });
   });
 });
 

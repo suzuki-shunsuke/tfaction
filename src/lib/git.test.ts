@@ -14,6 +14,7 @@ import {
   hasFileChangedPorcelain,
   listWorkingDirFiles,
   getRootDir,
+  getTreeSHA,
   checkGitDiff,
 } from "./git";
 
@@ -239,5 +240,22 @@ describe("checkGitDiff", () => {
     });
     const result = await checkGitDiff(["file1.tf", "file2.tf"], "/workspace");
     expect(result).toEqual({ changedFiles: [] });
+  });
+});
+
+describe("getTreeSHA", () => {
+  it("returns the tree object id of the directory at HEAD", async () => {
+    vi.mocked(exec.getExecOutput).mockResolvedValue({
+      stdout: "0123456789abcdef\n",
+      stderr: "",
+      exitCode: 0,
+    });
+    const result = await getTreeSHA("/workspace/aws/foo");
+    expect(result).toBe("0123456789abcdef");
+    expect(exec.getExecOutput).toHaveBeenCalledWith(
+      "git",
+      ["rev-parse", "HEAD:./"],
+      expect.objectContaining({ cwd: "/workspace/aws/foo" }),
+    );
   });
 });
