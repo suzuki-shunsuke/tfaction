@@ -164,3 +164,16 @@ export const checkGitDiff = async (
   }
   return { changedFiles };
 };
+
+/**
+ * Get the git tree object id of a directory at HEAD
+ * @param dir - Absolute path to the directory
+ * @returns the tree object id
+ */
+export const getTreeSHA = async (dir: string): Promise<string> => {
+  const out = await exec.getExecOutput("git", ["rev-parse", "HEAD:./"], {
+    silent: true,
+    cwd: dir,
+  });
+  return out.stdout.trim();
+};

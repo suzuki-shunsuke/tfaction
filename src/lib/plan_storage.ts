@@ -6,6 +6,8 @@ import * as crypto from "crypto";
 import * as fs from "fs";
 import * as path from "path";
 import { z } from "zod";
+import { DefaultArtifactClient } from "@actions/artifact";
+import type * as github from "@actions/github";
 import {
   S3Client,
   PutObjectCommand,
@@ -36,12 +38,15 @@ export type PlanFile = z.infer<typeof PlanFile>;
 
 // The metadata file is self-describing: it records where the plan file is
 // stored (storage), the stored files with their hashes (for tamper detection),
-// and the plan result summary (for plan-label). All of these are non-sensitive.
+// the plan result summary (for plan-label), and a one-way hash of the plan
+// result (for skipping dismissing approvals if the plan result is unchanged).
+// All of these are non-sensitive.
 export const PlanMeta = z.object({
   storage: z.enum(["s3", "github-artifacts"]),
   bucket: z.string().optional(),
   files: PlanFile.array().optional(),
   summary: z.enum(["no-op", "update", "create", "delete"]),
+  plan_hash: z.string().optional(),
 });
 export type PlanMeta = z.infer<typeof PlanMeta>;
 
@@ -123,4 +128,60 @@ export const downloadPlanFromS3 = async (
   const filePath = path.join(dest, path.basename(key));
   fs.writeFileSync(filePath, Buffer.from(bytes));
   return filePath;
+};
+
+export type DownloadPreviousPlanMetaParams = {
+  octokit: ReturnType<typeof github.getOctokit>;
+  token: string;
+  owner: string;
+  repo: string;
+  target: string;
+  // The pull request's head branch and head repository id.
+  // The repository id is checked because a fork can have the same branch name.
+  headRef: string;
+  headRepoId: number;
+  // The current workflow run is excluded.
+  currentRunId: number;
+  dest: string;
+};
+
+// Download the metadata file of the latest previous plan run of the target on
+// the pull request's head branch. Returns undefined if it isn't found (e.g. the
+// first run, or the artifact expired).
+export const downloadPreviousPlanMeta = async (
+  params: DownloadPreviousPlanMetaParams,
+): Promise<PlanMeta | undefined> => {
+  const { data } = await params.octokit.rest.actions.listArtifactsForRepo({
+    owner: params.owner,
+    repo: params.repo,
+    name: metaArtifactName(params.target),
+    per_page: 100,
+  });
+  const candidates = data.artifacts
+    .filter(
+      (a) =>
+        !a.expired &&
+        a.workflow_run?.id !== undefined &&
+        a.workflow_run.id !== params.currentRunId &&
+        a.workflow_run.head_branch === params.headRef &&
+        a.workflow_run.head_repository_id === params.headRepoId,
+    )
+    .sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+  const latest = candidates[0];
+  if (!latest?.workflow_run?.id) {
+    return undefined;
+  }
+  const artifact = new DefaultArtifactClient();
+  await artifact.downloadArtifact(latest.id, {
+    path: params.dest,
+    findBy: {
+      token: params.token,
+      repositoryOwner: params.owner,
+      repositoryName: params.repo,
+      workflowRunId: latest.workflow_run.id,
+    },
+  });
+  return PlanMeta.parse(
+    JSON.parse(fs.readFileSync(path.join(params.dest, metaFileName), "utf8")),
+  );
 };
