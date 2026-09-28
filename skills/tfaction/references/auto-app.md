@@ -56,7 +56,7 @@ auto_apps:
 
 ## Dismissing approval
 
-```yaml
-dismiss_approval_before_plan:
-  skip_no_change_by_app: true # true by default
-```
+When the `terraform plan` result of an app PR is "No Change", approvals are not dismissed.
+Otherwise, approvals are dismissed as with other PRs.
+This behavior can't be changed, but you can disable dismissing approvals entirely.
+For details, see [Dismiss approval before plan](dismiss-approval-before-plan.md).
