@@ -100,6 +100,10 @@ vi.mock("../../comment", () => ({
   post: vi.fn(),
 }));
 
+vi.mock("../../ci-info", () => ({
+  sleep: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock("../../lib/plan_storage", async () => {
   const actual = await vi.importActual<typeof import("../../lib/plan_storage")>(
     "../../lib/plan_storage",
@@ -414,6 +418,36 @@ describe("main", () => {
     mockExecutor.exec.mockResolvedValue(0);
 
     await expect(main()).rejects.toThrow("No workflow run is found");
+  });
+
+  it("gives up after retrying listWorkflowRuns that keeps returning empty array", async () => {
+    const { mockOctokit } = await setupMainMocks({
+      workflowRuns: [],
+    });
+    const comment = await import("../../comment");
+
+    await expect(main()).rejects.toThrow("No workflow run is found");
+    // 1 initial attempt + 8 retries
+    expect(mockOctokit.rest.actions.listWorkflowRuns).toHaveBeenCalledTimes(9);
+    expect(comment.post).toHaveBeenCalledWith(
+      expect.objectContaining({ templateKey: "no-workflow-run-found" }),
+    );
+  });
+
+  it("succeeds when listWorkflowRuns transiently returns empty array", async () => {
+    const { mockOctokit, mockExecutor } = await setupMainMocks();
+    mockOctokit.rest.actions.listWorkflowRuns
+      .mockResolvedValueOnce({ data: { workflow_runs: [] } })
+      .mockResolvedValueOnce({ data: { workflow_runs: [] } });
+
+    await main();
+
+    expect(mockOctokit.rest.actions.listWorkflowRuns).toHaveBeenCalledTimes(3);
+    expect(mockExecutor.exec).toHaveBeenCalledWith(
+      "terraform",
+      expect.arrayContaining(["apply"]),
+      expect.anything(),
+    );
   });
 
   it("throws when workflow run head SHA does not match PR head SHA", async () => {

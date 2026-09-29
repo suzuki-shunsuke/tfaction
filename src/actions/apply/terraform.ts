@@ -16,6 +16,7 @@ import {
   DownloadArtifactOptions,
 } from "@actions/artifact";
 import { post } from "../../comment";
+import { sleep } from "../../ci-info";
 
 type WorkflowRun = {
   headSha: string;
@@ -274,6 +275,43 @@ const tryDownloadArtifact = async (
   return true;
 };
 
+// listWorkflowRuns occasionally returns an empty list for a branch that does
+// have runs, so retry before concluding that no workflow run exists.
+// https://github.com/suzuki-shunsuke/tfaction/issues/4389
+const getLatestWorkflowRun = async (
+  octokit: ReturnType<typeof github.getOctokit>,
+  owner: string,
+  repo: string,
+  workflowId: string,
+  branch: string,
+): Promise<{ head_sha: string; id: number } | undefined> => {
+  const maxRetries = 8;
+  const retryIntervalMs = 5000;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const { data } = await octokit.rest.actions.listWorkflowRuns({
+      owner,
+      repo,
+      workflow_id: workflowId,
+      branch,
+      per_page: 1,
+    });
+
+    if (data.workflow_runs.length > 0) {
+      return data.workflow_runs[0];
+    }
+
+    if (attempt < maxRetries) {
+      core.info(
+        `No workflow run of ${workflowId} is found for branch ${branch}, retrying in ${retryIntervalMs / 1000}s (attempt ${attempt + 1}/${maxRetries})`,
+      );
+      await sleep(retryIntervalMs);
+    }
+  }
+
+  return undefined;
+};
+
 const downloadPlanFile = async (): Promise<string> => {
   const cfg = await lib.getConfig();
   const githubToken = input.githubToken;
@@ -292,15 +330,15 @@ const downloadPlanFile = async (): Promise<string> => {
 
   // Get workflow run
   const octokit = github.getOctokit(githubToken);
-  const { data: workflowRuns } = await octokit.rest.actions.listWorkflowRuns({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    workflow_id: planWorkflowName,
-    branch: branch,
-    per_page: 1,
-  });
+  const latestRun = await getLatestWorkflowRun(
+    octokit,
+    github.context.repo.owner,
+    github.context.repo.repo,
+    planWorkflowName,
+    branch,
+  );
 
-  if (workflowRuns.workflow_runs.length === 0) {
+  if (!latestRun) {
     const ciInfoPrNumber = env.all.CI_INFO_PR_NUMBER;
     await post({
       octokit,
@@ -315,7 +353,6 @@ const downloadPlanFile = async (): Promise<string> => {
     throw new Error("No workflow run is found");
   }
 
-  const latestRun = workflowRuns.workflow_runs[0];
   const workflowRun: WorkflowRun = {
     headSha: latestRun.head_sha,
     databaseId: latestRun.id,
