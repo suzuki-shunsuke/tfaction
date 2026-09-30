@@ -450,6 +450,19 @@ describe("main", () => {
     );
   });
 
+  it("filters workflow runs by branch and PR head SHA", async () => {
+    const { mockOctokit } = await setupMainMocks({ prHeadSha: "abc123" });
+
+    await main();
+
+    expect(mockOctokit.rest.actions.listWorkflowRuns).toHaveBeenCalledWith(
+      expect.objectContaining({
+        branch: "feature-branch",
+        head_sha: "abc123",
+      }),
+    );
+  });
+
   it("throws when workflow run head SHA does not match PR head SHA", async () => {
     const { mockExecutor } = await setupMainMocks({
       workflowRuns: [{ head_sha: "different-sha", id: 1001 }],

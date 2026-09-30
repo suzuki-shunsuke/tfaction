@@ -278,12 +278,16 @@ const tryDownloadArtifact = async (
 // listWorkflowRuns occasionally returns an empty list for a branch that does
 // have runs, so retry before concluding that no workflow run exists.
 // https://github.com/suzuki-shunsuke/tfaction/issues/4389
+// Filter by head_sha too, because a branch-only query can return an older run
+// of a branch whose name was reused.
+// https://github.com/suzuki-shunsuke/tfaction/issues/4392
 const getLatestWorkflowRun = async (
   octokit: ReturnType<typeof github.getOctokit>,
   owner: string,
   repo: string,
   workflowId: string,
   branch: string,
+  headSha: string,
 ): Promise<{ head_sha: string; id: number } | undefined> => {
   const maxRetries = 8;
   const retryIntervalMs = 5000;
@@ -294,6 +298,7 @@ const getLatestWorkflowRun = async (
       repo,
       workflow_id: workflowId,
       branch,
+      head_sha: headSha,
       per_page: 1,
     });
 
@@ -303,7 +308,7 @@ const getLatestWorkflowRun = async (
 
     if (attempt < maxRetries) {
       core.info(
-        `No workflow run of ${workflowId} is found for branch ${branch}, retrying in ${retryIntervalMs / 1000}s (attempt ${attempt + 1}/${maxRetries})`,
+        `No workflow run of ${workflowId} is found for branch ${branch} and head sha ${headSha}, retrying in ${retryIntervalMs / 1000}s (attempt ${attempt + 1}/${maxRetries})`,
       );
       await sleep(retryIntervalMs);
     }
@@ -336,6 +341,7 @@ const downloadPlanFile = async (): Promise<string> => {
     github.context.repo.repo,
     planWorkflowName,
     branch,
+    prHeadSha,
   );
 
   if (!latestRun) {
