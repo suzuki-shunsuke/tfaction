@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: flatt-security/setup-takumi-guard-npm@6d4182745c1e474c35a023573c2612c085be45a4 # v1.2.0
+      - uses: flatt-security/setup-takumi-guard-npm@3d2e7e64161c6fb76c74abd6600e4248d4859153 # v1.3.0
         with:
           bot-id: ${{secrets.TAKUMI_GUARD_BOT_ID}}
       - run: npm ci
