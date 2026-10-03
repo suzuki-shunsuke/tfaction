@@ -137,7 +137,7 @@ The outputs are intended to be used as env, runs-on, and environment in subseque
   {
     "target": "github/foo",
     "working_directory": "github/service/foo",
-    "runs_on": "ubuntu-26.04",
+    "runs_on": "ubuntu-latest",
     "job_type": "terraform",
     "environment": "production",
     "skip_terraform": false,
@@ -147,7 +147,7 @@ The outputs are intended to be used as env, runs-on, and environment in subseque
 ```
 
 - target: Alias for working_directory. By default, same as `working_directory`
-- runs_on: Job execution environment. Defaults to `ubuntu-26.04`
+- runs_on: Job execution environment. Defaults to `ubuntu-latest`
 - environment: GitHub Environments
 - skip_terraform: Whether terraform plan and apply are unnecessary. The workflow has to act on this field. See [Skipping terraform plan and apply](skip-terraform.md)
 - type: Working directory type. Set to `module` for modules

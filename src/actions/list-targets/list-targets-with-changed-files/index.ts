@@ -49,7 +49,7 @@ const getTargetConfigByTarget = (
     result = {
       target: target,
       working_directory: wd,
-      runs_on: tg.runs_on ?? "ubuntu-26.04",
+      runs_on: tg.runs_on ?? "ubuntu-latest",
       environment: tg?.environment,
       secrets: tg.secrets,
       job_type: jobType,
@@ -59,7 +59,7 @@ const getTargetConfigByTarget = (
     result = {
       target: target,
       working_directory: wd,
-      runs_on: jobConfig.runs_on ?? tg.runs_on ?? "ubuntu-26.04",
+      runs_on: jobConfig.runs_on ?? tg.runs_on ?? "ubuntu-latest",
       environment: jobConfig.environment ?? tg.environment,
       secrets: jobConfig.secrets ?? tg.secrets,
       job_type: jobType,

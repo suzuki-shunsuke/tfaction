@@ -19,7 +19,7 @@ The outputs are intended to be used as `env`, `runs-on`, and `environment` in su
   {
     "target": "github/foo",
     "working_directory": "github/service/foo",
-    "runs_on": "ubuntu-26.04",
+    "runs_on": "ubuntu-latest",
     "job_type": "terraform",
     "environment": "production",
     "skip_terraform": false
@@ -28,7 +28,7 @@ The outputs are intended to be used as `env`, `runs-on`, and `environment` in su
 ```
 
 - `target`: Alias for `working_directory`. Defaults to the same value as `working_directory`
-- `runs_on`: Job execution environment. Defaults to `ubuntu-26.04`
+- `runs_on`: Job execution environment. Defaults to `ubuntu-latest`
 - `environment`: GitHub Environments
 - `skip_terraform`: Whether terraform plan and apply are unnecessary. `true` if all changed files match `skip_terraform_files`, or if the skip label is added to the PR. The workflow has to act on this field, either by gating the plan and apply steps with it or by passing it as `TFACTION_SKIP_TERRAFORM`
 
