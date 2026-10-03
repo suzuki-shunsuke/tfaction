@@ -40,7 +40,7 @@ on:
 jobs:
   list:
     timeout-minutes: 10
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     outputs:
@@ -72,7 +72,7 @@ jobs:
   plan:
     name: "plan (${{matrix.target.target}})" # Different job name per root module
     timeout-minutes: 30
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [list] # Run after list
     permissions:
       contents: read

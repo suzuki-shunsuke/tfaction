@@ -25,7 +25,7 @@ The `pull_requests: write` permission is required.
 jobs:
   hide-comment:
     timeout-minutes: 10
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       pull-requests: write
     steps:
@@ -47,7 +47,7 @@ The `pull_requests: write` permission is required.
 jobs:
   hide-comment:
     timeout-minutes: 10
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       pull-requests: write
     steps:

@@ -118,7 +118,7 @@ on:
 jobs:
   pick-out:
     timeout-minutes: 10
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       issues: ${{steps.pick-out.outputs.issues}}
       has_issues: ${{steps.pick-out.outputs.has_issues}}
@@ -194,7 +194,7 @@ on:
 jobs:
   create-drift-issues:
     timeout-minutes: 30
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       issues: write

@@ -41,7 +41,7 @@ jobs:
   release-module:
     timeout-minutes: 10
     name: "release-module (${{inputs.module_path}})"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:
