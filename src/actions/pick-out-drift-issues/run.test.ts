@@ -120,7 +120,7 @@ describe("run", () => {
         num_of_issues: 5,
       },
       octokit: octokit as unknown as RunInput["octokit"],
-      targets: new Map([["aws/foo/dev", "ubuntu-latest"]]),
+      targets: new Map([["aws/foo/dev", "ubuntu-26.04"]]),
       repoOwner: "owner",
       repoName: "repo",
       now: new Date("2024-01-15T10:00:00Z"),
@@ -159,7 +159,7 @@ describe("run", () => {
     });
 
     const targets = new Map([
-      ["aws/foo/dev", "ubuntu-latest"],
+      ["aws/foo/dev", "ubuntu-26.04"],
       ["gcp/bar/prod", '["self-hosted", "linux"]'],
     ]);
 
@@ -186,7 +186,7 @@ describe("run", () => {
       title: "Terraform Drift (aws/foo/dev)",
       target: "aws/foo/dev",
       state: "open",
-      runs_on: "ubuntu-latest",
+      runs_on: "ubuntu-26.04",
     });
     expect(result.issues[1]).toEqual({
       number: 456,
@@ -275,7 +275,7 @@ describe("run", () => {
     octokit.rest.issues.update.mockResolvedValue({});
 
     const targets = new Map([
-      ["aws/foo/dev", "ubuntu-latest"],
+      ["aws/foo/dev", "ubuntu-26.04"],
       ["gcp/bar/prod", "self-hosted"],
     ]);
 
@@ -333,8 +333,8 @@ describe("run", () => {
     });
 
     const targets = new Map([
-      ["aws/foo/dev", "ubuntu-latest"],
-      ["aws/bar/prod", "ubuntu-latest"],
+      ["aws/foo/dev", "ubuntu-26.04"],
+      ["aws/bar/prod", "ubuntu-26.04"],
     ]);
 
     const input: RunInput = {
@@ -382,7 +382,7 @@ describe("run", () => {
       },
     });
 
-    const targets = new Map([["aws/foo/dev", "ubuntu-latest"]]);
+    const targets = new Map([["aws/foo/dev", "ubuntu-26.04"]]);
 
     const input: RunInput = {
       driftDetection: {
@@ -481,8 +481,8 @@ describe("run", () => {
     });
 
     const targets = new Map([
-      ["aws/foo/dev", "ubuntu-latest"],
-      ["aws/bar/prod", "ubuntu-latest"],
+      ["aws/foo/dev", "ubuntu-26.04"],
+      ["aws/bar/prod", "ubuntu-26.04"],
     ]);
 
     const input: RunInput = {

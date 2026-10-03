@@ -58,7 +58,7 @@ const getRunsOn = (
     }
   }
 
-  return "ubuntu-latest";
+  return "ubuntu-26.04";
 };
 
 // Get target name from working directory path

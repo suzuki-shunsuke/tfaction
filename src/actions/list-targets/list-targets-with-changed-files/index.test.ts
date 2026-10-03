@@ -32,7 +32,7 @@ test("normal", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -120,7 +120,7 @@ const prCommentConfig = {
     },
     {
       working_directory: "yoo/services/**",
-      runs_on: "ubuntu-latest",
+      runs_on: "ubuntu-26.04",
       environment: "yoo",
     },
     {
@@ -234,7 +234,7 @@ test("module callers", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/bar",
@@ -243,7 +243,7 @@ test("module callers", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/baz",
@@ -252,7 +252,7 @@ test("module callers", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -293,7 +293,7 @@ test("nest", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -334,7 +334,7 @@ test("tfmigrate label", async () => {
       {
         environment: undefined,
         job_type: "tfmigrate",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -375,7 +375,7 @@ test("tfmigrate label with changed files", async () => {
       {
         environment: undefined,
         job_type: "tfmigrate",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -447,7 +447,7 @@ test("module callers triggered", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -496,7 +496,7 @@ test("replace_target", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "app/dev",
@@ -541,7 +541,7 @@ test("custom label prefixes for tfmigrate", async () => {
       {
         environment: undefined,
         job_type: "tfmigrate",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -582,7 +582,7 @@ test("skip label sets skip_terraform", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: true,
         target: "foo/dev",
@@ -591,7 +591,7 @@ test("skip label sets skip_terraform", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/bar",
@@ -636,7 +636,7 @@ test("custom skip label prefix", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: true,
         target: "foo/dev",
@@ -645,7 +645,7 @@ test("custom skip label prefix", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/bar",
@@ -748,7 +748,7 @@ test("duplicate tfmigrate labels", async () => {
       {
         environment: undefined,
         job_type: "tfmigrate",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -789,7 +789,7 @@ test("isApply mode", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -806,7 +806,7 @@ test("tfmigrate with job config", async () => {
         target_groups: [
           {
             working_directory: "foo/**",
-            runs_on: "ubuntu-latest",
+            runs_on: "ubuntu-26.04",
             tfmigrate_plan_config: {
               runs_on: "macos-latest",
               environment: "tfmigrate-env",
@@ -863,7 +863,7 @@ test("tfmigrate apply with job config", async () => {
         target_groups: [
           {
             working_directory: "foo/**",
-            runs_on: "ubuntu-latest",
+            runs_on: "ubuntu-26.04",
             tfmigrate_apply_config: {
               runs_on: "self-hosted",
               environment: "production",
@@ -934,7 +934,7 @@ test("module caller is also a module", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "terraform/dev",
@@ -951,7 +951,7 @@ test("multiple target groups", async () => {
         target_groups: [
           {
             working_directory: "aws/**",
-            runs_on: "ubuntu-latest",
+            runs_on: "ubuntu-26.04",
           },
           {
             working_directory: "gcp/**",
@@ -980,7 +980,7 @@ test("multiple target groups", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "aws/dev",
@@ -1006,7 +1006,7 @@ test("terraform plan job config", async () => {
         target_groups: [
           {
             working_directory: "foo/**",
-            runs_on: "ubuntu-latest",
+            runs_on: "ubuntu-26.04",
             terraform_plan_config: {
               runs_on: "self-hosted",
               environment: "plan-env",
@@ -1063,7 +1063,7 @@ test("terraform apply job config", async () => {
         target_groups: [
           {
             working_directory: "foo/**",
-            runs_on: "ubuntu-latest",
+            runs_on: "ubuntu-26.04",
             terraform_apply_config: {
               runs_on: "production-runner",
               environment: "production",
@@ -1164,7 +1164,7 @@ test("template_dir config files are excluded", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "aws/dev",
@@ -1206,7 +1206,7 @@ test("template_dir with trailing slash", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "aws/dev",
@@ -1292,7 +1292,7 @@ test("skip_terraform_files: all files match patterns", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: true,
         target: "foo/dev",
@@ -1334,7 +1334,7 @@ test("skip_terraform_files: some files don't match", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -1375,7 +1375,7 @@ test("skip_terraform_files: not configured", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -1418,7 +1418,7 @@ test("skip_terraform_files: module files don't match patterns", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -1461,7 +1461,7 @@ test("skip_terraform_files: module files all match patterns", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: true,
         target: "foo/dev",
@@ -1507,7 +1507,7 @@ test("skip_terraform_files: multiple patterns", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: true,
         target: "foo/dev",
@@ -1549,7 +1549,7 @@ test("module detected via moduleWorkingDirs gets type: module", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "modules/vpc",
@@ -1595,7 +1595,7 @@ test("mixed modules and regular working dirs", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -1604,7 +1604,7 @@ test("mixed modules and regular working dirs", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "modules/vpc",
@@ -1650,7 +1650,7 @@ test("isApply filters out module type from targetConfigs", async () => {
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -1731,7 +1731,7 @@ test("test_workflow: plan_and_apply changed_files match and no working dirs chan
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -1778,7 +1778,7 @@ test("test_workflow: plan_and_apply changed_files match but working dirs also ch
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -1862,7 +1862,7 @@ test("test_workflow: plan_and_apply apply mode includes test targets", async () 
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/dev",
@@ -1909,7 +1909,7 @@ test("test_workflow: only_plan changed_files match in plan mode adds targets", a
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/diff",
@@ -2000,7 +2000,7 @@ test("test_workflow: only_plan and plan_and_apply both match in plan mode adds b
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/nodiff",
@@ -2009,7 +2009,7 @@ test("test_workflow: only_plan and plan_and_apply both match in plan mode adds b
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/diff",
@@ -2063,7 +2063,7 @@ test("test_workflow: only_plan and plan_and_apply both match in apply mode adds 
       {
         environment: undefined,
         job_type: "terraform",
-        runs_on: "ubuntu-latest",
+        runs_on: "ubuntu-26.04",
         secrets: undefined,
         skip_terraform: false,
         target: "foo/nodiff",

@@ -140,7 +140,7 @@ on: pull_request
 jobs:
   plan:
     timeout-minutes: 30
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     env:
@@ -204,7 +204,7 @@ on:
 jobs:
   apply:
     timeout-minutes: 60
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     env:
