@@ -2,10 +2,10 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import { createHash } from "crypto";
-import { chmod, readFile, rm } from "fs/promises";
+import { chmod, copyFile, mkdtemp, readFile, rename, rm } from "fs/promises";
 import { join, dirname } from "path";
 import { arch, homedir, platform, tmpdir } from "os";
-import { mkdtempSync, existsSync, renameSync, mkdirSync } from "fs";
+import { mkdtempSync, existsSync, mkdirSync } from "fs";
 import * as lib from "../lib";
 import * as env from "../lib/env";
 import { execAndComment } from "../comment/exec";
@@ -350,7 +350,19 @@ export const install = async (): Promise<string> => {
     const aquaBinaryPath = join(extractedPath, isWindows ? "aqua.exe" : "aqua");
     await chmod(aquaBinaryPath, 0o755);
     mkdirSync(installDir, { recursive: true });
-    renameSync(aquaBinaryPath, installPath);
+    // tempDir and installDir can be on different file systems (e.g. /tmp is tmpfs),
+    // so rename fails with EXDEV. Copy the binary to installDir first and rename it
+    // in the same file system so that a partially written file is never installed.
+    // Each attempt uses its own staging directory so concurrent attempts don't conflict.
+    const stagingDir = await mkdtemp(join(installDir, ".aqua-"));
+    try {
+      const stagingPath = join(stagingDir, isWindows ? "aqua.exe" : "aqua");
+      await copyFile(aquaBinaryPath, stagingPath);
+      await chmod(stagingPath, 0o755);
+      await rename(stagingPath, installPath);
+    } finally {
+      await rm(stagingDir, { recursive: true, force: true });
+    }
     return installDir;
   } finally {
     await rm(tempDir, { recursive: true, force: true });
