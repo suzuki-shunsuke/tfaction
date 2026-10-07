@@ -22,37 +22,25 @@ jobs:
         id: changes
         with:
           filters: |
-            renovate-config-validator:
-              - renovate.json5
-              - .github/workflows/test.yaml
-              - .github/workflows/wc-renovate-config-validator.yaml
-            ghalint:
-              - .github/workflows/*.yaml
-              - aqua/ghalint.yaml
             build-schema:
               - .github/workflows/test.yaml
               - .github/workflows/wc-deploy-schema.yaml
               - "schema/**"
 
-  renovate-config-validator:
-    uses: ./.github/workflows/wc-renovate-config-validator.yaml
-    needs: path-filter
-    if: needs.path-filter.outputs.renovate-config-validator == 'true'
+  test:
+    uses: suzuki-shunsuke/test-workflow/.github/workflows/test.yaml@51ece8dcaabff59820bfb2053c56e3cb281cf7b2 # v0.0.1
+    with:
+      aqua_version: v2.64.0
     permissions:
+      pull-requests: read
       contents: read
-
-  ghalint:
-    needs: path-filter
-    if: needs.path-filter.outputs.ghalint == 'true'
-    uses: ./.github/workflows/wc-ghalint.yaml
-    permissions: {}
 
   build-schema:
     uses: ./.github/workflows/wc-deploy-schema.yaml
     permissions:
       contents: write
 
-  test:
+  js:
     uses: ./.github/workflows/wc-test.yaml
     permissions:
       id-token: write
@@ -74,10 +62,6 @@ jobs:
       gh_app_id: ${{secrets.gh_app_id}}
       gh_app_private_key: ${{secrets.gh_app_private_key}}
       TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
-
-  typos:
-    uses: ./.github/workflows/workflow_call_typos.yaml
-    permissions: {}
 
   test_deploy_doc:
     uses: ./.github/workflows/workflow_call_deploy_doc.yaml
