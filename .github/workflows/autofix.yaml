@@ -31,6 +31,7 @@ jobs:
 
   autofix:
     runs-on: ubuntu-26.04
+    needs: jsmodule
     permissions:
       contents: read
     timeout-minutes: 15
