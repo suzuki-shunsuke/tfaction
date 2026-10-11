@@ -24,10 +24,13 @@ jobs:
           bot-id: ${{secrets.TAKUMI_GUARD_BOT_ID}}
       - run: npm ci
 
+      # Archive node_modules with tar to keep file permissions and symlinks (e.g. node_modules/.bin)
+      - run: tar -cf node_modules.tar node_modules
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          path: node_modules
+          path: node_modules.tar
           name: node_modules
+          retention-days: 1
 
   autofix:
     runs-on: ubuntu-26.04
@@ -51,8 +54,9 @@ jobs:
 
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          path: node_modules
           name: node_modules
+          path: ${{runner.temp}}
+      - run: tar -xf "$RUNNER_TEMP/node_modules.tar"
 
       - name: Restore .npmrc to avoid committing the registry auth token
         run: git checkout -- .npmrc
