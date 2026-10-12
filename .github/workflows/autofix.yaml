@@ -14,6 +14,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          ref: ${{github.event.pull_request.head.sha}}
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -42,11 +43,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          ref: ${{github.event.pull_request.head.sha}}
       - uses: aquaproj/aqua-installer@82d0e83878a8657c4a6f2ff1755d3bfbfc67f329 # v4.1.0
         with:
           aqua_version: v2.64.0
-        env:
-          GITHUB_TOKEN: ${{github.token}}
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
@@ -61,8 +61,12 @@ jobs:
         run: git checkout -- .npmrc
 
       - run: aqua upc -prune
+        env:
+          AQUA_GITHUB_TOKEN: ${{github.token}}
       - run: aqua upc -prune
         working-directory: install
-      - run: cmdx fmt
+        env:
+          AQUA_GITHUB_TOKEN: ${{github.token}}
+      - run: npm run fmt
 
       - uses: autofix-ci/action@c5b2d67aa2274e7b5a18224e8171550871fc7e4a # v1.3.4
