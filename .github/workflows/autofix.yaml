@@ -4,7 +4,7 @@ on: pull_request
 permissions: {}
 jobs:
   fix:
-    uses: suzuki-shunsuke/js-autofix-action/.github/workflows/autofix-ci.yaml@aa66fabc07995e79f621f935d3ed34c3cbd2a880 # v0.0.2
+    uses: suzuki-shunsuke/js-autofix-action/.github/workflows/autofix-ci.yaml@71bff57547985a27ed4aaff4e7c2b3d6798704a0 # v0.0.3
     permissions:
       contents: read
       id-token: write
