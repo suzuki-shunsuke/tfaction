@@ -43,6 +43,7 @@ jobs:
   js:
     uses: ./.github/workflows/wc-test.yaml
     permissions:
+      contents: read
       id-token: write
     secrets:
       TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}

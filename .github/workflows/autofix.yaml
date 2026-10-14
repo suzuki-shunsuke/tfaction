@@ -57,9 +57,6 @@ jobs:
           path: ${{runner.temp}}
       - run: tar -xf "$RUNNER_TEMP/node_modules.tar"
 
-      - name: Restore .npmrc to avoid committing the registry auth token
-        run: git checkout -- .npmrc
-
       - run: aqua upc -prune
         env:
           AQUA_GITHUB_TOKEN: ${{github.token}}
