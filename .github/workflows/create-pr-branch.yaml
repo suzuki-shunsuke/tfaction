@@ -30,6 +30,8 @@ jobs:
     uses: ./.github/workflows/wc-release.yaml
     with:
       version: latest
+      # wc-create-pr-branch.yaml also calls wc-release.yaml in this workflow run
+      artifact_suffix: -latest
       pr: ${{fromJSON(inputs.pr)}}
     secrets:
       TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
