@@ -17,6 +17,13 @@ on:
         required: false
         default: false
         type: boolean
+      artifact_suffix:
+        description: |
+          A suffix of artifact names.
+          Artifact names must be unique in a workflow run, so set this when this workflow is called multiple times in a workflow run.
+        required: false
+        default: ""
+        type: string
     secrets:
       TAKUMI_GUARD_BOT_ID:
         required: true
@@ -53,7 +60,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           path: node_modules.tar
-          name: node_modules
+          name: node_modules-release${{inputs.artifact_suffix}}
           retention-days: 1
 
   release:
@@ -84,7 +91,7 @@ jobs:
           node-version-file: .node-version
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: node_modules
+          name: node_modules-release${{inputs.artifact_suffix}}
           path: ${{runner.temp}}
       - run: tar -xf "$RUNNER_TEMP/node_modules.tar"
 
@@ -105,4 +112,4 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           path: dist
-          name: js
+          name: js${{inputs.artifact_suffix}}
