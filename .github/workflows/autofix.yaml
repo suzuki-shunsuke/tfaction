@@ -3,13 +3,13 @@ name: autofix.ci
 on: pull_request
 permissions: {}
 jobs:
-  # Don't add jobs to this file. Please add jobs to wc_autofix.yaml.
   fix:
-    uses: ./.github/workflows/wc_autofix.yaml
+    uses: suzuki-shunsuke/js-autofix-action/.github/workflows/autofix-ci.yaml@aa66fabc07995e79f621f935d3ed34c3cbd2a880 # v0.0.2
     permissions:
       contents: read
       id-token: write
-      pull-requests: read
+    with:
+      aqua_version: v2.64.0
     secrets:
       TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
   autofix:
@@ -22,4 +22,3 @@ jobs:
       - fix
     steps:
       - run: exit 1
-  # Don't add jobs to this file. Please add jobs to wc_autofix.yaml.
