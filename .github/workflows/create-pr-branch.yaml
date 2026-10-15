@@ -12,13 +12,27 @@ on:
         type: boolean
         required: true
 jobs:
+  # Install npm packages once and share node_modules with the create-pr-branch and release jobs,
+  # so they build the same commit (the merge commit of the pull request)
+  npm:
+    uses: suzuki-shunsuke/download-npm-package-action/.github/workflows/download.yaml@ebbf371f6e38b49824a73f8c6680e2e1f83db2e8 # v0.0.1
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      ref: refs/pull/${{inputs.pr}}/merge
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
   create-pr-branch:
     uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@8be0b473dc9410a79482fad9e42fdf52d10118a3 # v0.0.4
+    needs: npm
     permissions:
       contents: write
       pull-requests: write
       id-token: write
     with:
+      npm_artifact_name: node_modules
+      ref: ${{needs.npm.outputs.sha}}
       version: pr/${{inputs.pr}}
       pr: ${{inputs.pr}}
       is_comment: ${{inputs.is_comment}}
@@ -44,7 +58,10 @@ jobs:
       gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
   release:
     uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@8be0b473dc9410a79482fad9e42fdf52d10118a3 # v0.0.4
+    needs: npm
     with:
+      npm_artifact_name: node_modules
+      ref: ${{needs.npm.outputs.sha}}
       version: latest
       # The create-pr-branch job also calls js-action-release-workflow in this workflow run
       artifact_suffix: -latest
