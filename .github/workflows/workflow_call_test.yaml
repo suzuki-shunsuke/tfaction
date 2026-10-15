@@ -9,6 +9,18 @@ on:
       TAKUMI_GUARD_BOT_ID:
         required: true
 jobs:
+  # Install npm packages once and share node_modules with the test-js and release jobs,
+  # so they run in parallel against the same commit (the merge commit of the pull request)
+  npm:
+    uses: suzuki-shunsuke/download-npm-package-action/.github/workflows/download.yaml@ebbf371f6e38b49824a73f8c6680e2e1f83db2e8 # v0.0.1
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      ref: refs/pull/${{github.event.pull_request.number}}/merge
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
+
   path-filter:
     # Get changed files to filter jobs
     timeout-minutes: 10
@@ -40,29 +52,53 @@ jobs:
     permissions:
       contents: write
 
-  js:
-    uses: ./.github/workflows/wc-test.yaml
+  test-js:
+    uses: suzuki-shunsuke/js-action-test-workflow/.github/workflows/test.yaml@93619ca5c984cc300f209f5b71cc3284838323b5 # v0.0.2
+    needs: npm
     permissions:
       contents: read
       id-token: write
     secrets:
       TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
+    with:
+      npm_artifact_name: node_modules
+      ref: ${{needs.npm.outputs.sha}}
 
-  create-pr-branch:
-    uses: ./.github/workflows/wc-create-pr-branch.yaml
+  release:
+    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@8be0b473dc9410a79482fad9e42fdf52d10118a3 # v0.0.4
+    needs: npm
     if: |
       ! (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
     permissions:
       contents: write
       pull-requests: write
-      issues: write
       id-token: write
     with:
+      npm_artifact_name: node_modules
+      ref: ${{needs.npm.outputs.sha}}
+      version: pr/${{github.event.pull_request.number}}
       pr: ${{github.event.pull_request.number}}
+      # Build the action and generate JSON Schema, which is committed with files
+      build_command: npm run build && mkdir -p schema && TFACTION_GENERATE_JSON_SCHEMA=1 node dist/index.js
+      files: |
+        schema/tfaction.json
+        schema/tfaction-root.json
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
+
+  # Test the action built by the release job
+  test-action:
+    uses: ./.github/workflows/wc-test.yaml
+    needs: release
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    with:
+      sha: ${{needs.release.outputs.sha}}
     secrets:
       gh_app_id: ${{secrets.gh_app_id}}
       gh_app_private_key: ${{secrets.gh_app_private_key}}
-      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
 
   test_deploy_doc:
     uses: ./.github/workflows/workflow_call_deploy_doc.yaml

@@ -2,3 +2,6 @@ version: 3
 ignore_actions:
   - name: suzuki-shunsuke/tfaction/.*
     ref: .*
+  # The document refers to the latest branch of notify-bot-pr-event-action, which pinact can't pin
+  - name: suzuki-shunsuke/notify-bot-pr-event-action
+    ref: latest

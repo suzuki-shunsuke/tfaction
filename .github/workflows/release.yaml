@@ -12,10 +12,15 @@ on:
         required: false
 jobs:
   release:
-    uses: ./.github/workflows/wc-release.yaml
+    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@8be0b473dc9410a79482fad9e42fdf52d10118a3 # v0.0.4
     with:
       version: ${{inputs.tag}}
       pr: ${{inputs.pr}}
+      # Build the action and generate JSON Schema, which is committed with files
+      build_command: npm run build && mkdir -p schema && TFACTION_GENERATE_JSON_SCHEMA=1 node dist/index.js
+      files: |
+        schema/tfaction.json
+        schema/tfaction-root.json
     secrets:
       TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
     permissions:
