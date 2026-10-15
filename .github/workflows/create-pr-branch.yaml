@@ -13,7 +13,7 @@ on:
         required: true
 jobs:
   create-pr-branch:
-    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@16e5ae83421dd948ccc5171777361ee8a389d550 # v0.0.3
+    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@8be0b473dc9410a79482fad9e42fdf52d10118a3 # v0.0.4
     permissions:
       contents: write
       pull-requests: write
@@ -43,7 +43,7 @@ jobs:
       gh_app_id: ${{secrets.APP_ID}}
       gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
   release:
-    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@16e5ae83421dd948ccc5171777361ee8a389d550 # v0.0.3
+    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@8be0b473dc9410a79482fad9e42fdf52d10118a3 # v0.0.4
     with:
       version: latest
       # The create-pr-branch job also calls js-action-release-workflow in this workflow run

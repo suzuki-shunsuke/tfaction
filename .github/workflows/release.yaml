@@ -12,7 +12,7 @@ on:
         required: false
 jobs:
   release:
-    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@16e5ae83421dd948ccc5171777361ee8a389d550 # v0.0.3
+    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@8be0b473dc9410a79482fad9e42fdf52d10118a3 # v0.0.4
     with:
       version: ${{inputs.tag}}
       pr: ${{inputs.pr}}
