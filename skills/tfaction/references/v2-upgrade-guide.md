@@ -128,7 +128,7 @@ The `setup` action outputs the IAM Role ARN and other values based on tfaction-r
   with:
     action: setup
 
-- uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+- uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
   if: steps.setup.outputs.aws_assume_role_arn != ''
   with:
     role-to-assume: ${{ steps.setup.outputs.aws_assume_role_arn }}
