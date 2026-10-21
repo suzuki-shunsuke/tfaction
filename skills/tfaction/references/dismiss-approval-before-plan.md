@@ -20,6 +20,7 @@ The apps are configured by `auto_apps.logins`. For details, see [Auto Apps (Reno
 
 The plan action doesn't dismiss approvals if the plan result is the same as the previous plan of the target on the pull request's head branch.
 For example, when a pull request branch is updated with the base branch and the plan result doesn't change, approvals are kept.
+This is true even if the base branch changes files in the working directory, unless the pull request also changes the same files or the base branch changes `.terraform.lock.hcl`.
 This feature is enabled by default, but it can be disabled.
 
 ```yaml
@@ -45,7 +46,8 @@ The hash is computed from the following things that affect apply:
 - `output_changes` of `terraform show -json` whose actions aren't `no-op`
 - the providers of the resource changes (`provider_name`)
 - the target and whether the plan is a destroy plan
-- the git tree object id of the working directory at `HEAD`. It covers files that aren't in the plan result, such as scripts run by provisioners
+- the pull request number and its base branch
+- the files under the working directory changed by the pull request, and their modes and object IDs in the checked-out commit. They cover files that aren't in the plan result, such as scripts run by provisioners. They're the same files as the pull request's diff, so changes of the base branch don't affect them unless the pull request changes the same files
 - the content of `.terraform.lock.hcl` in the working directory at plan time. It covers the selected providers even if the lock file isn't committed. Terraform guarantees that apply uses the same providers as the plan file
 
 Fields that change even if the plan result is the same, such as `timestamp`, `terraform_version`, and `prior_state`, are excluded.
@@ -53,8 +55,12 @@ Fields that change even if the plan result is the same, such as `timestamp`, `te
 Approvals are dismissed as before in the following cases:
 
 - the plan result has changed
-- no previous plan hash is found (the first run, the artifact expired, and so on)
+- a file under the working directory changed by the pull request has changed, including its mode
+- the base branch of the pull request has changed
+- the latest previous plan on the head branch is of another pull request
+- no previous plan hash is found (the first run, the artifact expired, approvals couldn't be dismissed in the previous run, and so on)
 - the hash couldn't be computed or the previous hash couldn't be got
+- the pull request changes more than 3,000 files, because the GitHub API returns at most 3,000 files
 
 Files outside the working directory, such as local modules and scripts in other directories, aren't covered unless they change the plan result.
 If you need to dismiss approvals when such files change, enable the branch protection rule (or ruleset) "Dismiss stale pull request approvals when new commits are pushed" too.

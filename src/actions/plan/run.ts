@@ -55,6 +55,8 @@ type Inputs = {
   githubToken: string;
   githubTokenForGitHubProvider?: string;
   workingDirectory: string;
+  /** relative path from the git root directory */
+  relativeWorkingDirectory: string;
   autoAppsLogins: string[];
   destroy: boolean;
   tfCommand: string;
@@ -149,10 +151,12 @@ export const disableAutoMergeForRenovateChange = async (
   });
 };
 
+// Returns false if approvals couldn't be listed or some of them couldn't be
+// dismissed.
 export const dismissApprovalReviews = async (
   githubToken: string,
   prNumber: number,
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     const octokit = github.getOctokit(githubToken);
     const { owner, repo } = github.context.repo;
@@ -219,6 +223,7 @@ export const dismissApprovalReviews = async (
       cursor = result.repository.pullRequest.reviews.pageInfo.endCursor;
     }
 
+    let dismissedAll = true;
     for (const review of reviewIds) {
       try {
         await octokit.graphql(
@@ -238,12 +243,15 @@ export const dismissApprovalReviews = async (
         core.warning(
           `Failed to dismiss review ${review.id}: ${e instanceof Error ? e.message : String(e)}`,
         );
+        dismissedAll = false;
       }
     }
+    return dismissedAll;
   } catch (e) {
     core.warning(
       `Failed to list reviews: ${e instanceof Error ? e.message : String(e)}`,
     );
+    return false;
   }
 };
 
@@ -258,12 +266,76 @@ const isForbidden = (e: unknown): boolean =>
   "status" in e &&
   (e.status === 403 || e.status === 401);
 
+const PRJson = z.object({
+  number: z.number(),
+  changed_files: z.number(),
+  base: z.object({ ref: z.string() }),
+  head: z.object({
+    ref: z.string(),
+    repo: z.object({ id: z.number() }).nullish(),
+  }),
+});
+type PRJson = z.infer<typeof PRJson>;
+
+const PRFile = z.object({
+  filename: z.string(),
+  previous_filename: z.string().nullish(),
+  status: z.string().optional(),
+});
+
+// Paths come from the pull request, and modes and object ids come from the
+// checked-out commit that terraform planned.
+// pr_files.json has at most 3000 files, so this fails if the list is incomplete.
+export const getPRFilesInWorkingDirectory = async (params: {
+  ciInfoTempDir: string;
+  changedFiles: number;
+  workingDirectory: string;
+  relativeWorkingDirectory: string;
+}): Promise<planHashLib.FileState[]> => {
+  const files = PRFile.array().parse(
+    JSON.parse(
+      fs.readFileSync(path.join(params.ciInfoTempDir, "pr_files.json"), "utf8"),
+    ),
+  );
+  if (files.length !== params.changedFiles) {
+    throw new Error(
+      `the list of files changed by the pull request is incomplete (${files.length} of ${params.changedFiles} files)`,
+    );
+  }
+  const isUnder = (file: string): boolean => {
+    const rel = path.relative(params.relativeWorkingDirectory, file);
+    return rel !== ".." && !rel.startsWith(`..${path.sep}`);
+  };
+  const entries = await git.listTreeEntries(params.workingDirectory);
+  for (const f of files) {
+    if (
+      f.status !== "removed" &&
+      isUnder(f.filename) &&
+      !entries.has(f.filename)
+    ) {
+      throw new Error(`${f.filename} isn't found in the checked-out commit`);
+    }
+  }
+  const paths = new Set(
+    files
+      .flatMap((f) => [f.filename, f.previous_filename])
+      .filter((p): p is string => !!p && isUnder(p)),
+  );
+  return [...paths].map((p) => ({ path: p, ...entries.get(p) }));
+};
+
+export type PlanHash = {
+  value: string;
+  // The head of the pull request to find the previous plan
+  head: PRJson["head"];
+};
+
 // Compute a one-way hash of the plan result to compare it with the previous
 // plan. Returns undefined if the feature is disabled or the computation fails.
 export const computePlanHashIfNeeded = async (
   inputs: Inputs,
   planJsonContent: string,
-): Promise<string | undefined> => {
+): Promise<PlanHash | undefined> => {
   if (!isSkipDismissIfUnchangedEnabled(inputs)) {
     return undefined;
   }
@@ -273,10 +345,32 @@ export const computePlanHashIfNeeded = async (
     ".terraform.lock.hcl",
   );
   try {
-    return await planHashLib.computePlanHash(planJsonContent, {
+    if (!inputs.ciInfoTempDir) {
+      throw new Error("the ci-info output directory is not set");
+    }
+    const pr = PRJson.parse(
+      JSON.parse(
+        fs.readFileSync(path.join(inputs.ciInfoTempDir, "pr.json"), "utf8"),
+      ),
+    );
+    // On events such as issue_comment, ci-info gets the pull request from the
+    // commit, which can be another pull request.
+    if (pr.number !== inputs.prNumber) {
+      throw new Error(
+        `pr.json is for the pull request #${pr.number}, not #${inputs.prNumber}`,
+      );
+    }
+    const value = await planHashLib.computePlanHash(planJsonContent, {
       target: inputs.target,
       destroy: inputs.destroy,
-      treeSHA: await git.getTreeSHA(inputs.workingDirectory),
+      prNumber: pr.number,
+      baseRef: pr.base.ref,
+      prFiles: await getPRFilesInWorkingDirectory({
+        ciInfoTempDir: inputs.ciInfoTempDir,
+        changedFiles: pr.changed_files,
+        workingDirectory: inputs.workingDirectory,
+        relativeWorkingDirectory: inputs.relativeWorkingDirectory,
+      }),
       lockFile: fs.existsSync(lockFilePath)
         ? fs.readFileSync(lockFilePath, "utf8")
         : null,
@@ -284,6 +378,7 @@ export const computePlanHashIfNeeded = async (
         ? { keyId, region: inputs.skipDismissIfUnchanged?.aws_region }
         : undefined,
     });
+    return { value, head: pr.head };
   } catch (e) {
     core.warning(
       `Failed to compute the plan hash: ${e instanceof Error ? e.message : String(e)}`,
@@ -292,25 +387,13 @@ export const computePlanHashIfNeeded = async (
   }
 };
 
-const PRHead = z.object({
-  head: z.object({
-    ref: z.string(),
-    repo: z.object({ id: z.number() }).nullish(),
-  }),
-});
-
 // Get the plan hash of the latest previous plan run of the target on the
 // pull request's head branch. Returns undefined if it isn't found.
 const getPreviousPlanHash = async (
   inputs: Inputs,
+  head: PRJson["head"],
 ): Promise<string | undefined> => {
-  const prJsonFile = path.join(inputs.ciInfoTempDir || "", "pr.json");
-  if (!inputs.ciInfoTempDir || !fs.existsSync(prJsonFile)) {
-    core.info(`PR JSON file not found: ${prJsonFile}`);
-    return undefined;
-  }
-  const pr = PRHead.parse(JSON.parse(fs.readFileSync(prJsonFile, "utf8")));
-  if (!pr.head.repo) {
+  if (!head.repo) {
     // The head repository was deleted
     return undefined;
   }
@@ -320,8 +403,8 @@ const getPreviousPlanHash = async (
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     target: inputs.target,
-    headRef: pr.head.ref,
-    headRepoId: pr.head.repo.id,
+    headRef: head.ref,
+    headRepoId: head.repo.id,
     currentRunId: Number(env.all.GITHUB_RUN_ID),
     dest: fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-")),
   });
@@ -330,13 +413,15 @@ const getPreviousPlanHash = async (
 
 // Dismiss approvals unless the plan result is the same as the previous plan.
 // If the previous plan hash can't be got, approvals are dismissed.
+// Returns the plan hash to store. It's undefined if approvals couldn't be
+// dismissed, so that the next plan doesn't skip dismissing them.
 export const dismissApprovalsIfNeeded = async (
   inputs: Inputs,
   detailedExitcode: number,
-  planHash: string | undefined,
-): Promise<void> => {
+  planHash: PlanHash | undefined,
+): Promise<string | undefined> => {
   if (!inputs.dismissApprovalBeforePlan || !inputs.prNumber) {
-    return;
+    return planHash?.value;
   }
   // Skip for Renovate PRs with no changes (detailedExitcode === 0)
   if (
@@ -345,21 +430,21 @@ export const dismissApprovalsIfNeeded = async (
     inputs.autoAppsLogins.includes(inputs.prAuthor)
   ) {
     core.info("Skipping dismiss approval reviews: Renovate PR with no changes");
-    return;
+    return planHash?.value;
   }
   if (planHash !== undefined && isSkipDismissIfUnchangedEnabled(inputs)) {
     try {
-      const previousPlanHash = await getPreviousPlanHash(inputs);
-      if (previousPlanHash === planHash) {
+      const previousPlanHash = await getPreviousPlanHash(inputs, planHash.head);
+      if (previousPlanHash === planHash.value) {
         core.info(
           "Skipping dismiss approval reviews: the plan result is the same as the previous plan",
         );
-        return;
+        return planHash.value;
       }
       core.info(
         previousPlanHash === undefined
           ? "The plan hash of the previous plan was not found"
-          : "The plan result has changed since the previous plan",
+          : "The plan hash is different from the previous plan",
       );
     } catch (e) {
       core.warning(
@@ -370,7 +455,10 @@ export const dismissApprovalsIfNeeded = async (
       );
     }
   }
-  await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
+  if (await dismissApprovalReviews(inputs.githubToken, inputs.prNumber)) {
+    return planHash?.value;
+  }
+  return undefined;
 };
 
 const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
@@ -647,8 +735,11 @@ export const runTerraformPlan = async (
   fs.writeFileSync(tempPlanJson, planJsonContent);
 
   // Dismiss existing approval reviews so reviewers must review the new plan
-  const planHash = await computePlanHashIfNeeded(inputs, planJsonContent);
-  await dismissApprovalsIfNeeded(inputs, detailedExitcode, planHash);
+  const planHash = await dismissApprovalsIfNeeded(
+    inputs,
+    detailedExitcode,
+    await computePlanHashIfNeeded(inputs, planJsonContent),
+  );
 
   const summary = getResultSummary(planJsonContent);
   core.setOutput("result_summary", summary);
@@ -757,6 +848,7 @@ export const main = async (
     githubToken: runInputs.githubToken,
     githubTokenForGitHubProvider: runInputs.githubTokenForGitHubProvider,
     workingDirectory: workingDir,
+    relativeWorkingDirectory: path.relative(config.git_root_dir, workingDir),
     autoAppsLogins: config.auto_apps.logins,
     destroy: targetConfig.destroy || false,
     tfCommand: targetConfig.terraform_command,

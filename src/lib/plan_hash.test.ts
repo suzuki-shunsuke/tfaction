@@ -42,7 +42,12 @@ const plan = (overrides: Record<string, unknown> = {}): string =>
 const ctx = {
   target: "aws/foo",
   destroy: false,
-  treeSHA: "tree-sha",
+  prNumber: 1,
+  baseRef: "main",
+  prFiles: [
+    { path: "aws/foo/main.tf", mode: "100644", oid: "blob-1" },
+    { path: "aws/foo/run.sh", mode: "100755", oid: "blob-2" },
+  ],
   lockFile: null,
 };
 
@@ -138,13 +143,23 @@ describe("computePlanHash", () => {
     const h1 = await computePlanHash(plan(), { ...ctx });
     const h2 = await computePlanHash(plan({ timestamp: "x" }), { ...ctx });
     expect(h1).toBe(h2);
-    expect(h1).toMatch(/^v1:sha256:[0-9a-f]{64}$/);
+    expect(h1).toMatch(/^v2:sha256:[0-9a-f]{64}$/);
   });
 
   it("returns a different hash if the context differs", async () => {
     const h = await computePlanHash(plan(), { ...ctx });
+    const [f1, f2] = ctx.prFiles;
+    for (const prFiles of [
+      [{ ...f1, oid: "other" }, f2],
+      [{ ...f1, mode: "100755" }, f2],
+      [{ path: f1.path }, f2],
+      [f1],
+    ]) {
+      expect(await computePlanHash(plan(), { ...ctx, prFiles })).not.toBe(h);
+    }
+    expect(await computePlanHash(plan(), { ...ctx, prNumber: 2 })).not.toBe(h);
     expect(
-      await computePlanHash(plan(), { ...ctx, treeSHA: "other" }),
+      await computePlanHash(plan(), { ...ctx, baseRef: "release" }),
     ).not.toBe(h);
     expect(
       await computePlanHash(plan(), { ...ctx, lockFile: "provider {}" }),
@@ -155,6 +170,24 @@ describe("computePlanHash", () => {
     expect(await computePlanHash(plan(), { ...ctx, destroy: true })).not.toBe(
       h,
     );
+  });
+
+  it("doesn't depend on the order of PR files", async () => {
+    expect(
+      await computePlanHash(plan(), {
+        ...ctx,
+        prFiles: [...ctx.prFiles].reverse(),
+      }),
+    ).toBe(await computePlanHash(plan(), { ...ctx }));
+  });
+
+  it("ignores unknown fields of PR files", async () => {
+    expect(
+      await computePlanHash(plan(), {
+        ...ctx,
+        prFiles: ctx.prFiles.map((f) => ({ ...f, status: "modified" })),
+      }),
+    ).toBe(await computePlanHash(plan(), { ...ctx }));
   });
 
   it("ignores changes of only sensitive values without a key", async () => {
@@ -179,7 +212,7 @@ describe("computePlanHash", () => {
       mac,
     );
     expect(mac).toHaveBeenCalledWith(key, expect.any(Buffer));
-    expect(h1).toMatch(/^v1:hmac-sha256-aws-kms:/);
+    expect(h1).toMatch(/^v2:hmac-sha256-aws-kms:/);
     expect(h1).not.toBe(h2);
   });
 });
