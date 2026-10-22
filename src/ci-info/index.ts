@@ -9,6 +9,7 @@ import * as input from "../lib/input";
 export interface PRFile {
   filename: string;
   previous_filename?: string;
+  status?: string;
 }
 
 export type Logger = {
@@ -118,6 +119,7 @@ export const getPRFiles = async (
       ...data.map((f) => ({
         filename: f.filename,
         previous_filename: f.previous_filename,
+        status: f.status,
       })),
     );
 

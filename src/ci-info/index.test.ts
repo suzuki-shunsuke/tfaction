@@ -614,7 +614,10 @@ describe("run", () => {
 
     octokit.rest.pulls.get.mockResolvedValue({ data: prData });
     octokit.rest.pulls.listFiles.mockResolvedValue({
-      data: [{ filename: "file1.ts" }, { filename: "file2.ts" }],
+      data: [
+        { filename: "file1.ts", status: "modified", sha: "a", additions: 1 },
+        { filename: "file2.ts", status: "removed", sha: "b", deletions: 1 },
+      ],
     });
 
     const input: RunInput = {
@@ -649,6 +652,15 @@ describe("run", () => {
       "utf-8",
     );
     expect(filesContent).toBe("file1.ts\nfile2.ts\n");
+
+    const prFilesContent = await fs.readFile(
+      path.join(tempDir, "pr_files.json"),
+      "utf-8",
+    );
+    expect(JSON.parse(prFilesContent)).toEqual([
+      { filename: "file1.ts", status: "modified" },
+      { filename: "file2.ts", status: "removed" },
+    ]);
   });
 
   it("logs info messages during execution", async () => {

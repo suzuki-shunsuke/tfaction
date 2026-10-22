@@ -45,7 +45,8 @@ The hash is computed from the following things that affect apply:
 - `output_changes` of `terraform show -json` whose actions aren't `no-op`
 - the providers of the resource changes (`provider_name`)
 - the target and whether the plan is a destroy plan
-- the git tree object id of the working directory at `HEAD`. It covers files that aren't in the plan result, such as scripts run by provisioners
+- the pull request number and its base branch
+- the files in the working directory changed by the pull request, including their modes. They cover files that aren't in the plan result, such as scripts run by provisioners
 - the content of `.terraform.lock.hcl` in the working directory at plan time. It covers the selected providers even if the lock file isn't committed. Terraform guarantees that apply uses the same providers as the plan file
 
 Fields that change even if the plan result is the same, such as `timestamp`, `terraform_version`, and `prior_state`, are excluded.
@@ -53,8 +54,12 @@ Fields that change even if the plan result is the same, such as `timestamp`, `te
 Approvals are dismissed as before in the following cases:
 
 - the plan result has changed
+- a file in the working directory changed by the pull request has changed
+- `.terraform.lock.hcl` has changed, even if the base branch changed it
+- the base branch of the pull request has changed
 - no previous plan hash is found (the first run, the artifact expired, and so on)
 - the hash couldn't be computed or the previous hash couldn't be got
+- the pull request changes more than 3,000 files
 
 Files outside the working directory, such as local modules and scripts in other directories, aren't covered unless they change the plan result.
 If you need to dismiss approvals when such files change, enable the branch protection rule (or ruleset) "Dismiss stale pull request approvals when new commits are pushed" too.
