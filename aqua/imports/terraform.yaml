@@ -1,2 +1,2 @@
 packages:
-  - name: hashicorp/terraform@v1.16.6
+  - name: hashicorp/terraform@v1.17.0
