@@ -6,78 +6,78 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.76.0/trivy_0.76.0_Linux-64bit.tar.gz",
-      "checksum": "E24B1C51293C1B15E4BA8D45BBC7891BA053F90278EC2698F3562C993E145FE7",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.76.1/trivy_0.76.1_Linux-64bit.tar.gz",
+      "checksum": "C7CBE3137FB8A48A17574BEDE3DD6BEB16742D1E9772929940FC90082C39D9C0",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.76.0/trivy_0.76.0_Linux-ARM64.tar.gz",
-      "checksum": "AAB21E677A7B7071FC79F1711480840754C18A1B9D9CEFA7CCD06AF63A0E8F4C",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.76.1/trivy_0.76.1_Linux-ARM64.tar.gz",
+      "checksum": "E174DFF2A6DBA5E3AE41F8D0537A6324405BD08132497340304C6B20E0F16A1F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.76.0/trivy_0.76.0_macOS-64bit.tar.gz",
-      "checksum": "89563D4D495CF4EF06A0D1950F8710B124E9F7BD2615EC6C47B03673F4AD45A2",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.76.1/trivy_0.76.1_macOS-64bit.tar.gz",
+      "checksum": "7AA762EACD582052D053B62DCF972A1AB058ABE39A57CCAE234ED8894945B6B7",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.76.0/trivy_0.76.0_macOS-ARM64.tar.gz",
-      "checksum": "E7EC0D21FE842553F59AF99ABA2EFBCC822369FBAED27019C575408B6D135FCE",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.76.1/trivy_0.76.1_macOS-ARM64.tar.gz",
+      "checksum": "11A9B6CD2752011B54F01EA4BD0DBFA9F0C41DC6538D5A3F9D23955F471BF4E5",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/aquasecurity/trivy/v0.76.0/trivy_0.76.0_windows-64bit.zip",
-      "checksum": "7B4762A5A5326CB4B83DFD2BB5D9AAF15A1ED867C75CAD7DD8B38840A28E7BE6",
+      "id": "github_release/github.com/aquasecurity/trivy/v0.76.1/trivy_0.76.1_windows-64bit.zip",
+      "checksum": "1051F49CB22D5284F43425F72AAD9CDA63CA12CEB92E7CAA06903490C82DC9BF",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.6/terragrunt_darwin_amd64.tar.gz",
-      "checksum": "BCF9F95A8FF2AF20998A7BACA477A5EA2B2869C86CA4D4D787C619612B00D257",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.2.1/terragrunt_darwin_amd64.tar.gz",
+      "checksum": "29806D1708F5C54E54BC6ADFCACFB710D4BB1F6F180EFD751692E6FAD5985640",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.6/terragrunt_darwin_arm64.tar.gz",
-      "checksum": "C801B7C085A893CCBC5B9844522415E7BF1486D0A11341DB793E76E61DC4C5F5",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.2.1/terragrunt_darwin_arm64.tar.gz",
+      "checksum": "0ADED323F844CE6567A15FEB26393B67EFF1400DC1722203FA4DD4E23B3BB182",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.6/terragrunt_linux_amd64.tar.gz",
-      "checksum": "5DCA0E3518445199ECFD8C356532E3F134BF3082B092CD2FD61F143AB9EA7A06",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.2.1/terragrunt_linux_amd64.tar.gz",
+      "checksum": "08C8844CC69E4F03451EBB8F347CB57D9BD6B8DB7B16E437AE5EC6F001228EF9",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.6/terragrunt_linux_arm64.tar.gz",
-      "checksum": "6F26B85E0BEFE77AC5F6777F810D8560E56A55CF87D9980FC2B9E29B2D347377",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.2.1/terragrunt_linux_arm64.tar.gz",
+      "checksum": "8B92D56A20B2848365E22EF94F963FBFE25FEDEEBCACFFACBC286CFCF9966066",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.1.6/terragrunt_windows_amd64.exe.tar.gz",
-      "checksum": "0F71DAE898D43E50A5935C4E74062C53253C0C8E4ADED0CCB302A7AE6FDCEAA3",
+      "id": "github_release/github.com/gruntwork-io/terragrunt/v1.2.1/terragrunt_windows_amd64.exe.tar.gz",
+      "checksum": "4393DF92D7F6A0BDFD5744F069460A4886C6371B921CD4B1BE03C186195DC05C",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.13.1/tofu_1.13.1_darwin_amd64.tar.gz",
-      "checksum": "A73720443BA38712D7D96DC1E857ADD02C15A790919C653AD07492E9952F8C27",
+      "id": "github_release/github.com/opentofu/opentofu/v1.13.2/tofu_1.13.2_darwin_amd64.tar.gz",
+      "checksum": "DC6E4EB1D3ED6550C2EF052596F933DBCD8C806957665EA83AE7537147CB3074",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.13.1/tofu_1.13.1_darwin_arm64.tar.gz",
-      "checksum": "BE78F659F04EF06A9DBD9B3934D46AF95D787A3AA38396D459DEA395261816A9",
+      "id": "github_release/github.com/opentofu/opentofu/v1.13.2/tofu_1.13.2_darwin_arm64.tar.gz",
+      "checksum": "0D1CDC85F38992055B48E7FB161304A2DDFE2E5EE0FF68FFEC9D0349C8BD1B59",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.13.1/tofu_1.13.1_linux_amd64.tar.gz",
-      "checksum": "378ADA19D4BC70C43732004E8159BE771B23B9A5AFDF059E5F8A2B3FA2C70A69",
+      "id": "github_release/github.com/opentofu/opentofu/v1.13.2/tofu_1.13.2_linux_amd64.tar.gz",
+      "checksum": "AC05D9952662C7DB28DD57E93F0A68018837BFDF9342384EC0987977C16A9645",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.13.1/tofu_1.13.1_linux_arm64.tar.gz",
-      "checksum": "9C1EF375AA1852DB0B2888AA921B640C71F8140D4682AA4FEC99378A64FA7DC3",
+      "id": "github_release/github.com/opentofu/opentofu/v1.13.2/tofu_1.13.2_linux_arm64.tar.gz",
+      "checksum": "88E2D9E3F94F97B76AB2FAF55ADE87578F56AED19C5E45FA139D70E994366D1F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/opentofu/opentofu/v1.13.1/tofu_1.13.1_windows_amd64.tar.gz",
-      "checksum": "6825AE311E9A15747CE2EDE7B7E97C8BB744A4D271FA8113259EEEEE3D09438C",
+      "id": "github_release/github.com/opentofu/opentofu/v1.13.2/tofu_1.13.2_windows_amd64.tar.gz",
+      "checksum": "E74FC2BDA0C81CE696B6B7016A4D5C1F557638161239E4101E9EE7D8E0FABA59",
       "algorithm": "sha256"
     },
     {
@@ -111,33 +111,33 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.2/cmdx_darwin_amd64.tar.gz",
-      "checksum": "768B8517666A15D25A6870307231416016FC1165F8A1C1743B6AACDBAC7A5FAC",
+      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.3/cmdx_darwin_amd64.tar.gz",
+      "checksum": "F5F05FF5DFA6702EDDE54A9A8B9B42E73E7845DA74CF749305F4884C3253F001",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.2/cmdx_darwin_arm64.tar.gz",
-      "checksum": "FBD7DADDBB65ABD0DE5C6B898F2219588C7D1A71DF6808137D0A628858E7777B",
+      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.3/cmdx_darwin_arm64.tar.gz",
+      "checksum": "CF3AF89361679CE703D85F58631D91A5D7B5C2C295A6D655AAD05B103BA711CD",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.2/cmdx_linux_amd64.tar.gz",
-      "checksum": "40BC7B5F472211B22C4786D55F6859FA8093F1A373FF40A2DCCD29BD3D11CF96",
+      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.3/cmdx_linux_amd64.tar.gz",
+      "checksum": "46CC5A6BDCE4F29A67DDD2E6E3D86FEB48C04B8AE7203000ADDAB23A00B33791",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.2/cmdx_linux_arm64.tar.gz",
-      "checksum": "691EB4CC3929A5E065F7C2F977CEE8306D817CB0F8DE9D5B4B4ED38C027CEC41",
+      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.3/cmdx_linux_arm64.tar.gz",
+      "checksum": "0D493091427FE0F31E597715DB3CE85FACE12DA773F2367983A48A4A35D7023F",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.2/cmdx_windows_amd64.zip",
-      "checksum": "4452010897556935E3F94A11AF2B2889563E05073A6DEA72FCF40B83B7F4AE5B",
+      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.3/cmdx_windows_amd64.zip",
+      "checksum": "F9DB129896D519DC4D2A5E543161CEED2AFD5A96524CF2A3C9B98A3D6F6C3EDC",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.2/cmdx_windows_arm64.zip",
-      "checksum": "156D02F4E784E237B0661464D6FF76D6C4EFC4E01F858F8A9734364CD41BC98E",
+      "id": "github_release/github.com/suzuki-shunsuke/cmdx/v2.0.3/cmdx_windows_arm64.zip",
+      "checksum": "A03861C4EA9B5A24B362E765AE5F11D53BB63A712CE9A1E12E3189990B1D708D",
       "algorithm": "sha256"
     },
     {
@@ -171,123 +171,123 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.0/pinact_darwin_amd64.tar.gz",
-      "checksum": "DA5532BD185A9D3A16A1F93774F835574E0C50BC74C2085B9917B9DF3E9FBBAA",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.2/pinact_darwin_amd64.tar.gz",
+      "checksum": "8FB6A0EE87B59BC2778371527C58A46073D5E289919BBD1C2559EFF7EFEB74E3",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.0/pinact_darwin_arm64.tar.gz",
-      "checksum": "3437EBFC9DB720E431E86FD03ED19173B88DCB80B0F177D11A892126108661B5",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.2/pinact_darwin_arm64.tar.gz",
+      "checksum": "9B9545D53376654005DAAEE5AB736D579887205CA3DF99925C8FE8358C6E7FDB",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.0/pinact_linux_amd64.tar.gz",
-      "checksum": "D005BBB85DA80DACDC07816F24A5DA723A9F6D1E9F3D3E7E73DF33F9CAA1358F",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.2/pinact_linux_amd64.tar.gz",
+      "checksum": "7F003D8F51E984C2264D2009D430E3E0E87AE404A0E2DC2A9A277B0F731BF5B7",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.0/pinact_linux_arm64.tar.gz",
-      "checksum": "D28CA5E9DDD7950DA4A808288F8A83F84FC3CA40E86BAB970F3ADEEF33578C0B",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.2/pinact_linux_arm64.tar.gz",
+      "checksum": "326E27F5B3B5FCA21E6A169B2785BA2023DF3DD9EE82DD0F4E438CB1220B68D7",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.0/pinact_windows_amd64.zip",
-      "checksum": "DF2F590F24C2BFE65A35010BFFB4369BA0792C9AFAF7FB324B2330895A37D19F",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.2/pinact_windows_amd64.zip",
+      "checksum": "ABDA382F54A28994E6C7AA220229D5077309DEF0666BFFE0D8D35852BBA54B14",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.0/pinact_windows_arm64.zip",
-      "checksum": "E054B2B99230629307172D70DDAB6D6C02CAE9CC5D4E40FB647025A2BDECEFF4",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.2/pinact_windows_arm64.zip",
+      "checksum": "C9935DCDB61BFA0A471B974034E150C29152AE456B545F04A140CBB7CD7FB37D",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_darwin_amd64.zip",
-      "checksum": "0F3A9FD17526014646A2DFC3F9122F7B4161ABE3D6B0F0F03F9014483DDF4D19",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.65.0/tflint_darwin_amd64.zip",
+      "checksum": "27696EA23ED77C1918945147EBFE6485A74F58560B9557CCECC77379205702C5",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_darwin_arm64.zip",
-      "checksum": "2496E9CB3D24992D553B45E7C87A0FDC9449CA975233876247A9BFEDA857E6C0",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.65.0/tflint_darwin_arm64.zip",
+      "checksum": "5A71C63481BA56760864298011FDB7317A9AE80A0BBAECEEFA35883C7F62AC71",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_linux_amd64.zip",
-      "checksum": "CCA9D13E2E1D7A2C627AF60FF899A3C9B74212899416AEB96EC764D2EF954537",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.65.0/tflint_linux_amd64.zip",
+      "checksum": "D4C545ED2E29D6338604B586F34F544F380F70F243AA72F7B484713835EAEC61",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_linux_arm64.zip",
-      "checksum": "560DA89AACF59389D4EB029730DD5B109B7288096C32F2726A0D9E783A5EA8EB",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.65.0/tflint_linux_arm64.zip",
+      "checksum": "843017C47A98BE1DE4D88FA038DAA293770FE25CD01656C4F08B2E30D1D3B3A0",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/terraform-linters/tflint/v0.64.0/tflint_windows_amd64.zip",
-      "checksum": "FB42FB859D844B156A8EA9D3363078C4D8B85CA78782E60876B08C9B8E59F303",
+      "id": "github_release/github.com/terraform-linters/tflint/v0.65.0/tflint_windows_amd64.zip",
+      "checksum": "292E760ADF0E9C7E0F10DDEB0F6ADD67FD6D2C68B5449FDF766FF6FFDDCE465C",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v24.22.0/node-v24.22.0-darwin-arm64.tar.gz",
-      "checksum": "6A9724D9B50A5F22B4816CDED441B5A8D9DDAE546191A5E5B7EFA5A5E2EE26D5",
+      "id": "http/nodejs.org/dist/v24.22.1/node-v24.22.1-darwin-arm64.tar.gz",
+      "checksum": "89C682593D76CD44233FA53B1563264E7DE9CBB189CAD169135C5B4FADFBC0A7",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v24.22.0/node-v24.22.0-darwin-x64.tar.gz",
-      "checksum": "495E3F273C645F3C4677D438304CDFC701729EA5DEC5728F5C8E76A2DECE4B91",
+      "id": "http/nodejs.org/dist/v24.22.1/node-v24.22.1-darwin-x64.tar.gz",
+      "checksum": "D132557E7EE2B85AF08B0C8C34338E65C6430F2238D01F727728EF42DC83B035",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v24.22.0/node-v24.22.0-linux-arm64.tar.gz",
-      "checksum": "B7E7991D5407815ADFA74A2A9CD4DB683552C8CE32FF4A295C22E972849C3F5D",
+      "id": "http/nodejs.org/dist/v24.22.1/node-v24.22.1-linux-arm64.tar.gz",
+      "checksum": "33C37BE234BA8BEE041961047B19160F4D7D0F164E8E246F78BDD10FEFF148B3",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v24.22.0/node-v24.22.0-linux-x64.tar.gz",
-      "checksum": "28EA0A438DE9A13BD7891FD758EEE6C7819EE8AF5442DFD8D45BD65E56D4228C",
+      "id": "http/nodejs.org/dist/v24.22.1/node-v24.22.1-linux-x64.tar.gz",
+      "checksum": "EB6728E77C576A35162C122C45CCADF224D89FF00ABC8DAE46CC2897C6002D7C",
       "algorithm": "sha256"
     },
     {
-      "id": "http/nodejs.org/dist/v24.22.0/node-v24.22.0-win-x64.zip",
-      "checksum": "F9683A19877E12A9B167305C8DB71040D812876359DE21F0D2E97C3F321F80C3",
+      "id": "http/nodejs.org/dist/v24.22.1/node-v24.22.1-win-x64.zip",
+      "checksum": "D2046D28C2C3DCD211AC5145C0BF30E2047EF9DFB306693C8C6E2ECCD8B95FA5",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.16.6/terraform_1.16.6_darwin_amd64.zip",
-      "checksum": "794A36C3F7EBF6C58F2089C226068A539D1705BA358A5679B51671C8DC7EBC7B",
+      "id": "http/releases.hashicorp.com/terraform/1.17.0/terraform_1.17.0_darwin_amd64.zip",
+      "checksum": "3773397524196E4EBBF7167E2B9FB478DFF1962D555D649F616BA97CA446A143",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.16.6/terraform_1.16.6_darwin_arm64.zip",
-      "checksum": "85E1BC78AB45BDC5F82A7BAC3929E37D072834A584D22583A2498DC67BB624CD",
+      "id": "http/releases.hashicorp.com/terraform/1.17.0/terraform_1.17.0_darwin_arm64.zip",
+      "checksum": "7472A54CCA911D46C0E399A5EBBCE44444912D0D4DAD7495F37F1FA51E7CA6B7",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.16.6/terraform_1.16.6_linux_amd64.zip",
-      "checksum": "38034B38D03096399A7A1264A14561A8029B2B496FD1F169452656E53968F1B7",
+      "id": "http/releases.hashicorp.com/terraform/1.17.0/terraform_1.17.0_linux_amd64.zip",
+      "checksum": "C168CAB7C637A8769FDB90089DDD19DE701BC6FF8ACA64DC2E2185FE46F59F67",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.16.6/terraform_1.16.6_linux_arm64.zip",
-      "checksum": "A750B5A11038F165846B2658C40C88CD7070AA67A61BAB431A14BA27928EA9EA",
+      "id": "http/releases.hashicorp.com/terraform/1.17.0/terraform_1.17.0_linux_arm64.zip",
+      "checksum": "F32478134FFC6D710EEC474BBD316652CDDDC0F4E336973A3745E8D3A3309CDF",
       "algorithm": "sha256"
     },
     {
-      "id": "http/releases.hashicorp.com/terraform/1.16.6/terraform_1.16.6_windows_amd64.zip",
-      "checksum": "6EA2C186E0E76A113AF30FBCDCF7A4B4C70756317994A04929E5C90B9E94B1DF",
+      "id": "http/releases.hashicorp.com/terraform/1.17.0/terraform_1.17.0_windows_amd64.zip",
+      "checksum": "2948DD7F77DEC0F562EC29000103E0441D915BE5E5F1A02C1CE23681951CFB19",
       "algorithm": "sha256"
     },
     {
-      "id": "http/unofficial-builds.nodejs.org/download/release/v24.22.0/node-v24.22.0-linux-arm64-musl.tar.gz",
-      "checksum": "6812A53E5B37FBC32476D6C3511038D2BC3BBD1B3BB348D6C04DD2C70A1C8F4A",
+      "id": "http/unofficial-builds.nodejs.org/download/release/v24.22.1/node-v24.22.1-linux-arm64-musl.tar.gz",
+      "checksum": "8254125825A3E5E834BD8A260DAB4C8303F720464A741506EC27989B9BA1769B",
       "algorithm": "sha256"
     },
     {
-      "id": "http/unofficial-builds.nodejs.org/download/release/v24.22.0/node-v24.22.0-linux-x64-musl.tar.gz",
-      "checksum": "72CD253FBE0C2539D52208ED098D47B78FF2C32BA76295D8E6B5B0CE067DCBA5",
+      "id": "http/unofficial-builds.nodejs.org/download/release/v24.22.1/node-v24.22.1-linux-x64-musl.tar.gz",
+      "checksum": "0A9EDDCE2D2E8F3ADDBE94FA46D751325B2D74F7FD1CE63296164D36B6DFC6E5",
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.575.0/registry.yaml",
-      "checksum": "340BC6F1FA7124077830D090576F9DC538212FDD7869F8DE973E81B0124EFFA1",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.578.0/registry.yaml",
+      "checksum": "EA4C2D5E969C4DA4C261F87B2B090A2BC137E6DC6406884E380AA465E25EA68D",
       "algorithm": "sha256"
     }
   ]
