@@ -181,50 +181,56 @@ export const dismissApprovalReviews = async (
       }
     }`;
 
-    const reviewIds: Array<{ id: string; login: string | null }> = [];
-    let cursor: string | null = null;
+    const listApprovals = async (): Promise<
+      Array<{ id: string; login: string | null }>
+    > => {
+      const reviewIds: Array<{ id: string; login: string | null }> = [];
+      let cursor: string | null = null;
 
-    while (true) {
-      const result: {
-        repository: {
-          pullRequest: {
-            reviews: {
-              nodes: Array<{
-                id: string;
-                author: {
-                  __typename: string;
-                  login: string;
-                } | null;
-              }>;
-              pageInfo: {
-                hasNextPage: boolean;
-                endCursor: string;
+      while (true) {
+        const result: {
+          repository: {
+            pullRequest: {
+              reviews: {
+                nodes: Array<{
+                  id: string;
+                  author: {
+                    __typename: string;
+                    login: string;
+                  } | null;
+                }>;
+                pageInfo: {
+                  hasNextPage: boolean;
+                  endCursor: string;
+                };
               };
             };
           };
-        };
-      } = await octokit.graphql(query, {
-        owner,
-        repo,
-        pr: prNumber,
-        cursor,
-      });
-
-      for (const node of result.repository.pullRequest.reviews.nodes) {
-        reviewIds.push({
-          id: node.id,
-          login: node.author?.__typename === "User" ? node.author.login : null,
+        } = await octokit.graphql(query, {
+          owner,
+          repo,
+          pr: prNumber,
+          cursor,
         });
-      }
 
-      if (!result.repository.pullRequest.reviews.pageInfo.hasNextPage) {
-        break;
-      }
-      cursor = result.repository.pullRequest.reviews.pageInfo.endCursor;
-    }
+        for (const node of result.repository.pullRequest.reviews.nodes) {
+          reviewIds.push({
+            id: node.id,
+            login:
+              node.author?.__typename === "User" ? node.author.login : null,
+          });
+        }
 
-    let dismissedAll = true;
-    for (const review of reviewIds) {
+        if (!result.repository.pullRequest.reviews.pageInfo.hasNextPage) {
+          break;
+        }
+        cursor = result.repository.pullRequest.reviews.pageInfo.endCursor;
+      }
+      return reviewIds;
+    };
+
+    const failedIds: string[] = [];
+    for (const review of await listApprovals()) {
       try {
         await octokit.graphql(
           `mutation($reviewId: ID!, $message: String!) {
@@ -243,10 +249,15 @@ export const dismissApprovalReviews = async (
         core.warning(
           `Failed to dismiss review ${review.id}: ${e instanceof Error ? e.message : String(e)}`,
         );
-        dismissedAll = false;
+        failedIds.push(review.id);
       }
     }
-    return dismissedAll;
+    if (failedIds.length === 0) {
+      return true;
+    }
+    // Plan jobs of other targets may have dismissed them at the same time.
+    const approved = new Set((await listApprovals()).map((r) => r.id));
+    return failedIds.every((id) => !approved.has(id));
   } catch (e) {
     core.warning(
       `Failed to list reviews: ${e instanceof Error ? e.message : String(e)}`,
@@ -277,12 +288,6 @@ const PRJson = z.object({
 });
 type PRJson = z.infer<typeof PRJson>;
 
-const PRFile = z.object({
-  filename: z.string(),
-  previous_filename: z.string().nullish(),
-  status: z.string().optional(),
-});
-
 // Paths come from the pull request, and modes and object ids come from the
 // checked-out commit that terraform planned.
 // pr_files.json has at most 3000 files, so this fails if the list is incomplete.
@@ -292,35 +297,38 @@ export const getPRFilesInWorkingDirectory = async (params: {
   workingDirectory: string;
   relativeWorkingDirectory: string;
 }): Promise<planHashLib.FileState[]> => {
-  const files = PRFile.array().parse(
+  const files = types.PRFile.array().parse(
     JSON.parse(
       fs.readFileSync(path.join(params.ciInfoTempDir, "pr_files.json"), "utf8"),
     ),
   );
   if (files.length !== params.changedFiles) {
     throw new Error(
-      `the list of files changed by the pull request is incomplete (${files.length} of ${params.changedFiles} files)`,
+      `pr_files.json has ${files.length} files but the pull request changes ${params.changedFiles} files`,
     );
   }
   const isUnder = (file: string): boolean => {
     const rel = path.relative(params.relativeWorkingDirectory, file);
     return rel !== ".." && !rel.startsWith(`..${path.sep}`);
   };
-  const entries = await git.listTreeEntries(params.workingDirectory);
-  for (const f of files) {
-    if (
-      f.status !== "removed" &&
-      isUnder(f.filename) &&
-      !entries.has(f.filename)
-    ) {
-      throw new Error(`${f.filename} isn't found in the checked-out commit`);
-    }
-  }
   const paths = new Set(
     files
       .flatMap((f) => [f.filename, f.previous_filename])
       .filter((p): p is string => !!p && isUnder(p)),
   );
+  if (paths.size === 0) {
+    return [];
+  }
+  const entries = await git.listTreeEntries(params.workingDirectory);
+  for (const f of files) {
+    if (
+      f.status !== "removed" &&
+      paths.has(f.filename) &&
+      !entries.has(f.filename)
+    ) {
+      throw new Error(`${f.filename} isn't found in the checked-out commit`);
+    }
+  }
   return [...paths].map((p) => ({ path: p, ...entries.get(p) }));
 };
 
@@ -360,17 +368,18 @@ export const computePlanHashIfNeeded = async (
         `pr.json is for the pull request #${pr.number}, not #${inputs.prNumber}`,
       );
     }
+    const prFiles = await getPRFilesInWorkingDirectory({
+      ciInfoTempDir: inputs.ciInfoTempDir,
+      changedFiles: pr.changed_files,
+      workingDirectory: inputs.workingDirectory,
+      relativeWorkingDirectory: inputs.relativeWorkingDirectory,
+    });
     const value = await planHashLib.computePlanHash(planJsonContent, {
       target: inputs.target,
       destroy: inputs.destroy,
       prNumber: pr.number,
       baseRef: pr.base.ref,
-      prFiles: await getPRFilesInWorkingDirectory({
-        ciInfoTempDir: inputs.ciInfoTempDir,
-        changedFiles: pr.changed_files,
-        workingDirectory: inputs.workingDirectory,
-        relativeWorkingDirectory: inputs.relativeWorkingDirectory,
-      }),
+      prFiles,
       lockFile: fs.existsSync(lockFilePath)
         ? fs.readFileSync(lockFilePath, "utf8")
         : null,
@@ -413,15 +422,14 @@ const getPreviousPlanHash = async (
 
 // Dismiss approvals unless the plan result is the same as the previous plan.
 // If the previous plan hash can't be got, approvals are dismissed.
-// Returns the plan hash to store. It's undefined if approvals couldn't be
-// dismissed, so that the next plan doesn't skip dismissing them.
+// Returns false if approvals couldn't be dismissed.
 export const dismissApprovalsIfNeeded = async (
   inputs: Inputs,
   detailedExitcode: number,
   planHash: PlanHash | undefined,
-): Promise<string | undefined> => {
+): Promise<boolean> => {
   if (!inputs.dismissApprovalBeforePlan || !inputs.prNumber) {
-    return planHash?.value;
+    return true;
   }
   // Skip for Renovate PRs with no changes (detailedExitcode === 0)
   if (
@@ -430,7 +438,7 @@ export const dismissApprovalsIfNeeded = async (
     inputs.autoAppsLogins.includes(inputs.prAuthor)
   ) {
     core.info("Skipping dismiss approval reviews: Renovate PR with no changes");
-    return planHash?.value;
+    return true;
   }
   if (planHash !== undefined && isSkipDismissIfUnchangedEnabled(inputs)) {
     try {
@@ -439,7 +447,7 @@ export const dismissApprovalsIfNeeded = async (
         core.info(
           "Skipping dismiss approval reviews: the plan result is the same as the previous plan",
         );
-        return planHash.value;
+        return true;
       }
       core.info(
         previousPlanHash === undefined
@@ -455,10 +463,7 @@ export const dismissApprovalsIfNeeded = async (
       );
     }
   }
-  if (await dismissApprovalReviews(inputs.githubToken, inputs.prNumber)) {
-    return planHash?.value;
-  }
-  return undefined;
+  return await dismissApprovalReviews(inputs.githubToken, inputs.prNumber);
 };
 
 const generateTfmigrateHcl = async (inputs: Inputs): Promise<boolean> => {
@@ -735,11 +740,15 @@ export const runTerraformPlan = async (
   fs.writeFileSync(tempPlanJson, planJsonContent);
 
   // Dismiss existing approval reviews so reviewers must review the new plan
-  const planHash = await dismissApprovalsIfNeeded(
+  const planHash = await computePlanHashIfNeeded(inputs, planJsonContent);
+  const approvalsHandled = await dismissApprovalsIfNeeded(
     inputs,
     detailedExitcode,
-    await computePlanHashIfNeeded(inputs, planJsonContent),
+    planHash,
   );
+  // If approvals couldn't be dismissed, the plan hash isn't stored so that the
+  // next plan doesn't skip dismissing them.
+  const storedPlanHash = approvalsHandled ? planHash?.value : undefined;
 
   const summary = getResultSummary(planJsonContent);
   core.setOutput("result_summary", summary);
@@ -774,7 +783,7 @@ export const runTerraformPlan = async (
       bucket: inputs.planFileS3.bucket,
       files: [planFile],
       summary,
-      plan_hash: planHash,
+      plan_hash: storedPlanHash,
     };
   } else {
     const artifactNameBinary = `terraform_plan_file_${inputs.target.replaceAll("/", "__")}`;
@@ -787,7 +796,7 @@ export const runTerraformPlan = async (
       tempDir,
     );
     await artifact.uploadArtifact(artifactNameJson, [tempPlanJson], tempDir);
-    meta = { storage: "github-artifacts", summary, plan_hash: planHash };
+    meta = { storage: "github-artifacts", summary, plan_hash: storedPlanHash };
   }
 
   fs.writeFileSync(metaPath, JSON.stringify(meta));
