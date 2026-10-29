@@ -9,7 +9,7 @@ import { KMSClient, GenerateMacCommand } from "@aws-sdk/client-kms";
 
 // Bump this when the normalization changes so that hashes computed by an older
 // version never match (a mismatch dismisses approvals, which is the safe side).
-const formatVersion = "v1";
+const formatVersion = "v2";
 
 const Change = z.object({
   actions: z.string().array(),
@@ -101,14 +101,32 @@ const maskChange = <T extends OutputChange>(change: T): T => ({
   after: maskSensitive(change.after, change.after_sensitive),
 });
 
+// Compare strings by UTF-16 code units instead of localeCompare so that the
+// order doesn't depend on the locale.
+const compareStrings = (a: string, b: string): number =>
+  a < b ? -1 : a > b ? 1 : 0;
+
+// The state of a file in the checked-out commit.
+// mode and oid are undefined if the file doesn't exist.
+export type FileState = {
+  path: string;
+  mode?: string;
+  oid?: string;
+};
+
 // Inputs other than the plan JSON that affect apply.
 export type PlanContext = {
   target: string;
   destroy: boolean;
-  // The git tree object id of the working directory.
-  // It covers files that aren't in the plan JSON, such as scripts run by
-  // provisioners and the committed .terraform.lock.hcl.
-  treeSHA: string;
+  // A plan of another pull request on the same head branch, or a plan before
+  // the base branch is changed, never matches.
+  prNumber: number;
+  baseRef: string;
+  // The files under the working directory changed by the pull request.
+  // They cover files that aren't in the plan JSON, such as scripts run by
+  // provisioners. Changes of the base branch don't affect them unless the
+  // pull request changes the same files.
+  prFiles: FileState[];
   // The content of .terraform.lock.hcl at plan time (null if it doesn't exist).
   // It covers the selected providers even if the lock file isn't committed.
   // Terraform guarantees that apply uses the same providers as the plan file.
@@ -142,11 +160,12 @@ export const normalizePlan = (
     .map((rc): ResourceChange =>
       opts.maskSensitive ? { ...rc, change: maskChange(rc.change) } : rc,
     )
-    .sort((a, b) => {
-      const ka = `${a.address}\u0000${a.deposed ?? ""}`;
-      const kb = `${b.address}\u0000${b.deposed ?? ""}`;
-      return ka < kb ? -1 : ka > kb ? 1 : 0;
-    });
+    .sort((a, b) =>
+      compareStrings(
+        `${a.address}\u0000${a.deposed ?? ""}`,
+        `${b.address}\u0000${b.deposed ?? ""}`,
+      ),
+    );
   const outputChanges = Object.fromEntries(
     Object.entries(plan.output_changes ?? {})
       .filter(([, oc]) => !isNoop(oc.actions))
@@ -157,7 +176,11 @@ export const normalizePlan = (
     method: opts.method,
     target: opts.target,
     destroy: opts.destroy,
-    tree_sha: opts.treeSHA,
+    pr_number: opts.prNumber,
+    base_ref: opts.baseRef,
+    pr_files: opts.prFiles
+      .map(({ path, mode, oid }) => ({ path, mode, oid }))
+      .sort((a, b) => compareStrings(a.path, b.path)),
     lock_file: opts.lockFile,
     resource_changes: resourceChanges,
     output_changes: outputChanges,
@@ -210,18 +233,16 @@ export const computePlanHash = async (
   opts: ComputePlanHashOptions,
   mac: (key: AWSKMSKey, digest: Buffer) => Promise<string> = generateMac,
 ): Promise<string> => {
-  const method = opts.awsKMSKey ? "hmac-sha256-aws-kms" : "sha256";
+  const { awsKMSKey, ...ctx } = opts;
+  const method = awsKMSKey ? "hmac-sha256-aws-kms" : "sha256";
   const normalized = normalizePlan(planJsonContent, {
-    target: opts.target,
-    destroy: opts.destroy,
-    treeSHA: opts.treeSHA,
-    lockFile: opts.lockFile,
-    maskSensitive: !opts.awsKMSKey,
+    ...ctx,
+    maskSensitive: !awsKMSKey,
     method,
   });
   const digest = crypto.createHash("sha256").update(normalized).digest();
-  const value = opts.awsKMSKey
-    ? await mac(opts.awsKMSKey, digest)
+  const value = awsKMSKey
+    ? await mac(awsKMSKey, digest)
     : digest.toString("hex");
   return `${formatVersion}:${method}:${value}`;
 };

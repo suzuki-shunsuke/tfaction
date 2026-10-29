@@ -14,8 +14,8 @@ import {
   hasFileChangedPorcelain,
   listWorkingDirFiles,
   getRootDir,
-  getTreeSHA,
   checkGitDiff,
+  listTreeEntries,
 } from "./git";
 
 beforeEach(() => {
@@ -243,18 +243,27 @@ describe("checkGitDiff", () => {
   });
 });
 
-describe("getTreeSHA", () => {
-  it("returns the tree object id of the directory at HEAD", async () => {
+describe("listTreeEntries", () => {
+  it("returns the modes and object ids of the files at HEAD", async () => {
     vi.mocked(exec.getExecOutput).mockResolvedValue({
-      stdout: "0123456789abcdef\n",
+      stdout:
+        "100644 blob aaa\taws/foo/main.tf\0" +
+        "100755 blob bbb\taws/foo/scripts/run me.sh\0" +
+        "160000 commit ccc\taws/foo/sub\0",
       stderr: "",
       exitCode: 0,
     });
-    const result = await getTreeSHA("/workspace/aws/foo");
-    expect(result).toBe("0123456789abcdef");
+    const result = await listTreeEntries("/workspace/aws/foo");
+    expect(result).toEqual(
+      new Map([
+        ["aws/foo/main.tf", { mode: "100644", oid: "aaa" }],
+        ["aws/foo/scripts/run me.sh", { mode: "100755", oid: "bbb" }],
+        ["aws/foo/sub", { mode: "160000", oid: "ccc" }],
+      ]),
+    );
     expect(exec.getExecOutput).toHaveBeenCalledWith(
       "git",
-      ["rev-parse", "HEAD:./"],
+      ["ls-tree", "-r", "-z", "--full-name", "HEAD", "--", "."],
       expect.objectContaining({ cwd: "/workspace/aws/foo" }),
     );
   });
