@@ -34,7 +34,7 @@
     "handlebars": "^4.7.8",
     "js-yaml": "5.5.0",
     "json-diff": "^1.0.6",
-    "minimatch": "^10.1.2",
+    "minimatch": "^11.0.0",
     "semver": "^7.7.2",
     "strip-ansi": "^7.1.0",
     "tmp": "^0.2.3",
