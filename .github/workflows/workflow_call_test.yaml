@@ -64,8 +64,18 @@ jobs:
       gh_app_private_key: ${{secrets.gh_app_private_key}}
       TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
 
-  test_deploy_doc:
-    uses: ./.github/workflows/workflow_call_deploy_doc.yaml
+  test-doc:
+    uses: suzuki-shunsuke/release-doc-action/.github/workflows/test.yaml@1cb15eb99aa8f0ae05ae28174430e49579e878fa # v0.2.0
+    with:
+      # Build the document only if these files are changed
+      paths: |
+        website/**
+        skills/tfaction/references/**
+        .github/workflows/test.yaml
+        .github/workflows/workflow_call_test.yaml
+    secrets:
+      TAKUMI_GUARD_BOT_ID: ${{secrets.TAKUMI_GUARD_BOT_ID}}
     permissions:
-      issues: write
-      contents: write
+      pull-requests: read
+      contents: read
+      id-token: write
