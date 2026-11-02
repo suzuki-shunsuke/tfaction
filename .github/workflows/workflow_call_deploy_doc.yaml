@@ -10,7 +10,7 @@ jobs:
       contents: write
       issues: write
     steps:
-      - uses: suzuki-shunsuke/release-doc-action@a9e1ea0c4ca8c62906ca2a7fd3fa33325ee43ec9 # v0.1.0
+      - uses: suzuki-shunsuke/release-doc-action@1cb15eb99aa8f0ae05ae28174430e49579e878fa # v0.2.0
         with:
           issue_number: 2533
           source_dir: website
