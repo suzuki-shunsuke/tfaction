@@ -43,7 +43,7 @@ jobs:
       contents: write
 
   js:
-    uses: ./.github/workflows/wc-test.yaml
+    uses: suzuki-shunsuke/js-action-test-workflow/.github/workflows/test.yaml@c834a7dfc9560fb54167eaf33f94eb28f1a4e222 # v0.0.4
     permissions:
       contents: read
       id-token: write
