@@ -73,7 +73,7 @@ jobs:
       - uses: actions/download-artifact@v8.0.2
         with:
           path: dist
-          name: js
+          name: dist
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
@@ -160,7 +160,7 @@ jobs:
       - uses: actions/download-artifact@v8.0.2
         with:
           path: yoo/dist
-          name: js
+          name: dist
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         working-directory: yoo
         run: |
@@ -232,7 +232,7 @@ jobs:
       - uses: actions/download-artifact@v8.0.2
         with:
           path: dist
-          name: js
+          name: dist
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
@@ -307,7 +307,7 @@ jobs:
       - uses: actions/download-artifact@v8.0.2
         with:
           path: dist
-          name: js
+          name: dist
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
@@ -370,7 +370,7 @@ jobs:
       - uses: actions/download-artifact@v8.0.2
         with:
           path: dist
-          name: js
+          name: dist
       - name: Replace suzuki-shusnuke/tfaction/*@main with ./*
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
