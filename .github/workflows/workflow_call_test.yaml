@@ -13,8 +13,7 @@ jobs:
     # Get changed files to filter jobs
     timeout-minutes: 10
     outputs:
-      renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
-      ghalint: ${{steps.changes.outputs.ghalint}}
+      build-schema: ${{steps.changes.outputs.build-schema}}
     runs-on: ubuntu-26.04
     permissions: {}
     steps:
@@ -24,6 +23,7 @@ jobs:
           filters: |
             build-schema:
               - .github/workflows/test.yaml
+              - .github/workflows/workflow_call_test.yaml
               - .github/workflows/wc-deploy-schema.yaml
               - "schema/**"
 
@@ -36,6 +36,8 @@ jobs:
       contents: read
 
   build-schema:
+    needs: path-filter
+    if: needs.path-filter.outputs.build-schema == 'true'
     uses: ./.github/workflows/wc-deploy-schema.yaml
     permissions:
       contents: write
