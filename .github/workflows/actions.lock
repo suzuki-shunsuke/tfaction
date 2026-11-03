@@ -40,14 +40,6 @@ workflows:
         - 'actions/setup-node@v7.1.0'
         - 'actions/upload-artifact@v7.0.2'
         - 'flatt-security/setup-takumi-guard-npm@v1.4.0'
-    '.github/workflows/wc_autofix.yaml':
-        - 'actions/checkout@v7.0.1'
-        - 'actions/download-artifact@v8.0.2'
-        - 'actions/setup-node@v7.1.0'
-        - 'actions/upload-artifact@v7.0.2'
-        - 'aquaproj/aqua-installer@v4.1.1'
-        - 'autofix-ci/action@v1.3.4'
-        - 'flatt-security/setup-takumi-guard-npm@v1.4.0'
     '.github/workflows/workflow_call_test.yaml':
         - 'dorny/paths-filter@v4.0.3'
 dependencies:
@@ -91,11 +83,6 @@ dependencies:
         commit: 'sha1-611554c6f0137ba41c8dd15aca8bee82504ea461'
         owner_id: 95116411
         repo_id: 400140776
-    'autofix-ci/action@v1.3.4':
-        ref: 'v1.3.4'
-        commit: 'sha1-c5b2d67aa2274e7b5a18224e8171550871fc7e4a'
-        owner_id: 114818642
-        repo_id: 544055925
     'csm-actions/securefix-action@4d885e1bcb71f4f110215c833002ce9fa0ee0fa6':
         ref: 'v0.6.0'
         commit: 'sha1-4d885e1bcb71f4f110215c833002ce9fa0ee0fa6'
