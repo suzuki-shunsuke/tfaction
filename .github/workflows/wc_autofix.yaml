@@ -15,23 +15,23 @@ jobs:
       pull-requests: read
       id-token: write # Required for OIDC
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           ref: ${{github.event.pull_request.head.sha}}
 
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
           cache: npm
-      - uses: flatt-security/setup-takumi-guard-npm@14f07d0cbc739b42a1b7c70a04c2b84cd1318ddd # v1.4.0
+      - uses: flatt-security/setup-takumi-guard-npm@v1.4.0
         with:
           bot-id: ${{secrets.TAKUMI_GUARD_BOT_ID}}
       - run: npm ci
 
       # Archive node_modules with tar to keep file permissions and symlinks (e.g. node_modules/.bin)
       - run: tar -cf node_modules.tar node_modules
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - uses: actions/upload-artifact@v7.0.2
         with:
           path: node_modules.tar
           name: node_modules
@@ -44,18 +44,18 @@ jobs:
       contents: read
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           ref: ${{github.event.pull_request.head.sha}}
-      - uses: aquaproj/aqua-installer@611554c6f0137ba41c8dd15aca8bee82504ea461 # v4.1.1
+      - uses: aquaproj/aqua-installer@v4.1.1
         with:
           aqua_version: v2.66.0
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
 
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      - uses: actions/download-artifact@v8.0.2
         with:
           name: node_modules
           path: ${{runner.temp}}
@@ -70,4 +70,4 @@ jobs:
           AQUA_GITHUB_TOKEN: ${{github.token}}
       - run: npm run fmt
 
-      - uses: autofix-ci/action@c5b2d67aa2274e7b5a18224e8171550871fc7e4a # v1.3.4
+      - uses: autofix-ci/action@v1.3.4
