@@ -30,7 +30,7 @@ jobs:
   test:
     uses: suzuki-shunsuke/test-workflow/.github/workflows/test.yaml@0b89b9b4314282810bc944364380568708208eaa # v0.0.2
     with:
-      aqua_version: v2.66.0
+      aqua_version: v2.66.1
     permissions:
       pull-requests: read
       contents: read
