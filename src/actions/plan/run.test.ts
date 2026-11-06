@@ -8,6 +8,7 @@ import {
   runTfmigratePlan,
   disableAutoMergeForRenovateChange,
   dismissApprovalReviews,
+  getPRFilesInWorkingDirectory,
   getResultSummary,
   main,
   type RunInputs,
@@ -16,6 +17,7 @@ import type * as aqua from "../../aqua";
 import type * as getTargetConfig from "../get-target-config";
 import { post } from "../../comment";
 import * as planStorage from "../../lib/plan_storage";
+import * as git from "../../lib/git";
 import { computePlanHash } from "../../lib/plan_hash";
 
 // Mock modules
@@ -79,7 +81,7 @@ vi.mock("../../conftest", () => ({
 }));
 
 vi.mock("../../lib/git", () => ({
-  getTreeSHA: vi.fn().mockResolvedValue("tree-sha"),
+  listTreeEntries: vi.fn(),
 }));
 
 vi.mock("../../comment", () => ({
@@ -149,6 +151,7 @@ const graphqlReviewsResponse = (
 const createBaseInputs = (executor: MockExecutor) => ({
   githubToken: "test-token",
   workingDirectory: "/test/working/dir",
+  relativeWorkingDirectory: "aws/test/dev",
   autoAppsLogins: ["renovate[bot]", "dependabot[bot]"],
   destroy: false,
   tfCommand: "terraform",
@@ -164,7 +167,7 @@ describe("runTerraformPlan", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     mockExecutor = createMockExecutor();
     tempDir = "/tmp/tfaction-test123";
     vi.mocked(fs.mkdtempSync).mockReturnValue(tempDir);
@@ -630,8 +633,29 @@ describe("runTerraformPlan", () => {
     const lockFile = 'provider "registry.terraform.io/hashicorp/null" {}';
     const planJson =
       '{"resource_changes": [{"address": "null_resource.foo", "change": {"actions": ["create"]}}]}';
+    const prFiles = [
+      { filename: "aws/test/dev/main.tf", status: "modified" },
+      { filename: "aws/other/main.tf", status: "modified" },
+    ];
+    const wdFile = {
+      path: "aws/test/dev/main.tf",
+      mode: "100644",
+      oid: "blob-1",
+    };
+    const hashOf = (files = [wdFile], baseRef = "main") =>
+      computePlanHash(planJson, {
+        target: "test/dev",
+        destroy: false,
+        prNumber: 42,
+        baseRef,
+        prFiles: files,
+        lockFile,
+      });
 
-    const setup = (previousPlanHash: string | undefined) => {
+    const setup = (
+      previousPlanHash: string | undefined,
+      pr: Record<string, unknown> = {},
+    ) => {
       const mockOctokit = createMockOctokit();
       mockOctokit.graphql
         .mockResolvedValueOnce(
@@ -646,10 +670,23 @@ describe("runTerraformPlan", () => {
         mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
       );
       vi.mocked(fs.existsSync).mockReturnValue(true);
-      vi.mocked(fs.readFileSync).mockImplementation((p) =>
-        String(p).endsWith("pr.json")
-          ? JSON.stringify({ head: { ref: "feature", repo: { id: 1 } } })
-          : lockFile,
+      vi.mocked(fs.readFileSync).mockImplementation((p) => {
+        if (String(p).endsWith("pr.json")) {
+          return JSON.stringify({
+            number: 42,
+            changed_files: prFiles.length,
+            base: { ref: "main" },
+            head: { ref: "feature", repo: { id: 1 } },
+            ...pr,
+          });
+        }
+        if (String(p).endsWith("pr_files.json")) {
+          return JSON.stringify(prFiles);
+        }
+        return lockFile;
+      });
+      vi.mocked(git.listTreeEntries).mockResolvedValue(
+        new Map([[wdFile.path, { mode: wdFile.mode, oid: wdFile.oid }]]),
       );
       vi.mocked(planStorage.downloadPreviousPlanMeta).mockResolvedValue(
         previousPlanHash === undefined
@@ -669,27 +706,33 @@ describe("runTerraformPlan", () => {
       return mockOctokit;
     };
 
+    // target differs from the working directory to check that PR files are
+    // filtered by the working directory
     const inputs = () => ({
       ...createBaseInputs(mockExecutor),
+      target: "test/dev",
       dismissApprovalBeforePlan: true,
       prNumber: 42,
       ciInfoTempDir: "/tmp/ci-info",
     });
 
     it("doesn't dismiss approvals if the plan result is unchanged", async () => {
-      const hash = await computePlanHash(planJson, {
-        target: "aws/test/dev",
-        destroy: false,
-        treeSHA: "tree-sha",
-        lockFile,
-      });
+      const hash = await hashOf();
       const mockOctokit = setup(hash);
       await runTerraformPlan(inputs());
 
       expect(mockOctokit.graphql).not.toHaveBeenCalled();
+      expect(git.listTreeEntries).toHaveBeenCalledWith("/test/working/dir");
+      for (const p of [
+        "/tmp/ci-info/pr.json",
+        "/tmp/ci-info/pr_files.json",
+        "/test/working/dir/.terraform.lock.hcl",
+      ]) {
+        expect(fs.readFileSync).toHaveBeenCalledWith(p, "utf8");
+      }
       expect(planStorage.downloadPreviousPlanMeta).toHaveBeenCalledWith(
         expect.objectContaining({
-          target: "aws/test/dev",
+          target: "test/dev",
           headRef: "feature",
           headRepoId: 1,
         }),
@@ -701,10 +744,90 @@ describe("runTerraformPlan", () => {
     });
 
     it("dismisses approvals if the plan result has changed", async () => {
-      const mockOctokit = setup("v1:sha256:other");
+      const mockOctokit = setup("v2:sha256:other");
       await runTerraformPlan(inputs());
 
       expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining("plan_meta.json"),
+        expect.stringContaining(`"plan_hash":"${await hashOf()}"`),
+      );
+    });
+
+    it("dismisses approvals if a file in the working directory has changed", async () => {
+      const mockOctokit = setup(await hashOf());
+      vi.mocked(git.listTreeEntries).mockResolvedValue(
+        new Map([[wdFile.path, { mode: wdFile.mode, oid: "blob-2" }]]),
+      );
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+    });
+
+    it("dismisses approvals if the mode of a file in the working directory has changed", async () => {
+      const mockOctokit = setup(await hashOf());
+      vi.mocked(git.listTreeEntries).mockResolvedValue(
+        new Map([[wdFile.path, { mode: "100755", oid: wdFile.oid }]]),
+      );
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+    });
+
+    it("dismisses approvals if the base branch has changed", async () => {
+      const mockOctokit = setup(await hashOf(), {
+        base: { ref: "release" },
+      });
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+    });
+
+    it("dismisses approvals if the list of PR files is incomplete", async () => {
+      const mockOctokit = setup(await hashOf(), { changed_files: 3001 });
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+      expect(core.warning).toHaveBeenCalledWith(
+        "Failed to compute the plan hash: pr_files.json has 2 files but the pull request changes 3001 files",
+      );
+    });
+
+    it("dismisses approvals if pr.json is for another pull request", async () => {
+      const mockOctokit = setup(await hashOf(), { number: 10 });
+      await runTerraformPlan(inputs());
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+      expect(core.warning).toHaveBeenCalledWith(
+        expect.stringContaining("pr.json is for the pull request #10"),
+      );
+    });
+
+    it("dismisses approvals if the ci-info output directory isn't set", async () => {
+      const mockOctokit = setup(await hashOf());
+      await runTerraformPlan({ ...inputs(), ciInfoTempDir: undefined });
+
+      expect(mockOctokit.graphql).toHaveBeenCalledTimes(2);
+      expect(core.warning).toHaveBeenCalledWith(
+        "Failed to compute the plan hash: the ci-info output directory is not set",
+      );
+    });
+
+    it("doesn't store the plan hash if approvals couldn't be dismissed", async () => {
+      const mockOctokit = setup("v2:sha256:other");
+      mockOctokit.graphql.mockReset();
+      mockOctokit.graphql.mockRejectedValue(new Error("rate limited"));
+      await runTerraformPlan(inputs());
+
+      // The hash was computed but approvals couldn't be dismissed
+      expect(planStorage.downloadPreviousPlanMeta).toHaveBeenCalled();
+      expect(core.warning).toHaveBeenCalledWith(
+        "Failed to list reviews: rate limited",
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining("plan_meta.json"),
+        expect.not.stringContaining("plan_hash"),
+      );
     });
 
     it("dismisses approvals if the previous plan is not found", async () => {
@@ -728,12 +851,7 @@ describe("runTerraformPlan", () => {
     });
 
     it("dismisses approvals if disabled", async () => {
-      const hash = await computePlanHash(planJson, {
-        target: "aws/test/dev",
-        destroy: false,
-        treeSHA: "tree-sha",
-        lockFile,
-      });
+      const hash = await hashOf();
       const mockOctokit = setup(hash);
       await runTerraformPlan({
         ...inputs(),
@@ -771,11 +889,86 @@ describe("runTerraformPlan", () => {
   });
 });
 
+describe("getPRFilesInWorkingDirectory", () => {
+  const files = [
+    { filename: "aws/foo/main.tf", status: "modified" },
+    { filename: "aws/foo/scripts/run.sh", status: "added" },
+    {
+      filename: "aws/bar/main.tf",
+      previous_filename: "aws/foo/old.tf",
+      status: "renamed",
+    },
+    {
+      filename: "aws/foo/new.tf",
+      previous_filename: "aws/bar/new.tf",
+      status: "renamed",
+    },
+    { filename: "aws/foo2/main.tf", status: "modified" },
+    { filename: "aws/foo/removed.tf", status: "removed" },
+  ];
+  const entries = new Map([
+    ["aws/foo/main.tf", { mode: "100644", oid: "a" }],
+    ["aws/foo/scripts/run.sh", { mode: "100755", oid: "b" }],
+    ["aws/foo/new.tf", { mode: "100644", oid: "c" }],
+  ]);
+  const params = {
+    ciInfoTempDir: "/tmp/ci-info",
+    changedFiles: files.length,
+    workingDirectory: "/workspace/aws/foo",
+    relativeWorkingDirectory: "aws/foo",
+  };
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(files));
+    vi.mocked(git.listTreeEntries).mockResolvedValue(entries);
+  });
+
+  it("returns the states of the files under the working directory", async () => {
+    expect(await getPRFilesInWorkingDirectory(params)).toEqual([
+      { path: "aws/foo/main.tf", mode: "100644", oid: "a" },
+      { path: "aws/foo/scripts/run.sh", mode: "100755", oid: "b" },
+      { path: "aws/foo/old.tf" },
+      { path: "aws/foo/new.tf", mode: "100644", oid: "c" },
+      { path: "aws/foo/removed.tf" },
+    ]);
+    expect(git.listTreeEntries).toHaveBeenCalledWith("/workspace/aws/foo");
+  });
+
+  it("throws if the list is incomplete", async () => {
+    await expect(
+      getPRFilesInWorkingDirectory({ ...params, changedFiles: 3001 }),
+    ).rejects.toThrow(
+      "pr_files.json has 6 files but the pull request changes 3001 files",
+    );
+  });
+
+  it("doesn't run git if no file is under the working directory", async () => {
+    expect(
+      await getPRFilesInWorkingDirectory({
+        ...params,
+        workingDirectory: "/workspace/aws/baz",
+        relativeWorkingDirectory: "aws/baz",
+      }),
+    ).toEqual([]);
+    expect(git.listTreeEntries).not.toHaveBeenCalled();
+  });
+
+  it("throws if a file changed by the pull request isn't in the checked-out commit", async () => {
+    const missing = new Map(entries);
+    missing.delete("aws/foo/new.tf");
+    vi.mocked(git.listTreeEntries).mockResolvedValue(missing);
+    await expect(getPRFilesInWorkingDirectory(params)).rejects.toThrow(
+      "aws/foo/new.tf isn't found in the checked-out commit",
+    );
+  });
+});
+
 describe("disableAutoMergeForRenovateChange", () => {
   let mockExecutor: MockExecutor;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     mockExecutor = createMockExecutor();
   });
 
@@ -814,7 +1007,7 @@ describe("disableAutoMergeForRenovateChange", () => {
 
 describe("dismissApprovalReviews", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   afterEach(() => {
@@ -840,7 +1033,7 @@ describe("dismissApprovalReviews", () => {
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
-    await dismissApprovalReviews("test-token", 42);
+    expect(await dismissApprovalReviews("test-token", 42)).toBe(true);
 
     // 1 list query + 2 dismiss mutations
     expect(mockOctokit.graphql).toHaveBeenCalledTimes(3);
@@ -872,7 +1065,7 @@ describe("dismissApprovalReviews", () => {
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
-    await dismissApprovalReviews("test-token", 42);
+    expect(await dismissApprovalReviews("test-token", 42)).toBe(false);
 
     expect(core.warning).toHaveBeenCalledWith(
       "Failed to list reviews: API error",
@@ -893,17 +1086,46 @@ describe("dismissApprovalReviews", () => {
         ),
       )
       .mockRejectedValueOnce(new Error("Dismiss failed")) // dismiss PRR_1 fails
-      .mockResolvedValueOnce({}); // dismiss PRR_2 succeeds
+      .mockResolvedValueOnce({}) // dismiss PRR_2 succeeds
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse(
+          [{ id: "PRR_1", author: { __typename: "User", login: "user1" } }],
+          false,
+          null,
+        ),
+      ); // PRR_1 is still approved
     vi.mocked(github.getOctokit).mockReturnValue(
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
-    await dismissApprovalReviews("test-token", 42);
+    expect(await dismissApprovalReviews("test-token", 42)).toBe(false);
 
     expect(core.warning).toHaveBeenCalledWith(
       "Failed to dismiss review PRR_1: Dismiss failed",
     );
-    // 1 list query + 2 dismiss mutations (both attempted)
+    // 1 list query + 2 dismiss mutations (both attempted) + 1 list query
+    expect(mockOctokit.graphql).toHaveBeenCalledTimes(4);
+  });
+
+  it("returns true if a review that couldn't be dismissed was dismissed by another job", async () => {
+    const mockOctokit = createMockOctokit();
+    mockOctokit.graphql
+      .mockResolvedValueOnce(
+        graphqlReviewsResponse(
+          [{ id: "PRR_1", author: { __typename: "User", login: "user1" } }],
+          false,
+          null,
+        ),
+      )
+      .mockRejectedValueOnce(
+        new Error("Can not dismiss a dismissed pull request review"),
+      )
+      .mockResolvedValueOnce(graphqlReviewsResponse([], false, null));
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+
+    expect(await dismissApprovalReviews("test-token", 42)).toBe(true);
     expect(mockOctokit.graphql).toHaveBeenCalledTimes(3);
   });
 
@@ -972,7 +1194,7 @@ describe("dismissApprovalReviews", () => {
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
 
-    await dismissApprovalReviews("test-token", 42);
+    expect(await dismissApprovalReviews("test-token", 42)).toBe(true);
 
     // Only the list query, no dismiss mutations
     expect(mockOctokit.graphql).toHaveBeenCalledTimes(1);
@@ -984,7 +1206,7 @@ describe("runTfmigratePlan", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     mockExecutor = createMockExecutor();
     tempDir = "/tmp/tfaction-test456";
     vi.mocked(fs.mkdtempSync).mockReturnValue(tempDir);
@@ -1224,7 +1446,7 @@ describe("main", () => {
   const mockConftestRun = vi.fn();
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     mockExecutor = createMockExecutor();
 
     const lib = await import("../../lib");
@@ -1379,6 +1601,71 @@ describe("main", () => {
       expect.any(Object),
     );
     expect(mockConftestRun).toHaveBeenCalled();
+  });
+
+  it("hashes the files changed by the pull request under the working directory", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+    vi.mocked(fs.existsSync).mockReturnValue(false);
+    vi.mocked(fs.readFileSync).mockImplementation((p) =>
+      String(p).endsWith("pr.json")
+        ? JSON.stringify({
+            number: 42,
+            changed_files: 1,
+            base: { ref: "main" },
+            head: { ref: "feature", repo: { id: 1 } },
+          })
+        : JSON.stringify([
+            { filename: "aws/test/main.tf", status: "modified" },
+          ]),
+    );
+    const file = { path: "aws/test/main.tf", mode: "100644", oid: "blob-1" };
+    vi.mocked(git.listTreeEntries).mockResolvedValue(
+      new Map([[file.path, { mode: file.mode, oid: file.oid }]]),
+    );
+    const planJson = '{"resource_changes": []}';
+    vi.mocked(planStorage.downloadPreviousPlanMeta).mockResolvedValue({
+      storage: "github-artifacts",
+      summary: "no-op",
+      plan_hash: await computePlanHash(planJson, {
+        target: "aws/test/dev",
+        destroy: false,
+        prNumber: 42,
+        baseRef: "main",
+        prFiles: [file],
+        lockFile: null,
+      }),
+    });
+    mockExecutor.exec.mockResolvedValueOnce(0); // terraform plan
+    mockExecutor.getExecOutput.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: planJson,
+      stderr: "",
+    }); // terraform show
+
+    await main(
+      {
+        // not normalized
+        working_directory: "/aws/test",
+        target: "aws/test/dev",
+        providers_lock_opts: "",
+        enable_tflint: false,
+        enable_trivy: false,
+        tflint_fix: false,
+        terraform_command: "terraform",
+      },
+      {
+        githubToken: "test-token",
+        jobType: "terraform",
+        prNumber: 42,
+        ciInfoTempDir: "/tmp/ci-info",
+      },
+    );
+
+    expect(git.listTreeEntries).toHaveBeenCalledWith("/git/root/aws/test");
+    expect(mockOctokit.graphql).not.toHaveBeenCalled();
   });
 
   it("runs tfmigrate plan for tfmigrate job type when .tfmigrate.hcl exists", async () => {

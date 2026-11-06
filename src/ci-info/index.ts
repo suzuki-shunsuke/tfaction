@@ -5,11 +5,9 @@ import * as os from "os";
 import * as path from "path";
 import * as env from "../lib/env";
 import * as input from "../lib/input";
+import type { PRFile } from "../lib/types";
 
-export interface PRFile {
-  filename: string;
-  previous_filename?: string;
-}
+export type { PRFile };
 
 export type Logger = {
   info: (message: string) => void;
@@ -118,6 +116,7 @@ export const getPRFiles = async (
       ...data.map((f) => ({
         filename: f.filename,
         previous_filename: f.previous_filename,
+        status: f.status,
       })),
     );
 

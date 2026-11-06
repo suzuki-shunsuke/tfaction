@@ -165,15 +165,35 @@ export const checkGitDiff = async (
   return { changedFiles };
 };
 
+export type TreeEntry = {
+  mode: string;
+  oid: string;
+};
+
 /**
- * Get the git tree object id of a directory at HEAD
  * @param dir - Absolute path to the directory
- * @returns the tree object id
+ * @returns a map from relative paths from the git root directory to the modes and object ids of the files under the directory at HEAD
  */
-export const getTreeSHA = async (dir: string): Promise<string> => {
-  const out = await exec.getExecOutput("git", ["rev-parse", "HEAD:./"], {
-    silent: true,
-    cwd: dir,
-  });
-  return out.stdout.trim();
+export const listTreeEntries = async (
+  dir: string,
+): Promise<Map<string, TreeEntry>> => {
+  const out = await exec.getExecOutput(
+    "git",
+    ["ls-tree", "-r", "-z", "--full-name", "HEAD", "--", "."],
+    {
+      silent: true,
+      cwd: dir,
+    },
+  );
+  const entries = new Map<string, TreeEntry>();
+  for (const line of out.stdout.split("\0")) {
+    if (line === "") {
+      continue;
+    }
+    // <mode> SP <type> SP <object> TAB <file>
+    const tab = line.indexOf("\t");
+    const [mode, , oid] = line.slice(0, tab).split(" ");
+    entries.set(line.slice(tab + 1), { mode, oid });
+  }
+  return entries;
 };
