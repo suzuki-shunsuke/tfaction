@@ -380,3 +380,11 @@ export interface Config extends ParsedConfig {
   config_dir: string;
   workspace: string;
 }
+
+// An entry of pr_files.json, which ci-info writes and the plan action reads.
+export const PRFile = z.object({
+  filename: z.string(),
+  previous_filename: z.string().nullish(),
+  status: z.string().optional(),
+});
+export type PRFile = z.infer<typeof PRFile>;
