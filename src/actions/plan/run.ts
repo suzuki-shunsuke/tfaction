@@ -101,31 +101,46 @@ type TfmigratePlanOutputs = {
   planJson?: string;
 };
 
-const PRJson = z.object({
+// pr.json is the response of the pulls API written by ci-info.
+// Each caller validates only the fields it uses, so a field needed by one
+// feature doesn't break another.
+const PlanHashPRJson = z.object({
   number: z.number(),
-  node_id: z.string(),
   changed_files: z.number(),
-  auto_merge: z.object({}).nullish(),
   base: z.object({ ref: z.string() }),
   head: z.object({
     ref: z.string(),
     repo: z.object({ id: z.number() }).nullish(),
   }),
 });
-type PRJson = z.infer<typeof PRJson>;
+type PlanHashPRJson = z.infer<typeof PlanHashPRJson>;
 
-// The result of reading pr.json written by ci-info.
-// If it can't be read, error is set and each caller decides how to handle it.
-export type PRJsonResult = { pr: PRJson } | { error: string };
+const AutoMergePRJson = z.object({
+  node_id: z.string(),
+  auto_merge: z.object({}).nullish(),
+});
 
+export type PRJsonResult =
+  | { ok: true; ciInfoTempDir: string; data: unknown }
+  // notFound is true if the ci-info output directory isn't set or pr.json
+  // doesn't exist.
+  | { ok: false; notFound: boolean; error: string };
+
+// Read and parse pr.json once. It isn't validated here.
 export const readPRJson = (ciInfoTempDir: string | undefined): PRJsonResult => {
   if (!ciInfoTempDir) {
-    return { error: "the ci-info output directory is not set" };
+    return {
+      ok: false,
+      notFound: true,
+      error: "the ci-info output directory is not set",
+    };
   }
   const prJsonFile = path.join(ciInfoTempDir, "pr.json");
   try {
     return {
-      pr: PRJson.parse(JSON.parse(fs.readFileSync(prJsonFile, "utf8"))),
+      ok: true,
+      ciInfoTempDir,
+      data: JSON.parse(fs.readFileSync(prJsonFile, "utf8")),
     };
   } catch (e) {
     if (
@@ -134,12 +149,26 @@ export const readPRJson = (ciInfoTempDir: string | undefined): PRJsonResult => {
       "code" in e &&
       e.code === "ENOENT"
     ) {
-      return { error: `PR JSON file not found: ${prJsonFile}` };
+      return {
+        ok: false,
+        notFound: true,
+        error: `PR JSON file not found: ${prJsonFile}`,
+      };
     }
     return {
+      ok: false,
+      notFound: false,
       error: `Failed to read ${prJsonFile}: ${e instanceof Error ? e.message : String(e)}`,
     };
   }
+};
+
+const parsePRJson = <T>(schema: z.ZodType<T>, data: unknown): T => {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    throw new Error(`pr.json is invalid: ${z.prettifyError(result.error)}`);
+  }
+  return result.data;
 };
 
 export const disableAutoMergeForRenovateChange = async (
@@ -156,11 +185,15 @@ export const disableAutoMergeForRenovateChange = async (
     return;
   }
 
-  if ("error" in prJson) {
-    core.warning(prJson.error);
-    return;
+  if (!prJson.ok) {
+    if (prJson.notFound) {
+      core.warning(prJson.error);
+      return;
+    }
+    // Fail the job instead of keeping auto-merge enabled.
+    throw new Error(prJson.error);
   }
-  const prData = prJson.pr;
+  const prData = parsePRJson(AutoMergePRJson, prJson.data);
 
   // If auto_merge is not enabled, nothing to do
   if (!prData.auto_merge) {
@@ -363,7 +396,7 @@ export const getPRFilesInWorkingDirectory = async (params: {
 export type PlanHash = {
   value: string;
   // The head of the pull request to find the previous plan
-  head: PRJson["head"];
+  head: PlanHashPRJson["head"];
 };
 
 // Compute a one-way hash of the plan result to compare it with the previous
@@ -382,13 +415,10 @@ export const computePlanHashIfNeeded = async (
     ".terraform.lock.hcl",
   );
   try {
-    if ("error" in prJson) {
+    if (!prJson.ok) {
       throw new Error(prJson.error);
     }
-    const { pr } = prJson;
-    if (!inputs.ciInfoTempDir) {
-      throw new Error("the ci-info output directory is not set");
-    }
+    const pr = parsePRJson(PlanHashPRJson, prJson.data);
     // On events such as issue_comment, ci-info gets the pull request from the
     // commit, which can be another pull request.
     if (pr.number !== inputs.prNumber) {
@@ -397,7 +427,7 @@ export const computePlanHashIfNeeded = async (
       );
     }
     const prFiles = await getPRFilesInWorkingDirectory({
-      ciInfoTempDir: inputs.ciInfoTempDir,
+      ciInfoTempDir: prJson.ciInfoTempDir,
       changedFiles: pr.changed_files,
       workingDirectory: inputs.workingDirectory,
       relativeWorkingDirectory: inputs.relativeWorkingDirectory,
@@ -428,7 +458,7 @@ export const computePlanHashIfNeeded = async (
 // pull request's head branch. Returns undefined if it isn't found.
 const getPreviousPlanHash = async (
   inputs: Inputs,
-  head: PRJson["head"],
+  head: PlanHashPRJson["head"],
 ): Promise<string | undefined> => {
   if (!head.repo) {
     // The head repository was deleted

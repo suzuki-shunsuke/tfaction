@@ -986,22 +986,16 @@ describe("disableAutoMergeForRenovateChange", () => {
     vi.restoreAllMocks();
   });
 
-  const prJson = {
-    number: 42,
-    node_id: "PR_node",
-    changed_files: 1,
-    base: { ref: "main" },
-    head: { ref: "renovate/foo", repo: { id: 1 } },
-  };
+  const renovateInputs = () => ({
+    ...createBaseInputs(mockExecutor),
+    prAuthor: "renovate[bot]",
+    ciInfoTempDir: "/tmp/ci-info",
+  });
 
-  it("skips when pr.json can't be read", async () => {
-    const inputs = {
-      ...createBaseInputs(mockExecutor),
-      prAuthor: "renovate[bot]",
-      ciInfoTempDir: "/tmp/ci-info",
-    };
-
-    await disableAutoMergeForRenovateChange(inputs, {
+  it("skips when pr.json isn't found", async () => {
+    await disableAutoMergeForRenovateChange(renovateInputs(), {
+      ok: false,
+      notFound: true,
       error: "PR JSON file not found: /tmp/ci-info/pr.json",
     });
     expect(core.warning).toHaveBeenCalledWith(
@@ -1010,39 +1004,53 @@ describe("disableAutoMergeForRenovateChange", () => {
     expect(post).not.toHaveBeenCalled();
   });
 
-  it("skips when auto-merge isn't enabled", async () => {
-    const inputs = {
-      ...createBaseInputs(mockExecutor),
-      prAuthor: "renovate[bot]",
-      ciInfoTempDir: "/tmp/ci-info",
-    };
-
-    await disableAutoMergeForRenovateChange(inputs, {
-      pr: { ...prJson, auto_merge: null },
-    });
-    expect(github.getOctokit).not.toHaveBeenCalled();
+  it("fails when pr.json can't be parsed", async () => {
+    await expect(
+      disableAutoMergeForRenovateChange(renovateInputs(), {
+        ok: false,
+        notFound: false,
+        error: "Failed to read /tmp/ci-info/pr.json: Unexpected token",
+      }),
+    ).rejects.toThrow("Failed to read /tmp/ci-info/pr.json");
     expect(post).not.toHaveBeenCalled();
   });
 
-  it("disables auto-merge", async () => {
+  it("fails when pr.json doesn't have node_id", async () => {
+    await expect(
+      disableAutoMergeForRenovateChange(renovateInputs(), {
+        ok: true,
+        ciInfoTempDir: "/tmp/ci-info",
+        data: { auto_merge: {} },
+      }),
+    ).rejects.toThrow("pr.json is invalid");
+    expect(post).not.toHaveBeenCalled();
+  });
+
+  it("doesn't require fields used only by the plan hash", async () => {
     const mockOctokit = createMockOctokit();
     vi.mocked(github.getOctokit).mockReturnValue(
       mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
     );
-    const inputs = {
-      ...createBaseInputs(mockExecutor),
-      prAuthor: "renovate[bot]",
+    await disableAutoMergeForRenovateChange(renovateInputs(), {
+      ok: true,
       ciInfoTempDir: "/tmp/ci-info",
-    };
-
-    await disableAutoMergeForRenovateChange(inputs, {
-      pr: { ...prJson, auto_merge: {} },
+      data: { node_id: "PR_node", auto_merge: {} },
     });
     expect(mockOctokit.graphql).toHaveBeenCalledWith(
       expect.stringContaining("disablePullRequestAutoMerge"),
       { nodeId: "PR_node" },
     );
     expect(post).toHaveBeenCalled();
+  });
+
+  it("skips when auto-merge isn't enabled", async () => {
+    await disableAutoMergeForRenovateChange(renovateInputs(), {
+      ok: true,
+      ciInfoTempDir: "/tmp/ci-info",
+      data: { node_id: "PR_node", auto_merge: null },
+    });
+    expect(github.getOctokit).not.toHaveBeenCalled();
+    expect(post).not.toHaveBeenCalled();
   });
 
   it("skips when allowAutoMergeChange is true", async () => {
@@ -1053,7 +1061,11 @@ describe("disableAutoMergeForRenovateChange", () => {
       allowAutoMergeChange: true,
     };
 
-    await disableAutoMergeForRenovateChange(inputs, { error: "unused" });
+    await disableAutoMergeForRenovateChange(inputs, {
+      ok: false,
+      notFound: false,
+      error: "unused",
+    });
     expect(post).not.toHaveBeenCalled();
   });
 });
@@ -1067,42 +1079,44 @@ describe("readPRJson", () => {
     vi.restoreAllMocks();
   });
 
-  it("returns the parsed pr.json", () => {
-    const pr = {
-      number: 42,
-      node_id: "PR_node",
-      changed_files: 1,
-      auto_merge: null,
-      base: { ref: "main" },
-      head: { ref: "feature", repo: { id: 1 } },
-    };
-    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(pr));
-    expect(readPRJson("/tmp/ci-info")).toEqual({ pr });
+  it("returns the parsed pr.json without validating it", () => {
+    const data = { number: 42 };
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(data));
+    expect(readPRJson("/tmp/ci-info")).toEqual({
+      ok: true,
+      ciInfoTempDir: "/tmp/ci-info",
+      data,
+    });
     expect(fs.readFileSync).toHaveBeenCalledWith(
       "/tmp/ci-info/pr.json",
       "utf8",
     );
   });
 
-  it("returns an error if the ci-info output directory isn't set", () => {
+  it("returns notFound if the ci-info output directory isn't set", () => {
     expect(readPRJson(undefined)).toEqual({
+      ok: false,
+      notFound: true,
       error: "the ci-info output directory is not set",
     });
   });
 
-  it("returns an error if pr.json isn't found", () => {
+  it("returns notFound if pr.json isn't found", () => {
     vi.mocked(fs.readFileSync).mockImplementation(() => {
       throw Object.assign(new Error("no such file"), { code: "ENOENT" });
     });
     expect(readPRJson("/tmp/ci-info")).toEqual({
+      ok: false,
+      notFound: true,
       error: "PR JSON file not found: /tmp/ci-info/pr.json",
     });
   });
 
-  it("returns an error if pr.json is invalid", () => {
-    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ number: 42 }));
-    const result = readPRJson("/tmp/ci-info");
-    expect(result).toEqual({
+  it("returns an error if pr.json isn't valid JSON", () => {
+    vi.mocked(fs.readFileSync).mockReturnValue("{");
+    expect(readPRJson("/tmp/ci-info")).toEqual({
+      ok: false,
+      notFound: false,
       error: expect.stringContaining("Failed to read /tmp/ci-info/pr.json"),
     });
   });
