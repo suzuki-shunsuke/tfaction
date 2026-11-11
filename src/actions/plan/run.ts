@@ -116,6 +116,7 @@ const PlanHashPRJson = z.object({
 type PlanHashPRJson = z.infer<typeof PlanHashPRJson>;
 
 const AutoMergePRJson = z.object({
+  number: z.number(),
   node_id: z.string(),
   auto_merge: z.object({}).nullish(),
 });
@@ -194,6 +195,15 @@ export const disableAutoMergeForRenovateChange = async (
     throw new Error(prJson.error);
   }
   const prData = parsePRJson(AutoMergePRJson, prJson.data);
+  // On events such as issue_comment, ci-info gets the pull request from the
+  // commit, which can be another pull request. Then it's unclear which pull
+  // request's auto-merge should be disabled, so fail the job instead of
+  // keeping auto-merge enabled.
+  if (inputs.prNumber !== undefined && prData.number !== inputs.prNumber) {
+    throw new Error(
+      `pr.json is for the pull request #${prData.number}, not #${inputs.prNumber}`,
+    );
+  }
 
   // If auto_merge is not enabled, nothing to do
   if (!prData.auto_merge) {
