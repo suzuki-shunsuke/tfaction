@@ -11,6 +11,7 @@ import {
   getPRFilesInWorkingDirectory,
   getResultSummary,
   main,
+  readPRJson,
   type RunInputs,
 } from "./run";
 import type * as aqua from "../../aqua";
@@ -373,8 +374,12 @@ describe("runTerraformPlan", () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.readFileSync).mockReturnValue(
       JSON.stringify({
+        number: 42,
         node_id: "PR_123",
+        changed_files: 1,
         auto_merge: { merge_method: "squash" },
+        base: { ref: "main" },
+        head: { ref: "renovate/foo", repo: { id: 1 } },
       }),
     );
 
@@ -409,8 +414,12 @@ describe("runTerraformPlan", () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.readFileSync).mockReturnValue(
       JSON.stringify({
+        number: 42,
         node_id: "PR_123",
+        changed_files: 1,
         auto_merge: null,
+        base: { ref: "main" },
+        head: { ref: "renovate/foo", repo: { id: 1 } },
       }),
     );
 
@@ -674,6 +683,7 @@ describe("runTerraformPlan", () => {
         if (String(p).endsWith("pr.json")) {
           return JSON.stringify({
             number: 42,
+            node_id: "PR_42",
             changed_files: prFiles.length,
             base: { ref: "main" },
             head: { ref: "feature", repo: { id: 1 } },
@@ -976,20 +986,63 @@ describe("disableAutoMergeForRenovateChange", () => {
     vi.restoreAllMocks();
   });
 
-  it("skips when pr.json not found", async () => {
-    vi.mocked(fs.existsSync).mockReturnValue(false);
+  const prJson = {
+    number: 42,
+    node_id: "PR_node",
+    changed_files: 1,
+    base: { ref: "main" },
+    head: { ref: "renovate/foo", repo: { id: 1 } },
+  };
 
+  it("skips when pr.json can't be read", async () => {
     const inputs = {
       ...createBaseInputs(mockExecutor),
       prAuthor: "renovate[bot]",
       ciInfoTempDir: "/tmp/ci-info",
     };
 
-    await disableAutoMergeForRenovateChange(inputs);
+    await disableAutoMergeForRenovateChange(inputs, {
+      error: "PR JSON file not found: /tmp/ci-info/pr.json",
+    });
     expect(core.warning).toHaveBeenCalledWith(
       "PR JSON file not found: /tmp/ci-info/pr.json",
     );
     expect(post).not.toHaveBeenCalled();
+  });
+
+  it("skips when auto-merge isn't enabled", async () => {
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      prAuthor: "renovate[bot]",
+      ciInfoTempDir: "/tmp/ci-info",
+    };
+
+    await disableAutoMergeForRenovateChange(inputs, {
+      pr: { ...prJson, auto_merge: null },
+    });
+    expect(github.getOctokit).not.toHaveBeenCalled();
+    expect(post).not.toHaveBeenCalled();
+  });
+
+  it("disables auto-merge", async () => {
+    const mockOctokit = createMockOctokit();
+    vi.mocked(github.getOctokit).mockReturnValue(
+      mockOctokit as unknown as ReturnType<typeof github.getOctokit>,
+    );
+    const inputs = {
+      ...createBaseInputs(mockExecutor),
+      prAuthor: "renovate[bot]",
+      ciInfoTempDir: "/tmp/ci-info",
+    };
+
+    await disableAutoMergeForRenovateChange(inputs, {
+      pr: { ...prJson, auto_merge: {} },
+    });
+    expect(mockOctokit.graphql).toHaveBeenCalledWith(
+      expect.stringContaining("disablePullRequestAutoMerge"),
+      { nodeId: "PR_node" },
+    );
+    expect(post).toHaveBeenCalled();
   });
 
   it("skips when allowAutoMergeChange is true", async () => {
@@ -1000,8 +1053,58 @@ describe("disableAutoMergeForRenovateChange", () => {
       allowAutoMergeChange: true,
     };
 
-    await disableAutoMergeForRenovateChange(inputs);
+    await disableAutoMergeForRenovateChange(inputs, { error: "unused" });
     expect(post).not.toHaveBeenCalled();
+  });
+});
+
+describe("readPRJson", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("returns the parsed pr.json", () => {
+    const pr = {
+      number: 42,
+      node_id: "PR_node",
+      changed_files: 1,
+      auto_merge: null,
+      base: { ref: "main" },
+      head: { ref: "feature", repo: { id: 1 } },
+    };
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(pr));
+    expect(readPRJson("/tmp/ci-info")).toEqual({ pr });
+    expect(fs.readFileSync).toHaveBeenCalledWith(
+      "/tmp/ci-info/pr.json",
+      "utf8",
+    );
+  });
+
+  it("returns an error if the ci-info output directory isn't set", () => {
+    expect(readPRJson(undefined)).toEqual({
+      error: "the ci-info output directory is not set",
+    });
+  });
+
+  it("returns an error if pr.json isn't found", () => {
+    vi.mocked(fs.readFileSync).mockImplementation(() => {
+      throw Object.assign(new Error("no such file"), { code: "ENOENT" });
+    });
+    expect(readPRJson("/tmp/ci-info")).toEqual({
+      error: "PR JSON file not found: /tmp/ci-info/pr.json",
+    });
+  });
+
+  it("returns an error if pr.json is invalid", () => {
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ number: 42 }));
+    const result = readPRJson("/tmp/ci-info");
+    expect(result).toEqual({
+      error: expect.stringContaining("Failed to read /tmp/ci-info/pr.json"),
+    });
   });
 });
 
@@ -1613,6 +1716,7 @@ describe("main", () => {
       String(p).endsWith("pr.json")
         ? JSON.stringify({
             number: 42,
+            node_id: "PR_42",
             changed_files: 1,
             base: { ref: "main" },
             head: { ref: "feature", repo: { id: 1 } },

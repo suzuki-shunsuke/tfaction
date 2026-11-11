@@ -101,8 +101,50 @@ type TfmigratePlanOutputs = {
   planJson?: string;
 };
 
+const PRJson = z.object({
+  number: z.number(),
+  node_id: z.string(),
+  changed_files: z.number(),
+  auto_merge: z.object({}).nullish(),
+  base: z.object({ ref: z.string() }),
+  head: z.object({
+    ref: z.string(),
+    repo: z.object({ id: z.number() }).nullish(),
+  }),
+});
+type PRJson = z.infer<typeof PRJson>;
+
+// The result of reading pr.json written by ci-info.
+// If it can't be read, error is set and each caller decides how to handle it.
+export type PRJsonResult = { pr: PRJson } | { error: string };
+
+export const readPRJson = (ciInfoTempDir: string | undefined): PRJsonResult => {
+  if (!ciInfoTempDir) {
+    return { error: "the ci-info output directory is not set" };
+  }
+  const prJsonFile = path.join(ciInfoTempDir, "pr.json");
+  try {
+    return {
+      pr: PRJson.parse(JSON.parse(fs.readFileSync(prJsonFile, "utf8"))),
+    };
+  } catch (e) {
+    if (
+      typeof e === "object" &&
+      e !== null &&
+      "code" in e &&
+      e.code === "ENOENT"
+    ) {
+      return { error: `PR JSON file not found: ${prJsonFile}` };
+    }
+    return {
+      error: `Failed to read ${prJsonFile}: ${e instanceof Error ? e.message : String(e)}`,
+    };
+  }
+};
+
 export const disableAutoMergeForRenovateChange = async (
   inputs: Inputs,
+  prJson: PRJsonResult,
 ): Promise<void> => {
   // Skip if not a renovate PR
   if (!inputs.prAuthor || !inputs.autoAppsLogins.includes(inputs.prAuthor)) {
@@ -114,14 +156,11 @@ export const disableAutoMergeForRenovateChange = async (
     return;
   }
 
-  // Read pr.json from ciInfoTempDir
-  const prJsonFile = path.join(inputs.ciInfoTempDir || "", "pr.json");
-  if (!fs.existsSync(prJsonFile)) {
-    core.warning(`PR JSON file not found: ${prJsonFile}`);
+  if ("error" in prJson) {
+    core.warning(prJson.error);
     return;
   }
-
-  const prData = JSON.parse(fs.readFileSync(prJsonFile, "utf8"));
+  const prData = prJson.pr;
 
   // If auto_merge is not enabled, nothing to do
   if (!prData.auto_merge) {
@@ -277,17 +316,6 @@ const isForbidden = (e: unknown): boolean =>
   "status" in e &&
   (e.status === 403 || e.status === 401);
 
-const PRJson = z.object({
-  number: z.number(),
-  changed_files: z.number(),
-  base: z.object({ ref: z.string() }),
-  head: z.object({
-    ref: z.string(),
-    repo: z.object({ id: z.number() }).nullish(),
-  }),
-});
-type PRJson = z.infer<typeof PRJson>;
-
 // Paths come from the pull request, and modes and object ids come from the
 // checked-out commit that terraform planned.
 // pr_files.json has at most 3000 files, so this fails if the list is incomplete.
@@ -343,6 +371,7 @@ export type PlanHash = {
 export const computePlanHashIfNeeded = async (
   inputs: Inputs,
   planJsonContent: string,
+  prJson: PRJsonResult,
 ): Promise<PlanHash | undefined> => {
   if (!isSkipDismissIfUnchangedEnabled(inputs)) {
     return undefined;
@@ -353,14 +382,13 @@ export const computePlanHashIfNeeded = async (
     ".terraform.lock.hcl",
   );
   try {
+    if ("error" in prJson) {
+      throw new Error(prJson.error);
+    }
+    const { pr } = prJson;
     if (!inputs.ciInfoTempDir) {
       throw new Error("the ci-info output directory is not set");
     }
-    const pr = PRJson.parse(
-      JSON.parse(
-        fs.readFileSync(path.join(inputs.ciInfoTempDir, "pr.json"), "utf8"),
-      ),
-    );
     // On events such as issue_comment, ci-info gets the pull request from the
     // commit, which can be another pull request.
     if (pr.number !== inputs.prNumber) {
@@ -740,7 +768,12 @@ export const runTerraformPlan = async (
   fs.writeFileSync(tempPlanJson, planJsonContent);
 
   // Dismiss existing approval reviews so reviewers must review the new plan
-  const planHash = await computePlanHashIfNeeded(inputs, planJsonContent);
+  const prJson = readPRJson(inputs.ciInfoTempDir);
+  const planHash = await computePlanHashIfNeeded(
+    inputs,
+    planJsonContent,
+    prJson,
+  );
   const approvalsHandled = await dismissApprovalsIfNeeded(
     inputs,
     detailedExitcode,
@@ -816,7 +849,7 @@ export const runTerraformPlan = async (
 
   // If not drift detection mode, validate renovate changes
   if (!inputs.driftIssueNumber) {
-    await disableAutoMergeForRenovateChange(inputs);
+    await disableAutoMergeForRenovateChange(inputs, prJson);
   }
 
   // If drift detection mode and there are changes, fail
