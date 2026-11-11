@@ -34,7 +34,7 @@ jobs:
   # and push the release branch in a job with contents: write, which doesn't run code of the repository and its dependencies.
   # The built dist is uploaded as the artifact dist${{inputs.artifact_suffix}}.
   release:
-    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@efac7db543858e8cd879d715fc025b360636e907 # v0.0.6
+    uses: suzuki-shunsuke/js-action-release-workflow/.github/workflows/release.yaml@926d8ac583b51179ff3f5532992cd545292bdab0 # v0.0.7
     permissions:
       contents: write
       pull-requests: write
