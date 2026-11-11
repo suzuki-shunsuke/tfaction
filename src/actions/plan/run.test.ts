@@ -990,6 +990,7 @@ describe("disableAutoMergeForRenovateChange", () => {
     ...createBaseInputs(mockExecutor),
     prAuthor: "renovate[bot]",
     ciInfoTempDir: "/tmp/ci-info",
+    prNumber: 42,
   });
 
   it("skips when pr.json isn't found", async () => {
@@ -1020,7 +1021,7 @@ describe("disableAutoMergeForRenovateChange", () => {
       disableAutoMergeForRenovateChange(renovateInputs(), {
         ok: true,
         ciInfoTempDir: "/tmp/ci-info",
-        data: { auto_merge: {} },
+        data: { number: 42, auto_merge: {} },
       }),
     ).rejects.toThrow("pr.json is invalid");
     expect(post).not.toHaveBeenCalled();
@@ -1034,7 +1035,7 @@ describe("disableAutoMergeForRenovateChange", () => {
     await disableAutoMergeForRenovateChange(renovateInputs(), {
       ok: true,
       ciInfoTempDir: "/tmp/ci-info",
-      data: { node_id: "PR_node", auto_merge: {} },
+      data: { number: 42, node_id: "PR_node", auto_merge: {} },
     });
     expect(mockOctokit.graphql).toHaveBeenCalledWith(
       expect.stringContaining("disablePullRequestAutoMerge"),
@@ -1043,11 +1044,23 @@ describe("disableAutoMergeForRenovateChange", () => {
     expect(post).toHaveBeenCalled();
   });
 
+  it("fails when pr.json is for another pull request", async () => {
+    await expect(
+      disableAutoMergeForRenovateChange(renovateInputs(), {
+        ok: true,
+        ciInfoTempDir: "/tmp/ci-info",
+        data: { number: 10, node_id: "PR_node", auto_merge: {} },
+      }),
+    ).rejects.toThrow("pr.json is for the pull request #10, not #42");
+    expect(github.getOctokit).not.toHaveBeenCalled();
+    expect(post).not.toHaveBeenCalled();
+  });
+
   it("skips when auto-merge isn't enabled", async () => {
     await disableAutoMergeForRenovateChange(renovateInputs(), {
       ok: true,
       ciInfoTempDir: "/tmp/ci-info",
-      data: { node_id: "PR_node", auto_merge: null },
+      data: { number: 42, node_id: "PR_node", auto_merge: null },
     });
     expect(github.getOctokit).not.toHaveBeenCalled();
     expect(post).not.toHaveBeenCalled();
