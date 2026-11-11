@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Dismiss approval before plan | tfaction</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://suzuki-shunsuke.github.io/tfaction/docs/dismiss-approval-before-plan"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Dismiss approval before plan | tfaction"><meta data-rh="true" name="description" content="The plan action dismisses approvals immediately after running terraform plan, forcing reviewers to approve after seeing the plan results."><meta data-rh="true" property="og:description" content="The plan action dismisses approvals immediately after running terraform plan, forcing reviewers to approve after seeing the plan results."><link data-rh="true" rel="canonical" href="https://suzuki-shunsuke.github.io/tfaction/docs/dismiss-approval-before-plan"><link data-rh="true" rel="alternate" href="https://suzuki-shunsuke.github.io/tfaction/docs/dismiss-approval-before-plan" hreflang="en"><link data-rh="true" rel="alternate" href="https://suzuki-shunsuke.github.io/tfaction/docs/dismiss-approval-before-plan" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://LUUUGNZT4I-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Dismiss approval before plan","item":"https://suzuki-shunsuke.github.io/tfaction/docs/dismiss-approval-before-plan"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="tfaction" href="/tfaction/docs/opensearch.xml"><link rel="stylesheet" href="/tfaction/docs/assets/css/styles.72b33106.css">
-<script src="/tfaction/docs/assets/js/runtime~main.2c0fe35c.js" defer="defer"></script>
+<script src="/tfaction/docs/assets/js/runtime~main.952684da.js" defer="defer"></script>
 <script src="/tfaction/docs/assets/js/main.7cb99334.js" defer="defer"></script>
 </head>
 <body>
@@ -33,18 +33,26 @@ Then it compares the hash with the one in the metadata artifact of the latest pr
 <li class=""><code>output_changes</code> of <code>terraform show -json</code> whose actions aren&#x27;t <code>no-op</code></li>
 <li class="">the providers of the resource changes (<code>provider_name</code>)</li>
 <li class="">the target and whether the plan is a destroy plan</li>
-<li class="">the git tree object id of the working directory at <code>HEAD</code>. It covers files that aren&#x27;t in the plan result, such as scripts run by provisioners</li>
+<li class="">the pull request number and the name of its base branch</li>
+<li class="">the files in the working directory changed by the pull request, including their modes. They cover files that aren&#x27;t in the plan result, such as scripts run by provisioners</li>
 <li class="">the content of <code>.terraform.lock.hcl</code> in the working directory at plan time. It covers the selected providers even if the lock file isn&#x27;t committed. Terraform guarantees that apply uses the same providers as the plan file</li>
 </ul>
 <p>Fields that change even if the plan result is the same, such as <code>timestamp</code>, <code>terraform_version</code>, and <code>prior_state</code>, are excluded.</p>
 <p>Approvals are dismissed as before in the following cases:</p>
 <ul>
 <li class="">the plan result has changed</li>
+<li class="">a file in the working directory changed by the pull request has changed, even if the base branch changed it</li>
+<li class=""><code>.terraform.lock.hcl</code> has changed, even if the base branch changed it</li>
+<li class="">the base branch of the pull request has been changed to another branch</li>
 <li class="">no previous plan hash is found (the first run, the artifact expired, and so on)</li>
 <li class="">the hash couldn&#x27;t be computed or the previous hash couldn&#x27;t be got</li>
+<li class="">the pull request changes more than 3,000 files</li>
 </ul>
 <p>Files outside the working directory, such as local modules and scripts in other directories, aren&#x27;t covered unless they change the plan result.
 If you need to dismiss approvals when such files change, enable the branch protection rule (or ruleset) &quot;Dismiss stale pull request approvals when new commits are pushed&quot; too.</p>
+<p>Files in the working directory that only the base branch changed aren&#x27;t covered either, except <code>.terraform.lock.hcl</code>.
+For example, if another pull request changes a script run by a provisioner, approvals are kept when the plan result doesn&#x27;t change.
+If you need to dismiss approvals in this case, set <code>skip_if_unchanged.enabled</code> to <code>false</code>.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="hash-method">Hash method<a href="#hash-method" class="hash-link" aria-label="Direct link to Hash method" title="Direct link to Hash method" translate="no">​</a></h3>
 <ul>
 <li class="">With <code>aws_kms_key_id</code>, the hash is an HMAC-SHA256 generated by the AWS KMS key, including sensitive values. The key never leaves AWS KMS, and people without access to the key can&#x27;t brute-force values from the hash. Changes of only sensitive values are also detected.</li>
