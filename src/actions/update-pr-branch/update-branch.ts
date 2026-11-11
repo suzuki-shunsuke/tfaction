@@ -11,6 +11,7 @@ export type Logger = {
 export type OctokitType = ReturnType<typeof github.getOctokit>;
 
 // Interface for update-branch-action update function
+// The return value is ignored. update-branch-action v0.1.1 or later returns the server workflow run.
 export type UpdateBranchFn = (params: {
   octokit: OctokitType;
   owner: string;
@@ -18,7 +19,7 @@ export type UpdateBranchFn = (params: {
   pullRequestNumber: number;
   serverRepositoryOwner: string;
   serverRepositoryName: string;
-}) => Promise<void>;
+}) => Promise<unknown>;
 
 // Input for listRelatedPullRequests
 export type ListRelatedPullRequestsInput = {
