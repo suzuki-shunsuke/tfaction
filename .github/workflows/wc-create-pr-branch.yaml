@@ -78,7 +78,7 @@ jobs:
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
-        uses: actions/create-github-app-token@v3.3.0
+        uses: actions/create-github-app-token@v3.4.0
         with:
           app-id: ${{secrets.gh_app_id}}
           private-key: ${{secrets.gh_app_private_key}}
@@ -166,7 +166,7 @@ jobs:
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
-        uses: actions/create-github-app-token@v3.3.0
+        uses: actions/create-github-app-token@v3.4.0
         with:
           app-id: ${{secrets.gh_app_id}}
           private-key: ${{secrets.gh_app_private_key}}
@@ -237,7 +237,7 @@ jobs:
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
-        uses: actions/create-github-app-token@v3.3.0
+        uses: actions/create-github-app-token@v3.4.0
         with:
           app-id: ${{secrets.gh_app_id}}
           private-key: ${{secrets.gh_app_private_key}}
@@ -312,7 +312,7 @@ jobs:
         run: |
           git ls-files | grep -v ".github" | xargs sed -i -E 's|uses: suzuki-shunsuke/tfaction@main|uses: ./|'
       - id: token
-        uses: actions/create-github-app-token@v3.3.0
+        uses: actions/create-github-app-token@v3.4.0
         with:
           app-id: ${{secrets.gh_app_id}}
           private-key: ${{secrets.gh_app_private_key}}
