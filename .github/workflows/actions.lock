@@ -24,7 +24,7 @@ workflows:
         - 'actions/download-artifact@v8.0.2'
     '.github/workflows/wc-deploy-schema.yaml':
         - 'actions/checkout@v7.0.1'
-        - 'aquaproj/aqua-installer@v4.1.1'
+        - 'aquaproj/aqua-installer@v4.1.2'
         - 'suzuki-shunsuke/gh-pages-action@v0.1.0'
     '.github/workflows/wc-release.yaml': []
     '.github/workflows/workflow_call_test.yaml':
@@ -50,9 +50,9 @@ dependencies:
         commit: 'sha1-9000827ccba6bdab643e8b6fd33ac0654aef8333'
         owner_id: 44036562
         repo_id: 192626254
-    'aquaproj/aqua-installer@v4.1.1':
-        ref: 'v4.1.1'
-        commit: 'sha1-611554c6f0137ba41c8dd15aca8bee82504ea461'
+    'aquaproj/aqua-installer@v4.1.2':
+        ref: 'v4.1.2'
+        commit: 'sha1-b8be739961814ee66b9e0d505f4d5de0d2eff047'
         owner_id: 95116411
         repo_id: 400140776
     'csm-actions/securefix-action@4d885e1bcb71f4f110215c833002ce9fa0ee0fa6':
