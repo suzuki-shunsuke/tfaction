@@ -119,6 +119,61 @@ export const readTargetConfig = (p: string): TargetConfig => {
   return TargetConfig.parse(loadYaml(fs.readFileSync(p, "utf8")));
 };
 
+/**
+ * Returns terraform_command for a working directory or a module directory.
+ * The priority is the same as get-target-config:
+ * tfaction_module.yaml (or tfaction.yaml) > target_groups > tfaction-root.yaml.
+ * Unlike get-target-config, a directory matching no target group doesn't fail,
+ * and a file that can't be read is treated as having no terraform_command.
+ * @param config
+ * @param workingDir - A relative path from git_root_dir
+ * @returns terraform_command
+ */
+export const getTerraformCommand = (
+  config: Pick<
+    Config,
+    | "git_root_dir"
+    | "working_directory_file"
+    | "module_file"
+    | "target_groups"
+    | "terraform_command"
+  >,
+  workingDir: string,
+): string => {
+  const moduleFilePath = path.join(
+    config.git_root_dir,
+    workingDir,
+    config.module_file,
+  );
+  const filePath = fs.existsSync(moduleFilePath)
+    ? moduleFilePath
+    : path.join(config.git_root_dir, workingDir, config.working_directory_file);
+  let wdCommand: string | undefined;
+  try {
+    wdCommand = readTargetConfig(filePath).terraform_command;
+  } catch (err) {
+    core.warning(
+      `terraform_command in ${filePath} is ignored because the file can't be read: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+  const targetGroup = getTargetFromTargetGroupsByWorkingDir(
+    config.target_groups,
+    workingDir,
+  );
+  return (
+    wdCommand ?? targetGroup?.terraform_command ?? config.terraform_command
+  );
+};
+
+/**
+ * Returns true if the command is OpenTofu.
+ * Paths and extensions are ignored: /usr/local/bin/tofu and tofu.exe are OpenTofu.
+ * @param command - terraform_command
+ */
+export const isTofu = (command: string): boolean => {
+  return path.parse(command).name === "tofu";
+};
+
 export const getJobConfig = (
   config:
     | Pick<

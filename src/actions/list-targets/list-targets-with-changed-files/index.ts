@@ -259,23 +259,36 @@ const validateChangeLimits = async (
   }
 };
 
-export const run = async (input: Input): Promise<Result> => {
-  const config = input.config;
-  const isApply = input.isApply;
-
-  // Collect template_dir values from target groups
-  const templateDirs = config.target_groups
+/**
+ * Filter out config files under template directories (target_groups[].template_dir)
+ * @param configFiles - Relative paths from git_root_dir
+ * @param targetGroups
+ * @returns config files that aren't under template directories
+ */
+export const excludeTemplateDirs = (
+  configFiles: string[],
+  targetGroups: types.TargetGroup[],
+): string[] => {
+  const templateDirs = targetGroups
     .map((tg) => tg.template_dir)
     .filter((dir): dir is string => dir !== undefined);
-
-  // Filter out config files under template directories
-  const filteredConfigFiles = input.configFiles.filter((configFile) => {
+  return configFiles.filter((configFile) => {
     const dir = path.dirname(configFile);
     return !templateDirs.some((templateDir) => {
       const rel = path.relative(templateDir, dir);
       return rel === "" || !rel.startsWith("..");
     });
   });
+};
+
+export const run = async (input: Input): Promise<Result> => {
+  const config = input.config;
+  const isApply = input.isApply;
+
+  const filteredConfigFiles = excludeTemplateDirs(
+    input.configFiles,
+    config.target_groups,
+  );
 
   const workingDirs = listWD(filteredConfigFiles);
   const { wdTargetMap, targetWDMap } = createTargetMaps(
@@ -524,18 +537,21 @@ export const main = async (executor: aqua.Executor, pr: ciInfo.Result) => {
   }
 
   const githubToken = input.getRequiredGitHubToken();
+  const octokit = github.getOctokit(githubToken);
 
   let moduleCallers: ModuleToCallers | null = null;
   if (cfg.update_local_path_module_caller?.enabled) {
+    // Templates are never planned, so they don't need to be inspected.
     moduleCallers = await listModuleCallers(
       cfg.git_root_dir,
-      configFiles,
+      excludeTemplateDirs(configFiles, cfg.target_groups),
       githubToken,
       executor,
+      cfg,
+      octokit,
+      github.context.payload.pull_request?.number ?? 0,
     );
   }
-
-  const octokit = github.getOctokit(githubToken);
 
   const result = await run({
     labels: pr.pr?.data.labels?.map((l) => l.name) ?? [],
