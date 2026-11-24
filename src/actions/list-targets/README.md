@@ -165,10 +165,11 @@ Otherwise, it uses `terraform-config-inspect`.
 In the directory, list-module-caller:
 
 1. Runs `aqua i -l -a` to install OpenTofu defined in aqua.yaml of the directory
-1. Runs `<terraform_command> show --help`. If `-module` isn't an option (OpenTofu < 1.11), it uses `terraform-config-inspect`
 1. Runs `<terraform_command> show -module=. -json`
 
-If `tofu` isn't found or `aqua i` / `tofu show --help` fails, list-targets fails with a pull request comment.
+If `tofu` isn't found or `aqua i` fails, list-targets fails with a pull request comment.
+If `tofu show` fails with `flag provided but not defined: -module` (OpenTofu < 1.11), list-module-caller uses `terraform-config-inspect`.
+`tofu show --help` isn't used to check it, because OpenTofu 1.11 and 1.12 support `-module` but don't list it in the help.
 
 OpenTofu prints the module calls under `.root_module`, and omits `module_calls` when the directory calls no module.
 

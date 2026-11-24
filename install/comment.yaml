@@ -221,7 +221,7 @@ exec:
 
         {{link}} | [document](https://suzuki-shunsuke.github.io/tfaction/docs/unreleased/detect-module-dependency)
 
-        `terraform_command` of this directory is OpenTofu, so list-targets resolves module dependencies with `tofu show -module`, but it failed to run OpenTofu.
+        `terraform_command` of this directory is OpenTofu, so list-targets resolves module dependencies with `tofu show -module`, but it failed to install OpenTofu with aqua.
         Make `tofu` available in the list-targets job (e.g. add OpenTofu to aqua.yaml), or change `terraform_command` of this directory.
 
         {{join_command}}
@@ -229,7 +229,7 @@ exec:
         {{hidden_combined_output}}
 
   tofu-show-module:
-    - when: ExitCode != 0 && !Stderr.contains("Unable to compute static value")
+    - when: 'ExitCode != 0 && !Stderr.contains("Unable to compute static value") && !Stderr.contains("flag provided but not defined: -module")'
       template: |
         ## :x: {{#if Vars.tfaction_target}}{{Vars.tfaction_target}}: {{/if}}Failed to resolve module dependencies
 

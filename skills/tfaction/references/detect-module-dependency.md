@@ -33,7 +33,8 @@ Internally, tfaction analyzes dependencies with [terraform-config-inspect](https
 
 ## OpenTofu
 
-If `terraform_command` of a directory is `tofu` and OpenTofu is 1.11.0 or later, tfaction runs `tofu show -module=. -json` in the directory instead of terraform-config-inspect.
+If `terraform_command` of a directory is `tofu`, tfaction runs `tofu show -module=. -json` in the directory instead of terraform-config-inspect.
+OpenTofu older than 1.11.0 doesn't support `-module`, so tfaction uses terraform-config-inspect for it.
 `terraform_command` is resolved for each directory in the same order as other settings: `tfaction_module.yaml` (or `tfaction.yaml`) > `target_groups` > `tfaction-root.yaml`.
 No setting is needed.
 

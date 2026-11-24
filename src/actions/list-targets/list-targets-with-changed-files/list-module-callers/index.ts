@@ -209,6 +209,12 @@ type ModuleCallMap = Record<string, { source: string }>;
 /** The error that `tofu show -module` prints when a value of static evaluation can't be computed */
 const staticValueError = "Unable to compute static value";
 
+/**
+ * The error that `tofu show` prints when it doesn't support -module (OpenTofu < 1.11).
+ * `tofu show --help` can't be used to check it because OpenTofu 1.11 and 1.12 support -module but don't list it.
+ */
+const moduleFlagError = "flag provided but not defined: -module";
+
 type InspectInput = {
   executor: aqua.Executor;
   /** A relative path from git_root_dir */
@@ -267,14 +273,6 @@ const inspectWithTerraformConfigInspect = async (
 };
 
 /**
- * @param helpStdout - stdout of `tofu show --help`
- * @returns true if `tofu show` supports `-module` (OpenTofu >= 1.11)
- */
-export const supportsShowModule = (helpStdout: string): boolean => {
-  return /^\s+-module=/m.test(helpStdout);
-};
-
-/**
  * @param stdout - stdout of `tofu show -module=. -json`
  * @returns module name => module call. `module_calls` is omitted when the directory calls no module
  */
@@ -289,7 +287,8 @@ type TofuResult =
 /**
  * Get module calls with `tofu show -module`.
  * @returns module calls, or the reason to fall back to terraform-config-inspect
- * @throws if tofu can't be run or `tofu show -module` fails for a reason other than static evaluation
+ * @throws if tofu can't be run or `tofu show -module` fails for a reason other than
+ * a value of static evaluation or an old OpenTofu
  */
 export const inspectWithTofu = async (
   input: InspectInput,
@@ -306,17 +305,32 @@ export const inspectWithTofu = async (
     comment,
   });
 
-  let help: Awaited<ReturnType<aqua.Executor["getExecOutput"]>>;
+  let out: Awaited<ReturnType<aqua.Executor["getExecOutput"]>>;
   try {
-    help = await input.executor.getExecOutput(command, ["show", "--help"], {
-      cwd: input.absTfDir,
-      silent: true,
-      ignoreReturnCode: true,
-      comment,
-    });
+    out = await input.executor.getExecOutput(
+      command,
+      ["show", "-module=.", "-json"],
+      {
+        cwd: input.absTfDir,
+        group: `${command} show -module=. -json`,
+        ignoreReturnCode: true,
+        comment: {
+          token: input.githubToken,
+          key: "tofu-show-module",
+          vars: { tfaction_target: input.tfDir },
+        },
+      },
+    );
   } catch (err) {
     // @actions/exec throws before starting the process if the command isn't found,
     // so the exec comment template isn't evaluated.
+    // Other errors (e.g. failing to post the exec comment) are rethrown as is.
+    if (
+      !(err instanceof Error) ||
+      !err.message.includes("Unable to locate executable file")
+    ) {
+      throw err;
+    }
     if (input.prNumber > 0) {
       await post({
         octokit: input.octokit,
@@ -329,33 +343,13 @@ export const inspectWithTofu = async (
       cause: err,
     });
   }
-  if (help.exitCode !== 0) {
-    throw new Error(
-      `\`${command} show --help\` failed in ${input.tfDir} with exit code ${help.exitCode}`,
-    );
+  if (out.exitCode === 0) {
+    return { moduleCalls: parseShowModule(out.stdout) };
   }
-  if (!supportsShowModule(help.stdout)) {
+  if (out.stderr.includes(moduleFlagError)) {
     return {
       reason: `\`${command} show\` doesn't support -module (OpenTofu 1.11.0 or later is required)`,
     };
-  }
-
-  const out = await input.executor.getExecOutput(
-    command,
-    ["show", "-module=.", "-json"],
-    {
-      cwd: input.absTfDir,
-      group: `${command} show -module=. -json`,
-      ignoreReturnCode: true,
-      comment: {
-        token: input.githubToken,
-        key: "tofu-show-module",
-        vars: { tfaction_target: input.tfDir },
-      },
-    },
-  );
-  if (out.exitCode === 0) {
-    return { moduleCalls: parseShowModule(out.stdout) };
   }
   if (out.stderr.includes(staticValueError)) {
     // list-targets can't see values given to plan (env, TF_VAR_* in the plan job)

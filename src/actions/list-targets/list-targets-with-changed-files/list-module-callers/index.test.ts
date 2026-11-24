@@ -1,9 +1,4 @@
-import {
-  buildModuleToCallers,
-  inspectWithTofu,
-  parseShowModule,
-  supportsShowModule,
-} from "./";
+import { buildModuleToCallers, inspectWithTofu, parseShowModule } from "./";
 import { expect, describe, it, vi, beforeEach } from "vitest";
 import { post } from "../../../../comment";
 
@@ -169,40 +164,6 @@ describe("buildModuleToCallers", () => {
   });
 });
 
-// The beginning of `tofu show --help` of OpenTofu 1.13.9
-const helpWithModule = `Usage: tofu [global options] show [options] [arguments...]
-
-  Reads and outputs a OpenTofu state or plan file in a human-readable form. If
-  no path is specified, the current state will be shown.
-
-Target selection options:
-
-  Use one of the following options to specify what to show.
-
-  -config         Show the current configuration (requires -json).
-
-  -module=DIR     Show the specified module configuration (requires -json)
-
-  -plan=FILENAME  The plan from a saved plan file.
-`;
-// The same help without the -module option, as in OpenTofu < 1.11
-const helpWithoutModule = helpWithModule.replace(
-  "  -module=DIR     Show the specified module configuration (requires -json)\n\n",
-  "",
-);
-
-describe("supportsShowModule", () => {
-  it("returns true if -module is an option", () => {
-    expect(supportsShowModule(helpWithModule)).toBe(true);
-  });
-  it("returns false if -module isn't an option", () => {
-    expect(supportsShowModule(helpWithoutModule)).toBe(false);
-  });
-  it("doesn't match a word in a description", () => {
-    expect(supportsShowModule("  shows the root -module=DIR\n")).toBe(false);
-  });
-});
-
 describe("parseShowModule", () => {
   it("returns module_calls", () => {
     expect(
@@ -221,23 +182,15 @@ describe("inspectWithTofu", () => {
     vi.mocked(post).mockReset();
   });
 
-  /** A mock executor. outputs are returned by getExecOutput in order */
+  /** A mock executor. getExecOutput returns or throws out */
   const newExecutor = (
-    outputs: Array<
-      { exitCode: number; stdout?: string; stderr?: string } | Error
-    >,
+    out: { exitCode: number; stdout?: string; stderr?: string } | Error,
   ) => {
     const getExecOutput = vi.fn();
-    for (const out of outputs) {
-      if (out instanceof Error) {
-        getExecOutput.mockRejectedValueOnce(out);
-      } else {
-        getExecOutput.mockResolvedValueOnce({
-          stdout: "",
-          stderr: "",
-          ...out,
-        });
-      }
+    if (out instanceof Error) {
+      getExecOutput.mockRejectedValueOnce(out);
+    } else {
+      getExecOutput.mockResolvedValueOnce({ stdout: "", stderr: "", ...out });
     }
     return { exec: vi.fn().mockResolvedValue(0), getExecOutput };
   };
@@ -257,15 +210,14 @@ describe("inspectWithTofu", () => {
     prNumber,
   });
 
+  const notFound = () => new Error("Unable to locate executable file: tofu.");
+
   it("returns module calls", async () => {
-    const executor = newExecutor([
-      { exitCode: 0, stdout: helpWithModule },
-      {
-        exitCode: 0,
-        stdout:
-          '{"root_module":{"module_calls":{"vpc":{"source":"../modules/vpc"}}}}',
-      },
-    ]);
+    const executor = newExecutor({
+      exitCode: 0,
+      stdout:
+        '{"root_module":{"module_calls":{"vpc":{"source":"../modules/vpc"}}}}',
+    });
     const result = await inspectWithTofu(newInput(executor));
     expect(result).toEqual({
       moduleCalls: { vpc: { source: "../modules/vpc" } },
@@ -275,8 +227,7 @@ describe("inspectWithTofu", () => {
       ["i", "-l", "-a"],
       expect.objectContaining({ cwd: "/repo/aws/foo" }),
     );
-    expect(executor.getExecOutput).toHaveBeenNthCalledWith(
-      2,
+    expect(executor.getExecOutput).toHaveBeenCalledWith(
       "tofu",
       ["show", "-module=.", "-json"],
       expect.objectContaining({ cwd: "/repo/aws/foo", ignoreReturnCode: true }),
@@ -284,66 +235,53 @@ describe("inspectWithTofu", () => {
   });
 
   it("runs terraform_command as is", async () => {
-    const executor = newExecutor([
-      { exitCode: 0, stdout: helpWithModule },
-      { exitCode: 0, stdout: '{"root_module":{}}' },
-    ]);
-    await inspectWithTofu({
+    const executor = newExecutor({ exitCode: 0, stdout: '{"root_module":{}}' });
+    const result = await inspectWithTofu({
       ...newInput(executor),
       terraformCommand: "/opt/tofu/bin/tofu",
     });
-    expect(executor.getExecOutput).toHaveBeenNthCalledWith(
-      1,
+    expect(result).toEqual({ moduleCalls: {} });
+    expect(executor.getExecOutput).toHaveBeenCalledWith(
       "/opt/tofu/bin/tofu",
-      ["show", "--help"],
+      ["show", "-module=.", "-json"],
       expect.anything(),
     );
   });
 
   it("falls back if tofu doesn't support -module", async () => {
-    const executor = newExecutor([{ exitCode: 0, stdout: helpWithoutModule }]);
+    const executor = newExecutor({
+      exitCode: 1,
+      stderr: "flag provided but not defined: -module\nUsage: tofu show",
+    });
     const result = await inspectWithTofu(newInput(executor));
     expect(result.moduleCalls).toBeUndefined();
     expect(result.reason).toContain("doesn't support -module");
-    expect(executor.getExecOutput).toHaveBeenCalledTimes(1);
   });
 
   it("falls back if a value of static evaluation can't be computed", async () => {
-    const executor = newExecutor([
-      { exitCode: 0, stdout: helpWithModule },
-      {
-        exitCode: 1,
-        stderr:
-          "Error: Failed to request input from user for variable var.env\nError: Unable to compute static value\nError: Duplicate module call\n",
-      },
-    ]);
+    const executor = newExecutor({
+      exitCode: 1,
+      stderr:
+        "Error: Failed to request input from user for variable var.env\nError: Unable to compute static value\nError: Duplicate module call\n",
+    });
     const result = await inspectWithTofu(newInput(executor));
     expect(result.moduleCalls).toBeUndefined();
     expect(result.reason).toContain("Unable to compute static value");
   });
 
   it("throws if tofu show -module fails for another reason", async () => {
-    const executor = newExecutor([
-      { exitCode: 0, stdout: helpWithModule },
-      { exitCode: 1, stderr: "Error: Unsupported block type\n" },
-    ]);
+    const executor = newExecutor({
+      exitCode: 1,
+      stderr: "Error: Unsupported block type\n",
+    });
     await expect(inspectWithTofu(newInput(executor))).rejects.toThrow(
       "failed in aws/foo",
-    );
-  });
-
-  it("throws if tofu show --help fails", async () => {
-    const executor = newExecutor([{ exitCode: 1 }]);
-    await expect(inspectWithTofu(newInput(executor))).rejects.toThrow(
-      "--help` failed",
     );
     expect(post).not.toHaveBeenCalled();
   });
 
   it("posts a comment and throws if tofu isn't found", async () => {
-    const executor = newExecutor([
-      new Error("Unable to locate executable file: tofu"),
-    ]);
+    const executor = newExecutor(notFound());
     await expect(inspectWithTofu(newInput(executor))).rejects.toThrow(
       "isn't found",
     );
@@ -357,17 +295,23 @@ describe("inspectWithTofu", () => {
   });
 
   it("doesn't post a comment if there is no pull request", async () => {
-    const executor = newExecutor([
-      new Error("Unable to locate executable file: tofu"),
-    ]);
+    const executor = newExecutor(notFound());
     await expect(inspectWithTofu(newInput(executor, 0))).rejects.toThrow(
       "isn't found",
     );
     expect(post).not.toHaveBeenCalled();
   });
 
+  it("rethrows an error other than a missing command", async () => {
+    const executor = newExecutor(new Error("failed to post a comment"));
+    await expect(inspectWithTofu(newInput(executor))).rejects.toThrow(
+      "failed to post a comment",
+    );
+    expect(post).not.toHaveBeenCalled();
+  });
+
   it("throws if aqua i fails", async () => {
-    const executor = newExecutor([]);
+    const executor = newExecutor({ exitCode: 0 });
     executor.exec.mockRejectedValueOnce(new Error("aqua i failed"));
     await expect(inspectWithTofu(newInput(executor))).rejects.toThrow(
       "aqua i failed",
