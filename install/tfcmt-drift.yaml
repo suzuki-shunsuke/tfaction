@@ -14,7 +14,7 @@ terraform:
       <details><summary>Details (Click me)</summary>
       {{wrapCode .CombinedOutput}}
       </details>
-      {{template "error_messages" .}}`
+      {{template "error_messages" .}}
     when_parse_error:
       template: |
         {{template "apply_title" .}}
