@@ -111,6 +111,16 @@ post:
       - {{this}}
       {{/each}}
 
+  tofu-not-found:
+    template: |
+      ## :x: {{#if Vars.tfaction_target}}{{Vars.tfaction_target}}: {{/if}}Failed to resolve module dependencies
+
+      {{link}} | [document](https://suzuki-shunsuke.github.io/tfaction/docs/unreleased/detect-module-dependency)
+
+      `{{Vars.command}}` isn't found.
+      `terraform_command` of this directory is OpenTofu, so list-targets resolves module dependencies with `tofu show -module`.
+      Make `tofu` available in the list-targets job (e.g. add OpenTofu to aqua.yaml), or change `terraform_command` of this directory.
+
 exec:
   default:
     - when: ExitCode != 0
@@ -199,6 +209,34 @@ exec:
         {{link}} | [document](https://suzuki-shunsuke.github.io/tfaction/docs/unreleased/detect-module-dependency)
 
         Failed to resolve module dependencies using [terraform-config-inspect](https://github.com/hashicorp/terraform-config-inspect).
+
+        {{join_command}}
+
+        {{hidden_combined_output}}
+
+  tofu-unavailable:
+    - when: ExitCode != 0
+      template: |
+        ## :x: {{#if Vars.tfaction_target}}{{Vars.tfaction_target}}: {{/if}}Failed to resolve module dependencies
+
+        {{link}} | [document](https://suzuki-shunsuke.github.io/tfaction/docs/unreleased/detect-module-dependency)
+
+        `terraform_command` of this directory is OpenTofu, so list-targets resolves module dependencies with `tofu show -module`, but it failed to run OpenTofu.
+        Make `tofu` available in the list-targets job (e.g. add OpenTofu to aqua.yaml), or change `terraform_command` of this directory.
+
+        {{join_command}}
+
+        {{hidden_combined_output}}
+
+  tofu-show-module:
+    - when: ExitCode != 0 && !Stderr.contains("Unable to compute static value")
+      template: |
+        ## :x: {{#if Vars.tfaction_target}}{{Vars.tfaction_target}}: {{/if}}Failed to resolve module dependencies
+
+        {{link}} | [document](https://suzuki-shunsuke.github.io/tfaction/docs/unreleased/detect-module-dependency)
+
+        Failed to resolve module dependencies using `tofu show -module`.
+        If this directory has configuration that only Terraform accepts, set `terraform_command` of this directory to `terraform` to use [terraform-config-inspect](https://github.com/hashicorp/terraform-config-inspect) instead.
 
         {{join_command}}
 

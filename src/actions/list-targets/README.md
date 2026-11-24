@@ -98,7 +98,8 @@ with:
 - In case of PR event, validate if the current commit is latest
 - List all working directories and modules by searching files `tfaction.yaml` and `tfaction_module.yaml`
 - If `.update_local_path_module_caller?.enabled` is true, adding working directories where dependent modules are changed to the output `targets`
-  - Run `terragrunt render --json` and `terraform-config-inspect`
+  - Run `terragrunt render --json`, and `tofu show -module` or `terraform-config-inspect`
+  - Directories under `target_groups[].template_dir` are excluded
 - Create pairs of working directory and target based on all working directories, `target_groups`, and `replace_target`
 - Merge config of the global config, `target_groups`, and `tfaction.yaml` for each working directory
 - Handle PR labels (tfmigrate and skip labels)
@@ -108,7 +109,8 @@ with:
 
 ## list module caller
 
-list-module-caller detects dependent modules by `terragrunt` and `terraform-config-inspect`.
+list-module-caller detects dependent modules by `terragrunt`, and `tofu show -module` or `terraform-config-inspect`.
+Directories under `target_groups[].template_dir` are excluded because they are never planned.
 It creates pairs of working directories and dependent modules.
 
 ```yaml
@@ -148,9 +150,48 @@ terragrunt outputs a JSON string.
 `.terraform.source` is a relative path from the working directory.
 If `.terraform.source` starts with `..`, the working directory depends on `.terraform.source`.
 
+### Choose the tool for each directory
+
+For each working directory and module, list-module-caller gets `terraform_command` of the directory.
+The priority is the same as other actions: `tfaction_module.yaml` (or `tfaction.yaml`) > `target_groups` > `tfaction-root.yaml`.
+A directory matching no target group uses its own file and `tfaction-root.yaml`.
+If the file can't be read, `terraform_command` in it is ignored with a warning.
+
+If the file name of `terraform_command` without the extension is `tofu` (e.g. `tofu`, `/usr/local/bin/tofu`, `tofu.exe`), list-module-caller uses `tofu show -module`.
+Otherwise, it uses `terraform-config-inspect`.
+
+### tofu show -module
+
+In the directory, list-module-caller:
+
+1. Runs `aqua i -l -a` to install OpenTofu defined in aqua.yaml of the directory
+1. Runs `<terraform_command> show --help`. If `-module` isn't an option (OpenTofu < 1.11), it uses `terraform-config-inspect`
+1. Runs `<terraform_command> show -module=. -json`
+
+If `tofu` isn't found or `aqua i` / `tofu show --help` fails, list-targets fails with a pull request comment.
+
+OpenTofu prints the module calls under `.root_module`, and omits `module_calls` when the directory calls no module.
+
+```json
+{
+  "format_version": "1.0",
+  "root_module": {
+    "module_calls": {
+      "foo": {
+        "source": "../modules/foo"
+      }
+    }
+  }
+}
+```
+
+If `tofu show -module` fails and its error output has `Unable to compute static value`, list-module-caller uses `terraform-config-inspect` for the directory.
+This happens when a value of static evaluation (module `source` / `version`, provider `for_each`, etc.) uses a variable whose value list-targets doesn't know, for example a variable given by `env` in `tfaction.yaml` or `TF_VAR_*` in the plan job.
+Otherwise, list-targets fails with a pull request comment.
+
 ### terraform-config-inspect
 
-Run `terraform-config-inspect --json` in all working directories.
+Run `terraform-config-inspect --json` in working directories that don't use `tofu show -module`.
 It outputs a JSON string.
 
 ```json
