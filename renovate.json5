@@ -6,6 +6,21 @@
     "github>aquaproj/aqua-renovate-config#2.15.0",
     "github>aquaproj/aqua-renovate-config:file#2.15.0(aqua/.*\\.yaml)",
   ],
+  customManagers: [
+    {
+      // terraform-config-inspect has no release or tag, so aqua installs it with go_install and a pseudo-version.
+      // The go datasource returns the pseudo-version of the latest commit for a module without tags.
+      customType: "regex",
+      managerFilePatterns: [
+        "/^install/aqua/imports/terraform-config-inspect\\.yaml$/",
+      ],
+      matchStrings: [
+        "name: +hashicorp/terraform-config-inspect\\n +version: +(?<currentValue>v0\\.0\\.0-[0-9]{14}-[0-9a-f]{12})",
+      ],
+      datasourceTemplate: "go",
+      depNameTemplate: "github.com/hashicorp/terraform-config-inspect",
+    },
+  ],
   packageRules: [
     {
       // typescript-eslint doesn't support TypeScript 7 yet.
