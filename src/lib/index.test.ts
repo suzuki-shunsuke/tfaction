@@ -1,3 +1,6 @@
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
 import { describe, it, expect, afterEach } from "vitest";
 import {
   createWDTargetMap,
@@ -6,6 +9,8 @@ import {
   setOutputs,
   setEnvs,
   getJobType,
+  getTerraformCommand,
+  isTofu,
 } from "./index";
 import { checkDriftDetectionEnabled } from "./drift";
 import type { TargetGroup, TargetConfig, Config, Replace } from "./types";
@@ -594,5 +599,112 @@ describe("getJobType", () => {
   it("throws when TFACTION_JOB_TYPE is invalid", () => {
     process.env.TFACTION_JOB_TYPE = "invalid";
     expect(() => getJobType()).toThrow();
+  });
+});
+
+describe("isTofu", () => {
+  it.each([
+    ["tofu", true],
+    ["/usr/local/bin/tofu", true],
+    ["tofu.exe", true],
+    ["bin/tofu", true],
+    ["terraform", false],
+    ["terragrunt", false],
+    ["/usr/local/bin/terraform", false],
+    ["tofu-wrapper", false],
+  ])("isTofu(%s) is %s", (command, expected) => {
+    expect(isTofu(command)).toBe(expected);
+  });
+});
+
+describe("getTerraformCommand", () => {
+  const dirs: string[] = [];
+  afterEach(() => {
+    for (const dir of dirs.splice(0)) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  /** Creates files under a temporary git root and returns its path */
+  const setup = (files: Record<string, string>): string => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "tfaction-test-"));
+    dirs.push(root);
+    for (const [name, content] of Object.entries(files)) {
+      const p = path.join(root, name);
+      fs.mkdirSync(path.dirname(p), { recursive: true });
+      fs.writeFileSync(p, content);
+    }
+    return root;
+  };
+
+  const newConfig = (
+    root: string,
+    targetGroups: TargetGroup[],
+    terraformCommand = "terraform",
+  ) => ({
+    git_root_dir: root,
+    working_directory_file: "tfaction.yaml",
+    module_file: "tfaction_module.yaml",
+    target_groups: targetGroups,
+    terraform_command: terraformCommand,
+  });
+
+  it("prefers tfaction.yaml over target_groups and the root", () => {
+    const root = setup({
+      "aws/foo/tfaction.yaml": "terraform_command: tofu\n",
+    });
+    const config = newConfig(root, [
+      { working_directory: "aws/**", terraform_command: "terraform" },
+    ]);
+    expect(getTerraformCommand(config, "aws/foo")).toBe("tofu");
+  });
+
+  it("prefers tfaction_module.yaml over tfaction.yaml", () => {
+    const root = setup({
+      "modules/vpc/tfaction_module.yaml": "terraform_command: tofu\n",
+      "modules/vpc/tfaction.yaml": "terraform_command: terraform\n",
+    });
+    expect(getTerraformCommand(newConfig(root, []), "modules/vpc")).toBe(
+      "tofu",
+    );
+  });
+
+  it("uses target_groups when the file has no terraform_command", () => {
+    const root = setup({ "aws/foo/tfaction.yaml": "{}\n" });
+    const config = newConfig(
+      root,
+      [{ working_directory: "aws/**", terraform_command: "tofu" }],
+      "terraform",
+    );
+    expect(getTerraformCommand(config, "aws/foo")).toBe("tofu");
+  });
+
+  it("uses the root when no target group matches", () => {
+    const root = setup({ "other/foo/tfaction.yaml": "{}\n" });
+    const config = newConfig(
+      root,
+      [{ working_directory: "aws/**", terraform_command: "terraform" }],
+      "tofu",
+    );
+    expect(getTerraformCommand(config, "other/foo")).toBe("tofu");
+  });
+
+  it("ignores a file that can't be read", () => {
+    const root = setup({ "aws/foo/tfaction.yaml": "" });
+    const config = newConfig(
+      root,
+      [{ working_directory: "aws/**", terraform_command: "tofu" }],
+      "terraform",
+    );
+    expect(getTerraformCommand(config, "aws/foo")).toBe("tofu");
+  });
+
+  it("ignores a file with an invalid field", () => {
+    const root = setup({
+      "aws/foo/tfaction.yaml": "terraform_command: [tofu]\n",
+    });
+    expect(getTerraformCommand(newConfig(root, [], "tofu"), "aws/foo")).toBe(
+      "tofu",
+    );
   });
 });

@@ -13,7 +13,9 @@ export type Comment = {
     | "tfmigrate-plan"
     | "tfmigrate-apply"
     | "drift-apply"
-    | "terraform-config-inspect";
+    | "terraform-config-inspect"
+    | "tofu-unavailable"
+    | "tofu-show-module";
   vars?: Partial<Record<varKey, string>>;
   org?: string;
   repo?: string;

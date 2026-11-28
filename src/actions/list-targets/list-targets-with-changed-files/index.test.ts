@@ -1,4 +1,4 @@
-import { run } from "./index";
+import { excludeTemplateDirs, run } from "./index";
 import { expect, test } from "vitest";
 
 test("normal", async () => {
@@ -2112,4 +2112,26 @@ test("test_workflow: duplicate working_directory in only_plan and plan_and_apply
   ).rejects.toThrow(
     /working_directories appear in both only_plan and plan_and_apply/,
   );
+});
+
+test("excludeTemplateDirs excludes config files under template directories", () => {
+  expect(
+    excludeTemplateDirs(
+      [
+        "aws/foo/tfaction.yaml",
+        "templates/aws/tfaction.yaml",
+        "templates/aws/sub/tfaction.yaml",
+        "templates/aws-2/tfaction.yaml",
+        "modules/vpc/tfaction_module.yaml",
+      ],
+      [
+        { working_directory: "aws/**", template_dir: "templates/aws" },
+        { working_directory: "modules/**" },
+      ],
+    ),
+  ).toEqual([
+    "aws/foo/tfaction.yaml",
+    "templates/aws-2/tfaction.yaml",
+    "modules/vpc/tfaction_module.yaml",
+  ]);
 });
